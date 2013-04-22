@@ -9,13 +9,17 @@ public class Group {
 	List<String> perms;
 	int rank;
 	List<String> inheritances;
-	public Group(boolean isdefault, String name, List<String> perms, int rank, List<String> inheritances) 
+	String prefix;
+	String suffix;
+	public Group(boolean isdefault, String name, List<String> perms, int rank, List<String> inheritances, String prefix, String suffix) 
 	{
 		this.isdefault = isdefault;
 		this.name = name;
 		this.perms = perms;
 		this.rank = rank;
 		this.inheritances = inheritances;
+		this.prefix = prefix;
+		this.suffix = suffix;
 	}
 	public boolean isDefault() {
 		return isdefault;
@@ -32,42 +36,48 @@ public class Group {
 	public List<String> getInheritance() {
 		return inheritances;
 	}
+	public String getPrefix() {
+		return prefix;
+	}
+	public String getSuffix() {
+		return suffix;
+	}
 	//1:has perm
 	//0:hasnt perm
 	//-1: perm removed
-	public int isPermittet(String perm)
-	{
-		int ret=0;
-		for(int i=0;i<perms.size();i++)
-		{
-			if(perms.get(i).equalsIgnoreCase(perm))
-			{
-				ret=1;
-			}
-			else if(perms.get(i).equalsIgnoreCase("-"+perm))
-			{
-				ret=-1;
-			}
-			else
-			{
-				List<String> lpermsi=Statics.ToList(perms.get(i), ".");
-				List<String> lperm=Statics.ToList(perm, ".");
-				int index=0;
-				try
-				{
-					while(lperm.get(index).equalsIgnoreCase(lpermsi.get(index)))
-					{
-						index++;
-					}
-					if(lpermsi.get(index).equalsIgnoreCase("*"))
-					{
-						ret=1;
-					}
-				}catch(Exception e){}
-			}
-		}
-		return ret;
-	}
+//	public int isPermittet(String perm)
+//	{
+//		int ret=0;
+//		for(int i=0;i<perms.size();i++)
+//		{
+//			if(perms.get(i).equalsIgnoreCase(perm))
+//			{
+//				ret=1;
+//			}
+//			else if(perms.get(i).equalsIgnoreCase("-"+perm))
+//			{
+//				ret=-1;
+//			}
+//			else
+//			{
+//				List<String> lpermsi=Statics.ToList(perms.get(i), ".");
+//				List<String> lperm=Statics.ToList(perm, ".");
+//				int index=0;
+//				try
+//				{
+//					while(lperm.get(index).equalsIgnoreCase(lpermsi.get(index)))
+//					{
+//						index++;
+//					}
+//					if(lpermsi.get(index).equalsIgnoreCase("*"))
+//					{
+//						ret=1;
+//					}
+//				}catch(Exception e){}
+//			}
+//		}
+//		return ret;
+//	}
 	public List<String> getEffectivePerms(List<Group> allgroups)
 	{
 		List<String> ret=new ArrayList<String>();

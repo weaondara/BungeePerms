@@ -8,9 +8,6 @@ import java.util.List;
 import net.alpenblock.bungeeperms.config.FileConfiguration;
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
 
-
-
-
 public class NewConfig {
 	
 	private FileConfiguration fconfig;

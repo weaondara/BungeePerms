@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -79,10 +78,6 @@ public class BungeePerms extends Plugin implements Listener
 					{
 						if(hasOrConsole(sender,"bungeeperms.reload",true))
 						{
-							for(ProxiedPlayer p:bc.getPlayers())
-							{
-								removePlayerPerms(p.getName());
-							}
 							loadperms();
 							sender.sendMessage("Permissions reloaded");
 						}
@@ -594,7 +589,7 @@ public class BungeePerms extends Plugin implements Listener
 		}
 		return ret;
 	}
-	private Group getNextGroup(Group group)
+	public Group getNextGroup(Group group)
 	{
 		for(int i=0;i<groups.size();i++)
 		{
@@ -612,7 +607,7 @@ public class BungeePerms extends Plugin implements Listener
 		}
 		throw new IllegalArgumentException("group does not exist (anymore)");
 	}
-	private Group getPreviousGroup(Group group)
+	public Group getPreviousGroup(Group group)
 	{
 		for(int i=0;i<groups.size();i++)
 		{
@@ -666,19 +661,6 @@ public class BungeePerms extends Plugin implements Listener
 	{
 		e.setHasPermission(hasPermOrConsole(e.getSender(),e.getPermission()));
 	}
-	private void removePlayerPerms(String playername)
-	{
-		UserConnection pp=(UserConnection)bc.getPlayer(playername);
-		if(pp!=null)
-		{
-			Player p=getUser(playername);
-			List<String> newperms=p.getEffectivePerms();
-			for(String perm:newperms)
-			{
-				pp.setPermission(perm, false);
-			}
-		}
-	}	
 	private void loadcmds()
 	{
 		bc.getPluginManager().registerCommand(this,
@@ -708,7 +690,9 @@ public class BungeePerms extends Plugin implements Listener
 			List<String> permissions=permsconf.getListString("groups."+g+".permissions", new ArrayList<String>());
 			boolean isdefault=permsconf.getBoolean("groups."+g+".default",false);
 			int rank=permsconf.getInt("groups."+g+".rank", 1000);
-			Group group=new Group(isdefault, g, permissions, rank, inheritances);
+			String prefix=permsconf.getString("groups."+g+".prefix", "");
+			String suffix=permsconf.getString("groups."+g+".suffix", "");
+			Group group=new Group(isdefault, g, permissions, rank, inheritances, prefix, suffix);
 			this.groups.add(group);
 		}
 		Collections.sort(this.groups, new Comparator<Group>()
@@ -739,7 +723,7 @@ public class BungeePerms extends Plugin implements Listener
 			//setPlayerPerms(player.getName());
 		}
 	}
-	private Group getGroup(String groupname)
+	public Group getGroup(String groupname)
 	{
 		for(Group g:groups)
 		{
@@ -750,7 +734,7 @@ public class BungeePerms extends Plugin implements Listener
 		}
 		return null;
 	}
-	private Player getUser(String username)
+	public Player getUser(String username)
 	{
 		for(Player p:players)
 		{
@@ -808,7 +792,11 @@ public class BungeePerms extends Plugin implements Listener
 	}
 	public boolean hasPermOrConsole(String sender, String permission)
 	{
-		if(!sender.equalsIgnoreCase("CONSOLE"))
+		if(sender.equalsIgnoreCase("CONSOLE"))
+		{
+			return true;
+		}
+		else
 		{
 			Player p=getUser(sender);
 			if(p==null)
@@ -817,11 +805,6 @@ public class BungeePerms extends Plugin implements Listener
 			}
 			return p.hasPerm(permission);
 		}
-		else if(sender.equalsIgnoreCase("CONSOLE"))
-		{
-			return true;
-		}
-		return false;
 	}
 	public boolean has(CommandSender sender, String perm, boolean msg)
 	{
