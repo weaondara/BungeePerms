@@ -7,17 +7,17 @@ import java.util.List;
 
 import net.alpenblock.bungeeperms.config.FileConfiguration;
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
+import net.md_5.bungee.api.plugin.Plugin;
 
-public class NewConfig {
+public class Config {
 	
 	private FileConfiguration fconfig;
 	private String path;
 	
-	
-	public NewConfig (String path) 
+	public Config (Plugin p,String path) 
 	{
-		this.path=System.getProperty("user.dir")+path;
-		fconfig = YamlConfiguration.loadConfiguration(new File(System.getProperty("user.dir")+path));
+		this.path=p.getDataFolder()+path;
+		fconfig = YamlConfiguration.loadConfiguration(new File(this.path));
 	}
 	
 	public void load() {
@@ -143,5 +143,9 @@ public class NewConfig {
 		catch(Exception e){}
 		return ret;
 	}
-
+	public void deleteNode(String node)
+	{
+		fconfig.set(node, null);
+		try { fconfig.save(path); } catch (IOException e) { e.printStackTrace(); }
+	}
 }

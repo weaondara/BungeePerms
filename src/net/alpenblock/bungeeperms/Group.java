@@ -4,84 +4,77 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Group {
-	boolean isdefault;
 	String name;
+	List<String> inheritances;
 	List<String> perms;
 	int rank;
-	List<String> inheritances;
+	boolean isdefault;
+	String display;
 	String prefix;
 	String suffix;
-	public Group(boolean isdefault, String name, List<String> perms, int rank, List<String> inheritances, String prefix, String suffix) 
+	public Group(String name, List<String> inheritances, List<String> perms, int rank, boolean isdefault, String display, String prefix, String suffix) 
 	{
 		this.isdefault = isdefault;
 		this.name = name;
 		this.perms = perms;
 		this.rank = rank;
 		this.inheritances = inheritances;
+		this.display = display;
 		this.prefix = prefix;
 		this.suffix = suffix;
-	}
-	public boolean isDefault() {
-		return isdefault;
 	}
 	public String getName() {
 		return name;
 	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public List<String> getInheritances() {
+		return inheritances;
+	}
+	public void setInheritances(List<String> inheritances) {
+		this.inheritances = inheritances;
+	}
 	public List<String> getPerms() {
 		return perms;
+	}
+	public void setPerms(List<String> perms) {
+		this.perms = perms;
 	}
 	public int getRank() {
 		return rank;
 	}
-	public List<String> getInheritance() {
-		return inheritances;
+	public void setRank(int rank) {
+		this.rank = rank;
+	}
+	public boolean isDefault() {
+		return isdefault;
+	}
+	public void setIsdefault(boolean isdefault) {
+		this.isdefault = isdefault;
+	}
+	public String getDisplay() {
+		return display;
+	}
+	public void setDisplay(String display) {
+		this.display = display;
 	}
 	public String getPrefix() {
 		return prefix;
 	}
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
 	public String getSuffix() {
 		return suffix;
 	}
-	//1:has perm
-	//0:hasnt perm
-	//-1: perm removed
-//	public int isPermittet(String perm)
-//	{
-//		int ret=0;
-//		for(int i=0;i<perms.size();i++)
-//		{
-//			if(perms.get(i).equalsIgnoreCase(perm))
-//			{
-//				ret=1;
-//			}
-//			else if(perms.get(i).equalsIgnoreCase("-"+perm))
-//			{
-//				ret=-1;
-//			}
-//			else
-//			{
-//				List<String> lpermsi=Statics.ToList(perms.get(i), ".");
-//				List<String> lperm=Statics.ToList(perm, ".");
-//				int index=0;
-//				try
-//				{
-//					while(lperm.get(index).equalsIgnoreCase(lpermsi.get(index)))
-//					{
-//						index++;
-//					}
-//					if(lpermsi.get(index).equalsIgnoreCase("*"))
-//					{
-//						ret=1;
-//					}
-//				}catch(Exception e){}
-//			}
-//		}
-//		return ret;
-//	}
-	public List<String> getEffectivePerms(List<Group> allgroups)
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
+	public List<String> getEffectivePerms()
 	{
 		List<String> ret=new ArrayList<String>();
-		for(Group g:allgroups)
+		for(Group g:BungeePerms.getInstance().getGroups())
 		{
 			if(inheritances.contains(g.getName()))
 			{
@@ -146,9 +139,9 @@ public class Group {
 		}
 		return ret;
 	}
-	public boolean has(List<Group> allgroups,String perm) 
+	public boolean has(String perm) 
 	{
-		List<String> perms=getEffectivePerms(allgroups);
+		List<String> perms=getEffectivePerms();
 		boolean has=false;
 		for(String p:perms)
 		{

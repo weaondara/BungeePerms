@@ -61,5 +61,15 @@ public class Statics {
 		}
 		return l;
 	}
-
+	public static boolean ArgAlias(String arg,String[] aliases)
+	{
+		for(int i=0;i<aliases.length;i++)
+		{
+			if(aliases[i].equalsIgnoreCase(arg))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

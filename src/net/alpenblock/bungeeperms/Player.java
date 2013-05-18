@@ -7,23 +7,30 @@ public class Player
 {
 	String name;
 	List<Group> groups;
-	List<Group> allgroups;
 	List<String> extraperms;
-	public Player(String name, List<Group> groups, List<Group> allgroups, List<String> extraperms) 
+	public Player(String name, List<Group> groups, List<String> extraperms) 
 	{
 		this.name = name;
 		this.groups = groups;
-		this.allgroups = allgroups;
 		this.extraperms = extraperms;
 	}
 	public String getName() {
 		return name;
 	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public List<Group> getGroups() {
 		return groups;
 	}
+	public void setGroups(List<Group> groups) {
+		this.groups = groups;
+	}
 	public List<String> getExtraperms() {
 		return extraperms;
+	}
+	public void setExtraperms(List<String> extraperms) {
+		this.extraperms = extraperms;
 	}
 	public boolean hasPerm(String perm)
 	{
@@ -87,7 +94,7 @@ public class Player
 		List<String> ret=new ArrayList<String>();
 		for(Group g:groups)
 		{
-			List<String> gperms=g.getEffectivePerms(allgroups);
+			List<String> gperms=g.getEffectivePerms();
 			for(String perm:gperms)
 			{
 				boolean added=false;
