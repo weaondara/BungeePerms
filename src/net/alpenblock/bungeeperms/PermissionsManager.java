@@ -71,6 +71,7 @@ public class PermissionsManager implements Listener
 	 */
 	public void loadPerms()
 	{
+		bc.getLogger().info("[BungeePerms] loading permissions ...");
 		this.groups.clear();
 		this.players.clear();
 		
@@ -129,6 +130,8 @@ public class PermissionsManager implements Listener
 			Player player=new Player(u, lgroups, extrapermissions, serverperms);
 			this.players.add(player);
 		}
+		
+		bc.getLogger().info("[BungeePerms] permissions loaded");
 	}
 	
 	/**
