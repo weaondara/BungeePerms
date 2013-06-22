@@ -6,7 +6,19 @@ import java.util.List;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Statics.
+ */
 public class Statics {
+	
+	/**
+	 * Count sequences.
+	 *
+	 * @param s the s
+	 * @param seq the seq
+	 * @return the int
+	 */
 	public static int countSequences(String s, String seq)
 	{
 		int count=0;
@@ -19,6 +31,14 @@ public class Statics {
 		}
 		return count;
 	}
+	
+	/**
+	 * Gets the full player name.
+	 *
+	 * @param s the s
+	 * @param player the player
+	 * @return the full player name
+	 */
 	public static String getFullPlayerName(BungeeCord s,String player)
 	{
 		ProxiedPlayer p = s.getPlayer(player);
@@ -38,6 +58,14 @@ public class Statics {
 			return player;
 		}
 	}
+	
+	/**
+	 * To list.
+	 *
+	 * @param s the s
+	 * @param seperator the seperator
+	 * @return the list
+	 */
 	public static List<String> ToList(String s,String seperator)
 	{
 		List<String> l=new ArrayList<String>();
@@ -61,6 +89,14 @@ public class Statics {
 		}
 		return l;
 	}
+	
+	/**
+	 * Arg alias.
+	 *
+	 * @param arg the arg
+	 * @param aliases the aliases
+	 * @return true, if successful
+	 */
 	public static boolean ArgAlias(String arg,String[] aliases)
 	{
 		for(int i=0;i<aliases.length;i++)
