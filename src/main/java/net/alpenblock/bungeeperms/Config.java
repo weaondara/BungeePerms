@@ -13,7 +13,8 @@ import net.md_5.bungee.api.plugin.Plugin;
 /**
  * The Class Config.
  */
-public class Config {
+public class Config 
+{
 	
 	/** The fconfig. */
 	private FileConfiguration fconfig;
@@ -30,24 +31,32 @@ public class Config {
 	public Config (Plugin p,String path) 
 	{
 		this.path=p.getDataFolder()+path;
-		fconfig = YamlConfiguration.loadConfiguration(new File(this.path));
+        createFile();
+        fconfig = YamlConfiguration.loadConfiguration(new File(this.path));
 	}
 	
 	/**
 	 * Load.
 	 */
-	public void load() {
+	public void load()
+    {
 		createFile();
-		try {fconfig.load(path);
-		} catch (Exception e) {e.printStackTrace();}
+		try 
+        {
+            fconfig.load(path);
+		} 
+        catch (Exception e) {e.printStackTrace();}
 	}
 	
 	/**
 	 * Save.
 	 */
-	public void save() {
+	public void save() 
+    {
 		createFile();
-		try {fconfig.save(path);
+		try 
+        {
+            fconfig.save(path);
 		} catch (Exception e) {e.printStackTrace();}
 	}
 	
@@ -66,7 +75,6 @@ public class Config {
 			} 
 			catch (Exception e) 
 			{
-				//dobug.log(e,true);
 				e.printStackTrace();
 			}
 		}
@@ -178,6 +186,16 @@ public class Config {
 	 */
 	public void setString(String key, String val) {
 		fconfig.set(key, val);
+	}
+	
+	/**
+	 * Sets the string.
+	 *
+	 * @param key the key
+	 * @param val the val
+	 */
+	public void setStringAndSave(String key, String val) {
+		fconfig.set(key, val);
 		try { fconfig.save(path); } catch (IOException e) { e.printStackTrace(); }
 	}
 	
@@ -187,7 +205,18 @@ public class Config {
 	 * @param key the key
 	 * @param val the val
 	 */
-	public void setInt(String key, int val) {
+	public void setInt(String key, int val)
+    {
+		fconfig.set(key, val);
+	}
+	
+	/**
+	 * Sets the int.
+	 *
+	 * @param key the key
+	 * @param val the val
+	 */
+	public void setIntAndSave(String key, int val) {
 		fconfig.set(key, val);
 		try { fconfig.save(path); } catch (IOException e) { e.printStackTrace(); }
 	}
@@ -200,6 +229,16 @@ public class Config {
 	 */
 	public void setBool(String key, boolean val) {
 		fconfig.set(key, val);
+	}
+	
+	/**
+	 * Sets the bool.
+	 *
+	 * @param key the key
+	 * @param val the val
+	 */
+	public void setBoolAndSave(String key, boolean val) {
+		fconfig.set(key, val);
 		try { fconfig.save(path); } catch (IOException e) { e.printStackTrace(); }
 	}
 	
@@ -210,6 +249,16 @@ public class Config {
 	 * @param val the val
 	 */
 	public void setListString(String key, List<String> val) {
+		fconfig.set(key, val);
+	}
+	
+	/**
+	 * Sets the list string.
+	 *
+	 * @param key the key
+	 * @param val the val
+	 */
+	public void setListStringAndSave(String key, List<String> val) {
 		fconfig.set(key, val);
 		try { fconfig.save(path); } catch (IOException e) { e.printStackTrace(); }
 	}

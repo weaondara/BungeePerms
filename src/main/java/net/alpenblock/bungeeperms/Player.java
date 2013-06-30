@@ -209,8 +209,7 @@ public class Player
 					{
 						if(index==0)
 						{
-							if( lperm.get(0).equalsIgnoreCase(lp.get(0))|
-								lp.get(0).equalsIgnoreCase("-"+lperm.get(0)))
+							if( lperm.get(0).equalsIgnoreCase(lp.get(0))| lp.get(0).equalsIgnoreCase("-"+lperm.get(0)))
 							{
 								index++;
 							}
@@ -249,7 +248,7 @@ public class Player
 	 */
 	public List<String> getEffectivePerms()
 	{
-		List<String> ret=new ArrayList<String>();
+		List<String> ret=new ArrayList<>();
 		for(Group g:groups)
 		{
 			List<String> gperms=g.getEffectivePerms();
@@ -321,7 +320,7 @@ public class Player
 	 */
 	public List<String> getEffectivePerms(ServerInfo server)
 	{
-		List<String> ret=new ArrayList<String>();
+		List<String> ret=new ArrayList<>();
 		for(Group g:groups)
 		{
 			List<String> gperms=g.getEffectivePerms(server);
@@ -355,11 +354,12 @@ public class Player
 			}
 			
 			//per server perms
-			List<String> serverperms=g.getServerPerms().get(server.getName());
-			if(serverperms==null)
+			Server srv=g.getServers().get(server.getName());
+			if(srv==null)
 			{
-				serverperms=new ArrayList<>();
+				srv=new Server(server.getName(),new ArrayList<String>(),"","","");
 			}
+			List<String> serverperms=srv.getPerms();
 			for(String perm:serverperms)
 			{
 				boolean added=false;

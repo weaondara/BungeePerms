@@ -263,7 +263,7 @@ public class MemorySection implements ConfigurationSection {
 
     public int getInt(String path) {
         Object def = getDefault(path);
-        return getInt(path, (def instanceof Number) ? (int)(def) : 0);
+        return getInt(path, (def instanceof Number) ? Integer.valueOf(def.toString()) : 0);
     }
 
     public int getInt(String path, int def) {

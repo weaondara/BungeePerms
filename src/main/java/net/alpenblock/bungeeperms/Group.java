@@ -22,7 +22,7 @@ public class Group {
 	private List<String> perms;
 	
 	/** The serverperms. */
-	private Map<String,List<String>> serverperms;
+	private Map<String,Server> servers;
 	
 	/** The rank. */
 	private int rank;
@@ -52,12 +52,12 @@ public class Group {
 	 * @param prefix the prefix
 	 * @param suffix the suffix
 	 */
-	public Group(String name, List<String> inheritances, List<String> perms, Map<String,List<String>> serverperms, int rank, boolean isdefault, String display, String prefix, String suffix) 
+	public Group(String name, List<String> inheritances, List<String> perms, Map<String,Server> servers, int rank, boolean isdefault, String display, String prefix, String suffix) 
 	{
 		this.isdefault = isdefault;
 		this.name = name;
 		this.perms = perms;
-		this.serverperms = serverperms;
+		this.servers = servers;
 		this.rank = rank;
 		this.inheritances = inheritances;
 		this.display = display;
@@ -120,21 +120,21 @@ public class Group {
 	}
 	
 	/**
-	 * Gets the server perms.
+	 * Gets the servers.
 	 *
-	 * @return the server perms
+	 * @return the servers
 	 */
-	public Map<String, List<String>> getServerPerms() {
-		return serverperms;
+	public Map<String, Server> getServers() {
+		return servers;
 	}
 	
 	/**
-	 * Sets the server perms.
+	 * Sets the servers.
 	 *
-	 * @param serverperms the serverperms
+	 * @param serverperms the servers
 	 */
-	public void setServerPerms(Map<String, List<String>> serverperms) {
-		this.serverperms = serverperms;
+	public void setServerPerms(Map<String, Server> servers) {
+		this.servers = servers;
 	}
 	
 	/**
@@ -234,7 +234,7 @@ public class Group {
 	 */
 	public List<String> getEffectivePerms()
 	{
-		List<String> ret=new ArrayList<String>();
+		List<String> ret=new ArrayList<>();
 		for(Group g:BungeePerms.getInstance().getPermissionsManager().getGroups())
 		{
 			if(inheritances.contains(g.getName()))
@@ -309,7 +309,7 @@ public class Group {
 	 */
 	public List<String> getEffectivePerms(ServerInfo server) 
 	{
-		List<String> ret=new ArrayList<String>();
+		List<String> ret=new ArrayList<>();
 		for(Group g:BungeePerms.getInstance().getPermissionsManager().getGroups())
 		{
 			if(inheritances.contains(g.getName()))
@@ -346,11 +346,12 @@ public class Group {
 			}
 			
 			//per server perms
-			List<String> serverperms=g.getServerPerms().get(server.getName());
-			if(serverperms==null)
+            Server srv=g.getServers().get(server.getName());
+			if(srv==null)
 			{
-				serverperms=new ArrayList<>();
+				srv=new Server(server.getName(),new ArrayList<String>(),"","","");
 			}
+			List<String> serverperms=srv.getPerms();
 			for(String perm:serverperms)
 			{
 				boolean added=false;
@@ -411,11 +412,12 @@ public class Group {
 		}
 		
 		//per server perms
-		List<String> perserverperms=serverperms.get(server.getName());
-		if(perserverperms==null)
-		{
-			perserverperms=new ArrayList<>();
-		}
+        Server srv=servers.get(server.getName());
+        if(srv==null)
+        {
+            srv=new Server(server.getName(),new ArrayList<String>(),"","","");
+        }
+        List<String> perserverperms=srv.getPerms();
 		for(String perm:perserverperms)
 		{
 			boolean added=false;

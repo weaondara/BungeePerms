@@ -1,11 +1,15 @@
 package net.alpenblock.bungeeperms;
 
+import java.io.File;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.alpenblock.bungeeperms.config.YamlConfiguration;
 
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
@@ -38,6 +42,13 @@ public class PermissionsManager implements Listener
 	/** The players. */
 	private List<Player> players;
 	
+    /** The config. */
+    private Config config;
+    
+    private boolean saveAllUsers;
+    
+    private boolean deleteUsersOnCleanup;
+    
 	/** The permsconf. */
 	private Config permsconf;
 	
@@ -57,15 +68,55 @@ public class PermissionsManager implements Listener
 		bc=BungeeCord.getInstance();
 		plugin=p;
 		
-		this.groups=new ArrayList<Group>();
-		this.players=new ArrayList<Player>();
+		this.groups=new ArrayList<>();
+		this.players=new ArrayList<>();
+        
+        //config
+        config=new Config(p, "/config.yml");
+        loadConfig();
+        
 		//load perms form file
 		permspath="/permissions.yml";
+        
+        //if no permissions file is found copy packed default config to plugin folder
+        File f=new File(p.getDataFolder()+permspath);
+        if(!f.exists()|!f.isFile())
+        {
+            bc.getLogger().info("[BungeePerms] no permissions file found -> copy packed default permissions.yml to data folder ...");
+            f.getParentFile().mkdirs();
+            try 
+			{
+				//file öffnen
+				ClassLoader cl=this.getClass().getClassLoader();
+	            URL url = cl.getResource("permissions.yml");
+	            if(url!=null)
+	            {
+		            URLConnection connection = url.openConnection();
+		            connection.setUseCaches(false);
+		            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(connection.getInputStream());
+		            defConfig.save(f);
+	            }
+	        } 
+			catch (Exception e) 
+	        {
+				e.printStackTrace();
+	        }
+        }
+        
+        //load the perms
 		permsconf=new Config(p, permspath);
 		loadPerms();
-		bc.getPluginManager().registerListener(plugin,this);
+        	
+        bc.getPluginManager().registerListener(plugin,this);
 	}
 	
+    public void loadConfig()
+    {
+        config.load();
+        saveAllUsers=config.getBoolean("saveAllUsers", true);
+        deleteUsersOnCleanup=config.getBoolean("deleteUsersOnCleanup", false);
+    }
+    
 	/**
 	 * Load perms.
 	 */
@@ -94,13 +145,17 @@ public class PermissionsManager implements Listener
 			String suffix=permsconf.getString("groups."+g+".suffix", "");
 			
 			//per server perms
-			Map<String,List<String>> serverperms=new HashMap<>();
+			Map<String,Server> servers=new HashMap<>();
 			for(String server:permsconf.getSubNodes("groups."+g+".servers"))
 			{
-				serverperms.put(server, permsconf.getListString("groups."+g+".servers."+server+".permissions", new ArrayList<String>()));
+				List<String> serverperms=permsconf.getListString("groups."+g+".servers."+server+".permissions", new ArrayList<String>());
+                String sdisplay=permsconf.getString("groups."+g+".servers."+server+".display", "");
+                String sprefix=permsconf.getString("groups."+g+".servers."+server+".prefix", "");
+                String ssuffix=permsconf.getString("groups."+g+".servers."+server+".suffix", "");
+                servers.put(server, new Server(server,serverperms,sdisplay,sprefix,ssuffix));
 			}
 			
-			Group group=new Group(g, inheritances, permissions, serverperms, rank, isdefault, display, prefix, suffix);
+			Group group=new Group(g, inheritances, permissions, servers, rank, isdefault, display, prefix, suffix);
 			this.groups.add(group);
 		}
 		sortGroups();
@@ -346,6 +401,27 @@ public class PermissionsManager implements Listener
 	 */
 	public synchronized void saveUser(Player p) 
 	{
+        if(!saveAllUsers)
+        {
+            //check if all player groups are default groups
+            boolean alldefault=true;
+            for(Group g:p.getGroups())
+            {
+                if(!g.isDefault())
+                {
+                    alldefault=false;
+                }
+            }
+        
+            //check for default user without extra perms and non-default groups
+            if(alldefault&p.getExtraperms().isEmpty()&p.getServerPerms().isEmpty())
+            {
+                return;
+            }
+        }
+        
+        
+        
 		List<String> groups=new ArrayList<>();
 		for(Group g:p.getGroups())
 		{
@@ -358,6 +434,8 @@ public class PermissionsManager implements Listener
 		{
 			permsconf.setListString("users."+p.getName()+".servers."+server+".permissions", p.getServerPerms().get(server));
 		}
+        
+        permsconf.save();
 	}	
 	
 	/**
@@ -375,10 +453,16 @@ public class PermissionsManager implements Listener
 		permsconf.setString("groups."+g.getName()+".prefix", g.getPrefix());
 		permsconf.setString("groups."+g.getName()+".suffix", g.getSuffix());
 
-		for(String server:g.getServerPerms().keySet())
+		for(String server:g.getServers().keySet())
 		{
-			permsconf.setListString("groups."+g.getName()+".servers."+server+".permissions", g.getServerPerms().get(server));
+            Server s=g.getServers().get(server);
+			permsconf.setListString("groups."+g.getName()+".servers."+server+".permissions", s.getPerms());
+            permsconf.setString("groups."+g.getName()+".servers."+server+".display", s.getDisplay());
+            permsconf.setString("groups."+g.getName()+".servers."+server+".prefix", s.getPrefix());
+            permsconf.setString("groups."+g.getName()+".servers."+server+".suffix", s.getSuffix());
 		}
+        
+        permsconf.save();
 	}
 	
 	/**
@@ -393,10 +477,11 @@ public class PermissionsManager implements Listener
 			if(players.get(i).getName().equalsIgnoreCase(user.getName()))
 			{
 				players.remove(i);
-				return;
+                permsconf.deleteNode("users."+user.getName());
+                permsconf.save();
+				break;
 			}
 		}
-		permsconf.deleteNode("users."+user.getName());
 	}
 	
 	/**
@@ -413,9 +498,12 @@ public class PermissionsManager implements Listener
 				groups.remove(i);
 				permsconf.deleteNode("groups."+group.getName());
 				validateUserGroups();
+                permsconf.save();
 				return;
 			}
 		}
+        
+        
 	}
 	
 	/**
@@ -768,4 +856,113 @@ public class PermissionsManager implements Listener
 		if(!isperm & msg){sender.sendMessage(Color.Error+"You don't have permission to do that!"+ChatColor.RESET);}
 		return isperm;
 	}
+
+    public void format() 
+    {
+        new File(plugin.getDataFolder()+"/permissions.yml").delete();
+        Config newperms=new Config(plugin,"/permissions.yml");
+        for(int i=0;i<groups.size();i++)
+        {
+            Group g=groups.get(i);
+            newperms.setInt("groups."+g.getName()+".rank", g.getRank());
+            newperms.setBool("groups."+g.getName()+".default", g.isDefault());
+            newperms.setString("groups."+g.getName()+".display",g.getDisplay());
+            newperms.setString("groups."+g.getName()+".prefix",g.getPrefix());
+            newperms.setString("groups."+g.getName()+".suffix",g.getSuffix());
+            newperms.setListString("groups."+g.getName()+".inheritances", g.getInheritances());
+            newperms.setListString("groups."+g.getName()+".permissions", g.getPerms());
+            for(String server:g.getServers().keySet())
+            {
+                Server s=g.getServers().get(server);
+                newperms.setListString("groups."+g.getName()+".servers."+server+".permissions", s.getPerms());
+                newperms.setString("groups."+g.getName()+".servers."+server+".display", s.getDisplay());
+                newperms.setString("groups."+g.getName()+".servers."+server+".prefix", s.getPrefix());
+                newperms.setString("groups."+g.getName()+".servers."+server+".suffix", s.getSuffix());
+            }
+        }
+        for(Player p:players)
+        {
+            List<String> groups=new ArrayList<>();
+            for(Group g:p.getGroups())
+            {
+                groups.add(g.getName());
+            }
+            newperms.setListString("users."+p.getName()+".groups", groups);
+            
+            newperms.setListString("users."+p.getName()+".permissions", p.getExtraperms());
+            for(String server:p.getServerPerms().keySet())
+            {
+                newperms.setListString("users."+p.getName()+".servers."+server+".permissions", p.getServerPerms().get(server));
+            }
+        }
+        newperms.save();
+        
+        //loadPerms();
+    }
+
+    public void cleanup() 
+    {
+        new File(plugin.getDataFolder()+"/permissions.yml").delete();
+        Config newperms=new Config(plugin,"/permissions.yml");
+        for(Group g:groups)
+        {
+            newperms.setInt("groups."+g.getName()+".rank", g.getRank());
+            newperms.setBool("groups."+g.getName()+".default", g.isDefault());
+            newperms.setString("groups."+g.getName()+".display",g.getDisplay());
+            newperms.setString("groups."+g.getName()+".prefix",g.getPrefix());
+            newperms.setString("groups."+g.getName()+".suffix",g.getSuffix());
+            newperms.setListString("groups."+g.getName()+".inheritances", g.getInheritances());
+            newperms.setListString("groups."+g.getName()+".permissions", g.getPerms());
+            for(String server:g.getServers().keySet())
+            {
+                Server s=g.getServers().get(server);
+                newperms.setListString("groups."+g.getName()+".servers."+server+".permissions", s.getPerms());
+                newperms.setString("groups."+g.getName()+".servers."+server+".display", s.getDisplay());
+                newperms.setString("groups."+g.getName()+".servers."+server+".prefix", s.getPrefix());
+                newperms.setString("groups."+g.getName()+".servers."+server+".suffix", s.getSuffix());
+            }
+        }
+        for(Player p:players)
+        {
+            if(deleteUsersOnCleanup)
+            {
+                //check for additional permissions AND onlinecheck
+                if(p.getGroups().isEmpty()&p.getExtraperms().isEmpty()&p.getServerPerms().isEmpty()&BungeeCord.getInstance().getPlayer(p.getName())==null)
+                {
+                    continue;
+                }
+            
+                //check if all player groups are default groups
+                boolean alldefault=true;
+                for(Group g:p.getGroups())
+                {
+                    if(!g.isDefault())
+                    {
+                        alldefault=false;
+                    }
+                }
+                if(alldefault)
+                {
+                    continue;
+                }
+            }
+            
+            //player has to be saved
+            List<String> groups=new ArrayList<>();
+            for(Group g:p.getGroups())
+            {
+                groups.add(g.getName());
+            }
+            newperms.setListString("users."+p.getName()+".groups", groups);
+            
+            newperms.setListString("users."+p.getName()+".permissions", p.getExtraperms());
+            for(String server:p.getServerPerms().keySet())
+            {
+                newperms.setListString("users."+p.getName()+".servers."+server+".permissions", p.getServerPerms().get(server));
+            }
+        }
+        newperms.save();
+        
+        loadPerms();
+    }
 }
