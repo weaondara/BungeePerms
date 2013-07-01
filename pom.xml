@@ -36,4 +36,11 @@
     <properties>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
     </properties>
+    <repositories>
+        <repository>
+            <id>bungee-repo</id>
+            <name>BungeeCord Repository</name>
+            <url>http://ci.md-5.net/job/BungeeCord/lastSuccessfulBuild/artifact/proxy/target</url>
+        </repository>
+    </repositories>
 </project>
