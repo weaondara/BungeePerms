@@ -1069,8 +1069,6 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"You don't have a group!");
 									return true;
 								}
-								System.out.println(issuergroup.getRank());
-								System.out.println(nextgroup.getRank());
 								if(issuergroup.getRank()<nextgroup.getRank())
 								{
 									for(int i=0;i<player.getGroups().size();i++)
