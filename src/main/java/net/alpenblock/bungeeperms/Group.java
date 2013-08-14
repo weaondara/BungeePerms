@@ -10,48 +10,18 @@ import net.md_5.bungee.api.config.ServerInfo;
 /**
  * The Class Group.
  */
-public class Group {
-	
-	/** The name. */
+public class Group implements Comparable<Group>
+{
 	private String name;
-	
-	/** The inheritances. */
 	private List<String> inheritances;
-	
-	/** The perms. */
 	private List<String> perms;
-	
-	/** The serverperms. */
 	private Map<String,Server> servers;
-	
-	/** The rank. */
 	private int rank;
-	
-	/** The isdefault. */
 	private boolean isdefault;
-	
-	/** The display. */
 	private String display;
-	
-	/** The prefix. */
 	private String prefix;
-	
-	/** The suffix. */
 	private String suffix;
 	
-	/**
-	 * Instantiates a new group.
-	 *
-	 * @param name the name
-	 * @param inheritances the inheritances
-	 * @param perms the perms
-	 * @param serverperms the serverperms
-	 * @param rank the rank
-	 * @param isdefault the isdefault
-	 * @param display the display
-	 * @param prefix the prefix
-	 * @param suffix the suffix
-	 */
 	public Group(String name, List<String> inheritances, List<String> perms, Map<String,Server> servers, int rank, boolean isdefault, String display, String prefix, String suffix) 
 	{
 		this.isdefault = isdefault;
@@ -578,4 +548,10 @@ public class Group {
 		}
 		return has;
 	}
+
+    @Override
+    public int compareTo(Group g)
+    {
+        return -Integer.compare(rank, g.getRank());
+    }
 }
