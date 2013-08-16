@@ -1,0 +1,14 @@
+saveAllUsers: true
+deleteUsersOnCleanup: false
+backendtype: YAML
+debug:
+  path: plugins/BungeePerms/debug.log
+  showexceptions: true
+  showlogs: false
+bungeeperms:
+  general:
+    mysqlhost: localhost
+    mysqlport: '3306'
+    mysqldb: bungeeperms
+    mysqluser: bungeeperms
+    mysqlpw: password

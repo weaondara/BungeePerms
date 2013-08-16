@@ -1,34 +1,41 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.md_5.bungee.BungeeCord;
 
 import net.md_5.bungee.api.config.ServerInfo;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Group.
  */
 public class Group implements Comparable<Group>
 {
+    private Map<String,List<String>> cachedPerms;
+    
 	private String name;
 	private List<String> inheritances;
 	private List<String> perms;
 	private Map<String,Server> servers;
 	private int rank;
+    private String ladder;
 	private boolean isdefault;
 	private String display;
 	private String prefix;
 	private String suffix;
 	
-	public Group(String name, List<String> inheritances, List<String> perms, Map<String,Server> servers, int rank, boolean isdefault, String display, String prefix, String suffix) 
+	public Group(String name, List<String> inheritances, List<String> perms, Map<String,Server> servers, int rank, String ladder, boolean isdefault, String display, String prefix, String suffix) 
 	{
+        cachedPerms=new HashMap<>();
+        
 		this.isdefault = isdefault;
 		this.name = name;
 		this.perms = perms;
 		this.servers = servers;
 		this.rank = rank;
+		this.ladder = ladder;
 		this.inheritances = inheritances;
 		this.display = display;
 		this.prefix = prefix;
@@ -103,7 +110,7 @@ public class Group implements Comparable<Group>
 	 *
 	 * @param serverperms the servers
 	 */
-	public void setServerPerms(Map<String, Server> servers) {
+	public void setServers(Map<String, Server> servers) {
 		this.servers = servers;
 	}
 	
@@ -124,6 +131,20 @@ public class Group implements Comparable<Group>
 	public void setRank(int rank) {
 		this.rank = rank;
 	}
+
+    /**
+     * @return the ladder
+     */
+    public String getLadder() {
+        return ladder;
+    }
+
+    /**
+     * @param ladder the ladder to set
+     */
+    public void setLadder(String ladder) {
+        this.ladder = ladder;
+    }
 	
 	/**
 	 * Checks if is default.
@@ -204,6 +225,35 @@ public class Group implements Comparable<Group>
 	 */
 	public List<String> getEffectivePerms()
 	{
+        List<String> effperms=cachedPerms.get("global");
+        if(effperms==null)
+        {
+            effperms=calcEffectivePerms();
+            cachedPerms.put("global", effperms);
+        }
+        
+        return effperms;
+    }
+    /**
+	 * Gets the effective perms.
+	 *
+	 * @param server the server
+	 * @return the effective perms
+	 */
+    public List<String> getEffectivePerms(ServerInfo server) 
+	{
+        List<String> effperms=cachedPerms.get(server.getName());
+        if(effperms==null)
+        {
+            effperms=calcEffectivePerms(server);
+            cachedPerms.put(server.getName(), effperms);
+        }
+        
+        return effperms;
+    }
+    
+	public List<String> calcEffectivePerms()
+	{
 		List<String> ret=new ArrayList<>();
 		for(Group g:BungeePerms.getInstance().getPermissionsManager().getGroups())
 		{
@@ -271,13 +321,7 @@ public class Group implements Comparable<Group>
 		return ret;
 	}
 	
-	/**
-	 * Gets the effective perms.
-	 *
-	 * @param server the server
-	 * @return the effective perms
-	 */
-	public List<String> getEffectivePerms(ServerInfo server) 
+	public List<String> calcEffectivePerms(ServerInfo server) 
 	{
 		List<String> ret=new ArrayList<>();
 		for(Group g:BungeePerms.getInstance().getPermissionsManager().getGroups())
@@ -442,8 +486,8 @@ public class Group implements Comparable<Group>
 			}
 			else if(p.endsWith("*"))
 			{
-				List<String> lp=Statics.ToList(p, ".");
-				List<String> lperm=Statics.ToList(perm, ".");
+				List<String> lp=Statics.toList(p, ".");
+				List<String> lperm=Statics.toList(perm, ".");
 				int index=0;
 				try
 				{
@@ -507,8 +551,8 @@ public class Group implements Comparable<Group>
 			}
 			else if(p.endsWith("*"))
 			{
-				List<String> lp=Statics.ToList(p, ".");
-				List<String> lperm=Statics.ToList(perm, ".");
+				List<String> lp=Statics.toList(p, ".");
+				List<String> lperm=Statics.toList(perm, ".");
 				int index=0;
 				try
 				{
@@ -548,10 +592,38 @@ public class Group implements Comparable<Group>
 		}
 		return has;
 	}
+    
+    public void recalcPerms() 
+    {
+        List<String> effperms=calcEffectivePerms();
+        cachedPerms.put("global", effperms);
+    }
+    public void recalcPerms(String server)
+    {
+        ServerInfo si=BungeeCord.getInstance().config.getServers().get(server);
+        List<String> effperms=calcEffectivePerms(si);
+        cachedPerms.put(si.getName(), effperms);
+    }
 
+    public synchronized void recalcAllPerms() 
+    {
+        for(String server:cachedPerms.keySet())
+        {
+            if(server.equalsIgnoreCase("global"))
+            {
+                recalcPerms();
+            }
+            else
+            {
+                recalcPerms(server);
+            }
+        }
+    }
+    
     @Override
     public int compareTo(Group g)
     {
         return -Integer.compare(rank, g.getRank());
     }
+
 }

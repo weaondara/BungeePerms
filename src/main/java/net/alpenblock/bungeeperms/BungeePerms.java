@@ -1,46 +1,40 @@
 package net.alpenblock.bungeeperms;
 
+import java.io.File;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import net.alpenblock.bungeeperms.config.YamlConfiguration;
+import net.alpenblock.bungeeperms.io.BackEndType;
 
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.command.ConsoleCommandSender;
 
 /**
  * The Class BungeePerms.
  */
 public class BungeePerms extends Plugin implements Listener
 {
-	
-	/** The instance. */
-	static BungeePerms instance;
-	
-	/**
-	 * Gets the single instance of BungeePerms.
-	 *
-	 * @return single instance of BungeePerms
-	 */
+	private static BungeePerms instance;
 	public static BungeePerms getInstance()
 	{
 		return instance;
 	}
 	
-	/** The bc. */
-	BungeeCord bc;
+	private BungeeCord bc;
+	private Config config;
+	private Debug debug;
+    
+	private PermissionsManager pm;
 	
-	/** The pm. */
-	PermissionsManager pm;
-	
-	/* (non-Javadoc)
-	 * @see net.md_5.bungee.api.plugin.Plugin#onLoad()
-	 */
 	@Override
 	public void onLoad()
 	{
@@ -48,45 +42,64 @@ public class BungeePerms extends Plugin implements Listener
 		instance=this;
 		
 		bc=BungeeCord.getInstance();
+        
+        //check for config file existance
+        File f=new File(getDataFolder(),"/config.yml");
+        if(!f.exists()|!f.isFile())
+        {
+            bc.getLogger().info("[BungeePerms] no config file found -> copy packed default config.yml to data folder ...");
+            f.getParentFile().mkdirs();
+            try 
+			{
+				//file öffnen
+				ClassLoader cl=this.getClass().getClassLoader();
+	            URL url = cl.getResource("config.yml");
+	            if(url!=null)
+	            {
+		            URLConnection connection = url.openConnection();
+		            connection.setUseCaches(false);
+		            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(connection.getInputStream());
+		            defConfig.save(f);
+	            }
+	        } 
+			catch (Exception e) 
+	        {
+				e.printStackTrace();
+	        }
+            bc.getLogger().info("[BungeePerms] copied default config.yml to data folder");
+        }
+        
+        config=new Config(this,"/config.yml");
+        config.load();
+        debug=new Debug(this,config,"BP");
+        
 		//load commands
 		loadcmds();
-		pm=new PermissionsManager(this);
+        
+		pm=new PermissionsManager(this,config,debug);
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.md_5.bungee.api.plugin.Plugin#onEnable()
-	 */
 	@Override
 	public void onEnable()
 	{
 		bc.getLogger().info("Activating BungeePerms ...");
+        pm.enable();
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.md_5.bungee.api.plugin.Plugin#onDisable()
-	 */
 	@Override
 	public void onDisable() 
 	{
 		bc.getLogger().info("Deactivating BungeePerms ...");
+        pm.disable();
 	}
 	
-	/**
-	 * On command.
-	 *
-	 * @param sender the sender
-	 * @param cmd the cmd
-	 * @param label the label
-	 * @param args the args
-	 * @return true, if successful
-	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
 	{
 		if(cmd.getName().equalsIgnoreCase("bungeeperms"))
 		{
 			if(args.length==0)
 			{
-				sender.sendMessage(ChatColor.GOLD+"Welcome to BungeePerms, a BungeeCord permissions plugin!");
+				sender.sendMessage(ChatColor.GOLD+"Welcome to BungeePerms, a BungeeCord permissions plugin");
 				return true;
 			}
 			else if(args.length>0)
@@ -119,13 +132,15 @@ public class BungeePerms extends Plugin implements Listener
 					{
 						if(pm.hasOrConsole(sender,"bungeeperms.users.list",true))
 						{
-							if(pm.getUsers().size()>0)
+                            List<User> users=pm.getUsers();
+							if(users.size()>0)
 							{
-								sender.sendMessage(Color.Text+"There are following players:");
-								for(Player p:pm.getUsers())
+                                String out=Color.Text+"Following players are registered: ";
+								for(int i=0;i<users.size();i++)
 								{
-									sender.sendMessage(Color.Text+"- "+Color.User+p.getName());
+									out+=Color.User+users.get(i).getName()+Color.Text+(i+1<users.size()?", ":"");
 								}
+                                sender.sendMessage(out);
 							}
 							else
 							{
@@ -163,7 +178,7 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.perms.list",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-								Player user=pm.getUser(player);
+								User user=pm.getUser(player);
 								if(user!=null)
 								{
 									sender.sendMessage(Color.Text+"Permissions of the player "+Color.User+player+Color.Text+":");
@@ -185,7 +200,7 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.groups",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-								Player user=pm.getUser(player);
+								User user=pm.getUser(player);
 								if(user!=null)
 								{
 									sender.sendMessage(Color.Text+"Groups of the player "+Color.User+player+Color.Text+":");
@@ -206,7 +221,7 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.info",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-								Player user=pm.getUser(player);
+								User user=pm.getUser(player);
 								if(user==null)
 								{
 									sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
@@ -234,26 +249,24 @@ public class BungeePerms extends Plugin implements Listener
 								String player=Statics.getFullPlayerName(bc,args[1]);
 								String perm=args[3].toLowerCase();
 								String server=args.length>4?args[4]:null;
-								Player user=pm.getUser(player);
+								User user=pm.getUser(player);
 								if(user!=null)
 								{
 									if(server==null)
 									{
-										if(user.getExtraperms().contains("-"+perm.toLowerCase()))
+										if(user.getExtraperms().contains("-"+perm))
 										{
-											user.getExtraperms().remove("-"+perm.toLowerCase());
-											pm.updateUser(user);
+                                            pm.removeUserPerm(user,"-"+perm);
 											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+".");
 										}
-										else if(!user.getExtraperms().contains(perm.toLowerCase()))
+										else if(!user.getExtraperms().contains(perm))
 										{
-											user.getExtraperms().add(perm.toLowerCase());
-											pm.updateUser(user);
+                                            pm.addUserPerm(user,perm);
 											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+".");
 										}
 										else
 										{
-											sender.sendMessage("The player "+Color.Value+player+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+".");
+											sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+".");
 										}
 									}
 									else
@@ -263,23 +276,19 @@ public class BungeePerms extends Plugin implements Listener
 										{
 											perserverperms=new ArrayList<>();
 										}
-										if(perserverperms.contains("-"+perm.toLowerCase()))
+										if(perserverperms.contains("-"+perm))
 										{
-											perserverperms.remove("-"+perm.toLowerCase());
-											user.getServerPerms().put(server, perserverperms);
-											pm.updateUser(user);
+                                            pm.removeUserPerServerPerm(user,server,"-"+perm);
 											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
-										else if(!perserverperms.contains(perm.toLowerCase()))
+										else if(!perserverperms.contains(perm))
 										{
-											perserverperms.add(perm.toLowerCase());
-											user.getServerPerms().put(server, perserverperms);
-											pm.updateUser(user);
+                                            pm.addUserPerServerPerm(user,server,perm);
 											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
 										else
 										{
-											sender.sendMessage("The player "+Color.Value+player+Color.Text+" alreday has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+											sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" alreday has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
 									}
 								}
@@ -297,26 +306,24 @@ public class BungeePerms extends Plugin implements Listener
 								String player=Statics.getFullPlayerName(bc,args[1]);
 								String perm=args[3].toLowerCase();
 								String server=args.length>4?args[4]:null;
-								Player user=pm.getUser(player);
+								User user=pm.getUser(player);
 								if(user!=null)
 								{
 									if(server==null)
 									{
-										if(user.getExtraperms().contains(perm.toLowerCase()))
+										if(user.getExtraperms().contains(perm))
 										{
-											user.getExtraperms().remove(perm.toLowerCase());
-											pm.updateUser(user);
+                                            pm.removeUserPerm(user, perm);
 											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+".");
 										}
-										else if(!user.getExtraperms().contains("-"+perm.toLowerCase()))
+										else if(!user.getExtraperms().contains("-"+perm))
 										{
-											user.getExtraperms().add("-"+perm.toLowerCase());
-											pm.updateUser(user);
+                                            pm.addUserPerm(user, "-"+perm);
 											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+".");
 										}
 										else
 										{
-											sender.sendMessage("The player "+Color.Value+player+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+".");
+											sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+".");
 										}
 									}
 									else
@@ -326,23 +333,19 @@ public class BungeePerms extends Plugin implements Listener
 										{
 											perserverperms=new ArrayList<>();
 										}
-										if(perserverperms.contains(perm.toLowerCase()))
+										if(perserverperms.contains(perm))
 										{
-											perserverperms.remove(perm.toLowerCase());
-											user.getServerPerms().put(server, perserverperms);
-											pm.updateUser(user);
+                                            pm.removeUserPerServerPerm(user, server, perm);
 											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
-										else if(!perserverperms.contains("-"+perm.toLowerCase()))
+										else if(!perserverperms.contains("-"+perm))
 										{
-											perserverperms.add("-"+perm.toLowerCase());
-											user.getServerPerms().put(server, perserverperms);
-											pm.updateUser(user);
+											pm.removeUserPerServerPerm(user, server, "-"+perm);
 											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
 										else
 										{
-											sender.sendMessage("The player "+Color.Value+player+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+											sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
 									}
 								}
@@ -358,7 +361,7 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.perms.has",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-								Player user=pm.getUser(player);
+								User user=pm.getUser(player);
 								String server=args.length>4?args[4]:null;
 								if(user!=null)
 								{
@@ -398,10 +401,10 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"The group "+Color.User+groupname+Color.Error+" does not exist!");
 									return true;
 								}
-								Player p=pm.getUser(player);
-								if(p!=null)
+								User u=pm.getUser(player);
+								if(u!=null)
 								{
-									List<Group> groups=p.getGroups();
+									List<Group> groups=u.getGroups();
 									for(int i=0;i<groups.size();i++)
 									{
 										if(groups.get(i).getName().equalsIgnoreCase(group.getName()))
@@ -410,9 +413,8 @@ public class BungeePerms extends Plugin implements Listener
 											return true;
 										}
 									}
-									groups.add(group);
-									p.setGroups(groups);
-									pm.updateUser(p);
+                                    
+                                    pm.addUserGroup(u, group);
 									sender.sendMessage(Color.Text+"Added group "+Color.Value+groupname+Color.Text+" to player "+Color.User+player+Color.Text+".");
 									return true;
 								}
@@ -435,17 +437,15 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"The group "+Color.User+groupname+Color.Error+" does not exist!");
 									return true;
 								}
-								Player p=pm.getUser(player);
-								if(p!=null)
+								User u=pm.getUser(player);
+								if(u!=null)
 								{
-									List<Group> groups=p.getGroups();
+									List<Group> groups=u.getGroups();
 									for(int j=0;j<groups.size();j++)
 									{
 										if(groups.get(j).getName().equalsIgnoreCase(group.getName()))
 										{
-											groups.remove(j);
-											p.setGroups(groups);
-											pm.updateUser(p);
+                                            pm.removeUserGroup(u, group);
 											sender.sendMessage(Color.Text+"Removed group "+Color.Value+groupname+Color.Text+" from player "+Color.User+player+Color.Text+".");
 											return true;
 										}
@@ -471,28 +471,15 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"The group "+Color.User+groupname+Color.Error+" does not exist!");
 									return true;
 								}
-								Player p=pm.getUser(player);
-								if(p!=null)
+								User u=pm.getUser(player);
+								if(u!=null)
 								{
-									List<Group> groups=p.getGroups();
-									Group main=pm.getMainGroup(p);
-									if(main==null)
-									{
-										groups.add(group);
-									}
-									else
-									{
-										for(int i=0;i<groups.size();i++)
-										{
-											if(groups.get(i).getName().equalsIgnoreCase(main.getName()))
-											{
-												groups.set(i, group);
-												break;
-											}
-										}
-									}
-									p.setGroups(groups);
-									pm.updateUser(p);
+                                    List<Group> laddergroups=pm.getLadderGroups(group.getLadder());
+                                    for(Group g:laddergroups)
+                                    {
+                                        pm.removeUserGroup(u, g);
+                                    }
+                                    pm.addUserGroup(u, group);
 									sender.sendMessage(Color.Text+"Set group "+Color.Value+groupname+Color.Text+" for player "+Color.User+player+Color.Text+".");
 									return true;
 								}
@@ -581,6 +568,9 @@ public class BungeePerms extends Plugin implements Listener
 									//group rank
 									sender.sendMessage(Color.Text+"Rank: "+Color.Value+group.getRank());
 									
+									//group ladder
+									sender.sendMessage(Color.Text+"Ladder: "+Color.Value+group.getLadder());
+									
 									//default
 									sender.sendMessage(Color.Text+"Default: "+Color.Value+(group.isDefault()?ChatColor.GREEN:ChatColor.RED)+String.valueOf(group.isDefault()).toUpperCase());
 									
@@ -613,7 +603,7 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" already exists!");
 									return true;
 								}
-								Group group=new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String,Server>(), 1500, false, "", "", "");
+								Group group=new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String,Server>(), 1500, "default", false, "", "", "");
 								pm.addGroup(group);
 								sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" created.");
 							}
@@ -645,23 +635,21 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.group.perms.add",true))
 							{
 								String groupname=args[1];
-								String perm=args[3];
+								String perm=args[3].toLowerCase();
 								String server=args.length>4?args[4]:null;
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
 									if(server==null)
 									{
-										if(group.getPerms().contains("-"+perm.toLowerCase()))
+										if(group.getPerms().contains("-"+perm))
 										{
-											group.getPerms().remove("-"+perm.toLowerCase());
-											pm.updateGroup(group);
+                                            pm.removeGroupPerm(group,"-"+perm);
 											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+".");
 										}
-										else if(!group.getPerms().contains(perm.toLowerCase()))
+										else if(!group.getPerms().contains(perm))
 										{
-											group.getPerms().add(perm.toLowerCase());
-											pm.updateGroup(group);
+                                            pm.addGroupPerm(group,perm);
 											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+".");
 										}
 										else
@@ -677,20 +665,14 @@ public class BungeePerms extends Plugin implements Listener
                                             srv=new Server(server,new ArrayList<String>(),"","","");
                                         }
                                         List<String> perserverperms=srv.getPerms();
-										if(perserverperms.contains("-"+perm.toLowerCase()))
+										if(perserverperms.contains("-"+perm))
 										{
-											perserverperms.remove("-"+perm.toLowerCase());
-                                            srv.setPerms(perserverperms);
-                                            group.getServers().put(server, srv);
-											pm.updateGroup(group);
+                                            pm.removeGroupPerServerPerm(group, server, "-"+perm);
 											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
-										else if(!perserverperms.contains(perm.toLowerCase()))
+										else if(!perserverperms.contains(perm))
 										{
-											perserverperms.add(perm.toLowerCase());
-											srv.setPerms(perserverperms);
-                                            group.getServers().put(server, srv);
-											pm.updateGroup(group);
+                                            pm.addGroupPerServerPerm(group, server, perm);
 											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
 										else
@@ -711,23 +693,21 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.group.perms.remove",true))
 							{
 								String groupname=args[1];
-								String perm=args[3];
+								String perm=args[3].toLowerCase();
 								String server=args.length>4?args[4]:null;
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
 									if(server==null)
 									{
-										if(group.getPerms().contains(perm.toLowerCase()))
+										if(group.getPerms().contains(perm))
 										{
-											group.getPerms().remove(perm.toLowerCase());
-											pm.updateGroup(group);
+                                            pm.removeGroupPerm(group, perm);
 											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+".");
 										}
-										else if(!group.getPerms().contains("-"+perm.toLowerCase()))
+										else if(!group.getPerms().contains("-"+perm))
 										{
-											group.getPerms().add("-"+perm.toLowerCase());
-											pm.updateGroup(group);
+                                            pm.addGroupPerm(group, "-"+perm);
 											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+".");
 										}
 										else
@@ -743,20 +723,14 @@ public class BungeePerms extends Plugin implements Listener
                                             srv=new Server(server,new ArrayList<String>(),"","","");
                                         }
                                         List<String> perserverperms=srv.getPerms();
-										if(perserverperms.contains(perm.toLowerCase()))
+										if(perserverperms.contains(perm))
 										{
-											perserverperms.remove(perm.toLowerCase());
-											srv.setPerms(perserverperms);
-                                            group.getServers().put(server, srv);
-											pm.updateGroup(group);
+                                            pm.removeGroupPerServerPerm(group, server, perm);
 											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
-										else if(!perserverperms.contains("-"+perm.toLowerCase()))
+										else if(!perserverperms.contains("-"+perm))
 										{
-											perserverperms.add("-"+perm.toLowerCase());
-											srv.setPerms(perserverperms);
-                                            group.getServers().put(server, srv);
-											pm.updateGroup(group);
+                                            pm.addGroupPerServerPerm(group, server, "-"+perm);
 											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+".");
 										}
 										else
@@ -833,11 +807,9 @@ public class BungeePerms extends Plugin implements Listener
 											return true;
 										}
 									}
-									inheritances.add(toadd.getName());
-									
-									//saving
-									group.setInheritances(inheritances);
-									pm.updateGroup(group);
+                                    
+                                    pm.addGroupInheritance(group, toadd);
+                                    
 									sender.sendMessage(Color.Text+"Added inheritance "+Color.Value+addgroup+Color.Text+" to group "+Color.Value+groupname+Color.Text+".");
 									return true;
 								}
@@ -868,9 +840,8 @@ public class BungeePerms extends Plugin implements Listener
 									{
 										if(inheritances.get(i).equalsIgnoreCase(toremove.getName()))
 										{
-											inheritances.remove(i);
-											group.setInheritances(inheritances);
-											pm.updateGroup(group);
+											pm.removeGroupInheritance(group, toremove);
+                                            
 											sender.sendMessage(Color.Text+"Removed inheritance "+Color.Value+removegroup+Color.Text+" from group "+Color.Value+groupname+Color.Text+".");
 											return true;
 										}
@@ -890,7 +861,7 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.group.rank",true))
 							{
 								String groupname=args[1];
-								int rank=0;
+								int rank;
 								try
 								{
 									rank=Integer.parseInt(args[3]);
@@ -907,9 +878,28 @@ public class BungeePerms extends Plugin implements Listener
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
-									group.setRank(rank);
-									pm.updateGroup(group);
+                                    pm.rankGroup(group,rank);
 									sender.sendMessage(Color.Text+"Group rank set for group "+Color.Value+groupname+Color.Text+".");
+									return true;
+								}
+								else
+								{
+									sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" does not exist!");
+								}
+							}
+							return true;
+						}
+                        else if(args[2].equalsIgnoreCase("ladder"))
+						{
+							if(pm.hasOrConsole(sender,"bungeeperms.group.ladder",true))
+							{
+								String groupname=args[1];
+								String ladder=args[3];
+								Group group=pm.getGroup(groupname);
+								if(group!=null)
+								{
+                                    pm.ladderGroup(group,ladder);
+									sender.sendMessage(Color.Text+"Group ladder set for group "+Color.Value+groupname+Color.Text+".");
 									return true;
 								}
 								else
@@ -938,8 +928,7 @@ public class BungeePerms extends Plugin implements Listener
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
-									group.setIsdefault(isdefault);
-									pm.updateGroup(group);
+                                    pm.setGroupDefault(group, isdefault);
 									sender.sendMessage(Color.Text+"Marked group "+Color.Value+groupname+Color.Text+" as "+(isdefault?"":"non-")+"default.");
 									return true;
 								}
@@ -959,8 +948,7 @@ public class BungeePerms extends Plugin implements Listener
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
-									group.setDisplay(display);
-									pm.updateGroup(group);
+                                    pm.setGroupDisplay(group, display);
 									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+groupname+Color.Text+".");
 									return true;
 								}
@@ -980,8 +968,7 @@ public class BungeePerms extends Plugin implements Listener
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
-									group.setPrefix(prefix);
-									pm.updateGroup(group);
+									pm.setGroupPrefix(group, prefix);
 									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+groupname+Color.Text+".");
 									return true;
 								}
@@ -1001,8 +988,7 @@ public class BungeePerms extends Plugin implements Listener
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
-									group.setSuffix(suffix);
-									pm.updateGroup(group);
+									pm.setGroupSuffix(group, suffix);
 									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+groupname+Color.Text+".");
 									return true;
 								}
@@ -1017,47 +1003,57 @@ public class BungeePerms extends Plugin implements Listener
 				}
 				else if(args[0].equalsIgnoreCase("promote"))
 				{
-					if(args.length==2)
+					if(args.length>=2)
 					{
 						if(pm.hasOrConsole(sender,"bungeeperms.promote",true))
 						{
 							//getting next group
-							Player player=pm.getUser(Statics.getFullPlayerName(bc,args[1]));
-							if(player==null)
+							User user=pm.getUser(Statics.getFullPlayerName(bc,args[1]));
+							if(user==null)
 							{
 								sender.sendMessage(Color.Error+"The player "+Color.User+args[1]+Color.Error+" does not exist!");
 								return true;
 							}
-							Group playergroup=pm.getMainGroup(player);
-							if(playergroup==null)
-							{
-								sender.sendMessage(Color.Error+"The player "+Color.User+player.getName()+Color.Error+" doesn't have a group!");
-								return true;
-							}
-							Group nextgroup=pm.getNextGroup(playergroup);
+							Group playergroup=null;
+							Group nextgroup=null;
+                            if(args.length==3)
+                            {
+                                String ladder=args[2];
+                                playergroup = user.getGroupByLadder(ladder);
+                                if(playergroup!=null)
+                                {
+                                    nextgroup=pm.getNextGroup(playergroup);
+                                }
+                                else
+                                {
+                                    List<Group> laddergroups=pm.getLadderGroups(ladder);
+                                    if(!laddergroups.isEmpty())
+                                    {
+                                        nextgroup=laddergroups.get(0);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                playergroup=pm.getMainGroup(user);
+                                if(playergroup==null)
+                                {
+                                    sender.sendMessage(Color.Error+"The player "+Color.User+user.getName()+Color.Error+" doesn't have a group!");
+                                    return true;
+                                }
+                                nextgroup=pm.getNextGroup(playergroup);
+                            }
+							
 							if(nextgroup==null)
 							{
-								sender.sendMessage(Color.Error+"The player "+Color.User+player.getName()+Color.Error+" can't get promoted!");
+								sender.sendMessage(Color.Error+"The player "+Color.User+user.getName()+Color.Error+" can't be promoted!");
 								return true;
 							}
-							//promote player
-							if(sender instanceof ConsoleCommandSender)
-							{
-								for(int i=0;i<player.getGroups().size();i++)
-								{
-									if(player.getGroups().get(i).getRank()==playergroup.getRank())
-									{
-										player.getGroups().remove(i);
-										player.getGroups().add(nextgroup);
-										pm.updateUser(player);
-										sender.sendMessage(Color.User+player.getName()+Color.Text+" is now "+Color.Value+nextgroup.getName()+Color.Text+"!");
-										return true;
-									}
-								}
-							}
-							else
-							{
-								Player issuer=pm.getUser(sender.getName());
+                            
+                            //permision checks if sender is a player
+                            if(sender instanceof ProxiedPlayer)
+                            {
+                                User issuer=pm.getUser(sender.getName());
 								if(issuer==null)
 								{
 									sender.sendMessage(Color.Error+"You do not exist!");
@@ -1069,28 +1065,29 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"You don't have a group!");
 									return true;
 								}
-								if(issuergroup.getRank()<nextgroup.getRank())
+                                if(!(issuergroup.getRank()<nextgroup.getRank()))
 								{
-									for(int i=0;i<player.getGroups().size();i++)
-									{
-										if(player.getGroups().get(i).getRank()==playergroup.getRank())
-										{
-											player.getGroups().remove(i);
-											player.getGroups().add(nextgroup);
-											pm.updateUser(player);
-											sender.sendMessage(Color.User+player.getName()+Color.Text+" is now "+Color.Value+nextgroup.getName()+Color.Text+"!");
-											return true;
-										}
-									}
-									sender.sendMessage(Color.Error+"Error during promotion of player "+Color.User+player.getName()+Color.Error+"!");
+									sender.sendMessage(Color.Error+"You can't promote the player "+Color.User+user.getName()+Color.Error+"!");
 									return true;
 								}
-								else
-								{
-									sender.sendMessage(Color.Error+"You can't promote the player "+Color.User+player.getName()+Color.Error+"!");
-									return true;
-								}
-							}
+                            }
+                            
+							//promote player
+                            //remove old group if neccessary
+                            if(playergroup!=null)
+                            {
+                                for(int i=0;i<user.getGroups().size();i++)
+                                {
+                                    if(user.getGroups().get(i).getRank()==playergroup.getRank())
+                                    {
+                                        pm.removeUserGroup(user, user.getGroups().get(i));
+                                        break;
+                                    }
+                                }
+                            }
+                            pm.addUserGroup(user, nextgroup);
+                            sender.sendMessage(Color.User+user.getName()+Color.Text+" is now "+Color.Value+nextgroup.getName()+Color.Text+"!");
+                            return true;
 						}
 						return true;
 					}
@@ -1102,42 +1099,45 @@ public class BungeePerms extends Plugin implements Listener
 						if(pm.hasOrConsole(sender,"bungeeperms.demote",true))
 						{
 							//getting next group
-							Player player=pm.getUser(Statics.getFullPlayerName(bc,args[1]));
-							if(player==null)
+							User user=pm.getUser(Statics.getFullPlayerName(bc,args[1]));
+							if(user==null)
 							{
 								sender.sendMessage(Color.Error+"The player "+Color.User+args[1]+Color.Error+" does not exist!");
 								return true;
 							}
-							Group playergroup=pm.getMainGroup(player);
-							if(playergroup==null)
-							{
-								sender.sendMessage(Color.Error+"The player "+Color.User+player.getName()+Color.Error+" doesn't have a group!");
-								return true;
-							}
-							Group previousgroup=pm.getPreviousGroup(playergroup);
+                            
+                            Group playergroup=null;
+							Group previousgroup=null;
+                            if(args.length==3)
+                            {
+                                String ladder=args[2];
+                                playergroup = user.getGroupByLadder(ladder);
+                                if(playergroup!=null)
+                                {
+                                    previousgroup=pm.getPreviousGroup(playergroup);
+                                }
+                            }
+                            else
+                            {
+                                playergroup=pm.getMainGroup(user);
+                                if(playergroup==null)
+                                {
+                                    sender.sendMessage(Color.Error+"The player "+Color.User+user.getName()+Color.Error+" doesn't have a group!");
+                                    return true;
+                                }
+                                previousgroup=pm.getPreviousGroup(playergroup);
+                            }
+                            
 							if(previousgroup==null)
 							{
-								sender.sendMessage(Color.Error+"The player "+Color.User+player.getName()+Color.Error+" can't get demoted!");
+								sender.sendMessage(Color.Error+"The player "+Color.User+user.getName()+Color.Error+" can't be demoted!");
 								return true;
 							}
-							//demote player
-							if(sender instanceof ConsoleCommandSender)
+                            
+							//permision checks if sender is a player
+							if(sender instanceof ProxiedPlayer)
 							{
-								for(int i=0;i<player.getGroups().size();i++)
-								{
-									if(player.getGroups().get(i).getRank()==playergroup.getRank())
-									{
-										player.getGroups().remove(i);
-										player.getGroups().add(previousgroup);
-										pm.updateUser(player);
-										sender.sendMessage(Color.User+player.getName()+Color.Text+" is now "+Color.Value+previousgroup.getName()+Color.Text+"!");
-										return true;
-									}
-								}
-							}
-							else
-							{
-								Player issuer=pm.getUser(sender.getName());
+								User issuer=pm.getUser(sender.getName());
 								if(issuer==null)
 								{
 									sender.sendMessage(Color.Error+"You do not exist!");
@@ -1149,28 +1149,29 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"You don't have a group!");
 									return true;
 								}
-								if(issuergroup.getRank()<playergroup.getRank())
+								if(!(issuergroup.getRank()<playergroup.getRank()))
 								{
-									for(int i=0;i<player.getGroups().size();i++)
-									{
-										if(player.getGroups().get(i).getRank()==playergroup.getRank())
-										{
-											player.getGroups().remove(i);
-											player.getGroups().add(previousgroup);
-											pm.updateUser(player);
-											sender.sendMessage(Color.User+player.getName()+Color.Text+" is now "+Color.Value+previousgroup.getName()+Color.Text+"!");
-											return true;
-										}
-									}
-									sender.sendMessage(Color.Error+"Error during demotion of player "+Color.User+player.getName()+Color.Error+"!");
-									return true;
-								}
-								else
-								{
-									sender.sendMessage(Color.Error+"You can't demote the player "+Color.User+player.getName()+Color.Error+"!");
+									sender.sendMessage(Color.Error+"You can't demote the player "+Color.User+user.getName()+Color.Error+"!");
 									return true;
 								}
 							}
+                            
+                            //demote
+                            //remove old group if neccessary
+                            if(playergroup!=null)
+                            {
+                                for(int i=0;i<user.getGroups().size();i++)
+                                {
+                                    if(user.getGroups().get(i).getRank()==playergroup.getRank())
+                                    {
+                                        pm.removeUserGroup(user, user.getGroups().get(i));
+                                        break;
+                                    }
+                                }
+                            }
+                            pm.addUserGroup(user, previousgroup);
+                            sender.sendMessage(Color.User+user.getName()+Color.Text+" is now "+Color.Value+previousgroup.getName()+Color.Text+"!");
+                            return true;
 						}
 						return true;
 					}
@@ -1179,7 +1180,7 @@ public class BungeePerms extends Plugin implements Listener
 				{
                     if(pm.hasOrConsole(sender,"bungeeperms.format",true))
                     {
-                        sender.sendMessage(Color.Text+"Formating permissions file ...");
+                        sender.sendMessage(Color.Text+"Formating permissions file/table ...");
                         pm.format();
                         sender.sendMessage(Color.Message+"Finished formating.");
                     }
@@ -1189,9 +1190,48 @@ public class BungeePerms extends Plugin implements Listener
 				{
                     if(pm.hasOrConsole(sender,"bungeeperms.cleanup",true))
                     {
-                        sender.sendMessage(Color.Text+"Cleaning up permissions file ...");
-                        pm.cleanup();
-                        sender.sendMessage(Color.Message+"Finished cleaning.");
+                        sender.sendMessage(Color.Text+"Cleaning up permissions file/table ...");
+                        int deleted=pm.cleanup();
+                        sender.sendMessage(Color.Message+"Finished cleaning. Deleted "+Color.Value+deleted+" users"+Color.Message+".");
+                    }
+                    return true;
+                }
+                else if(args[0].equalsIgnoreCase("backend"))
+				{
+                    if(pm.hasOrConsole(sender,"bungeeperms.backend",true))
+                    {
+                        if(args.length==1)
+                        {
+                            sender.sendMessage(Color.Text+"Currently using "+Color.Value+pm.getBackEnd().getType().name()+Color.Text+" as backend");
+                        }
+                        else if(args.length==2)
+                        {
+                            String stype=args[1];
+                            BackEndType type=null;
+                            for(BackEndType bet:BackEndType.values())
+                            {
+                                if(stype.equalsIgnoreCase(bet.name()))
+                                {
+                                    type=bet;
+                                    break;
+                                }
+                            }
+                            if(type==null)
+                            {
+                                sender.sendMessage(Color.Error+"Invalid backend type! "+Color.Value+BackEndType.YAML.name()+Color.Error+" or "+Color.Value+BackEndType.MySQL.name()+Color.Error+" is required!");
+                                return true;
+                            }
+                            
+                            if(type==pm.getBackEnd().getType())
+                            {
+                                sender.sendMessage(Color.Error+"Invalid backend type! You can't migrate from "+Color.Value+pm.getBackEnd().getType().name()+Color.Error+" to "+Color.Value+type.name()+Color.Error+"!");
+                                return true;
+                            }
+                            
+                            sender.sendMessage(Color.Text+"Migrating permissions to "+Color.Value+type.name()+Color.Text+" ...");
+                            pm.migrateBackEnd(type);
+                            sender.sendMessage(Color.Message+"Finished migration.");
+                        }
                     }
                     return true;
                 }
@@ -1214,9 +1254,9 @@ public class BungeePerms extends Plugin implements Listener
 		if(pm.hasPermOrConsole(sender,"bungeeperms.reload")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms reload"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Reloads the permissions");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.users")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms users [-c]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Lists the users [or shows the amount of them]");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.info")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> info"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows information to the given user");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.add")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> addperm <permission>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Adds a permission to the given user");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.remove")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> removeperm <permission>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Remove a permission from the given user");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.has")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> has <permission>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Checks if the given user has the given permission");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.add")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> addperm <permission> [server]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Adds a permission to the given user");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.remove")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> removeperm <permission> [server]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Remove a permission from the given user");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.has")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> has <permission> [server]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Checks if the given user has the given permission");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.list")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> list"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Lists the permissions of the given user");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.group.add")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> addgroup <groupname>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Added the given group to the given user");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.group.remove")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> removegroup <groupname>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Removes the given group from the given user");}
@@ -1229,18 +1269,20 @@ public class BungeePerms extends Plugin implements Listener
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.inheritances.add")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> addinherit <group>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Adds a inheritance to the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.inheritances.remove")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> removeinherit <group>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Remove a inheritance from the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.rank")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> rank <new rank>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Sets the rank for the given group");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.group.ladder")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> ladder <new ladder>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Sets the ladder for the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.default")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> default <true|false>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Determines whether the given group is a default group or not");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.display")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> display <displayname>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Sets the display name for the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.prefix")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> prefix <prefix>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Sets the prefix for the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.suffix")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> suffix <suffix>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Sets the suffix for the given group");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.group.perms.add")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> addperm <permission>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Adds a permission to the given group");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.group.perms.remove")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> removeperm <permission>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Remove a permission from the given group");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.group.perms.has")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> has <permission>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Checks if the given group has the given permission");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.group.perms.add")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> addperm <permission> [server]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Adds a permission to the given group");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.group.perms.remove")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> removeperm <permission> [server]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Remove a permission from the given group");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.group.perms.has")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> has <permission> [server]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Checks if the given group has the given permission");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.perms.list")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> list"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Lists the permissions of the given group");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.promote")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms promote <username>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Promotes the given user to the next rank");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.demote")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms demote <username>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Demotes the given user to the previous rank");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.format")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms format"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Reformates the plugin.yml - "+ChatColor.RED+" BE CAREFUL");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.cleanup")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms cleanup"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Cleans up the permission.yml - "+ChatColor.RED+" !BE VERY CAREFUL! - removes a lot of players from the permissions.yml if configured");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.promote")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms promote <username> [ladder]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Promotes the given user to the next rank");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.demote")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms demote <username> [ladder]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Demotes the given user to the previous rank");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.format")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms format"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Reformates the permission.yml or mysql table - "+ChatColor.RED+" BE CAREFUL");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.cleanup")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms cleanup"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Cleans up the permission.yml or mysql table - "+ChatColor.RED+" !BE VERY CAREFUL! - removes a lot of players from the permissions.yml if configured");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.backend")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms backend [yaml|mysql]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows the used permissions database (file or mysql table) [or migrates to the given database] - "+ChatColor.RED+" !BE CAREFUL! - BungeePerms needs a mysql account on your server add general table permissions");}
 		sender.sendMessage(ChatColor.GOLD+"---------------------------------------------------");
 	}
 	

@@ -1,15 +1,18 @@
 package net.alpenblock.bungeeperms;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLConnection;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import net.alpenblock.bungeeperms.config.YamlConfiguration;
+import java.util.logging.Level;
+import net.alpenblock.bungeeperms.io.BackEnd;
+import net.alpenblock.bungeeperms.io.BackEndType;
+import net.alpenblock.bungeeperms.io.MySQLBackEnd;
+import net.alpenblock.bungeeperms.io.YAMLBackEnd;
+import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL;
+import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
+import net.alpenblock.bungeeperms.io.migrate.Migrator;
 
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
@@ -21,210 +24,109 @@ import net.md_5.bungee.api.event.PermissionCheckEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.command.ConsoleCommandSender;
+import net.md_5.bungee.event.EventBus;
 import net.md_5.bungee.event.EventHandler;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class PermissionsManager.
- */
 public class PermissionsManager implements Listener
 {
-	
-	/** The bc. */
 	private BungeeCord bc;
-	
-	/** The plugin. */
 	private Plugin plugin;
-	
-	/** The groups. */
-	private List<Group> groups;
-	
-	/** The players. */
-	private List<Player> players;
-	
-    /** The config. */
     private Config config;
+    private Debug debug;
+    private boolean enabled;
+    
     
     private boolean saveAllUsers;
-    
     private boolean deleteUsersOnCleanup;
     
-	/** The permsconf. */
-	private Config permsconf;
+    private BackEnd backend;
 	
-	/** The permspath. */
-	private String permspath;
-	
-	/** The permsversion. */
-	private int permsversion;
-	
-	/**
-	 * Instantiates a new permissions manager.
-	 *
-	 * @param p the p
-	 */
-	public PermissionsManager(Plugin p)
+	public PermissionsManager(Plugin p,Config conf,Debug d)
 	{
 		bc=BungeeCord.getInstance();
 		plugin=p;
+        config=conf;
+        debug=d;
 		
-		this.groups=new ArrayList<>();
-		this.players=new ArrayList<>();
-        
         //config
-        config=new Config(p, "/config.yml");
         loadConfig();
         
-		//load perms form file
-		permspath="/permissions.yml";
-        
-        //if no permissions file is found copy packed default config to plugin folder
-        File f=new File(p.getDataFolder()+permspath);
-        if(!f.exists()|!f.isFile())
-        {
-            bc.getLogger().info("[BungeePerms] no permissions file found -> copy packed default permissions.yml to data folder ...");
-            f.getParentFile().mkdirs();
-            try 
-			{
-				//file öffnen
-				ClassLoader cl=this.getClass().getClassLoader();
-	            URL url = cl.getResource("permissions.yml");
-	            if(url!=null)
-	            {
-		            URLConnection connection = url.openConnection();
-		            connection.setUseCaches(false);
-		            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(connection.getInputStream());
-		            defConfig.save(f);
-	            }
-	        } 
-			catch (Exception e) 
-	        {
-				e.printStackTrace();
-	        }
-        }
-        
-        //load the perms
-		permsconf=new Config(p, permspath);
+		//perms
 		loadPerms();
-        	
-        bc.getPluginManager().registerListener(plugin,this);
+        
+        enabled=false;
 	}
 	
-    public void loadConfig()
+    public final void loadConfig()
     {
         config.load();
+        
         saveAllUsers=config.getBoolean("saveAllUsers", true);
         deleteUsersOnCleanup=config.getBoolean("deleteUsersOnCleanup", false);
+        
+        BackEndType bet=config.getEnumValue("backendtype",BackEndType.YAML);
+        if(bet==BackEndType.YAML)
+        {
+            backend=new YAMLBackEnd(bc,plugin,saveAllUsers,deleteUsersOnCleanup);
+        }
+        else if(bet==BackEndType.MySQL)
+        {
+            backend=new MySQLBackEnd(bc,config,debug,saveAllUsers,deleteUsersOnCleanup);
+        }
     }
-    
-	/**
-	 * Load perms.
-	 */
-	public void loadPerms()
+	public final void loadPerms()
 	{
 		bc.getLogger().info("[BungeePerms] loading permissions ...");
-		this.groups.clear();
-		this.players.clear();
 		
-		//load from file
-		permsconf.load();
-		
-		//version
-		permsversion=permsconf.getInt("version", 1);
-		
-		//load groups
-		List<String> groups=permsconf.getSubNodes("groups");
-		for(String g:groups)
-		{
-			List<String> inheritances=permsconf.getListString("groups."+g+".inheritances", new ArrayList<String>());
-			List<String> permissions=permsconf.getListString("groups."+g+".permissions", new ArrayList<String>());
-			boolean isdefault=permsconf.getBoolean("groups."+g+".default",false);
-			int rank=permsconf.getInt("groups."+g+".rank", 1000);
-			String display=permsconf.getString("groups."+g+".display", "");
-			String prefix=permsconf.getString("groups."+g+".prefix", "");
-			String suffix=permsconf.getString("groups."+g+".suffix", "");
-			
-			//per server perms
-			Map<String,Server> servers=new HashMap<>();
-			for(String server:permsconf.getSubNodes("groups."+g+".servers"))
-			{
-				List<String> serverperms=permsconf.getListString("groups."+g+".servers."+server+".permissions", new ArrayList<String>());
-                String sdisplay=permsconf.getString("groups."+g+".servers."+server+".display", "");
-                String sprefix=permsconf.getString("groups."+g+".servers."+server+".prefix", "");
-                String ssuffix=permsconf.getString("groups."+g+".servers."+server+".suffix", "");
-                servers.put(server, new Server(server,serverperms,sdisplay,sprefix,ssuffix));
-			}
-			
-			Group group=new Group(g, inheritances, permissions, servers, rank, isdefault, display, prefix, suffix);
-			this.groups.add(group);
-		}
-		sortGroups();
-		
-		//load users
-		List<String> users=permsconf.getSubNodes("users");
-		for(String u:users)
-		{
-			List<String> sgroups=permsconf.getListString("users."+u+".groups", new ArrayList<String>());
-			List<Group> lgroups=new ArrayList<Group>();
-			for(String s:sgroups)
-			{
-				Group g=getGroup(s);
-				if(g!=null)
-				{
-					lgroups.add(g);
-				}
-			}
-			List<String> extrapermissions=permsconf.getListString("users."+u+".permissions", new ArrayList<String>());
-			
-			Map<String,List<String>> serverperms=new HashMap<>();
-			for(String server:permsconf.getSubNodes("users."+u+".servers"))
-			{
-				serverperms.put(server, permsconf.getListString("users."+u+".servers."+server+".permissions", new ArrayList<String>()));
-			}
-			
-			Player player=new Player(u, lgroups, extrapermissions, serverperms);
-			this.players.add(player);
-		}
+        backend.load();
 		
 		bc.getLogger().info("[BungeePerms] permissions loaded");
 	}
+    
+    public void enable()
+    {
+        if(!enabled)
+        {
+            bc.getPluginManager().registerListener(plugin,this);
+            enabled=true;
+        }
+    }
+    public void disable()
+    {
+        if(!enabled)
+        {
+            //since md-5 doesn't provide an unregister function we have to do this via reflections
+            try
+            {
+                Field f=bc.getPluginManager().getClass().getDeclaredField("eventBus");
+                f.setAccessible(true);
+                EventBus bus=(EventBus) f.get(bc.getPluginManager());
+                bus.unregister(this);
+            } catch (Exception ex) {ex.printStackTrace();}
+            enabled=false;
+        }
+    }
 	
-	/**
-	 * Sort groups.
-	 */
-	public void sortGroups()
+	public synchronized void validateUserGroups() 
 	{
-		Collections.sort(this.groups, new Comparator<Group>()
-				{
-					@Override
-					public int compare(Group arg0, Group arg1) 
-					{
-						return -Integer.compare(arg0.getRank(), arg1.getRank());
-					}
-				});
-	}
-	
-	/**
-	 * Validate user groups.
-	 */
-	public void validateUserGroups() 
-	{
-		for(int i=0;i<players.size();i++)
+        //user check
+        List<User> users=backend.getUsers();
+		for(int i=0;i<users.size();i++)
 		{
-			Player p=players.get(i);
-			List<Group> pgroups=p.getGroups();
+			User u=users.get(i);
+			List<Group> pgroups=u.getGroups();
 			for(int j=0;j<pgroups.size();j++)
 			{
 				if(getGroup(pgroups.get(j).getName())==null)
 				{
-					pgroups.remove(j);
+                    backend.removeUserGroup(u,pgroups.get(j));
 					j--;
 				}
 			}
-			p.setGroups(pgroups);
-			players.set(i, p);
-			saveUser(p);
 		}
+        
+        //group check
+        List<Group> groups=backend.getGroups();
 		for(int i=0;i<groups.size();i++)
 		{
 			Group group=groups.get(i);
@@ -233,29 +135,20 @@ public class PermissionsManager implements Listener
 			{
 				if(getGroup(inheritances.get(j))==null)
 				{
-					inheritances.remove(j);
+					backend.removeGroupInheritance(group,inheritances.get(j));
 					j--;
 				}
 			}
-			group.setInheritances(inheritances);
-			groups.set(i, group);
-			saveGroup(group);
 		}
 	}
 
-	/**
-	 * Gets the main group.
-	 *
-	 * @param player the player
-	 * @return the main group
-	 */
-	public Group getMainGroup(Player player) 
+	public synchronized Group getMainGroup(User player) 
 	{
 		if(player==null)
 		{
 			throw new NullPointerException("player is null");
 		}
-		if(player.getGroups().size()==0)
+		if(player.getGroups().isEmpty())
 		{
 			return null;
 		}
@@ -269,22 +162,17 @@ public class PermissionsManager implements Listener
 		}
 		return ret;
 	}
-	
-	/**
-	 * Gets the next group.
-	 *
-	 * @param group the group
-	 * @return the next group
-	 */
-	public Group getNextGroup(Group group)
+	public synchronized Group getNextGroup(Group group)
 	{
-		for(int i=0;i<groups.size();i++)
+        List<Group> laddergroups=getLadderGroups(group.getLadder());
+        
+		for(int i=0;i<laddergroups.size();i++)
 		{
-			if(groups.get(i).getRank()==group.getRank())
+			if(laddergroups.get(i).getRank()==group.getRank())
 			{
-				if(i+1<groups.size())
+				if(i+1<laddergroups.size())
 				{
-					return groups.get(i+1);
+					return laddergroups.get(i+1);
 				}
 				else
 				{
@@ -292,24 +180,19 @@ public class PermissionsManager implements Listener
 				}
 			}
 		}
-		throw new IllegalArgumentException("group does not exist (anymore)");
+		throw new IllegalArgumentException("group ladder does not exist (anymore)");
 	}
-	
-	/**
-	 * Gets the previous group.
-	 *
-	 * @param group the group
-	 * @return the previous group
-	 */
-	public Group getPreviousGroup(Group group)
+	public synchronized Group getPreviousGroup(Group group)
 	{
-		for(int i=0;i<groups.size();i++)
+        List<Group> laddergroups=getLadderGroups(group.getLadder());
+        
+		for(int i=0;i<laddergroups.size();i++)
 		{
-			if(groups.get(i).getRank()==group.getRank())
+			if(laddergroups.get(i).getRank()==group.getRank())
 			{
 				if(i>0)
 				{
-					return groups.get(i-1);
+					return laddergroups.get(i-1);
 				}
 				else
 				{
@@ -317,54 +200,38 @@ public class PermissionsManager implements Listener
 				}
 			}
 		}
-		throw new IllegalArgumentException("group does not exist (anymore)");
+		throw new IllegalArgumentException("group ladder does not exist (anymore)");
+	}
+    public synchronized List<Group> getLadderGroups(String ladder)
+    {
+        List<Group> ret=new ArrayList<>();
+        
+        for(Group g:backend.getGroups())
+        {
+            if(g.getLadder().equalsIgnoreCase(ladder))
+            {
+                ret.add(g);
+            }
+        }
+        
+        Collections.sort(ret);
+        
+        return ret;
+    }
+	
+	public synchronized Group getGroup(String groupname)
+	{
+		return backend.getGroup(groupname);
+	}
+	public synchronized User getUser(String username)
+	{
+		return backend.getUser(username);
 	}
 	
-	/**
-	 * Gets the group.
-	 *
-	 * @param groupname the groupname
-	 * @return the group
-	 */
-	public Group getGroup(String groupname)
+	public synchronized List<Group> getDefaultGroups()
 	{
-		for(Group g:groups)
-		{
-			if(g.getName().equalsIgnoreCase(groupname))
-			{
-				return g;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * Gets the user.
-	 *
-	 * @param username the username
-	 * @return the user
-	 */
-	public Player getUser(String username)
-	{
-		for(Player p:players)
-		{
-			if(p.getName().equalsIgnoreCase(username))
-			{
-				return p;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * Gets the default groups.
-	 *
-	 * @return the default groups
-	 */
-	public List<Group> getDefaultGroups()
-	{
-		List<Group> ret=new ArrayList<Group>();
-		for(Group g:groups)
+		List<Group> ret=new ArrayList<>();
+		for(Group g:backend.getGroups())
 		{
 			if(g.isDefault())
 			{
@@ -374,246 +241,56 @@ public class PermissionsManager implements Listener
 		return ret;
 	}
 	
-	/**
-	 * Gets the groups.
-	 *
-	 * @return the groups
-	 */
 	public List<Group> getGroups()
 	{
-		return Collections.unmodifiableList(groups);
+		return Collections.unmodifiableList(backend.getGroups());
+	}
+	public List<User> getUsers()
+	{
+		return Collections.unmodifiableList(backend.getUsers());
 	}
 	
-	/**
-	 * Gets the users.
-	 *
-	 * @return the users
-	 */
-	public List<Player> getUsers()
+	public synchronized void deleteUser(User user) 
 	{
-		return Collections.unmodifiableList(players);
+		backend.deleteUser(user);
 	}
-	
-	/**
-	 * Save user.
-	 *
-	 * @param p the p
-	 */
-	public synchronized void saveUser(Player p) 
-	{
-        if(!saveAllUsers)
-        {
-            //check if all player groups are default groups
-            boolean alldefault=true;
-            for(Group g:p.getGroups())
-            {
-                if(!g.isDefault())
-                {
-                    alldefault=false;
-                }
-            }
-        
-            //check for default user without extra perms and non-default groups
-            if(alldefault&p.getExtraperms().isEmpty()&p.getServerPerms().isEmpty())
-            {
-                return;
-            }
-        }
-        
-        
-        
-		List<String> groups=new ArrayList<>();
-		for(Group g:p.getGroups())
-		{
-			groups.add(g.getName());
-		}
-		permsconf.setListString("users."+p.getName()+".groups", groups);
-		permsconf.setListString("users."+p.getName()+".permissions", p.getExtraperms());
-
-		for(String server:p.getServerPerms().keySet())
-		{
-			permsconf.setListString("users."+p.getName()+".servers."+server+".permissions", p.getServerPerms().get(server));
-		}
-        
-        permsconf.save();
-	}	
-	
-	/**
-	 * Save group.
-	 *
-	 * @param g the g
-	 */
-	public synchronized void saveGroup(Group g)
-	{
-		permsconf.setListString("groups."+g.getName()+".inheritances", g.getInheritances());
-		permsconf.setListString("groups."+g.getName()+".permissions", g.getPerms());
-		permsconf.setInt("groups."+g.getName()+".rank", g.getRank());
-		permsconf.setBool("groups."+g.getName()+".default", g.isDefault());
-		permsconf.setString("groups."+g.getName()+".display", g.getDisplay());
-		permsconf.setString("groups."+g.getName()+".prefix", g.getPrefix());
-		permsconf.setString("groups."+g.getName()+".suffix", g.getSuffix());
-
-		for(String server:g.getServers().keySet())
-		{
-            Server s=g.getServers().get(server);
-			permsconf.setListString("groups."+g.getName()+".servers."+server+".permissions", s.getPerms());
-            permsconf.setString("groups."+g.getName()+".servers."+server+".display", s.getDisplay());
-            permsconf.setString("groups."+g.getName()+".servers."+server+".prefix", s.getPrefix());
-            permsconf.setString("groups."+g.getName()+".servers."+server+".suffix", s.getSuffix());
-		}
-        
-        permsconf.save();
-	}
-	
-	/**
-	 * Delete user.
-	 *
-	 * @param user the user
-	 */
-	public synchronized void deleteUser(Player user) 
-	{
-		for(int i=0;i<players.size();i++)
-		{
-			if(players.get(i).getName().equalsIgnoreCase(user.getName()))
-			{
-				players.remove(i);
-                permsconf.deleteNode("users."+user.getName());
-                permsconf.save();
-				break;
-			}
-		}
-	}
-	
-	/**
-	 * Delete group.
-	 *
-	 * @param group the group
-	 */
 	public synchronized void deleteGroup(Group group) 
 	{
-		for(int i=0;i<groups.size();i++)
-		{
-			if(groups.get(i).getName().equalsIgnoreCase(group.getName()))
-			{
-				groups.remove(i);
-				permsconf.deleteNode("groups."+group.getName());
-				validateUserGroups();
-                permsconf.save();
-				return;
-			}
-		}
-        
-        
+		backend.deleteGroup(group);
 	}
 	
-	/**
-	 * Update user.
-	 *
-	 * @param user the user
-	 */
-	public synchronized void updateUser(Player user) 
+	public synchronized void addUser(User user) 
 	{
-		for(int i=0;i<players.size();i++)
-		{
-			if(players.get(i).getName().equalsIgnoreCase(user.getName()))
-			{
-				players.set(i,user);
-				saveUser(user);
-				return;
-			}
-		}
+		backend.addUser(user);
 	}
-	
-	/**
-	 * Update group.
-	 *
-	 * @param group the group
-	 */
-	public synchronized void updateGroup(Group group) 
-	{
-		for(int i=0;i<groups.size();i++)
-		{
-			if(groups.get(i).getName().equalsIgnoreCase(group.getName()))
-			{
-				groups.set(i,group);
-				saveGroup(group);
-				sortGroups();
-				return;
-			}
-		}
-	}
-	
-	/**
-	 * Adds the user.
-	 *
-	 * @param user the user
-	 */
-	public synchronized void addUser(Player user) 
-	{
-		players.add(user);
-		saveUser(user);
-	}
-	
-	/**
-	 * Adds the group.
-	 *
-	 * @param group the group
-	 */
 	public synchronized void addGroup(Group group) 
 	{
-		groups.add(group);
-		sortGroups();
-		saveGroup(group);
+		backend.addGroup(group);
 	}
 	
-	/**
-	 * On login.
-	 *
-	 * @param e the e
-	 */
 	@EventHandler
 	public void onLogin(LoginEvent e)
 	{
-		bc.getLogger().info("[BungeePerms] Login by "+e.getConnection().getName());
-		boolean found=false;
-		for(int i=0;i<players.size();i++)
-		{
-			if(e.getConnection().getName().equalsIgnoreCase(players.get(i).getName()))
-			{
-				found=true;
-				break;
-			}
-		}
-		if(!found)
-		{
-			String playername=e.getConnection().getName();
-			bc.getLogger().info("[BungeePerms] Adding default groups to "+playername);
+        String playername=e.getConnection().getName();
+		bc.getLogger().log(Level.INFO, "[BungeePerms] Login by {0}", playername);
+        
+        User u=backend.getUser(playername);
+        if(u==null)
+        {
+			bc.getLogger().log(Level.INFO, "[BungeePerms] Adding default groups to {0}", playername);
+            
 			List<Group> groups=getDefaultGroups();
-			Player p=new Player(playername, groups, new ArrayList<String>(),new HashMap<String, List<String>>());
-			//save to cache
-			players.add(p);
-			saveUser(p);
-		}
+			u=new User(playername, groups, new ArrayList<String>(),new HashMap<String, List<String>>());
+            
+			backend.addUser(u);
+        }
 	}
-	
-	/**
-	 * On permission check.
-	 *
-	 * @param e the e
-	 */
 	@EventHandler
 	public void onPermissionCheck(PermissionCheckEvent e)
 	{
 		e.setHasPermission(hasPermOrConsoleOnServer(e.getSender(),e.getPermission()));
 	}
 	
-	/**
-	 * Checks for perm.
-	 *
-	 * @param sender the sender
-	 * @param permission the permission
-	 * @return true, if successful
-	 */
 	public boolean hasPerm(CommandSender sender, String permission)
 	{
 		if(sender instanceof ProxiedPlayer)
@@ -622,14 +299,6 @@ public class PermissionsManager implements Listener
 		}
 		return false;
 	}
-	
-	/**
-	 * Checks for perm or console.
-	 *
-	 * @param sender the sender
-	 * @param permission the permission
-	 * @return true, if successful
-	 */
 	public boolean hasPermOrConsole(CommandSender sender, String permission)
 	{
 		if(sender instanceof ProxiedPlayer)
@@ -642,35 +311,19 @@ public class PermissionsManager implements Listener
 		}
 		return false;
 	}
-	
-	/**
-	 * Checks for perm.
-	 *
-	 * @param sender the sender
-	 * @param permission the permission
-	 * @return true, if successful
-	 */
 	public boolean hasPerm(String sender, String permission)
 	{
 		if(!sender.equalsIgnoreCase("CONSOLE"))
 		{
-			Player p=getUser(sender);
-			if(p==null)
+			User u=getUser(sender);
+			if(u==null)
 			{
 				return false;
 			}
-			return p.hasPerm(permission);
+			return u.hasPerm(permission);
 		}
 		return false;
 	}
-	
-	/**
-	 * Checks for perm or console.
-	 *
-	 * @param sender the sender
-	 * @param permission the permission
-	 * @return true, if successful
-	 */
 	public boolean hasPermOrConsole(String sender, String permission)
 	{
 		if(sender.equalsIgnoreCase("CONSOLE"))
@@ -679,23 +332,14 @@ public class PermissionsManager implements Listener
 		}
 		else
 		{
-			Player p=getUser(sender);
-			if(p==null)
+			User u=getUser(sender);
+			if(u==null)
 			{
 				return false;
 			}
-			return p.hasPerm(permission);
+			return u.hasPerm(permission);
 		}
 	}
-	
-	/**
-	 * Checks for.
-	 *
-	 * @param sender the sender
-	 * @param perm the perm
-	 * @param msg the msg
-	 * @return true, if successful
-	 */
 	public boolean has(CommandSender sender, String perm, boolean msg)
 	{
 		if(sender instanceof Player)
@@ -710,34 +354,17 @@ public class PermissionsManager implements Listener
 			return false;
 		}
 	}
-	
-	/**
-	 * Checks for or console.
-	 *
-	 * @param sender the sender
-	 * @param perm the perm
-	 * @param msg the msg
-	 * @return true, if successful
-	 */
 	public boolean hasOrConsole(CommandSender sender, String perm, boolean msg)
 	{
 		boolean isperm=(hasPerm(sender, perm)|(sender instanceof ConsoleCommandSender));
 		if(!isperm & msg){sender.sendMessage(Color.Error+"You don't have permission to do that!"+ChatColor.RESET);}
 		return isperm;
 	}
-
-	/**
-	 * Checks for perm on server.
-	 *
-	 * @param sender the sender
-	 * @param permission the permission
-	 * @return true, if successful
-	 */
 	public boolean hasPermOnServer(CommandSender sender, String permission)
 	{
 		if(sender instanceof ProxiedPlayer)
 		{
-			Player user=getUser(sender.getName());
+			User user=getUser(sender.getName());
 			if(((ProxiedPlayer) sender).getServer()==null)
 			{
 				return user.hasPerm(permission);
@@ -746,19 +373,11 @@ public class PermissionsManager implements Listener
 		}
 		return false;
 	}
-	
-	/**
-	 * Checks for perm or console on server.
-	 *
-	 * @param sender the sender
-	 * @param permission the permission
-	 * @return true, if successful
-	 */
 	public boolean hasPermOrConsoleOnServer(CommandSender sender, String permission)
 	{
 		if(sender instanceof ProxiedPlayer)
 		{
-			Player user=getUser(sender.getName());
+			User user=getUser(sender.getName());
 			if(((ProxiedPlayer) sender).getServer()==null)
 			{
 				return user.hasPerm(permission);
@@ -771,20 +390,11 @@ public class PermissionsManager implements Listener
 		}
 		return false;
 	}
-	
-	/**
-	 * Checks for perm on server.
-	 *
-	 * @param sender the sender
-	 * @param permission the permission
-	 * @param server the server
-	 * @return true, if successful
-	 */
 	public boolean hasPermOnServer(String sender, String permission,ServerInfo server)
 	{
 		if(!sender.equalsIgnoreCase("CONSOLE"))
 		{
-			Player p=getUser(sender);
+			User p=getUser(sender);
 			if(p==null)
 			{
 				return false;
@@ -793,15 +403,6 @@ public class PermissionsManager implements Listener
 		}
 		return false;
 	}
-	
-	/**
-	 * Checks for perm or console on server.
-	 *
-	 * @param sender the sender
-	 * @param permission the permission
-	 * @param server the server
-	 * @return true, if successful
-	 */
 	public boolean hasPermOrConsoleOnServer(String sender, String permission,ServerInfo server)
 	{
 		if(sender.equalsIgnoreCase("CONSOLE"))
@@ -810,23 +411,14 @@ public class PermissionsManager implements Listener
 		}
 		else
 		{
-			Player p=getUser(sender);
-			if(p==null)
+			User u=getUser(sender);
+			if(u==null)
 			{
 				return false;
 			}
-			return p.hasPermOnServer(permission,server);
+			return u.hasPermOnServer(permission,server);
 		}
 	}
-	
-	/**
-	 * Checks for on server.
-	 *
-	 * @param sender the sender
-	 * @param perm the perm
-	 * @param msg the msg
-	 * @return true, if successful
-	 */
 	public boolean hasOnServer(CommandSender sender, String perm, boolean msg)
 	{
 		if(sender instanceof Player)
@@ -841,15 +433,6 @@ public class PermissionsManager implements Listener
 			return false;
 		}
 	}
-	
-	/**
-	 * Checks for or console on server.
-	 *
-	 * @param sender the sender
-	 * @param perm the perm
-	 * @param msg the msg
-	 * @return true, if successful
-	 */
 	public boolean hasOrConsoleOnServer(CommandSender sender, String perm, boolean msg)
 	{
 		boolean isperm=(hasPermOnServer(sender, perm)|(sender instanceof ConsoleCommandSender));
@@ -859,110 +442,120 @@ public class PermissionsManager implements Listener
 
     public void format() 
     {
-        new File(plugin.getDataFolder()+"/permissions.yml").delete();
-        Config newperms=new Config(plugin,"/permissions.yml");
-        for(int i=0;i<groups.size();i++)
-        {
-            Group g=groups.get(i);
-            newperms.setInt("groups."+g.getName()+".rank", g.getRank());
-            newperms.setBool("groups."+g.getName()+".default", g.isDefault());
-            newperms.setString("groups."+g.getName()+".display",g.getDisplay());
-            newperms.setString("groups."+g.getName()+".prefix",g.getPrefix());
-            newperms.setString("groups."+g.getName()+".suffix",g.getSuffix());
-            newperms.setListString("groups."+g.getName()+".inheritances", g.getInheritances());
-            newperms.setListString("groups."+g.getName()+".permissions", g.getPerms());
-            for(String server:g.getServers().keySet())
-            {
-                Server s=g.getServers().get(server);
-                newperms.setListString("groups."+g.getName()+".servers."+server+".permissions", s.getPerms());
-                newperms.setString("groups."+g.getName()+".servers."+server+".display", s.getDisplay());
-                newperms.setString("groups."+g.getName()+".servers."+server+".prefix", s.getPrefix());
-                newperms.setString("groups."+g.getName()+".servers."+server+".suffix", s.getSuffix());
-            }
-        }
-        for(Player p:players)
-        {
-            List<String> groups=new ArrayList<>();
-            for(Group g:p.getGroups())
-            {
-                groups.add(g.getName());
-            }
-            newperms.setListString("users."+p.getName()+".groups", groups);
-            
-            newperms.setListString("users."+p.getName()+".permissions", p.getExtraperms());
-            for(String server:p.getServerPerms().keySet())
-            {
-                newperms.setListString("users."+p.getName()+".servers."+server+".permissions", p.getServerPerms().get(server));
-            }
-        }
-        newperms.save();
-        
-        //loadPerms();
+        backend.format();
+    }
+    public int cleanup() 
+    {
+        return backend.cleanup();
     }
 
-    public void cleanup() 
+    public void addUserGroup(User user, Group group)
     {
-        new File(plugin.getDataFolder()+"/permissions.yml").delete();
-        Config newperms=new Config(plugin,"/permissions.yml");
-        for(Group g:groups)
-        {
-            newperms.setInt("groups."+g.getName()+".rank", g.getRank());
-            newperms.setBool("groups."+g.getName()+".default", g.isDefault());
-            newperms.setString("groups."+g.getName()+".display",g.getDisplay());
-            newperms.setString("groups."+g.getName()+".prefix",g.getPrefix());
-            newperms.setString("groups."+g.getName()+".suffix",g.getSuffix());
-            newperms.setListString("groups."+g.getName()+".inheritances", g.getInheritances());
-            newperms.setListString("groups."+g.getName()+".permissions", g.getPerms());
-            for(String server:g.getServers().keySet())
-            {
-                Server s=g.getServers().get(server);
-                newperms.setListString("groups."+g.getName()+".servers."+server+".permissions", s.getPerms());
-                newperms.setString("groups."+g.getName()+".servers."+server+".display", s.getDisplay());
-                newperms.setString("groups."+g.getName()+".servers."+server+".prefix", s.getPrefix());
-                newperms.setString("groups."+g.getName()+".servers."+server+".suffix", s.getSuffix());
-            }
-        }
-        for(Player p:players)
-        {
-            if(deleteUsersOnCleanup)
-            {
-                //check for additional permissions AND onlinecheck
-                if(p.getGroups().isEmpty()&p.getExtraperms().isEmpty()&p.getServerPerms().isEmpty()&BungeeCord.getInstance().getPlayer(p.getName())==null)
-                {
-                    continue;
-                }
-            
-                //check if all player groups are default groups
-                boolean alldefault=true;
-                for(Group g:p.getGroups())
-                {
-                    if(!g.isDefault())
-                    {
-                        alldefault=false;
-                    }
-                }
-                if(alldefault)
-                {
-                    continue;
-                }
-            }
-            
-            //player has to be saved
-            List<String> groups=new ArrayList<>();
-            for(Group g:p.getGroups())
-            {
-                groups.add(g.getName());
-            }
-            newperms.setListString("users."+p.getName()+".groups", groups);
-            
-            newperms.setListString("users."+p.getName()+".permissions", p.getExtraperms());
-            for(String server:p.getServerPerms().keySet())
-            {
-                newperms.setListString("users."+p.getName()+".servers."+server+".permissions", p.getServerPerms().get(server));
-            }
-        }
-        newperms.save();
-        
-        loadPerms();
+        backend.addUserGroup(user, group);
     }
+    public void removeUserGroup(User user, Group group)
+    {
+        backend.removeUserGroup(user, group);
+    }
+    
+    public void addUserPerm(User user, String perm)
+    {
+        backend.addUserPerm(user, perm);
+    }
+    public void removeUserPerm(User user, String perm) 
+    {
+        backend.removeUserPerm(user, perm);
+    }
+
+    public void addUserPerServerPerm(User user, String server, String perm) 
+    {
+        backend.addUserPerServerPerm(user, server, perm);
+    }
+    public void removeUserPerServerPerm(User user, String server, String perm) 
+    {
+        backend.removeUserPerServerPerm(user, server, perm);
+    }
+
+    public void addGroupPerm(Group group, String perm)
+    {
+        backend.addGroupPerm(group, perm);
+    }
+    public void removeGroupPerm(Group group, String perm) 
+    {
+        backend.removeGroupPerm(group, perm);
+    }
+
+    public void addGroupPerServerPerm(Group group, String server, String perm)
+    {
+        backend.addGroupPerServerPerm(group, server, perm);
+    }
+    public void removeGroupPerServerPerm(Group group, String server, String perm)
+    {
+        backend.removeGroupPerServerPerm(group, server, perm);
+    }
+
+    public void addGroupInheritance(Group group, Group toadd)
+    {
+        backend.addGroupInheritance(group, toadd.getName());
+    }
+    public void removeGroupInheritance(Group group, Group toremove) 
+    {
+         backend.removeGroupInheritance(group, toremove.getName());
+    }
+
+    public void rankGroup(Group group, int rank) 
+    {
+        backend.rankGroup(group, rank);
+    }
+    public void ladderGroup(Group group, String ladder) 
+    {
+        backend.ladderGroup(group, ladder);
+    }
+    public void setGroupDefault(Group group, boolean isdefault) 
+    {
+        backend.setGroupDefault(group, isdefault);
+    }
+    public void setGroupDisplay(Group group, String display) 
+    {
+        backend.setGroupDisplay(group, display);
+    }
+    public void setGroupPrefix(Group group, String prefix)
+    {
+        backend.setGroupPrefix(group, prefix);
+    }
+    public void setGroupSuffix(Group group, String suffix)
+    {
+        backend.setGroupSuffix(group, suffix);
+    }
+
+    public BackEnd getBackEnd() {
+        return backend;
+    }
+    public void setBackEnd(BackEnd backend) {
+        this.backend = backend;
+    }
+    public synchronized void migrateBackEnd(BackEndType bet)
+    {
+        if(bet==null)
+        {
+            throw new NullPointerException("bet must not be null");
+        }
+        Migrator migrator = null;
+        if(bet==BackEndType.MySQL)
+        {
+            migrator=new Migrate2MySQL(config,debug);
+        }
+        else if(bet==BackEndType.YAML)
+        {
+            migrator=new Migrate2YAML(plugin,config);
+        }
+        
+        if(migrator==null)
+        {
+            throw new UnsupportedOperationException("bet=="+bet.name());
+        }
+        
+        migrator.migrate(backend.getGroups(), backend.getUsers(), backend.getVersion());
+    }
+
 }

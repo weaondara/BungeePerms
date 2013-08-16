@@ -66,9 +66,9 @@ public class Statics {
 	 * @param seperator the seperator
 	 * @return the list
 	 */
-	public static List<String> ToList(String s,String seperator)
+	public static List<String> toList(String s,String seperator)
 	{
-		List<String> l=new ArrayList<String>();
+		List<String> l=new ArrayList<>();
 		String ls="";
 		for(int i=0;i<(s.length()-seperator.length())+1;i++)
 		{

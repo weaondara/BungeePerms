@@ -138,7 +138,29 @@ public class Config
 		}
 			
 	}
-	
+	public <T extends Enum> T getEnumValue(String key, T def)
+	{
+		if(fconfig.contains(key)) 
+		{
+            String s=getString(key,def.name());
+            T[] constants=(T[]) def.getDeclaringClass().getEnumConstants();
+            for(T constant:constants)
+            {
+                if(constant.name().equals(s))
+                {
+                    return constant;
+                }
+            }
+			return def;
+		}
+		else 
+		{
+			load();
+			fconfig.set(key, def.name());
+			save();
+			return def;
+		}
+	}
 	/**
 	 * Gets the list string.
 	 *
@@ -241,7 +263,16 @@ public class Config
 		fconfig.set(key, val);
 		try { fconfig.save(path); } catch (IOException e) { e.printStackTrace(); }
 	}
-	
+    
+	public <T extends Enum> void setEnumValue(String key, T val) 
+	{
+		fconfig.set(key, val.name());
+	}
+    public <T extends Enum> void setEnumAndSave(String key, T val) 
+	{
+		fconfig.set(key, val.name());
+		try { fconfig.save(path); } catch (IOException e) { e.printStackTrace(); }
+	}
 	/**
 	 * Sets the list string.
 	 *
@@ -293,4 +324,9 @@ public class Config
 		fconfig.set(node, null);
 		try { fconfig.save(path); } catch (IOException e) { e.printStackTrace(); }
 	}
+    
+    public boolean keyExists(String node)
+    {
+        return fconfig.contains(node);
+    }
 }
