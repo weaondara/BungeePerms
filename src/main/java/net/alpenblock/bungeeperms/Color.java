@@ -8,9 +8,6 @@ import net.md_5.bungee.api.ChatColor;
  */
 public class Color {
 	
-	/** The Constant ABT. */
-	public static final String ABT = ChatColor.RED+"Alpen"+ChatColor.WHITE+"block"+ChatColor.RED+"Tools"+ChatColor.RESET;
-	
 	/** The Text. */
 	public static ChatColor Text=ChatColor.GRAY;
 	
