@@ -182,7 +182,7 @@ public class MySQLBackEnd implements BackEnd
 	}
 
     @Override
-    public void addUser(User user)
+    public synchronized void addUser(User user)
     {
         users.add(user);
 		
@@ -203,7 +203,7 @@ public class MySQLBackEnd implements BackEnd
         }
     }
     @Override
-    public void addGroup(Group group)
+    public synchronized void addGroup(Group group)
     {
         groups.add(group);
 		Collections.sort(groups);
@@ -229,7 +229,7 @@ public class MySQLBackEnd implements BackEnd
     }
 
     @Override
-    public void deleteUser(User user)
+    public synchronized void deleteUser(User user)
     {
         for(int i=0;i<users.size();i++)
 		{
