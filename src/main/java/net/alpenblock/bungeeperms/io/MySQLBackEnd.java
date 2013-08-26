@@ -26,6 +26,7 @@ public class MySQLBackEnd implements BackEnd
     
     private MysqlConfig permsconf;
     private String table;
+    private String tablePrefix;
     
     private List<Group> groups;
     private List<User> users;
@@ -42,6 +43,8 @@ public class MySQLBackEnd implements BackEnd
         this.saveAllUsers=saveAllUsers;
         this.deleteUsersOnCleanup=deleteUsersOnCleanup;
         
+        loadConfig();
+        
          //inits
         groups=new ArrayList<>();
         users=new ArrayList<>();
@@ -49,10 +52,14 @@ public class MySQLBackEnd implements BackEnd
         mysql=new Mysql(conf,d,"bungeeperms");
         mysql.connect();
         
-        table="permissions";
+        table=tablePrefix+"permissions";
         
         permsconf=new MysqlConfig(mysql,table);
         permsconf.createTable();
+    }
+    private void loadConfig()
+    {
+        tablePrefix=config.getString("tablePrefix", "bungeeperms_");
     }
     
     @Override
