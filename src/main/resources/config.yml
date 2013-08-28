@@ -1,6 +1,7 @@
 saveAllUsers: true
 deleteUsersOnCleanup: false
 backendtype: YAML
+tablePrefix: bungeeperms_
 debug:
   path: plugins/BungeePerms/debug.log
   showexceptions: true
