@@ -17,48 +17,38 @@ public interface BackEnd
     public BackEndType getType();
     
     public void load();
-    public List<Group> getGroups();
-    public List<User> getUsers();
-    public int getVersion();
-    public void setVersion(int version);
+    public List<Group> loadGroups();
+    public List<User> loadUsers();
+    public User loadUser(String user);
+    public int loadVersion();
+    public void saveVersion(int version, boolean savetodisk);
     
     public boolean isUserInDatabase(User user);
+    public List<String> getRegisteredUsers();
     
-    public Group getGroup(String groupname);
-    public User getUser(String username);
-    
-    public void addUser(User user);
-    public void addGroup(Group group);
+    public void saveUser(User user, boolean savetodisk);
+    public void saveGroup(Group group, boolean savetodisk);
     public void deleteUser(User user);
     public void deleteGroup(Group group);
 
-    public void addUserGroup(User user, Group group);
-    public void removeUserGroup(User u, Group group);
+    public void saveUserGroups(User user);
+    public void saveUserPerms(User user);
+    public void saveUserPerServerPerms(User user, String server);
+    public void saveUserPerServerWorldPerms(User user, String server, String world);
 
-    public void addUserPerm(User user, String perm);
-    public void removeUserPerm(User user, String perm);
+    public void saveGroupPerms(Group group);
+    public void saveGroupPerServerPerms(Group group, String server);
+    public void saveGroupPerServerWorldPerms(Group group, String server, String world);
+    public void saveGroupInheritances(Group group);
+    public void saveGroupRank(Group group);
+    public void saveGroupLadder(Group group);
+    public void saveGroupDefault(Group group);
+    public void saveGroupDisplay(Group group);
+    public void saveGroupPrefix(Group group);
+    public void saveGroupSuffix(Group group);
 
-    public void addUserPerServerPerm(User user, String server, String perm);
-    public void removeUserPerServerPerm(User user, String server, String perm);
-
-    public void addGroupPerm(Group group, String perm);
-    public void removeGroupPerm(Group group, String perm);
- 
-    public void addGroupPerServerPerm(Group group, String server, String perm);
-    public void removeGroupPerServerPerm(Group group, String server, String perm);
-
-    public void addGroupInheritance(Group group, String toadd);
-    public void removeGroupInheritance(Group group, String toremove);
-
-    public void rankGroup(Group group, int rank);
-    public void ladderGroup(Group group, String ladder);
-    public void setGroupDefault(Group group, boolean adefault);
-    public void setGroupDisplay(Group group, String display);
-    public void setGroupPrefix(Group group, String prefix);
-    public void setGroupSuffix(Group group, String suffix);
-
-    public int cleanup();
-    public void format();
+    public int cleanup(List<Group> groups, List<User> users,int version);
+    public void format(List<Group> groups, List<User> users,int version);
     
     public void clearDatabase();
 }

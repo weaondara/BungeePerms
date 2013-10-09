@@ -31,13 +31,13 @@ public class Migrate2YAML  implements Migrator
         be.clearDatabase();
         for(Group group:groups)
         {
-            be.addGroup(group);
+            be.saveGroup(group,false);
         }
         for(User user:users)
         {
-            be.addUser(user);
+            be.saveUser(user,false);
         }
-        be.setVersion(permsversion);
+        be.saveVersion(permsversion,false);
         
         config.setEnumValue("backendtype",BackEndType.YAML);
         config.save();

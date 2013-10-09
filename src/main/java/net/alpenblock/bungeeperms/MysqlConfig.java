@@ -45,6 +45,26 @@ public class MysqlConfig
 		} 
         catch (Exception e) {e.printStackTrace();}
 	}
+    
+    public void fromResult(ResultSet res)
+    {
+		try 
+        {
+            while(res.next())
+            {
+                String key=res.getString("key");
+                String val=res.getString("value");
+                List<String> values=data.get(key);
+                if(values==null)
+                {
+                    values=new ArrayList<>();
+                    data.put(key, values);
+                }
+                values.add(val);
+            }
+		} 
+        catch (Exception e) {e.printStackTrace();}
+	}
 	
 	public void createTable()
 	{

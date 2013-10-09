@@ -13,6 +13,7 @@ import net.alpenblock.bungeeperms.Mysql;
 import net.alpenblock.bungeeperms.MysqlConfig;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
+import net.alpenblock.bungeeperms.World;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -28,10 +29,6 @@ public class MySQLBackEnd implements BackEnd
     private String table;
     private String tablePrefix;
     
-    private List<Group> groups;
-    private List<User> users;
-    private int permsversion;
-    
     private boolean saveAllUsers;
     private boolean deleteUsersOnCleanup;
     
@@ -44,10 +41,6 @@ public class MySQLBackEnd implements BackEnd
         this.deleteUsersOnCleanup=deleteUsersOnCleanup;
         
         loadConfig();
-        
-         //inits
-        groups=new ArrayList<>();
-        users=new ArrayList<>();
         
         mysql=new Mysql(conf,d,"bungeeperms");
         mysql.connect();
@@ -71,17 +64,15 @@ public class MySQLBackEnd implements BackEnd
     @Override
     public void load()
     {
-        this.groups.clear();
-		this.users.clear();
-        
-		//load from file
+		//load from table
 		permsconf.load();
-		
-		//version
-		permsversion=permsconf.getInt("version", 1);
-		
-		//load groups
-		List<String> groups=permsconf.getSubNodes("groups");
+    }
+    @Override
+    public List<Group> loadGroups()
+    {
+        List<Group> ret=new ArrayList<>();
+        
+        List<String> groups=permsconf.getSubNodes("groups");
 		for(String g:groups)
 		{
 			List<String> inheritances=permsconf.getListString("groups."+g+".inheritances", new ArrayList<String>());
@@ -101,23 +92,43 @@ public class MySQLBackEnd implements BackEnd
                 String sdisplay=permsconf.getString("groups."+g+".servers."+server+".display", "");
                 String sprefix=permsconf.getString("groups."+g+".servers."+server+".prefix", "");
                 String ssuffix=permsconf.getString("groups."+g+".servers."+server+".suffix", "");
-                servers.put(server, new Server(server,serverperms,sdisplay,sprefix,ssuffix));
+                
+                //per server world perms
+                Map<String,World> worlds=new HashMap<>();
+                for(String world:permsconf.getSubNodes("groups."+g+".servers."+server+".worlds"))
+                {
+                    List<String> worldperms=permsconf.getListString("groups."+g+".servers."+server+".worlds."+world+".permissions", new ArrayList<String>());
+                    String wdisplay=permsconf.getString("groups."+g+".servers."+server+".worlds."+world+".display", "");
+                    String wprefix=permsconf.getString("groups."+g+".servers."+server+".worlds."+world+".prefix", "");
+                    String wsuffix=permsconf.getString("groups."+g+".servers."+server+".worlds."+world+".suffix", "");
+                    
+                    World w=new World(world,worldperms,wdisplay,wprefix,wsuffix);
+                    worlds.put(world, w);
+                }
+                
+                servers.put(server, new Server(server,serverperms,worlds,sdisplay,sprefix,ssuffix));
 			}
 			
 			Group group=new Group(g, inheritances, permissions, servers, rank, ladder, isdefault, display, prefix, suffix);
-			this.groups.add(group);
+			ret.add(group);
 		}
-        Collections.sort(this.groups);
-		
-		//load users
-		List<String> users=permsconf.getSubNodes("users");
+        Collections.sort(ret);
+        
+        return ret;
+    }
+    @Override
+    public List<User> loadUsers()
+    {
+        List<User> ret=new ArrayList<>();
+        
+        List<String> users=permsconf.getSubNodes("users");
 		for(String u:users)
 		{
 			List<String> sgroups=permsconf.getListString("users."+u+".groups", new ArrayList<String>());
 			List<Group> lgroups=new ArrayList<>();
 			for(String s:sgroups)
 			{
-				Group g=getGroup(s);
+				Group g=BungeePerms.getInstance().getPermissionsManager().getGroup(s);
 				if(g!=null)
 				{
 					lgroups.add(g);
@@ -126,33 +137,74 @@ public class MySQLBackEnd implements BackEnd
 			List<String> extrapermissions=permsconf.getListString("users."+u+".permissions", new ArrayList<String>());
 			
 			Map<String,List<String>> serverperms=new HashMap<>();
+			Map<String,Map<String,List<String>>> serverworldperms=new HashMap<>();
 			for(String server:permsconf.getSubNodes("users."+u+".servers"))
 			{
+                //per server perms
 				serverperms.put(server, permsconf.getListString("users."+u+".servers."+server+".permissions", new ArrayList<String>()));
+                
+                //per server world perms
+                Map<String,List<String>> worldperms=new HashMap<>();
+                for(String world:permsconf.getSubNodes("users."+u+".servers."+server+".worlds"))
+                {
+                    worldperms.put(world, permsconf.getListString("users."+u+".servers."+server+".worlds."+world+".permissions", new ArrayList<String>()));
+                }
+                serverworldperms.put(server, worldperms);
 			}
 			
-			User user=new User(u, lgroups, extrapermissions, serverperms);
-			this.users.add(user);
+			User user=new User(u, lgroups, extrapermissions, serverperms,serverworldperms);
+			ret.add(user);
 		}
+        
+        return ret;
     }
+    @Override
+    public User loadUser(String user) 
+    {
+        if(!permsconf.keyExists("users."+user))
+        {
+            return null;
+        }
+        
+        //load user from database
+        List<String> sgroups=permsconf.getListString("users."+user+".groups", new ArrayList<String>());
+        List<Group> lgroups=new ArrayList<>();
+        for(String s:sgroups)
+        {
+            Group g=BungeePerms.getInstance().getPermissionsManager().getGroup(s);
+            if(g!=null)
+            {
+                lgroups.add(g);
+            }
+        }
+        List<String> extrapermissions=permsconf.getListString("users."+user+".permissions", new ArrayList<String>());
 
-    @Override
-    public List<Group> getGroups() 
-    {
-        return groups;
+        Map<String,List<String>> serverperms=new HashMap<>();
+        Map<String,Map<String,List<String>>> serverworldperms=new HashMap<>();
+        for(String server:permsconf.getSubNodes("users."+user+".servers"))
+        {
+            //per server perms
+            serverperms.put(server, permsconf.getListString("users."+user+".servers."+server+".permissions", new ArrayList<String>()));
+
+            //per server world perms
+            Map<String,List<String>> worldperms=new HashMap<>();
+            for(String world:permsconf.getSubNodes("users."+user+".servers."+server+".worlds"))
+            {
+                worldperms.put(world, permsconf.getListString("users."+user+".servers."+server+".worlds."+world+".permissions", new ArrayList<String>()));
+            }
+            serverworldperms.put(server, worldperms);
+        }
+
+        User u=new User(user, lgroups, extrapermissions, serverperms,serverworldperms);
+        return u;
     }
     @Override
-    public List<User> getUsers()
+    public int loadVersion()
     {
-        return users;
+         return permsconf.getInt("version", 1);
     }
     @Override
-    public int getVersion()
-    {
-        return permsversion;
-    }
-    @Override
-    public void setVersion(int version)
+    public void saveVersion(int version,boolean savetodisk)
     {
         permsconf.setInt("version", version);
     }
@@ -162,37 +214,15 @@ public class MySQLBackEnd implements BackEnd
     {
         return permsconf.keyExists("users."+user.getName());
     }
+    @Override
+    public List<String> getRegisteredUsers() 
+    {
+        return permsconf.getSubNodes("users");
+    }
     
     @Override
-    public synchronized Group getGroup(String groupname)
-	{
-		for(Group g:groups)
-		{
-			if(g.getName().equalsIgnoreCase(groupname))
-			{
-				return g;
-			}
-		}
-		return null;
-	}
-    @Override
-    public synchronized User getUser(String username)
-	{
-		for(User u:users)
-		{
-			if(u.getName().equalsIgnoreCase(username))
-			{
-				return u;
-			}
-		}
-		return null;
-	}
-
-    @Override
-    public synchronized void addUser(User user)
+    public synchronized void saveUser(User user,boolean savetodisk)
     {
-        users.add(user);
-		
         if(saveAllUsers?true:!user.isNothingSpecial())
         {
             List<String> groups=new ArrayList<>();
@@ -203,19 +233,22 @@ public class MySQLBackEnd implements BackEnd
             permsconf.setListString("users."+user.getName()+".groups", groups);
             permsconf.setListString("users."+user.getName()+".permissions", user.getExtraperms());
 
-            for(String server:user.getServerPerms().keySet())
+            for(Map.Entry<String, List<String>> se:user.getServerPerms().entrySet())
             {
-                permsconf.setListString("users."+user.getName()+".servers."+server+".permissions", user.getServerPerms().get(server));
+                permsconf.setListString("users."+user.getName()+".servers."+se.getKey()+".permissions", se.getValue());
+            }
+            for(Map.Entry<String, Map<String, List<String>>> swe:user.getServerWorldPerms().entrySet())
+            {
+                for(Map.Entry<String, List<String>> we:swe.getValue().entrySet())
+                {
+                    permsconf.getListString("users."+user.getName()+".servers."+swe.getKey()+".worlds."+we.getKey()+".permissions", we.getValue());
+                }
             }
         }
     }
     @Override
-    public synchronized void addGroup(Group group)
+    public synchronized void saveGroup(Group group,boolean savetodisk)
     {
-        groups.add(group);
-		Collections.sort(groups);
-		
-        //save
         permsconf.setListString("groups."+group.getName()+".inheritances", group.getInheritances());
 		permsconf.setListString("groups."+group.getName()+".permissions", group.getPerms());
 		permsconf.setInt("groups."+group.getName()+".rank", group.getRank());
@@ -225,51 +258,36 @@ public class MySQLBackEnd implements BackEnd
 		permsconf.setString("groups."+group.getName()+".prefix", group.getPrefix());
 		permsconf.setString("groups."+group.getName()+".suffix", group.getSuffix());
 
-		for(String server:group.getServers().keySet())
+		for(Map.Entry<String, Server> se:group.getServers().entrySet())
 		{
-            Server s=group.getServers().get(server);
-			permsconf.setListString("groups."+group.getName()+".servers."+server+".permissions", s.getPerms());
-            permsconf.setString("groups."+group.getName()+".servers."+server+".display", s.getDisplay());
-            permsconf.setString("groups."+group.getName()+".servers."+server+".prefix", s.getPrefix());
-            permsconf.setString("groups."+group.getName()+".servers."+server+".suffix", s.getSuffix());
+			permsconf.setListString("groups."+group.getName()+".servers."+se.getKey()+".permissions", se.getValue().getPerms());
+            permsconf.setString("groups."+group.getName()+".servers."+se.getKey()+".display", se.getValue().getDisplay());
+            permsconf.setString("groups."+group.getName()+".servers."+se.getKey()+".prefix", se.getValue().getPrefix());
+            permsconf.setString("groups."+group.getName()+".servers."+se.getKey()+".suffix", se.getValue().getSuffix());
+            
+            for(Map.Entry<String,World> we:se.getValue().getWorlds().entrySet())
+            {
+                permsconf.setListString("groups."+group.getName()+".servers."+se.getKey()+".worlds."+we.getKey()+".permissions", we.getValue().getPerms());
+                permsconf.setString("groups."+group.getName()+".servers."+se.getKey()+".worlds."+we.getKey()+".display", we.getValue().getDisplay());
+                permsconf.setString("groups."+group.getName()+".servers."+se.getKey()+".worlds."+we.getKey()+".prefix", we.getValue().getPrefix());
+                permsconf.setString("groups."+group.getName()+".servers."+se.getKey()+".worlds."+we.getKey()+".suffix", we.getValue().getSuffix());
+            }
 		}
     }
-
     @Override
     public synchronized void deleteUser(User user)
     {
-        for(int i=0;i<users.size();i++)
-		{
-			if(users.get(i).getName().equalsIgnoreCase(user.getName()))
-			{
-				users.remove(i);
-                permsconf.deleteNode("users."+user.getName());
-				return;
-			}
-		}
+        permsconf.deleteNode("users."+user.getName());
     }
-
     @Override
     public synchronized void deleteGroup(Group group)
     {
-        for(int i=0;i<groups.size();i++)
-		{
-			if(groups.get(i).getName().equalsIgnoreCase(group.getName()))
-			{
-				groups.remove(i);
-				permsconf.deleteNode("groups."+group.getName());
-				BungeePerms.getInstance().getPermissionsManager().validateUserGroups();
-				return;
-			}
-		}
+        permsconf.deleteNode("groups."+group.getName());
     }
 
     @Override
-    public synchronized void addUserGroup(User user, Group group)
+    public synchronized void saveUserGroups(User user)
     {
-        user.getGroups().add(group);
-        Collections.sort(user.getGroups());
-        
         List<String> savegroups=new ArrayList<>();
         for(Group g:user.getGroups())
         {
@@ -277,255 +295,105 @@ public class MySQLBackEnd implements BackEnd
         }
         
         permsconf.setListString("users."+user.getName()+".groups", savegroups);
-        
-        user.recalcAllPerms();
     }
     @Override
-    public synchronized void removeUserGroup(User user, Group group)
+    public synchronized void saveUserPerms(User user)
     {
-        user.getGroups().remove(group);
-        
-        List<String> savegroups=new ArrayList<>();
-        for(Group g:user.getGroups())
-        {
-            savegroups.add(g.getName());
-        }
-        
-        permsconf.setListString("users."+user.getName()+".groups", savegroups);
-        
-        user.recalcAllPerms();
-    }
-
-    @Override
-    public synchronized void addUserPerm(User user, String perm)
-    {
-        user.getExtraperms().add(perm);
         permsconf.setListString("users."+user.getName()+".permissions", user.getExtraperms());
-        user.recalcPerms();
     }
     @Override
-    public synchronized void removeUserPerm(User user, String perm)
+    public synchronized void saveUserPerServerPerms(User user, String server) 
     {
-        user.getExtraperms().remove(perm);
-        permsconf.setListString("users."+user.getName()+".permissions", user.getExtraperms());
-        user.recalcPerms();
+        permsconf.setListString("users."+user.getName()+".servers."+server+".permissions", user.getServerPerms().get(server));
+    }
+    @Override
+    public synchronized void saveUserPerServerWorldPerms(User user, String server, String world) 
+    {
+        permsconf.setListString("users."+user.getName()+".servers."+server+".worlds."+world+".permissions", user.getServerWorldPerms().get(server).get(world));
     }
 
     @Override
-    public synchronized void addUserPerServerPerm(User user, String server, String perm) 
+    public synchronized void saveGroupPerms(Group group)
     {
-        List<String> perserverperms=user.getServerPerms().get(server);
-        if(perserverperms==null)
-        {
-            perserverperms=new ArrayList<>();
-        }
-        
-        perserverperms.add(perm);
-        user.getServerPerms().put(server, perserverperms);
-        
-        permsconf.setListString("users."+user.getName()+".servers."+server+".permissions", perserverperms);
-        
-        user.recalcPerms(server);
-    }
-    @Override
-    public synchronized void removeUserPerServerPerm(User user, String server, String perm) 
-    {
-        List<String> perserverperms=user.getServerPerms().get(server);
-        if(perserverperms==null)
-        {
-            return;
-        }
-        
-        perserverperms.remove(perm);
-        user.getServerPerms().put(server, perserverperms);
-        
-        permsconf.setListString("users."+user.getName()+".servers."+server+".permissions", perserverperms);
-        
-        user.recalcPerms(server);
-    }
-    
-    @Override
-    public synchronized void addGroupPerm(Group group, String perm)
-    {
-        group.getPerms().add(perm);
         permsconf.setListString("groups."+group.getName()+".permissions", group.getPerms());
-        group.recalcPerms();
     }
     @Override
-    public synchronized void removeGroupPerm(Group group, String perm)
+    public synchronized void saveGroupPerServerPerms(Group group, String server) 
     {
-        group.getPerms().remove(perm);
-        permsconf.setListString("groups."+group.getName()+".permissions", group.getPerms());
-        group.recalcPerms();
-    }
-
-    @Override
-    public synchronized void addGroupPerServerPerm(Group group, String server, String perm) 
-    {
-        Server srv=group.getServers().get(server);
-        if(srv==null)
-        {
-            srv=new Server(server,new ArrayList<String>(),"","","");
-        }
-        
-        srv.getPerms().add(perm);
-        
-        group.getServers().put(server, srv);
-        
-        permsconf.setListString("groups."+group.getName()+".servers."+server+".permissions", srv.getPerms());
-        
-        group.recalcPerms(server);
+        permsconf.setListString("groups."+group.getName()+".servers."+server+".permissions", group.getServers().get(server).getPerms());
     }
     @Override
-    public synchronized void removeGroupPerServerPerm(Group group, String server, String perm) 
+    public synchronized void saveGroupPerServerWorldPerms(Group group, String server, String world)
     {
-        Server srv=group.getServers().get(server);
-        if(srv==null)
-        {
-            return;
-        }
-        
-        srv.getPerms().remove(perm);
-        
-        group.getServers().put(server, srv);
-        
-        permsconf.setListString("groups."+group.getName()+".servers."+server+".permissions", srv.getPerms());
-        
-        group.recalcPerms(server);
+        permsconf.setListString("groups."+group.getName()+".servers."+server+".worlds."+world+".permissions", group.getServers().get(server).getWorlds().get(world).getPerms());
     }
-
     @Override
-    public synchronized void addGroupInheritance(Group group, String toadd)
+    public synchronized void saveGroupInheritances(Group group)
     {
-        group.getInheritances().add(toadd);
-        Collections.sort(group.getInheritances());
         permsconf.setListString("groups."+group.getName()+".inheritances", group.getInheritances());
-        group.recalcAllPerms();
     }
     @Override
-    public synchronized void removeGroupInheritance(Group group, String toremove)
+    public synchronized void saveGroupLadder(Group group)
     {
-        group.getInheritances().remove(toremove);
-        permsconf.setListString("groups."+group.getName()+".inheritances", group.getInheritances());
-        group.recalcAllPerms();
-    }
-
-    @Override
-    public synchronized void ladderGroup(Group group, String ladder)
-    {
-        group.setLadder(ladder);
         permsconf.setString("groups."+group.getName()+".ladder", group.getLadder());
     }
     @Override
-    public synchronized void rankGroup(Group group, int rank)
+    public synchronized void saveGroupRank(Group group)
     {
-        group.setRank(rank);
-        Collections.sort(groups);
         permsconf.setInt("groups."+group.getName()+".rank", group.getRank());
     }
     @Override
-    public synchronized void setGroupDefault(Group group, boolean isdefault)
+    public synchronized void saveGroupDefault(Group group)
     {
-        group.setIsdefault(isdefault);
         permsconf.setBool("groups."+group.getName()+".default", group.isDefault());
     }
     @Override
-    public synchronized void setGroupDisplay(Group group, String display)
+    public synchronized void saveGroupDisplay(Group group)
     {
-        group.setDisplay(display);
         permsconf.setString("groups."+group.getName()+".display", group.getDisplay());
     }
     @Override
-    public synchronized void setGroupPrefix(Group group, String prefix)
+    public synchronized void saveGroupPrefix(Group group)
     {
-        group.setPrefix(prefix);
         permsconf.setString("groups."+group.getName()+".prefix", group.getPrefix());
     }
     @Override
-    public synchronized void setGroupSuffix(Group group, String suffix)
+    public synchronized void saveGroupSuffix(Group group)
     {
-        group.setSuffix(suffix);
         permsconf.setString("groups."+group.getName()+".suffix", group.getSuffix());
     }
     
     @Override
-    public synchronized void format() 
+    public synchronized void format(List<Group> groups, List<User> users,int version) 
     {
-        permsconf.clearTable(table);
-        MysqlConfig newperms=new MysqlConfig(mysql,table);
+        clearDatabase();
         for(int i=0;i<groups.size();i++)
         {
-            Group g=groups.get(i);
-            newperms.setInt("groups."+g.getName()+".rank", g.getRank());
-            newperms.setString("groups."+g.getName()+".ladder", g.getLadder());
-            newperms.setBool("groups."+g.getName()+".default", g.isDefault());
-            newperms.setString("groups."+g.getName()+".display",g.getDisplay());
-            newperms.setString("groups."+g.getName()+".prefix",g.getPrefix());
-            newperms.setString("groups."+g.getName()+".suffix",g.getSuffix());
-            newperms.setListString("groups."+g.getName()+".inheritances", g.getInheritances());
-            newperms.setListString("groups."+g.getName()+".permissions", g.getPerms());
-            for(String server:g.getServers().keySet())
-            {
-                Server s=g.getServers().get(server);
-                newperms.setListString("groups."+g.getName()+".servers."+server+".permissions", s.getPerms());
-                newperms.setString("groups."+g.getName()+".servers."+server+".display", s.getDisplay());
-                newperms.setString("groups."+g.getName()+".servers."+server+".prefix", s.getPrefix());
-                newperms.setString("groups."+g.getName()+".servers."+server+".suffix", s.getSuffix());
-            }
+            saveGroup(groups.get(i),false);
         }
-        for(User p:users)
+        for(int i=0;i<users.size();i++)
         {
-            List<String> groups=new ArrayList<>();
-            for(Group g:p.getGroups())
-            {
-                groups.add(g.getName());
-            }
-            newperms.setListString("users."+p.getName()+".groups", groups);
-            
-            newperms.setListString("users."+p.getName()+".permissions", p.getExtraperms());
-            for(String server:p.getServerPerms().keySet())
-            {
-                newperms.setListString("users."+p.getName()+".servers."+server+".permissions", p.getServerPerms().get(server));
-            }
+            saveUser(users.get(i),false);
         }
-        newperms.setInt("version", 1);
-        
-        permsconf=newperms;
-        
-        permsconf.load();
+        saveVersion(version,false);
     }
     @Override
-    public synchronized int cleanup() 
+    public synchronized int cleanup(List<Group> groups, List<User> users,int version) 
     {
         int deleted=0;
         
-        permsconf.clearTable(table);
-        MysqlConfig newperms=new MysqlConfig(mysql,table);
-        for(Group g:groups)
+        clearDatabase() ;
+        for(int i=0;i<groups.size();i++)
         {
-            newperms.setInt("groups."+g.getName()+".rank", g.getRank());
-            newperms.setString("groups."+g.getName()+".ladder", g.getLadder());
-            newperms.setBool("groups."+g.getName()+".default", g.isDefault());
-            newperms.setString("groups."+g.getName()+".display",g.getDisplay());
-            newperms.setString("groups."+g.getName()+".prefix",g.getPrefix());
-            newperms.setString("groups."+g.getName()+".suffix",g.getSuffix());
-            newperms.setListString("groups."+g.getName()+".inheritances", g.getInheritances());
-            newperms.setListString("groups."+g.getName()+".permissions", g.getPerms());
-            for(String server:g.getServers().keySet())
-            {
-                Server s=g.getServers().get(server);
-                newperms.setListString("groups."+g.getName()+".servers."+server+".permissions", s.getPerms());
-                newperms.setString("groups."+g.getName()+".servers."+server+".display", s.getDisplay());
-                newperms.setString("groups."+g.getName()+".servers."+server+".prefix", s.getPrefix());
-                newperms.setString("groups."+g.getName()+".servers."+server+".suffix", s.getSuffix());
-            }
+            saveGroup(groups.get(i),false);
         }
-        for(User p:users)
+        for(int i=0;i<users.size();i++)
         {
+            User u=users.get(i);
             if(deleteUsersOnCleanup)
             {
                 //check for additional permissions and non-default groups AND onlinecheck
-                if(p.isNothingSpecial()&BungeeCord.getInstance().getPlayer(p.getName())==null)
+                if(u.isNothingSpecial()&BungeeCord.getInstance().getPlayer(u.getName())==null)
                 {
                     deleted++;
                     continue;
@@ -533,24 +401,9 @@ public class MySQLBackEnd implements BackEnd
             }
             
             //player has to be saved
-            List<String> groups=new ArrayList<>();
-            for(Group g:p.getGroups())
-            {
-                groups.add(g.getName());
-            }
-            newperms.setListString("users."+p.getName()+".groups", groups);
-            
-            newperms.setListString("users."+p.getName()+".permissions", p.getExtraperms());
-            for(String server:p.getServerPerms().keySet())
-            {
-                newperms.setListString("users."+p.getName()+".servers."+server+".permissions", p.getServerPerms().get(server));
-            }
+            saveUser(users.get(i),false);
         }
-        newperms.setInt("version", 1);
-        
-        permsconf=newperms;
-        
-        load();
+        saveVersion(version,false);
         
         return deleted;
     }

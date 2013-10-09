@@ -1,30 +1,28 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.List;
-import java.util.Map;
 
-public class Server 
+public class World 
 {
-    private String server;
+    private String world;
     private List<String> perms;
     private String display;
     private String prefix;
     private String suffix;
-    private Map<String, World> worlds;
-    public Server(String server, List<String> perms, Map<String, World> worlds, String display, String prefix, String suffix) 
+    public World(String world, List<String> perms, String display, String prefix, String suffix) 
     {
-		this.server = server;
+		this.world = world;
 		this.perms = perms;
 		this.display = display;
 		this.prefix = prefix;
 		this.suffix = suffix;
-		this.worlds = worlds;
 	}
-    public String getServer() {
-        return server;
+
+    public String getWorld() {
+        return world;
     }
-    public void setServer(String server) {
-        this.server = server;
+    public void setWorld(String world) {
+        this.world = world;
     }
     public List<String> getPerms() {
         return perms;
@@ -50,10 +48,5 @@ public class Server
     public void setSuffix(String suffix) {
         this.suffix = suffix;
     }
-    public Map<String, World> getWorlds() {
-        return worlds;
-    }
-    public void setWorlds(Map<String, World> worlds) {
-        this.worlds = worlds;
-    }
+    
 }
