@@ -655,12 +655,12 @@ public class PermissionsManager implements Listener
     //database and permission operations
     public void format() 
     {
-        backend.format(groups, users,permsversion);
+        backend.format(backend.loadGroups(), backend.loadUsers(),permsversion);
         sendPMAll("reload;all");
     }
     public int cleanup() 
     {
-        int res=backend.cleanup(groups, users,permsversion);
+        int res=backend.cleanup(backend.loadGroups(), backend.loadUsers(),permsversion);
         sendPMAll("reload;all");
         return res;
     }
@@ -1088,10 +1088,12 @@ public class PermissionsManager implements Listener
     }
 
     //backend things
-    public BackEnd getBackEnd() {
+    public BackEnd getBackEnd()
+    {
         return backend;
     }
-    public void setBackEnd(BackEnd backend) {
+    public void setBackEnd(BackEnd backend)
+    {
         this.backend = backend;
     }
     public synchronized void migrateBackEnd(BackEndType bet)
@@ -1115,7 +1117,7 @@ public class PermissionsManager implements Listener
             throw new UnsupportedOperationException("bet=="+bet.name());
         }
         
-        migrator.migrate(groups, users, permsversion);
+        migrator.migrate(backend.loadGroups(), backend.loadUsers(), permsversion);
     }
     
     //perms per world
