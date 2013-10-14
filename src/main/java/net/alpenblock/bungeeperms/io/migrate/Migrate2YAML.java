@@ -37,7 +37,8 @@ public class Migrate2YAML  implements Migrator
         {
             be.saveUser(user,false);
         }
-        be.saveVersion(permsversion,false);
+        be.saveVersion(permsversion,true);
+        
         
         config.setEnumValue("backendtype",BackEndType.YAML);
         config.save();
