@@ -6,16 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * The Class Mysql.
- */
 public class Mysql 
 {
 	private Config config;
 	private Debug debug;
 	private Connection connection;
 	private String configsection;
-	
+    
 	public Mysql (Config c,Debug d,String configsection) 
 	{	
 		config = c;
@@ -28,7 +25,7 @@ public class Mysql
 		try 
 		{
 			//URL zusammenbasteln
-			String url = "jdbc:mysql://"+config.getString(configsection+".general.mysqlhost", "localhost")+":"+config.getString(configsection+".general.mysqlport","3306")+"/"+config.getString(configsection+".general.mysqldb", configsection)+"?autoReconnect=true";
+			String url = "jdbc:mysql://"+config.getString(configsection+".general.mysqlhost", "localhost")+":"+config.getString(configsection+".general.mysqlport","3306")+"/"+config.getString(configsection+".general.mysqldb", configsection)+"?autoReconnect=true&dontTrackOpenResources=true";
 			this.connection = DriverManager.getConnection(url,config.getString(configsection+".general.mysqluser",configsection),config.getString(configsection+".general.mysqlpw","password"));
 		}
 		catch (Exception e) 
@@ -55,25 +52,37 @@ public class Mysql
 	}
 	public boolean isConnected()
 	{
+        boolean connected=false;
+        
+        ResultSet rs=null;
         try 
         {
-            ResultSet rs = this.returnQuery("SELECT 1;",false);
+            rs = this.returnQuery("SELECT 1;",false);
             if (rs == null)
             {
-                return false;
+                connected=false;
             }
             if (rs.next()) 
             {
-                return true;
+                connected=true;
             }
-            return false;
+            connected=false;
         }
         catch (Exception e) 
         {
-            return false;
+            connected=false;
         }
+        finally
+        {
+            try
+            {
+                rs.close();
+            }
+            catch(Exception e){}
+        }
+        return connected;
 	}
-
+    
     public ResultSet returnQuery(String query) 
     {
     	return returnQuery(query, true);
@@ -86,18 +95,21 @@ public class Mysql
     {
         return runQueryGetId(query,true);
     }
-    
+
     public boolean tableExists(String table) 
     {
     	boolean tableexists = false;
+        
+        ResultSet res=null;
     	try 
     	{
-			ResultSet res = this.returnQuery("SHOW TABLES");
+			res = this.returnQuery("SHOW TABLES");
 			while(res.next()) 
 			{
 				if(res.getString(1).equalsIgnoreCase(table)) 
 				{
 					tableexists = true;
+                    break;
 				}
 			}
     	} 
@@ -105,14 +117,25 @@ public class Mysql
     	{
     		debug.log(e);
     	}
+        finally
+        {
+            try
+            {
+                res.close();
+            }
+            catch(Exception e){}
+        }
     	return tableexists;
     }
     public boolean addColumn(String table,String column,String type,String after,String value) 
     {
+        boolean success=false;
+        
+        ResultSet res=null;
     	try 
     	{
     		String getc="SHOW COLUMNS FROM "+table;
-			ResultSet res=returnQuery(getc);
+			res=returnQuery(getc);
 			
 			boolean found=false;
 			while(res.next())
@@ -130,52 +153,96 @@ public class Mysql
 				c="UPDATE "+table+" SET "+column+"="+value;
 				runQuery(c);
 			}
-			return true;
+			success=true;
     	} 
     	catch (Exception e)
     	{
     		debug.log(e);
-    		return false;
+    		success=false;
     	}
+        finally
+        {
+            try
+            {
+                res.close();
+            }
+            catch(Exception e){}
+        }
+        return success;
     }
     public int columnExists(String table,String column) 
     {
+        //0: error
+        //1: coulumn found
+        //2: cloumn not found
+        int fsuccess=0;
+        
+        ResultSet res=null;
     	try 
     	{
     		String getc="SHOW COLUMNS FROM "+table;
-			ResultSet res=returnQuery(getc);
+			res=returnQuery(getc);
 			
 			while(res.next())
 			{
 				if(res.getString("Field").equalsIgnoreCase(column))
 				{
-					return 1;
+					fsuccess=1;
 				}
 			}
-			return 2;
+			fsuccess=2;
     	} 
     	catch (Exception e)
     	{
     		debug.log(e);
-    		return 0;
+    		fsuccess=0;
     	}
+        finally
+        {
+            try
+            {
+                res.close();
+            }
+            catch(Exception e){}
+        }
+        return fsuccess;
     }
-
-	
+    
+    
     private ResultSet returnQuery(String query,boolean checkconnection) 
     {
+        Statement stmt=null;
+        ResultSet rs=null;
         try 
         {
         	if(checkconnection)checkConnection();
-            Statement stmt = this.connection.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            return rs;
+            stmt = this.connection.createStatement();
+            rs = stmt.executeQuery(query);
         } 
         catch (SQLException e) 
         {
         	debug.log(e);
-            return null;
+            try
+            {
+                rs.close();
+            }
+            catch(Exception ex){}
+            try
+            {
+                stmt.close();
+            }
+            catch(Exception ex){}
+            rs=null;
         }
+        finally
+        {
+            try
+            {
+                stmt.closeOnCompletion();
+            }
+            catch(Exception e){}
+        }
+        return rs;
     }
     private boolean runQuery(String query,boolean checkconnection) 
     {
@@ -183,7 +250,9 @@ public class Mysql
         {
         	if(checkconnection)checkConnection();
             Statement stmt = this.connection.createStatement();
-            return stmt.execute(query);
+            boolean success=stmt.execute(query);
+            stmt.close();
+            return success;
         }
         catch (Exception e) 
         {
@@ -193,24 +262,40 @@ public class Mysql
     }
     private long runQueryGetId(String query,boolean checkconnection) 
     {
+        long id=0;
+        
+        Statement stmt=null;
+        ResultSet rs=null;
         try 
         {
         	if(checkconnection)checkConnection();
-        	Statement stmt = this.connection.createStatement();
+        	stmt = this.connection.createStatement();
             stmt.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
             
-            //ResultSet rs = stmt.getGeneratedKeys();
-            ResultSet rs = stmt.getGeneratedKeys();
-            while(rs.next()) 
+            rs = stmt.getGeneratedKeys();
+            if(rs.last()) 
             {
-            	return rs.getLong(1);
+                id=rs.getLong(1);
             }
         }
         catch (Exception e) 
         {
         	debug.log(e);
         }
-        return 0;
+        finally
+        {
+            try
+            {
+                rs.close();
+            }
+            catch(Exception e){}
+            try
+            {
+                stmt.close();
+            }
+            catch(Exception e){}
+        }
+        return id;
     }
     
     private void checkConnection()
@@ -226,6 +311,7 @@ public class Mysql
     	connect();
     }
 
+    
     public static String escape(String s)
     {
         if(s==null)

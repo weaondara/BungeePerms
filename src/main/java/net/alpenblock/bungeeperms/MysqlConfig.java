@@ -27,9 +27,11 @@ public class MysqlConfig
 	public void load()
     {
 		createTable();
+        
+        ResultSet res=null;
 		try 
         {
-            ResultSet res=mysql.returnQuery("SELECT `key`,`value` FROM `"+table+"`");
+            res=mysql.returnQuery("SELECT `key`,`value` FROM `"+table+"`");
             while(res.next())
             {
                 String key=res.getString("key");
@@ -44,6 +46,14 @@ public class MysqlConfig
             }
 		} 
         catch (Exception e) {e.printStackTrace();}
+        finally
+        {
+            try
+            {
+                res.close();
+            }
+            catch(Exception e){}
+        }
 	}
     
     public void fromResult(ResultSet res)

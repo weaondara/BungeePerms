@@ -656,11 +656,13 @@ public class PermissionsManager implements Listener
     public void format() 
     {
         backend.format(backend.loadGroups(), backend.loadUsers(),permsversion);
+        backend.load();
         sendPMAll("reload;all");
     }
     public int cleanup() 
     {
         int res=backend.cleanup(backend.loadGroups(), backend.loadUsers(),permsversion);
+        backend.load();
         sendPMAll("reload;all");
         return res;
     }
@@ -1118,6 +1120,8 @@ public class PermissionsManager implements Listener
         }
         
         migrator.migrate(backend.loadGroups(), backend.loadUsers(), permsversion);
+        
+        backend.load();
     }
     
     //perms per world
