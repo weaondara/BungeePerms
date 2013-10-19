@@ -66,7 +66,6 @@ public class Mysql
             {
                 connected=true;
             }
-            connected=false;
         }
         catch (Exception e) 
         {
@@ -238,7 +237,7 @@ public class Mysql
         {
             try
             {
-                stmt.closeOnCompletion();
+                //stmt.closeOnCompletion();
             }
             catch(Exception e){}
         }
