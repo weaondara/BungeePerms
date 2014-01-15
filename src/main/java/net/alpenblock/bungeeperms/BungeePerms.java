@@ -107,15 +107,17 @@ public class BungeePerms extends Plugin implements Listener
 			{
 				if(args[0].equalsIgnoreCase("help"))
 				{
-					if(args.length==1)
-					{
-						if(pm.hasOrConsole(sender,"bungeeperms.help",true))
-						{
-							showHelp(sender);
-							return true;
-						}
-						return true;
-					}
+                    if(!matchArgs(sender,args,1))
+                    {
+                        return true;
+                    }
+                    
+                    if(pm.hasOrConsole(sender,"bungeeperms.help",true))
+                    {
+                        showHelp(sender);
+                        return true;
+                    }
+                    return true;
 				}
 				else if(args[0].equalsIgnoreCase("reload"))
 				{
@@ -172,75 +174,101 @@ public class BungeePerms extends Plugin implements Listener
 				}
 				else if(args[0].equalsIgnoreCase("user"))
 				{
-					if(args.length==3)
-					{
-						if(args[2].equalsIgnoreCase("list"))
-						{
-							if(pm.hasOrConsole(sender,"bungeeperms.user.perms.list",true))
-							{
-								String player=Statics.getFullPlayerName(bc,args[1]);
-								User user=pm.getUser(player);
-								if(user!=null)
-								{
-									sender.sendMessage(Color.Text+"Permissions of the player "+Color.User+player+Color.Text+":");
-									List<String> perms=user.getEffectivePerms();
-									for(String perm:perms)
-									{
-										sender.sendMessage(Color.Text+"- "+Color.Value+perm);
-									}
-								}
-								else
-								{
-									sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
-								}
-							}
-							return true;
-						}
-						else if(args[2].equalsIgnoreCase("groups"))
-						{
-							if(pm.hasOrConsole(sender,"bungeeperms.user.groups",true))
-							{
-								String player=Statics.getFullPlayerName(bc,args[1]);
-								User user=pm.getUser(player);
-								if(user!=null)
-								{
-									sender.sendMessage(Color.Text+"Groups of the player "+Color.User+player+Color.Text+":");
-									for(Group g:user.getGroups())
-									{
-										sender.sendMessage(Color.Text+"- "+Color.Value+g.getName());
-									}
-								}
-								else
-								{
-									sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
-								}
-							}
-							return true;
-						}
-						else if(args[2].equalsIgnoreCase("info"))
-						{
-							if(pm.hasOrConsole(sender,"bungeeperms.user.info",true))
-							{
-								String player=Statics.getFullPlayerName(bc,args[1]);
-								User user=pm.getUser(player);
-								if(user==null)
-								{
-									sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
-									return true;
-								}
-								String groups="";
-								for(int i=0;i<user.getGroups().size();i++)
-								{
-									groups+=Color.Value+user.getGroups().get(i).getName()+Color.Text+" ("+Color.Value+user.getGroups().get(i).getPerms().size()+Color.Text+")"+(i+1<user.getGroups().size()?", ":"");
-								}
-								sender.sendMessage(Color.Text+"Groups of the player "+Color.User+player+Color.Text+": "+groups);
-								
-								//all group perms
-								sender.sendMessage(Color.Text+"Effective permissions: "+Color.Value+user.getEffectivePerms().size());//TODO
-							}
-							return true;
-						}
-					}
+                    if(args[2].equalsIgnoreCase("list"))
+                    {
+                        if(pm.hasOrConsole(sender,"bungeeperms.user.perms.list",true))
+                        {
+                            if(args.length<3)
+                            {
+                                Messages.sendTooLessArgsMessage(sender);
+                                return true;
+                            }
+                            else if(args.length>5)
+                            {
+                                Messages.sendTooManyArgsMessage(sender);
+                                return true;
+                            }
+                            
+                            String player=Statics.getFullPlayerName(bc,args[1]);
+                            String server=args.length>3?args[3]:null;
+                            String world=args.length>4?args[4]:null;
+
+                            User user=pm.getUser(player);
+                            if(user!=null)
+                            {
+                                sender.sendMessage(Color.Text+"Permissions of the player "+Color.User+player+Color.Text+":");
+                                List<BPPermission> perms=user.getPermsWithOrigin(server,world);
+                                for(BPPermission perm:perms)
+                                {
+                                    sender.sendMessage(Color.Text+"- "+Color.Value+perm.getPermission()+Color.Text+
+                                            " ("+
+                                            Color.Value+(!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(player)?"own":perm.getOrigin())+Color.Text+
+                                            (perm.getServer()!=null?" | "+Color.Value+perm.getServer()+Color.Text:"")+
+                                            (perm.getWorld()!=null?" | "+Color.Value+perm.getWorld()+Color.Text:"")+
+                                            ")");
+                                }
+                            }
+                            else
+                            {
+                                sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
+                            }
+                        }
+                        return true;
+                    }
+                    else if(args[2].equalsIgnoreCase("groups"))
+                    {
+                        if(pm.hasOrConsole(sender,"bungeeperms.user.groups",true))
+                        {
+                            if(!matchArgs(sender,args,3))
+                            {
+                                return true;
+                            }
+                            
+                            String player=Statics.getFullPlayerName(bc,args[1]);
+                            User user=pm.getUser(player);
+                            if(user!=null)
+                            {
+                                sender.sendMessage(Color.Text+"Groups of the player "+Color.User+player+Color.Text+":");
+                                for(Group g:user.getGroups())
+                                {
+                                    sender.sendMessage(Color.Text+"- "+Color.Value+g.getName());
+                                }
+                            }
+                            else
+                            {
+                                sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
+                            }
+                        }
+                        return true;
+                    }
+                    else if(args[2].equalsIgnoreCase("info"))
+                    {
+                        if(pm.hasOrConsole(sender,"bungeeperms.user.info",true))
+                        {
+                            if(!matchArgs(sender,args,3))
+                            {
+                                return true;
+                            }
+                            
+                            String player=Statics.getFullPlayerName(bc,args[1]);
+                            User user=pm.getUser(player);
+                            if(user==null)
+                            {
+                                sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
+                                return true;
+                            }
+                            String groups="";
+                            for(int i=0;i<user.getGroups().size();i++)
+                            {
+                                groups+=Color.Value+user.getGroups().get(i).getName()+Color.Text+" ("+Color.Value+user.getGroups().get(i).getPerms().size()+Color.Text+")"+(i+1<user.getGroups().size()?", ":"");
+                            }
+                            sender.sendMessage(Color.Text+"Groups of the player "+Color.User+player+Color.Text+": "+groups);
+
+                            //all group perms
+                            sender.sendMessage(Color.Text+"Effective permissions: "+Color.Value+user.getEffectivePerms().size());//TODO
+                        }
+                        return true;
+                    }
 					else if(args.length>=4)
 					{
 						if(Statics.ArgAlias(args[2], new String[]{"add","addperm","addpermission"}))
@@ -577,140 +605,173 @@ public class BungeePerms extends Plugin implements Listener
 				}
 				else if(args[0].equalsIgnoreCase("groups"))
 				{
-					if(args.length==1)
-					{
-						if(pm.hasOrConsole(sender,"bungeeperms.groups.list",true))
-						{
-							if(pm.getGroups().size()>0)
-							{
-								sender.sendMessage(Color.Text+"There are following groups:");
-								for(Group g:pm.getGroups())
-								{
-									sender.sendMessage(Color.Text+"- "+Color.Value+g.getName());
-								}
-							}
-							else
-							{
-								sender.sendMessage(Color.Text+"No groups found!");
-							}
-						}
-						return true;
-					}
+                    if(pm.hasOrConsole(sender,"bungeeperms.groups.list",true))
+                    {
+                        if(!matchArgs(sender,args,1))
+                        {
+                            return true;
+                        }
+                        
+                        if(pm.getGroups().size()>0)
+                        {
+                            sender.sendMessage(Color.Text+"There are following groups:");
+                            for(Group g:pm.getGroups())
+                            {
+                                sender.sendMessage(Color.Text+"- "+Color.Value+g.getName());
+                            }
+                        }
+                        else
+                        {
+                            sender.sendMessage(Color.Text+"No groups found!");
+                        }
+                    }
+                    return true;
 				}
 				else if(args[0].equalsIgnoreCase("group"))
 				{
-					if(args.length==3)
-					{
-						if(args[2].equalsIgnoreCase("list"))
-						{
-							if(pm.hasOrConsole(sender,"bungeeperms.group.perms.list",true))
-							{
-								String groupname=args[1];
-								Group group=pm.getGroup(groupname);
-								if(group!=null)
-								{
-									sender.sendMessage(Color.Text+"Permission of the group "+Color.Value+groupname+Color.Text+":");
-									List<String> perms=group.getEffectivePerms();
-									for(String perm:perms)
-									{
-										sender.sendMessage(Color.Text+"- "+Color.Value+perm);
-									}
-								}
-								else
-								{
-									sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" does not exist!");
-								}
-							}
-							return true;
-						}
-						else if(args[2].equalsIgnoreCase("info"))
-						{
-							if(pm.hasOrConsole(sender,"bungeeperms.group.info",true))
-							{
-								String groupname=args[1];
-								Group group=pm.getGroup(groupname);
-								if(group!=null)
-								{
-									sender.sendMessage(Color.Text+"Info to group "+Color.Value+groupname+Color.Text+":");
-									
-									//inheritances
-									String inheritances="";
-									for(int i=0;i<group.getInheritances().size();i++)
-									{
-										inheritances+=Color.Value+group.getInheritances().get(i)+Color.Text+" ("+Color.Value+pm.getGroup(group.getInheritances().get(i)).getPerms().size()+Color.Text+")"+(i+1<group.getInheritances().size()?", ":"");
-									}
-									if(inheritances.length()==0)
-									{
-										inheritances=Color.Text+"(none)";
-									}
-									sender.sendMessage(Color.Text+"Inheritances: "+inheritances);
-									
-									//group perms
-									sender.sendMessage(Color.Text+"Group permissions: "+Color.Value+group.getPerms().size());
-									
-									//group rank
-									sender.sendMessage(Color.Text+"Rank: "+Color.Value+group.getRank());
-									
-									//group ladder
-									sender.sendMessage(Color.Text+"Ladder: "+Color.Value+group.getLadder());
-									
-									//default
-									sender.sendMessage(Color.Text+"Default: "+Color.Value+(group.isDefault()?ChatColor.GREEN:ChatColor.RED)+String.valueOf(group.isDefault()).toUpperCase());
-									
-									//all group perms
-									sender.sendMessage(Color.Text+"Effective permissions: "+Color.Value+group.getEffectivePerms().size());
-									
-									//display
-									sender.sendMessage(Color.Text+"Dislay name: "+ChatColor.RESET+(group.getDisplay().length()>0?group.getDisplay():Color.Text+"(none)"));
-									
-									//prefix
-									sender.sendMessage(Color.Text+"Prefix: "+ChatColor.RESET+(group.getPrefix().length()>0?group.getPrefix():Color.Text+"(none)"));
-									
-									//suffix
-									sender.sendMessage(Color.Text+"Suffix: "+ChatColor.RESET+(group.getSuffix().length()>0?group.getSuffix():Color.Text+"(none)"));
-								}
-								else
-								{
-									sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" does not exist!");
-								}//TODO
-							}
-							return true;
-						}
-						else if(args[2].equalsIgnoreCase("create"))
-						{
-							if(pm.hasOrConsole(sender,"bungeeperms.group.create",true))
-							{
-								String groupname=args[1];
-								if(pm.getGroup(groupname)!=null)
-								{
-									sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" already exists!");
-									return true;
-								}
-								Group group=new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String,Server>(), 1500, "default", false, "", "", "");
-								pm.addGroup(group);
-								sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" created.");
-							}
-							return true;
-						}
-						else if(args[2].equalsIgnoreCase("delete"))
-						{
-							if(pm.hasOrConsole(sender,"bungeeperms.group.delete",true))
-							{
-								String groupname=args[1];
-								Group group=pm.getGroup(groupname);
-								if(group!=null)
-								{
-									pm.deleteGroup(group);
-									sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" deleted.");
-								}
-								else
-								{
-									sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" does not exist!");
-								}
-							}
-							return true;
-						}
-					}
+                    if(args[2].equalsIgnoreCase("list"))
+                    {
+                        if(pm.hasOrConsole(sender,"bungeeperms.group.perms.list",true))
+                        {
+                            if(args.length<3)
+                            {
+                                Messages.sendTooLessArgsMessage(sender);
+                                return true;
+                            }
+                            else if(args.length>5)
+                            {
+                                Messages.sendTooManyArgsMessage(sender);
+                                return true;
+                            }
+                            
+                            String groupname=args[1];
+                            String server=args.length>3?args[3]:null;
+                            String world=args.length>4?args[4]:null;
+                            Group group=pm.getGroup(groupname);
+                            if(group!=null)
+                            {
+                                sender.sendMessage(Color.Text+"Permission of the group "+Color.Value+groupname+Color.Text+":");
+                                List<BPPermission> perms=group.getPermsWithOrigin(server, world);
+                                for(BPPermission perm:perms)
+                                {
+                                    sender.sendMessage(Color.Text+"- "+Color.Value+perm.getPermission()+Color.Text+
+                                            " ("+
+                                            Color.Value+(perm.getOrigin().equalsIgnoreCase(groupname)?"own":perm.getOrigin())+Color.Text+
+                                            (perm.getServer()!=null?" | "+Color.Value+perm.getServer()+Color.Text:"")+
+                                            (perm.getWorld()!=null?" | "+Color.Value+perm.getWorld()+Color.Text:"")+
+                                            ")");
+                                }
+                            }
+                            else
+                            {
+                                sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" does not exist!");
+                            }
+                        }
+                        return true;
+                    }
+                    else if(args[2].equalsIgnoreCase("info"))
+                    {
+                        if(pm.hasOrConsole(sender,"bungeeperms.group.info",true))
+                        {
+                            if(!matchArgs(sender,args,3))
+                            {
+                                return true;
+                            }
+                            
+                            String groupname=args[1];
+                            Group group=pm.getGroup(groupname);
+                            if(group!=null)
+                            {
+                                sender.sendMessage(Color.Text+"Info to group "+Color.Value+groupname+Color.Text+":");
+
+                                //inheritances
+                                String inheritances="";
+                                for(int i=0;i<group.getInheritances().size();i++)
+                                {
+                                    inheritances+=Color.Value+group.getInheritances().get(i)+Color.Text+" ("+Color.Value+pm.getGroup(group.getInheritances().get(i)).getPerms().size()+Color.Text+")"+(i+1<group.getInheritances().size()?", ":"");
+                                }
+                                if(inheritances.length()==0)
+                                {
+                                    inheritances=Color.Text+"(none)";
+                                }
+                                sender.sendMessage(Color.Text+"Inheritances: "+inheritances);
+
+                                //group perms
+                                sender.sendMessage(Color.Text+"Group permissions: "+Color.Value+group.getPerms().size());
+
+                                //group rank
+                                sender.sendMessage(Color.Text+"Rank: "+Color.Value+group.getRank());
+
+                                //group ladder
+                                sender.sendMessage(Color.Text+"Ladder: "+Color.Value+group.getLadder());
+
+                                //default
+                                sender.sendMessage(Color.Text+"Default: "+Color.Value+(group.isDefault()?ChatColor.GREEN:ChatColor.RED)+String.valueOf(group.isDefault()).toUpperCase());
+
+                                //all group perms
+                                sender.sendMessage(Color.Text+"Effective permissions: "+Color.Value+group.getEffectivePerms().size());
+
+                                //display
+                                sender.sendMessage(Color.Text+"Dislay name: "+ChatColor.RESET+(group.getDisplay().length()>0?group.getDisplay():Color.Text+"(none)"));
+
+                                //prefix
+                                sender.sendMessage(Color.Text+"Prefix: "+ChatColor.RESET+(group.getPrefix().length()>0?group.getPrefix():Color.Text+"(none)"));
+
+                                //suffix
+                                sender.sendMessage(Color.Text+"Suffix: "+ChatColor.RESET+(group.getSuffix().length()>0?group.getSuffix():Color.Text+"(none)"));
+                            }
+                            else
+                            {
+                                sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" does not exist!");
+                            }//TODO
+                        }
+                        return true;
+                    }
+                    else if(args[2].equalsIgnoreCase("create"))
+                    {
+                        if(pm.hasOrConsole(sender,"bungeeperms.group.create",true))
+                        {
+                            if(!matchArgs(sender,args,3))
+                            {
+                                return true;
+                            }
+                            
+                            String groupname=args[1];
+                            if(pm.getGroup(groupname)!=null)
+                            {
+                                sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" already exists!");
+                                return true;
+                            }
+                            Group group=new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String,Server>(), 1500, "default", false, "", "", "");
+                            pm.addGroup(group);
+                            sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" created.");
+                        }
+                        return true;
+                    }
+                    else if(args[2].equalsIgnoreCase("delete"))
+                    {
+                        if(pm.hasOrConsole(sender,"bungeeperms.group.delete",true))
+                        {
+                            if(!matchArgs(sender,args,3))
+                            {
+                                return true;
+                            }
+                            
+                            String groupname=args[1];
+                            Group group=pm.getGroup(groupname);
+                            if(group!=null)
+                            {
+                                pm.deleteGroup(group);
+                                sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" deleted.");
+                            }
+                            else
+                            {
+                                sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" does not exist!");
+                            }
+                        }
+                        return true;
+                    }
+                    
 					else if(args.length>=4)
 					{
 						if(Statics.ArgAlias(args[2], new String[]{"add","addperm","addpermission"}))
@@ -1480,4 +1541,19 @@ public class BungeePerms extends Plugin implements Listener
 	{
 		return pm;
 	}
+    
+    public static boolean matchArgs(CommandSender sender, String[] args,int length)
+    {
+        if(args.length>length)
+        {
+            Messages.sendTooManyArgsMessage(sender);
+            return false;
+        }
+        else if(args.length<length)
+        {
+            Messages.sendTooLessArgsMessage(sender);
+            return false;
+        }
+        return true;
+    }
 }

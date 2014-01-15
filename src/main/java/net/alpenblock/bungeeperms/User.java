@@ -767,4 +767,58 @@ public class User
         }
         return null;
     }
+    
+    public List<BPPermission> getPermsWithOrigin(String server, String world)
+    {
+        List<BPPermission> ret=new ArrayList<>();
+        
+        //add groups' perms
+		for(Group g:groups)
+		{
+            ret.addAll(g.getPermsWithOrigin(server, world));
+		}
+		
+		for(String s:extraperms)
+		{
+			BPPermission perm=new BPPermission(s,name,false,null,null);
+            ret.add(perm);
+		}
+		
+		//per server perms
+        for(Map.Entry<String, List<String>> srv:serverperms.entrySet())
+        {
+            //check for server
+            if(server!=null && !srv.getKey().equalsIgnoreCase(server))
+            {
+                continue;
+            }
+            
+            List<String> perserverperms=srv.getValue();
+            for(String s:perserverperms)
+            {
+                BPPermission perm=new BPPermission(s,name,false,srv.getKey(),null);
+                ret.add(perm);
+
+                //per server world perms
+                for(Map.Entry<String, List<String>> w:serverworldperms.get(srv.getKey()).entrySet())
+                {
+                    //check for world
+                    if(world!=null && !w.getKey().equalsIgnoreCase(world))
+                    {
+                        continue;
+                    }
+                    
+                    
+                    List<String> perserverworldperms=w.getValue();
+                    for(String s2:perserverworldperms)
+                    {
+                        BPPermission perm2=new BPPermission(s2,name,false,srv.getKey(),w.getKey());
+                        ret.add(perm2);
+                    }
+                }
+            }
+        }
+        
+		return ret;
+    }
 }

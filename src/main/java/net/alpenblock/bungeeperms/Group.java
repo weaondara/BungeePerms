@@ -817,4 +817,67 @@ public class Group implements Comparable<Group>
     {
         return -Integer.compare(rank, g.getRank());
     }
+    
+    public List<BPPermission> getPermsWithOrigin(String server, String world)
+    {
+        List<BPPermission> ret=new ArrayList<>();
+        
+        //add inherited groups' perms
+		for(Group g:BungeePerms.getInstance().getPermissionsManager().getGroups())
+		{            
+			if(inheritances.contains(g.getName()))
+			{
+                List<BPPermission> inheritgroupperms=g.getPermsWithOrigin(server, world);
+                for(BPPermission perm:inheritgroupperms)
+                {
+                    if(perm.getOrigin().equalsIgnoreCase(g.getName()))
+                    {
+                        ret.add(perm);
+                    }
+                }
+            }
+		}
+		
+		for(String s:perms)
+		{
+			BPPermission perm=new BPPermission(s,name,true,null,null);
+            ret.add(perm);
+		}
+		
+		//per server perms
+        for(Map.Entry<String, Server> srv:servers.entrySet())
+        {
+            //check for server
+            if(server!=null && !srv.getKey().equalsIgnoreCase(server))
+            {
+                continue;
+            }
+            
+            List<String> perserverperms=srv.getValue().getPerms();
+            for(String s:perserverperms)
+            {
+                BPPermission perm=new BPPermission(s,name,true,srv.getKey(),null);
+                ret.add(perm);
+            }
+
+            //per server world perms
+            for(Map.Entry<String, World> w:srv.getValue().getWorlds().entrySet())
+            {
+                //check for world
+                if(world!=null && !w.getKey().equalsIgnoreCase(world))
+                {
+                    continue;
+                }
+                
+                List<String> perserverworldperms=w.getValue().getPerms();
+                for(String s:perserverworldperms)
+                {
+                    BPPermission perm=new BPPermission(s,name,true,srv.getKey(),w.getKey());
+                    ret.add(perm);
+                }
+            }
+        }
+        
+		return ret;
+    }
 }
