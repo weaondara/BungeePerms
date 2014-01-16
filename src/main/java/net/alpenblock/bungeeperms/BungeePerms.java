@@ -802,7 +802,7 @@ public class BungeePerms extends Plugin implements Listener
 										}
 										else
 										{
-											sender.sendMessage("The group "+Color.Value+group.getName()+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+".");
+											sender.sendMessage(Color.Text+"The group "+Color.Value+group.getName()+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+".");
 										}
 									}
 									else
