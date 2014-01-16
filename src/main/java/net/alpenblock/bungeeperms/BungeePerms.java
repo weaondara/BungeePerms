@@ -615,9 +615,12 @@ public class BungeePerms extends Plugin implements Listener
                         if(pm.getGroups().size()>0)
                         {
                             sender.sendMessage(Color.Text+"There are following groups:");
-                            for(Group g:pm.getGroups())
+                            for(String l:pm.getLadders())
                             {
-                                sender.sendMessage(Color.Text+"- "+Color.Value+g.getName());
+                                for(Group g:pm.getLadderGroups(l))
+                                {
+                                    sender.sendMessage(Color.Text+"- "+Color.Value+g.getName()+Color.Text+" ("+Color.Value+l+Color.Text+")");
+                                }
                             }
                         }
                         else

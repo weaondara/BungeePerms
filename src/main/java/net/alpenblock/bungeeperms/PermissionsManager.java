@@ -252,6 +252,20 @@ public class PermissionsManager implements Listener
         
         return ret;
     }
+    public synchronized List<String> getLadders()
+    {
+        List<String> ret=new ArrayList<>();
+        
+        for(Group g:groups)
+        {
+            if(!ret.contains(g.getLadder()))
+            {
+                ret.add(g.getLadder());
+            }
+        }
+        
+        return ret;
+    }
 	public synchronized List<Group> getDefaultGroups()
 	{
 		List<Group> ret=new ArrayList<>();
