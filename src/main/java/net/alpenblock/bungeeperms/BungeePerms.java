@@ -1306,14 +1306,7 @@ public class BungeePerms extends Plugin implements Listener
                             //remove old group if neccessary
                             if(playergroup!=null)
                             {
-                                for(int i=0;i<user.getGroups().size();i++)
-                                {
-                                    if(user.getGroups().get(i).getRank()==playergroup.getRank())
-                                    {
-                                        pm.removeUserGroup(user, user.getGroups().get(i));
-                                        break;
-                                    }
-                                }
+                                pm.removeUserGroup(user, playergroup);
                             }
                             pm.addUserGroup(user, nextgroup);
                             sender.sendMessage(Color.User+user.getName()+Color.Text+" is now "+Color.Value+nextgroup.getName()+Color.Text+"!");
@@ -1390,14 +1383,7 @@ public class BungeePerms extends Plugin implements Listener
                             //remove old group if neccessary
                             if(playergroup!=null)
                             {
-                                for(int i=0;i<user.getGroups().size();i++)
-                                {
-                                    if(user.getGroups().get(i).getRank()==playergroup.getRank())
-                                    {
-                                        pm.removeUserGroup(user, user.getGroups().get(i));
-                                        break;
-                                    }
-                                }
+                                pm.removeUserGroup(user, playergroup);
                             }
                             pm.addUserGroup(user, previousgroup);
                             sender.sendMessage(Color.User+user.getName()+Color.Text+" is now "+Color.Value+previousgroup.getName()+Color.Text+"!");
