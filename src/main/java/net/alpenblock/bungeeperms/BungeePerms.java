@@ -196,7 +196,7 @@ public class BungeePerms extends Plugin implements Listener
                             User user=pm.getUser(player);
                             if(user!=null)
                             {
-                                sender.sendMessage(Color.Text+"Permissions of the player "+Color.User+player+Color.Text+":");
+                                sender.sendMessage(Color.Text+"Permissions of the player "+Color.User+user.getName()+Color.Text+":");
                                 List<BPPermission> perms=user.getPermsWithOrigin(server,world);
                                 for(BPPermission perm:perms)
                                 {
@@ -228,7 +228,7 @@ public class BungeePerms extends Plugin implements Listener
                             User user=pm.getUser(player);
                             if(user!=null)
                             {
-                                sender.sendMessage(Color.Text+"Groups of the player "+Color.User+player+Color.Text+":");
+                                sender.sendMessage(Color.Text+"Groups of the player "+Color.User+user.getName()+Color.Text+":");
                                 for(Group g:user.getGroups())
                                 {
                                     sender.sendMessage(Color.Text+"- "+Color.Value+g.getName());
@@ -262,7 +262,7 @@ public class BungeePerms extends Plugin implements Listener
                             {
                                 groups+=Color.Value+user.getGroups().get(i).getName()+Color.Text+" ("+Color.Value+user.getGroups().get(i).getPerms().size()+Color.Text+")"+(i+1<user.getGroups().size()?", ":"");
                             }
-                            sender.sendMessage(Color.Text+"Groups of the player "+Color.User+player+Color.Text+": "+groups);
+                            sender.sendMessage(Color.Text+"Groups of the player "+Color.User+user.getName()+Color.Text+": "+groups);
 
                             //all group perms
                             sender.sendMessage(Color.Text+"Effective permissions: "+Color.Value+user.getEffectivePerms().size());//TODO
@@ -287,16 +287,16 @@ public class BungeePerms extends Plugin implements Listener
 										if(user.getExtraperms().contains("-"+perm))
 										{
                                             pm.removeUserPerm(user,"-"+perm);
-											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+".");
+											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+user.getName()+Color.Text+".");
 										}
 										else if(!user.getExtraperms().contains(perm))
 										{
                                             pm.addUserPerm(user,perm);
-											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+".");
+											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+user.getName()+Color.Text+".");
 										}
 										else
 										{
-											sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+".");
+											sender.sendMessage(Color.Text+"The player "+Color.Value+user.getName()+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+".");
 										}
 									}
 									else
@@ -311,16 +311,16 @@ public class BungeePerms extends Plugin implements Listener
                                             if(perserverperms.contains("-"+perm))
                                             {
                                                 pm.removeUserPerServerPerm(user,server,"-"+perm);
-                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                             else if(!perserverperms.contains(perm))
                                             {
                                                 pm.addUserPerServerPerm(user,server,perm);
-                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                             else
                                             {
-                                                sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" alreday has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"The player "+Color.Value+user.getName()+Color.Text+" alreday has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                         }
                                         else
@@ -341,16 +341,16 @@ public class BungeePerms extends Plugin implements Listener
                                             if(perserverworldperms.contains("-"+perm))
                                             {
                                                 pm.removeUserPerServerWorldPerm(user,server,world,"-"+perm);
-                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                             else if(!perserverworldperms.contains(perm))
                                             {
                                                 pm.addUserPerServerWorldPerm(user,server,world,perm);
-                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                             else
                                             {
-                                                sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" alreday has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"The player "+Color.Value+user.getName()+Color.Text+" alreday has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                         }
 									}
@@ -378,16 +378,16 @@ public class BungeePerms extends Plugin implements Listener
 										if(user.getExtraperms().contains(perm))
 										{
                                             pm.removeUserPerm(user, perm);
-											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+".");
+											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+user.getName()+Color.Text+".");
 										}
 										else if(!user.getExtraperms().contains("-"+perm))
 										{
                                             pm.addUserPerm(user, "-"+perm);
-											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+".");
+											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+user.getName()+Color.Text+".");
 										}
 										else
 										{
-											sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+".");
+											sender.sendMessage(Color.Text+"The player "+Color.Value+user.getName()+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+".");
 										}
 									}
 									else
@@ -402,16 +402,16 @@ public class BungeePerms extends Plugin implements Listener
                                             if(perserverperms.contains(perm))
                                             {
                                                 pm.removeUserPerServerPerm(user, server, perm);
-                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                             else if(!perserverperms.contains("-"+perm))
                                             {
                                                 pm.removeUserPerServerPerm(user, server, "-"+perm);
-                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                             else
                                             {
-                                                sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"The player "+Color.Value+user.getName()+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                         }
                                         else
@@ -431,16 +431,16 @@ public class BungeePerms extends Plugin implements Listener
                                             if(perserverworldperms.contains(perm))
                                             {
                                                 pm.removeUserPerServerWorldPerm(user, server,world, perm);
-                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                             else if(!perserverworldperms.contains("-"+perm))
                                             {
                                                 pm.removeUserPerServerWorldPerm(user, server,world, "-"+perm);
-                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+player+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                             else
                                             {
-                                                sender.sendMessage(Color.Text+"The player "+Color.Value+player+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"The player "+Color.Value+user.getName()+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                         }
 									}
@@ -465,7 +465,7 @@ public class BungeePerms extends Plugin implements Listener
 									if(server==null)
 									{
 										boolean has=pm.hasPerm(player, args[3].toLowerCase());
-										sender.sendMessage(Color.Text+"Player "+Color.User+player+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
+										sender.sendMessage(Color.Text+"Player "+Color.User+user.getName()+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
 									}
 									else
 									{
@@ -477,8 +477,8 @@ public class BungeePerms extends Plugin implements Listener
                                                 sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
                                                 return true;
                                             }
-                                            boolean has=pm.hasPermOnServer(player, args[3].toLowerCase(),si);
-                                            sender.sendMessage(Color.Text+"Player "+Color.User+player+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
+                                            boolean has=pm.hasPermOnServer(user.getName(), args[3].toLowerCase(),si);
+                                            sender.sendMessage(Color.Text+"Player "+Color.User+user.getName()+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
                                         }
                                         else
                                         {
@@ -488,8 +488,8 @@ public class BungeePerms extends Plugin implements Listener
                                                 sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
                                                 return true;
                                             }
-                                            boolean has=pm.hasPermOnServerInWorld(player, args[3].toLowerCase(),si,world);
-                                            sender.sendMessage(Color.Text+"Player "+Color.User+player+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
+                                            boolean has=pm.hasPermOnServerInWorld(user.getName(), args[3].toLowerCase(),si,world);
+                                            sender.sendMessage(Color.Text+"Player "+Color.User+user.getName()+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
                                         }
                                     }
 								}
@@ -526,7 +526,7 @@ public class BungeePerms extends Plugin implements Listener
 									}
                                     
                                     pm.addUserGroup(u, group);
-									sender.sendMessage(Color.Text+"Added group "+Color.Value+groupname+Color.Text+" to player "+Color.User+player+Color.Text+".");
+									sender.sendMessage(Color.Text+"Added group "+Color.Value+groupname+Color.Text+" to player "+Color.User+u.getName()+Color.Text+".");
 									return true;
 								}
 								else
@@ -557,7 +557,7 @@ public class BungeePerms extends Plugin implements Listener
 										if(groups.get(j).getName().equalsIgnoreCase(group.getName()))
 										{
                                             pm.removeUserGroup(u, group);
-											sender.sendMessage(Color.Text+"Removed group "+Color.Value+groupname+Color.Text+" from player "+Color.User+player+Color.Text+".");
+											sender.sendMessage(Color.Text+"Removed group "+Color.Value+groupname+Color.Text+" from player "+Color.User+u.getName()+Color.Text+".");
 											return true;
 										}
 									}
@@ -591,7 +591,7 @@ public class BungeePerms extends Plugin implements Listener
                                         pm.removeUserGroup(u, g);
                                     }
                                     pm.addUserGroup(u, group);
-									sender.sendMessage(Color.Text+"Set group "+Color.Value+groupname+Color.Text+" for player "+Color.User+player+Color.Text+".");
+									sender.sendMessage(Color.Text+"Set group "+Color.Value+groupname+Color.Text+" for player "+Color.User+u.getName()+Color.Text+".");
 									return true;
 								}
 								else
@@ -653,7 +653,7 @@ public class BungeePerms extends Plugin implements Listener
                             Group group=pm.getGroup(groupname);
                             if(group!=null)
                             {
-                                sender.sendMessage(Color.Text+"Permission of the group "+Color.Value+groupname+Color.Text+":");
+                                sender.sendMessage(Color.Text+"Permission of the group "+Color.Value+group.getName()+Color.Text+":");
                                 List<BPPermission> perms=group.getPermsWithOrigin(server, world);
                                 for(BPPermission perm:perms)
                                 {
@@ -685,7 +685,7 @@ public class BungeePerms extends Plugin implements Listener
                             Group group=pm.getGroup(groupname);
                             if(group!=null)
                             {
-                                sender.sendMessage(Color.Text+"Info to group "+Color.Value+groupname+Color.Text+":");
+                                sender.sendMessage(Color.Text+"Info to group "+Color.Value+group.getName()+Color.Text+":");
 
                                 //inheritances
                                 String inheritances="";
@@ -765,7 +765,7 @@ public class BungeePerms extends Plugin implements Listener
                             if(group!=null)
                             {
                                 pm.deleteGroup(group);
-                                sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" deleted.");
+                                sender.sendMessage(Color.Text+"Group "+Color.Value+group.getName()+Color.Text+" deleted.");
                             }
                             else
                             {
@@ -793,16 +793,16 @@ public class BungeePerms extends Plugin implements Listener
 										if(group.getPerms().contains("-"+perm))
 										{
                                             pm.removeGroupPerm(group,"-"+perm);
-											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+".");
+											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+group.getName()+Color.Text+".");
 										}
 										else if(!group.getPerms().contains(perm))
 										{
                                             pm.addGroupPerm(group,perm);
-											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+".");
+											sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+group.getName()+Color.Text+".");
 										}
 										else
 										{
-											sender.sendMessage("The group "+Color.Value+groupname+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+".");
+											sender.sendMessage("The group "+Color.Value+group.getName()+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+".");
 										}
 									}
 									else
@@ -818,16 +818,16 @@ public class BungeePerms extends Plugin implements Listener
                                             if(perserverperms.contains("-"+perm))
                                             {
                                                 pm.removeGroupPerServerPerm(group, server, "-"+perm);
-                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+group.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                             else if(!perserverperms.contains(perm))
                                             {
                                                 pm.addGroupPerServerPerm(group, server, perm);
-                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+group.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                             else
                                             {
-                                                sender.sendMessage("The group "+Color.Value+groupname+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage("The group "+Color.Value+group.getName()+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                         }
                                         else
@@ -848,16 +848,16 @@ public class BungeePerms extends Plugin implements Listener
                                             if(perserverworldperms.contains("-"+perm))
                                             {
                                                 pm.removeGroupPerServerWorldPerm(group, server,world, "-"+perm);
-                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+group.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                             else if(!perserverworldperms.contains(perm))
                                             {
                                                 pm.addGroupPerServerWorldPerm(group, server,world, perm);
-                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Added permission "+Color.Value+perm+Color.Text+" to group "+Color.Value+group.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                             else
                                             {
-                                                sender.sendMessage("The group "+Color.Value+groupname+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage("The group "+Color.Value+group.getName()+Color.Text+" already has the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                         }
 									}
@@ -885,16 +885,16 @@ public class BungeePerms extends Plugin implements Listener
 										if(group.getPerms().contains(perm))
 										{
                                             pm.removeGroupPerm(group, perm);
-											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+".");
+											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+group.getName()+Color.Text+".");
 										}
 										else if(!group.getPerms().contains("-"+perm))
 										{
                                             pm.addGroupPerm(group, "-"+perm);
-											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+".");
+											sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+group.getName()+Color.Text+".");
 										}
 										else
 										{
-											sender.sendMessage("The group "+Color.Value+groupname+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+".");
+											sender.sendMessage("The group "+Color.Value+group.getName()+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+".");
 										}
 									}
 									else
@@ -910,16 +910,16 @@ public class BungeePerms extends Plugin implements Listener
                                             if(perserverperms.contains(perm))
                                             {
                                                 pm.removeGroupPerServerPerm(group, server, perm);
-                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+group.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                             else if(!perserverperms.contains("-"+perm))
                                             {
                                                 pm.addGroupPerServerPerm(group, server, "-"+perm);
-                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+group.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                             else
                                             {
-                                                sender.sendMessage("The group "+Color.Value+groupname+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
+                                                sender.sendMessage("The group "+Color.Value+group.getName()+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                         }
                                         else
@@ -940,16 +940,16 @@ public class BungeePerms extends Plugin implements Listener
                                             if(perserverworldperms.contains(perm))
                                             {
                                                 pm.removeGroupPerServerWorldPerm(group, server,world, perm);
-                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+group.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                             else if(!perserverworldperms.contains("-"+perm))
                                             {
                                                 pm.addGroupPerServerWorldPerm(group, server,world, "-"+perm);
-                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+groupname+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from group "+Color.Value+group.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                             else
                                             {
-                                                sender.sendMessage("The group "+Color.Value+groupname+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
+                                                sender.sendMessage("The group "+Color.Value+group.getName()+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                         }
 									}
@@ -975,7 +975,7 @@ public class BungeePerms extends Plugin implements Listener
 									if(server==null)
 									{
 										boolean has=group.has(perm.toLowerCase());
-										sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
+										sender.sendMessage(Color.Text+"Group "+Color.Value+group.getName()+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
 									}
 									else
 									{
@@ -988,7 +988,7 @@ public class BungeePerms extends Plugin implements Listener
                                                 return true;
                                             }
                                             boolean has=group.hasOnServer(perm.toLowerCase(),si);
-                                            sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
+                                            sender.sendMessage(Color.Text+"Group "+Color.Value+group.getName()+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
                                         }
                                         else
                                         {
@@ -1000,7 +1000,7 @@ public class BungeePerms extends Plugin implements Listener
                                             }
                                             
                                             boolean has=group.hasOnServerInWorld(perm.toLowerCase(),si,world);
-                                            sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
+                                            sender.sendMessage(Color.Text+"Group "+Color.Value+group.getName()+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
                                         }
 									}
 								}
@@ -1040,7 +1040,7 @@ public class BungeePerms extends Plugin implements Listener
                                     
                                     pm.addGroupInheritance(group, toadd);
                                     
-									sender.sendMessage(Color.Text+"Added inheritance "+Color.Value+addgroup+Color.Text+" to group "+Color.Value+groupname+Color.Text+".");
+									sender.sendMessage(Color.Text+"Added inheritance "+Color.Value+addgroup+Color.Text+" to group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}
 								else
@@ -1072,11 +1072,11 @@ public class BungeePerms extends Plugin implements Listener
 										{
 											pm.removeGroupInheritance(group, toremove);
                                             
-											sender.sendMessage(Color.Text+"Removed inheritance "+Color.Value+removegroup+Color.Text+" from group "+Color.Value+groupname+Color.Text+".");
+											sender.sendMessage(Color.Text+"Removed inheritance "+Color.Value+removegroup+Color.Text+" from group "+Color.Value+group.getName()+Color.Text+".");
 											return true;
 										}
 									}
-									sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" does not inherit from group "+Color.Value+removegroup+Color.Error+"!");
+									sender.sendMessage(Color.Error+"The group "+Color.Value+group.getName()+Color.Error+" does not inherit from group "+Color.Value+removegroup+Color.Error+"!");
 									return true;
 								}
 								else
@@ -1109,7 +1109,7 @@ public class BungeePerms extends Plugin implements Listener
 								if(group!=null)
 								{
                                     pm.rankGroup(group,rank);
-									sender.sendMessage(Color.Text+"Group rank set for group "+Color.Value+groupname+Color.Text+".");
+									sender.sendMessage(Color.Text+"Group rank set for group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}
 								else
@@ -1129,7 +1129,7 @@ public class BungeePerms extends Plugin implements Listener
 								if(group!=null)
 								{
                                     pm.ladderGroup(group,ladder);
-									sender.sendMessage(Color.Text+"Group ladder set for group "+Color.Value+groupname+Color.Text+".");
+									sender.sendMessage(Color.Text+"Group ladder set for group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}
 								else
@@ -1159,7 +1159,7 @@ public class BungeePerms extends Plugin implements Listener
 								if(group!=null)
 								{
                                     pm.setGroupDefault(group, isdefault);
-									sender.sendMessage(Color.Text+"Marked group "+Color.Value+groupname+Color.Text+" as "+(isdefault?"":"non-")+"default.");
+									sender.sendMessage(Color.Text+"Marked group "+Color.Value+group.getName()+Color.Text+" as "+(isdefault?"":"non-")+"default.");
 									return true;
 								}
 								else
@@ -1179,7 +1179,7 @@ public class BungeePerms extends Plugin implements Listener
 								if(group!=null)
 								{
                                     pm.setGroupDisplay(group, display);
-									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+groupname+Color.Text+".");
+									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}
 								else
@@ -1199,7 +1199,7 @@ public class BungeePerms extends Plugin implements Listener
 								if(group!=null)
 								{
 									pm.setGroupPrefix(group, prefix);
-									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+groupname+Color.Text+".");
+									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}
 								else
@@ -1219,7 +1219,7 @@ public class BungeePerms extends Plugin implements Listener
 								if(group!=null)
 								{
 									pm.setGroupSuffix(group, suffix);
-									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+groupname+Color.Text+".");
+									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}
 								else
