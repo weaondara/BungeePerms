@@ -31,7 +31,7 @@ public class MysqlConfig
         ResultSet res=null;
 		try 
         {
-            res=mysql.returnQuery("SELECT `key`,`value` FROM `"+table+"`");
+            res=mysql.returnQuery("SELECT `key`,`value` FROM `"+table+"` ORDER BY id ASC");
             while(res.next())
             {
                 String key=res.getString("key");
