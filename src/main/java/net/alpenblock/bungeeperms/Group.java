@@ -130,7 +130,7 @@ public class Group implements Comparable<Group>
         List<String> effperms=cachedPerms.get(server.getName()+";"+world);
         if(effperms==null)
         {
-            effperms=calcEffectivePerms(server);
+            effperms=calcEffectivePerms(server,world);
             cachedPerms.put(server.getName()+";"+world, effperms);
         }
         

@@ -473,7 +473,7 @@ public class User
 		List<String> ret=new ArrayList<>();
 		for(Group g:groups)
 		{
-			List<String> gperms=g.getEffectivePerms(server);
+			List<String> gperms=g.getEffectivePerms(server,world);
 			for(String perm:gperms)
 			{
 				boolean added=false;
