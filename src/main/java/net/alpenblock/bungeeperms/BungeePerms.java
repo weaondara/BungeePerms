@@ -174,16 +174,16 @@ public class BungeePerms extends Plugin implements Listener
 				}
 				else if(args[0].equalsIgnoreCase("user"))
 				{
+                    if(args.length<3)
+                    {
+                        Messages.sendTooLessArgsMessage(sender);
+                        return true;
+                    }
                     if(args[2].equalsIgnoreCase("list"))
                     {
                         if(pm.hasOrConsole(sender,"bungeeperms.user.perms.list",true))
                         {
-                            if(args.length<3)
-                            {
-                                Messages.sendTooLessArgsMessage(sender);
-                                return true;
-                            }
-                            else if(args.length>5)
+                            if(args.length>5)
                             {
                                 Messages.sendTooManyArgsMessage(sender);
                                 return true;
@@ -632,16 +632,17 @@ public class BungeePerms extends Plugin implements Listener
 				}
 				else if(args[0].equalsIgnoreCase("group"))
 				{
+                    if(args.length<3)
+                    {
+                        Messages.sendTooLessArgsMessage(sender);
+                        return true;
+                    }
                     if(args[2].equalsIgnoreCase("list"))
                     {
                         if(pm.hasOrConsole(sender,"bungeeperms.group.perms.list",true))
                         {
-                            if(args.length<3)
-                            {
-                                Messages.sendTooLessArgsMessage(sender);
-                                return true;
-                            }
-                            else if(args.length>5)
+                            
+                            if(args.length>5)
                             {
                                 Messages.sendTooManyArgsMessage(sender);
                                 return true;
