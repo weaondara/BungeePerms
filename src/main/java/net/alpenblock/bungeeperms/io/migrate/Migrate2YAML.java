@@ -11,7 +11,7 @@ import net.alpenblock.bungeeperms.io.YAMLBackEnd;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.plugin.Plugin;
 
-public class Migrate2YAML  implements Migrator
+public class Migrate2YAML implements Migrator
 {
     private BungeeCord bc;
     private Plugin plugin;
@@ -25,7 +25,7 @@ public class Migrate2YAML  implements Migrator
     }
     
     @Override
-    public void migrate(final List<Group> groups, final List<User> users, final int permsversion) 
+    public void migrate(final List<Group> groups, final List<User> users, final int permsversion)
     {
         BackEnd be=new YAMLBackEnd(bc,plugin,true,false);
         be.clearDatabase();

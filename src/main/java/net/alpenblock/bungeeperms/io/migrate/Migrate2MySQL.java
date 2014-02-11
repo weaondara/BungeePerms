@@ -26,7 +26,7 @@ public class Migrate2MySQL implements Migrator
     
     
     @Override
-    public void migrate(final List<Group> groups, final List<User> users, final int permsversion) 
+    public void migrate(final List<Group> groups, final List<User> users, final int permsversion)
     {
         BackEnd be=new MySQLBackEnd(bc,config,debug,true,false);
         be.clearDatabase();
@@ -45,5 +45,4 @@ public class Migrate2MySQL implements Migrator
         
         BungeePerms.getInstance().getPermissionsManager().setBackEnd(be);
     }
-    
 }
