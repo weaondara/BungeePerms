@@ -348,19 +348,19 @@ public class MySQLBackEnd implements BackEnd
         permsconf.setBool("groups."+group.getName()+".default", group.isDefault());
     }
     @Override
-    public synchronized void saveGroupDisplay(Group group)
+    public synchronized void saveGroupDisplay(Group group, String server, String world)
     {
-        permsconf.setString("groups."+group.getName()+".display", group.getDisplay());
+        permsconf.setString("groups."+group.getName()+(server!=null?".servers."+server+(world!=null?".worlds."+world:""):"")+".display", group.getDisplay());
     }
     @Override
-    public synchronized void saveGroupPrefix(Group group)
+    public synchronized void saveGroupPrefix(Group group, String server, String world)
     {
-        permsconf.setString("groups."+group.getName()+".prefix", group.getPrefix());
+        permsconf.setString("groups."+group.getName()+(server!=null?".servers."+server+(world!=null?".worlds."+world:""):"")+".prefix", group.getPrefix());
     }
     @Override
-    public synchronized void saveGroupSuffix(Group group)
+    public synchronized void saveGroupSuffix(Group group, String server, String world)
     {
-        permsconf.setString("groups."+group.getName()+".suffix", group.getSuffix());
+        permsconf.setString("groups."+group.getName()+(server!=null?".servers."+server+(world!=null?".worlds."+world:""):"")+".suffix", group.getSuffix());
     }
     
     @Override

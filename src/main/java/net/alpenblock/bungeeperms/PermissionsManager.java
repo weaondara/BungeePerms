@@ -1388,13 +1388,13 @@ public class PermissionsManager implements Listener
      * @param group
      * @param display
      */
-    public void setGroupDisplay(Group group, String display) 
+    public void setGroupDisplay(Group group, String display, String server, String world) 
     {
         //cache
         group.setDisplay(display);
         
         //database
-        backend.saveGroupDisplay(group);
+        backend.saveGroupDisplay(group,server,world);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());
@@ -1404,13 +1404,13 @@ public class PermissionsManager implements Listener
      * @param group
      * @param prefix
      */
-    public void setGroupPrefix(Group group, String prefix)
+    public void setGroupPrefix(Group group, String prefix, String server, String world)
     {
         //cache
         group.setPrefix(prefix);
         
         //database
-        backend.saveGroupPrefix(group);
+        backend.saveGroupPrefix(group,server,world);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());
@@ -1420,13 +1420,13 @@ public class PermissionsManager implements Listener
      * @param group
      * @param suffix
      */
-    public void setGroupSuffix(Group group, String suffix)
+    public void setGroupSuffix(Group group, String suffix, String server, String world)
     {
         //cache
         group.setSuffix(suffix);
         
         //database
-        backend.saveGroupSuffix(group);
+        backend.saveGroupSuffix(group,server,world);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());

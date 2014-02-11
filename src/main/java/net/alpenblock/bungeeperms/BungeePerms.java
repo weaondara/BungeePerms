@@ -1177,10 +1177,12 @@ public class BungeePerms extends Plugin implements Listener
 							{
 								String groupname=args[1];
 								String display=args[3];
+                                String server=args.length>4?args[4]:null;
+                                String world=args.length>5?args[5]:null;
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
-                                    pm.setGroupDisplay(group, display);
+                                    pm.setGroupDisplay(group, display,server,world);
 									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}
@@ -1197,10 +1199,12 @@ public class BungeePerms extends Plugin implements Listener
 							{
 								String groupname=args[1];
 								String prefix=args[3];
+                                String server=args.length>4?args[4]:null;
+                                String world=args.length>5?args[5]:null;
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
-									pm.setGroupPrefix(group, prefix);
+									pm.setGroupPrefix(group, prefix,server,world);
 									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}
@@ -1217,10 +1221,12 @@ public class BungeePerms extends Plugin implements Listener
 							{
 								String groupname=args[1];
 								String suffix=args[3];
+                                String server=args.length>4?args[4]:null;
+                                String world=args.length>5?args[5]:null;
 								Group group=pm.getGroup(groupname);
 								if(group!=null)
 								{
-									pm.setGroupSuffix(group, suffix);
+									pm.setGroupSuffix(group, suffix,server,world);
 									sender.sendMessage(Color.Text+"Set display name for group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}

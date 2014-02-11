@@ -43,9 +43,9 @@ public interface BackEnd
     public void saveGroupRank(Group group);
     public void saveGroupLadder(Group group);
     public void saveGroupDefault(Group group);
-    public void saveGroupDisplay(Group group);
-    public void saveGroupPrefix(Group group);
-    public void saveGroupSuffix(Group group);
+    public void saveGroupDisplay(Group group, String server, String world);
+    public void saveGroupPrefix(Group group, String server, String world);
+    public void saveGroupSuffix(Group group, String server, String world);
 
     public int cleanup(List<Group> groups, List<User> users,int version);
     public void format(List<Group> groups, List<User> users,int version);

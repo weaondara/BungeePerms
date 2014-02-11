@@ -351,19 +351,19 @@ public class YAMLBackEnd implements BackEnd
         permsconf.setBoolAndSave("groups."+group.getName()+".default", group.isDefault());
     }
     @Override
-    public synchronized void saveGroupDisplay(Group group)
+    public synchronized void saveGroupDisplay(Group group, String server, String world)
     {
-        permsconf.setStringAndSave("groups."+group.getName()+".display", group.getDisplay());
+        permsconf.setStringAndSave("groups."+group.getName()+(server!=null?".servers."+server+(world!=null?".worlds."+world:""):"")+".display", group.getDisplay());
     }
     @Override
-    public synchronized void saveGroupPrefix(Group group)
+    public synchronized void saveGroupPrefix(Group group, String server, String world)
     {
-        permsconf.setStringAndSave("groups."+group.getName()+".prefix", group.getPrefix());
+        permsconf.setStringAndSave("groups."+group.getName()+(server!=null?".servers."+server+(world!=null?".worlds."+world:""):"")+".prefix", group.getPrefix());
     }
     @Override
-    public synchronized void saveGroupSuffix(Group group)
+    public synchronized void saveGroupSuffix(Group group, String server, String world)
     {
-        permsconf.setStringAndSave("groups."+group.getName()+".suffix", group.getSuffix());
+        permsconf.setStringAndSave("groups."+group.getName()+(server!=null?".servers."+server+(world!=null?".worlds."+world:""):"")+".suffix", group.getSuffix());
     }
     
     @Override
