@@ -1,4 +1,4 @@
-package net.alpenblock.bungeeperms.mysql2;
+package net.alpenblock.bungeeperms.io.mysql2;
 
 public class ValueEntry 
 {

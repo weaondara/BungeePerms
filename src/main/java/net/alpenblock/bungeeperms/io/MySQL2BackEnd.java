@@ -10,14 +10,13 @@ import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Mysql;
-import net.alpenblock.bungeeperms.MysqlConfig;
-import net.alpenblock.bungeeperms.mysql2.MysqlPermsAdapter2;
+import net.alpenblock.bungeeperms.io.mysql2.MysqlPermsAdapter2;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
-import net.alpenblock.bungeeperms.mysql2.EntityType;
-import net.alpenblock.bungeeperms.mysql2.MysqlPermEntity;
-import net.alpenblock.bungeeperms.mysql2.ValueEntry;
+import net.alpenblock.bungeeperms.io.mysql2.EntityType;
+import net.alpenblock.bungeeperms.io.mysql2.MysqlPermEntity;
+import net.alpenblock.bungeeperms.io.mysql2.ValueEntry;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -62,7 +61,7 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public BackEndType getType()
     {
-        return BackEndType.MySQL;
+        return BackEndType.MySQL2;
     }
     
     @Override

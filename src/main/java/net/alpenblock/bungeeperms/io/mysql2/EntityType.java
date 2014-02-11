@@ -1,4 +1,4 @@
-package net.alpenblock.bungeeperms.mysql2;
+package net.alpenblock.bungeeperms.io.mysql2;
 
 public enum EntityType 
 {
@@ -17,7 +17,7 @@ public enum EntityType
         return code;
     }
     
-    public EntityType getByCode(int code)
+    public static EntityType getByCode(int code)
     {
         for(EntityType et:values())
         {

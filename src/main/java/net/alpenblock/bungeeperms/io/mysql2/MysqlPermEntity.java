@@ -1,4 +1,4 @@
-package net.alpenblock.bungeeperms.mysql2;
+package net.alpenblock.bungeeperms.io.mysql2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +10,7 @@ import java.util.Map;
 public class MysqlPermEntity 
 {
     private String name;
-    private boolean isGroup;
+    private EntityType type;
     private Map<String,List<ValueEntry>> data;
     
     
@@ -25,7 +25,7 @@ public class MysqlPermEntity
         if(res.first())
         {
             name=res.getString("name");
-            isGroup=res.getBoolean("isgroup");
+            type=EntityType.getByCode(res.getInt("type"));
         }
         
         res.beforeFirst();
@@ -67,8 +67,8 @@ public class MysqlPermEntity
         return name;
     }
 
-    public boolean isGroup() {
-        return isGroup;
+    public EntityType getType() {
+        return type;
     }
 
     public Map<String,List<ValueEntry>> getAllData() {

@@ -1,4 +1,4 @@
-package net.alpenblock.bungeeperms.mysql2;
+package net.alpenblock.bungeeperms.io.mysql2;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class MysqlPermsAdapter2
         ResultSet res=null;
 		try 
         {
-            res=mysql.returnQuery("SELECT DISTINCT `name` FROM `"+table+"` WHERE `type`="+EntityType.Group+" ORDER BY id ASC");
+            res=mysql.returnQuery("SELECT DISTINCT `name` FROM `"+table+"` WHERE `type`="+EntityType.Group.getCode()+" ORDER BY id ASC");
             while(res.next())
             {
                 String name=res.getString("name");
@@ -66,7 +66,7 @@ public class MysqlPermsAdapter2
         ResultSet res=null;
 		try 
         {
-            res=mysql.returnQuery("SELECT DISTINCT `name` FROM `"+table+"` WHERE NOT `type`="+EntityType.User+" ORDER BY id ASC");
+            res=mysql.returnQuery("SELECT DISTINCT `name` FROM `"+table+"` WHERE NOT `type`="+EntityType.User.getCode()+" ORDER BY id ASC");
             while(res.next())
             {
                 String name=res.getString("name");
