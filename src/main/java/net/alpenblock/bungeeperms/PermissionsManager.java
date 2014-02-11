@@ -9,8 +9,10 @@ import java.util.logging.Level;
 import net.alpenblock.bungeeperms.io.BackEnd;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.MySQLBackEnd;
+import net.alpenblock.bungeeperms.io.MySQL2BackEnd;
 import net.alpenblock.bungeeperms.io.YAMLBackEnd;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL;
+import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
 
@@ -85,6 +87,10 @@ public class PermissionsManager implements Listener
         else if(bet==BackEndType.MySQL)
         {
             backend=new MySQLBackEnd(bc,config,debug,saveAllUsers,deleteUsersOnCleanup);
+        }
+        else if(bet==BackEndType.MySQL2)
+        {
+            backend=new MySQL2BackEnd(bc,config,debug,saveAllUsers,deleteUsersOnCleanup);
         }
     }
     
@@ -1462,7 +1468,11 @@ public class PermissionsManager implements Listener
             throw new NullPointerException("bet must not be null");
         }
         Migrator migrator = null;
-        if(bet==BackEndType.MySQL)
+        if(bet==BackEndType.MySQL2)
+        {
+            migrator=new Migrate2MySQL2(config,debug);
+        }
+        else if(bet==BackEndType.MySQL)
         {
             migrator=new Migrate2MySQL(config,debug);
         }

@@ -1,0 +1,590 @@
+package net.alpenblock.bungeeperms.io;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.Debug;
+import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.Mysql;
+import net.alpenblock.bungeeperms.MysqlConfig;
+import net.alpenblock.bungeeperms.mysql2.MysqlPermsAdapter2;
+import net.alpenblock.bungeeperms.Server;
+import net.alpenblock.bungeeperms.User;
+import net.alpenblock.bungeeperms.World;
+import net.alpenblock.bungeeperms.mysql2.EntityType;
+import net.alpenblock.bungeeperms.mysql2.MysqlPermEntity;
+import net.alpenblock.bungeeperms.mysql2.ValueEntry;
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.plugin.Plugin;
+
+public class MySQL2BackEnd implements BackEnd
+{
+    private BungeeCord bc;
+    private Config config;
+    private Debug debug;
+    private Plugin plugin;
+    private Mysql mysql;
+    
+    private MysqlPermsAdapter2 adapter;
+    private String table;
+    private String tablePrefix;
+    
+    private boolean saveAllUsers;
+    private boolean deleteUsersOnCleanup;
+    
+    public MySQL2BackEnd(BungeeCord bc, Config conf, Debug d, boolean saveAllUsers, boolean deleteUsersOnCleanup)
+    {
+        this.bc=bc;
+        config=conf;
+        debug=d;
+        this.saveAllUsers=saveAllUsers;
+        this.deleteUsersOnCleanup=deleteUsersOnCleanup;
+        
+        loadConfig();
+        
+        mysql=new Mysql(conf,d,"bungeeperms");
+        mysql.connect();
+        
+        table=tablePrefix+"permissions2";
+        
+        adapter=new MysqlPermsAdapter2(mysql,table);
+        adapter.createTable();
+    }
+    private void loadConfig()
+    {
+        tablePrefix=config.getString("tablePrefix", "bungeeperms_");
+    }
+    
+    @Override
+    public BackEndType getType()
+    {
+        return BackEndType.MySQL;
+    }
+    
+    @Override
+    public void load()
+    {
+		//load from table
+		//permsconf.load();
+    }
+    @Override
+    public List<Group> loadGroups()
+    {
+        List<Group> ret=new ArrayList<>();
+        
+        List<String> groups=adapter.getGroups();
+		for(String g:groups)
+		{
+            MysqlPermEntity mpe = adapter.getGroup(g);
+			List<String> inheritances=getValue(mpe.getData("inheritances"));
+			boolean isdefault=getFirstValue(mpe.getData("default"),false);
+			int rank=getFirstValue(mpe.getData("rank"), 1000);
+			String ladder=getFirstValue(mpe.getData("ladder"), "default");
+			String display=getFirstValue(mpe.getData("display"), "");
+			String prefix=getFirstValue(mpe.getData("prefix"), "");
+			String suffix=getFirstValue(mpe.getData("suffix"), "");
+            
+            //perms
+            List<ValueEntry> permdata = mpe.getData("permissions");
+            List<String> globalperms=new ArrayList<>();
+            List<String> foundservers=new ArrayList<>();
+            
+            //globalperms
+            for(ValueEntry e:permdata)
+            {
+                //check for servers 
+                if(e.getServer()!=null)
+                {
+                    if(!foundservers.contains(e.getServer().toLowerCase()))
+                    {
+                        foundservers.add(e.getServer().toLowerCase());
+                    }
+                }
+                
+                //is global perm
+                else
+                {
+                    globalperms.add(e.getValue());
+                }
+            }
+            
+            //server perms
+            Map<String,Server> servers=new HashMap<>();
+            for(String server:foundservers)
+            {
+                List<String> serverperms=new ArrayList<>();
+                List<String> foundworlds=new ArrayList<>();
+                for(ValueEntry e:permdata)
+                {
+                    if(e.getServer()!=null && e.getServer().equalsIgnoreCase(server))
+                    {
+                        //check for worlds 
+                        if(e.getWorld()!=null)
+                        {
+                            if(!foundworlds.contains(e.getWorld().toLowerCase()))
+                            {
+                                foundworlds.add(e.getWorld().toLowerCase());
+                            }
+                        }
+
+                        //is server perm
+                        else
+                        {
+                            serverperms.add(e.getValue());
+                        }
+                    }
+                }
+                
+                //world perms
+                Map<String,World> worlds=new HashMap<>();
+                for(String world:foundservers)
+                {
+                    List<String> worldperms=new ArrayList<>();
+                    for(ValueEntry e:permdata)
+                    {
+                        if(e.getServer()!=null && e.getServer().equalsIgnoreCase(server) && e.getWorld()!=null && e.getWorld().equalsIgnoreCase(world))
+                        {
+                            worldperms.add(e.getValue());
+                        }
+                    }
+                    
+                    World w=new World(world.toLowerCase(),worldperms,null,null,null);
+                    worlds.put(world.toLowerCase(), w);
+                }
+                
+                Server s=new Server(server,serverperms,worlds,null,null,null);
+                servers.put(server.toLowerCase(),s);
+            }
+            
+            // display props for servers and worlds
+            for(Map.Entry<String, Server> server:servers.entrySet())
+            {
+                String sdisplay=getFirstValue(mpe.getData("display"), server.getKey(), "");
+                String sprefix=getFirstValue(mpe.getData("prefix"), server.getKey(), "");
+                String ssuffix=getFirstValue(mpe.getData("suffix"), server.getKey(), "");
+                server.getValue().setDisplay(sdisplay);
+                server.getValue().setPrefix(sprefix);
+                server.getValue().setSuffix(ssuffix);
+                
+                for(Map.Entry<String, World> world:server.getValue().getWorlds().entrySet())
+                {
+                    String wdisplay=getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), "");
+                    String wprefix=getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), "");
+                    String wsuffix=getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), "");
+                    world.getValue().setDisplay(wdisplay);
+                    world.getValue().setPrefix(wprefix);
+                    world.getValue().setSuffix(wsuffix);
+                }
+            }
+			
+			Group group=new Group(g, inheritances, globalperms, servers, rank, ladder, isdefault, display, prefix, suffix);
+			ret.add(group);
+		}
+        Collections.sort(ret);
+        
+        return ret;
+    }
+    @Override
+    public List<User> loadUsers()
+    {
+        List<User> ret=new ArrayList<>();
+        
+        List<String> users=adapter.getUsers();
+		for(String u:users)
+		{
+			User user=loadUser(u);
+			ret.add(user);
+		}
+        
+        return ret;
+    }
+    @Override
+    public User loadUser(String user) 
+    {
+        MysqlPermEntity mpe = adapter.getUser(user);
+        List<String> sgroups=getValue(mpe.getData("groups"));
+        List<Group> lgroups=new ArrayList<>();
+        for(String s:sgroups)
+        {
+            Group g=BungeePerms.getInstance().getPermissionsManager().getGroup(s);
+            if(g!=null)
+            {
+                lgroups.add(g);
+            }
+        }
+
+
+        //perms
+        List<ValueEntry> permdata = mpe.getData("permissions");
+        List<String> globalperms=new ArrayList<>();
+        Map<String,List<String>> serverperms=new HashMap<>();
+        Map<String,Map<String,List<String>>> serverworldperms=new HashMap<>();
+        for(ValueEntry e:permdata)
+        {
+            if(e.getServer()==null)
+            {
+                globalperms.add(e.getServer());
+            }
+            else if(e.getWorld()==null)
+            {
+                List<String> server = serverperms.get(e.getServer().toLowerCase());
+                if(server==null)
+                {
+                    server=new ArrayList<>();
+                    serverperms.put(e.getServer().toLowerCase(), server);
+                }
+                server.add(e.getValue());
+            }
+            else
+            {
+                Map<String, List<String>> server = serverworldperms.get(e.getServer().toLowerCase());
+                if(server==null)
+                {
+                    server=new HashMap<>();
+                    serverworldperms.put(e.getServer().toLowerCase(), server);
+                }
+
+                List<String> world = server.get(e.getWorld().toLowerCase());
+                if(world==null)
+                {
+                    world=new ArrayList<>();
+                    server.put(e.getWorld().toLowerCase(), world);
+                }
+                world.add(e.getValue());
+            }
+        }
+
+        User u=new User(user, lgroups, globalperms, serverperms,serverworldperms);
+        return u;
+    }
+    @Override
+    public int loadVersion()
+    {
+        MysqlPermEntity mpe = adapter.getVersion();
+        int version=getFirstValue(mpe.getData("version"),2);
+        return version;
+    }
+    @Override
+    public void saveVersion(int version,boolean savetodisk)
+    {
+        adapter.saveData("version", EntityType.Version, "version", mkValueList(mkList(String.valueOf(version)),null,null));
+    }
+
+    @Override
+    public boolean isUserInDatabase(User user)
+    {
+        return adapter.isInBD(user.getName(), EntityType.User);
+    }
+    @Override
+    public List<String> getRegisteredUsers() 
+    {
+        return adapter.getUsers();
+    }
+    
+    @Override
+    public synchronized void saveUser(User user,boolean savetodisk)
+    {
+        if(saveAllUsers?true:!user.isNothingSpecial())
+        {
+            List<String> groups=new ArrayList<>();
+            for(Group g:user.getGroups())
+            {
+                groups.add(g.getName());
+            }
+            saveUserGroups(user);
+            saveUserPerms(user);
+
+            for(Map.Entry<String, List<String>> se:user.getServerPerms().entrySet())
+            {
+                saveUserPerServerPerms(user, se.getKey());
+            }
+            for(Map.Entry<String, Map<String, List<String>>> swe:user.getServerWorldPerms().entrySet())
+            {
+                for(Map.Entry<String, List<String>> we:swe.getValue().entrySet())
+                {
+                    saveUserPerServerWorldPerms(user, swe.getKey(),we.getKey());
+                }
+            }
+        }
+    }
+    @Override
+    public synchronized void saveGroup(Group group,boolean savetodisk)
+    {
+        saveGroupInheritances(group);
+        saveGroupPerms(group);
+        saveGroupRank(group);
+        saveGroupLadder(group);
+        saveGroupDefault(group);
+        saveGroupDisplay(group,null,null);
+        saveGroupPrefix(group,null,null);
+        saveGroupSuffix(group,null,null);
+        
+		for(Map.Entry<String, Server> se:group.getServers().entrySet())
+		{
+            saveGroupPerServerPerms(group,se.getKey());
+            saveGroupDisplay(group,se.getKey(),null);
+            saveGroupPrefix(group,se.getKey(),null);
+            saveGroupSuffix(group,se.getKey(),null);
+            
+            for(Map.Entry<String,World> we:se.getValue().getWorlds().entrySet())
+            {
+                saveGroupPerServerWorldPerms(group,se.getKey(),we.getKey());
+                saveGroupDisplay(group,se.getKey(),we.getKey());
+                saveGroupPrefix(group,se.getKey(),we.getKey());
+                saveGroupSuffix(group,se.getKey(),we.getKey());
+            }
+		}
+    }
+    @Override
+    public synchronized void deleteUser(User user)
+    {
+        adapter.deleteEntity(user.getName(),EntityType.User);
+    }
+    @Override
+    public synchronized void deleteGroup(Group group)
+    {
+        adapter.deleteEntity(group.getName(),EntityType.Group);
+    }
+
+    @Override
+    public synchronized void saveUserGroups(User user)
+    {
+        List<String> savegroups=new ArrayList<>();
+        for(Group g:user.getGroups())
+        {
+            savegroups.add(g.getName());
+        }
+        
+        adapter.saveData(user.getName(), EntityType.User, "groups", mkValueList(savegroups,null,null));
+    }
+    @Override
+    public synchronized void saveUserPerms(User user)
+    {
+        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getExtraperms(),null,null));
+    }
+    @Override
+    public synchronized void saveUserPerServerPerms(User user, String server) 
+    {
+        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getServerPerms().get(server),server,null));
+    }
+    @Override
+    public synchronized void saveUserPerServerWorldPerms(User user, String server, String world) 
+    {
+        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getServerWorldPerms().get(server).get(world),server,world));
+    }
+
+    @Override
+    public synchronized void saveGroupPerms(Group group)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getPerms(),null,null));
+    }
+    @Override
+    public synchronized void saveGroupPerServerPerms(Group group, String server) 
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServers().get(server).getPerms(),server,null));
+    }
+    @Override
+    public synchronized void saveGroupPerServerWorldPerms(Group group, String server, String world)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServers().get(server).getWorlds().get(world).getPerms(),server,world));
+    }
+    @Override
+    public synchronized void saveGroupInheritances(Group group)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "inheritances", mkValueList(group.getInheritances(),null,null));
+    }
+    @Override
+    public synchronized void saveGroupLadder(Group group)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "ladder", mkList(new ValueEntry(group.getLadder(),null,null)));
+    }
+    @Override
+    public synchronized void saveGroupRank(Group group)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "rank", mkList(new ValueEntry(String.valueOf(group.getRank()),null,null)));
+    }
+    @Override
+    public synchronized void saveGroupDefault(Group group)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "default", mkList(new ValueEntry(String.valueOf(group.isDefault()),null,null)));
+    }
+    @Override
+    public synchronized void saveGroupDisplay(Group group,String server,String world)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "display", mkList(new ValueEntry(group.getDisplay(),server,world)));
+    }
+    @Override
+    public synchronized void saveGroupPrefix(Group group,String server,String world)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "prefix", mkList(new ValueEntry(group.getPrefix(),server,world)));
+    }
+    @Override
+    public synchronized void saveGroupSuffix(Group group,String server,String world)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "suffix", mkList(new ValueEntry(group.getSuffix(),server,world)));
+    }
+    
+    @Override
+    public synchronized void format(List<Group> groups, List<User> users,int version) 
+    {
+        clearDatabase();
+        for(int i=0;i<groups.size();i++)
+        {
+            saveGroup(groups.get(i),false);
+        }
+        for(int i=0;i<users.size();i++)
+        {
+            saveUser(users.get(i),false);
+        }
+        saveVersion(version,false);
+    }
+    @Override
+    public synchronized int cleanup(List<Group> groups, List<User> users,int version) 
+    {
+        int deleted=0;
+        
+        clearDatabase() ;
+        for(int i=0;i<groups.size();i++)
+        {
+            saveGroup(groups.get(i),false);
+        }
+        for(int i=0;i<users.size();i++)
+        {
+            User u=users.get(i);
+            if(deleteUsersOnCleanup)
+            {
+                //check for additional permissions and non-default groups AND onlinecheck
+                if(u.isNothingSpecial()&BungeeCord.getInstance().getPlayer(u.getName())==null)
+                {
+                    deleted++;
+                    continue;
+                }
+            }
+            
+            //player has to be saved
+            saveUser(users.get(i),false);
+        }
+        saveVersion(version,false);
+        
+        return deleted;
+    }
+
+    @Override
+    public void clearDatabase() 
+    {
+        adapter.clearTable(table);
+        load();
+    }
+    
+    
+    
+    //helper functions
+    private List<String> getValue(List<ValueEntry> values)
+    {
+        List<String> ret=new ArrayList<>();
+        for(ValueEntry e:values)
+        {
+            ret.add(e.getValue());
+        }
+        
+        return ret;
+    }
+    private String getFirstValue(List<ValueEntry> values, String def)
+    {
+        if(values==null || values.isEmpty())
+        {
+            return def;
+        }
+        for(ValueEntry e:values)
+        {
+            if(e.getServer() == null && e.getWorld()==null)
+            {
+                return e.getValue();
+            }
+        }
+        return def;
+    }
+    private String getFirstValue(List<ValueEntry> values, String server, String def)
+    {
+        if(values==null || values.isEmpty())
+        {
+            return def;
+        }
+        for(ValueEntry e:values)
+        {
+            if(e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld()==null)
+            {
+                return e.getValue();
+            }
+        }
+        return def;
+    }
+    private String getFirstValue(List<ValueEntry> values, String server, String world, String def)
+    {
+        if(values==null || values.isEmpty())
+        {
+            return def;
+        }
+        for(ValueEntry e:values)
+        {
+            if(e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld()!=null && e.getWorld().equalsIgnoreCase(world))
+            {
+                return e.getValue();
+            }
+        }
+        return def;
+    }
+    private boolean getFirstValue(List<ValueEntry> values, boolean def)
+    {
+        if(values==null || values.isEmpty())
+        {
+            return def;
+        }
+        try
+        {
+            return Boolean.parseBoolean(values.get(0).getValue());
+        }
+        catch(Exception e)
+        {
+            return def;
+        }
+    }
+    private int getFirstValue(List<ValueEntry> values, int def)
+    {
+        if(values==null || values.isEmpty())
+        {
+            return def;
+        }
+        try
+        {
+            return Integer.parseInt(values.get(0).getValue());
+        }
+        catch(Exception e)
+        {
+            return def;
+        }
+    }
+
+    private <T> List<T> mkList(T... elements)
+    {
+        List<T> l=new ArrayList<>();
+        for(T e:elements)
+        {
+            l.add(e);
+        }
+        return l;
+    }
+    private List<ValueEntry> mkValueList(List<String> values,String server,String world)
+    {
+        List<ValueEntry> l=new ArrayList<>();
+        for(String s:values)
+        {
+            l.add(new ValueEntry(s,server,world));
+        }
+        return l;
+    }
+}
