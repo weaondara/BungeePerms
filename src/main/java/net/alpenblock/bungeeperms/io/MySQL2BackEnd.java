@@ -89,6 +89,10 @@ public class MySQL2BackEnd implements BackEnd
             
             //perms
             List<ValueEntry> permdata = mpe.getData("permissions");
+            if(permdata==null)
+            {
+                permdata=new ArrayList<>();
+            }
             List<String> globalperms=new ArrayList<>();
             List<String> foundservers=new ArrayList<>();
             
@@ -219,6 +223,10 @@ public class MySQL2BackEnd implements BackEnd
 
         //perms
         List<ValueEntry> permdata = mpe.getData("permissions");
+        if(permdata==null)
+        {
+            permdata=new ArrayList<>();
+        }
         List<String> globalperms=new ArrayList<>();
         Map<String,List<String>> serverperms=new HashMap<>();
         Map<String,Map<String,List<String>>> serverworldperms=new HashMap<>();
@@ -484,6 +492,10 @@ public class MySQL2BackEnd implements BackEnd
     //helper functions
     private List<String> getValue(List<ValueEntry> values)
     {
+        if(values==null)
+        {
+            return new ArrayList<>();
+        }
         List<String> ret=new ArrayList<>();
         for(ValueEntry e:values)
         {
