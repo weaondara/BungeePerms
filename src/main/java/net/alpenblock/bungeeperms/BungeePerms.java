@@ -655,7 +655,7 @@ public class BungeePerms extends Plugin implements Listener
                             Group group=pm.getGroup(groupname);
                             if(group!=null)
                             {
-                                sender.sendMessage(Color.Text+"Permission of the group "+Color.Value+group.getName()+Color.Text+":");
+                                sender.sendMessage(Color.Text+"Permissions of the group "+Color.Value+group.getName()+Color.Text+":");
                                 List<BPPermission> perms=group.getPermsWithOrigin(server, world);
                                 for(BPPermission perm:perms)
                                 {
@@ -1442,7 +1442,10 @@ public class BungeePerms extends Plugin implements Listener
                             }
                             if(type==null)
                             {
-                                sender.sendMessage(Color.Error+"Invalid backend type! "+Color.Value+BackEndType.YAML.name()+Color.Error+" or "+Color.Value+BackEndType.MySQL.name()+Color.Error+" is required!");
+                                sender.sendMessage(Color.Error+"Invalid backend type! "+
+                                        Color.Value+BackEndType.YAML.name()+Color.Error+", "+
+                                        Color.Value+BackEndType.MySQL.name()+Color.Error+" or "+
+                                        Color.Value+BackEndType.MySQL2.name()+Color.Error+" is required!");
                                 return true;
                             }
                             

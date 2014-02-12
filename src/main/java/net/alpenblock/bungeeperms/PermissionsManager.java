@@ -150,27 +150,9 @@ public class PermissionsManager implements Listener
     /**
      * Validates all loaded groups and users and fixes invalid objects.
      */
-	public synchronized void validateUserGroups() 
+	public synchronized void validateUsersGroups() 
 	{
-        //user check
-		for(int i=0;i<users.size();i++)
-		{
-			User u=users.get(i);
-			for(int j=0;j<u.getGroups().size();j++)
-			{
-				if(getGroup(u.getGroups().get(j).getName())==null)
-				{
-                    u.getGroups().remove(j);
-					j--;
-				}
-			}
-            backend.saveUserGroups(u);
-            
-            //send bukkit update info
-            sendPM(u.getName(),"reloadUser;"+u.getName());
-		}
-        
-        //group check
+        //group check - remove inheritances
 		for(int i=0;i<groups.size();i++)
 		{
 			Group group=groups.get(i);
@@ -184,9 +166,56 @@ public class PermissionsManager implements Listener
 				}
 			}
             backend.saveGroupInheritances(group);
+		}
+        //perms recalc and bukkit perms update
+        for(Group g:groups)
+        {
+            g.recalcPerms();
             
             //send bukkit update info
-            sendPM(group.getName(),"reloadGroup;"+group.getName());
+            sendPM(g.getName(),"reloadGroup;"+g.getName());
+        }
+        
+        //user check
+		for(int i=0;i<users.size();i++)
+		{
+			User u=users.get(i);
+			for(int j=0;j<u.getGroups().size();j++)
+			{
+				if(getGroup(u.getGroups().get(j).getName())==null)
+				{
+                    u.getGroups().remove(j);
+					j--;
+				}
+			}
+            backend.saveUserGroups(u);
+		}
+        
+        System.out.println("users.size()="+users.size());
+        
+        //perms recalc and bukkit perms update
+        for(User u:users)
+        {
+            u.recalcPerms();
+            
+            //send bukkit update info
+            sendPM(u.getName(),"reloadUser;"+u.getName());
+        }
+        
+        //user groups check - backend
+        List<User> backendusers=backend.loadUsers();
+        for(int i=0;i<backendusers.size();i++)
+		{
+			User u=users.get(i);
+			for(int j=0;j<u.getGroups().size();j++)
+			{
+				if(getGroup(u.getGroups().get(j).getName())==null)
+				{
+                    u.getGroups().remove(j);
+					j--;
+				}
+			}
+            backend.saveUserGroups(u);
 		}
 	}
 
@@ -430,7 +459,7 @@ public class PermissionsManager implements Listener
 		backend.deleteGroup(group);
         
         //group validation
-        BungeePerms.getInstance().getPermissionsManager().validateUserGroups();
+        BungeePerms.getInstance().getPermissionsManager().validateUsersGroups();
         
         //send bukkit update info
         sendPM(group.getName(),"deleteGroup;"+group.getName());
@@ -1154,7 +1183,10 @@ public class PermissionsManager implements Listener
         backend.saveGroupPerms(group);
         
         //recalc perms
-        group.recalcAllPerms();
+        for(Group g:groups)
+        {
+            g.recalcPerms();
+        }
         for(User u:users)
         {
             u.recalcPerms();
@@ -1172,7 +1204,10 @@ public class PermissionsManager implements Listener
         backend.saveGroupPerms(group);
         
         //recalc perms
-        group.recalcAllPerms();
+        for(Group g:groups)
+        {
+            g.recalcPerms();
+        }
         for(User u:users)
         {
             u.recalcPerms();
@@ -1199,7 +1234,10 @@ public class PermissionsManager implements Listener
         backend.saveGroupPerServerPerms(group, server);
         
         //recalc perms
-        group.recalcPerms(server);
+        for(Group g:groups)
+        {
+            g.recalcPerms(server);
+        }
         for(User u:users)
         {
             u.recalcPerms();
@@ -1225,7 +1263,10 @@ public class PermissionsManager implements Listener
         backend.saveGroupPerServerPerms(group, server);
         
         //recalc perms
-        group.recalcPerms(server);
+        for(Group g:groups)
+        {
+            g.recalcPerms(server);
+        }
         for(User u:users)
         {
             u.recalcPerms();
@@ -1258,7 +1299,10 @@ public class PermissionsManager implements Listener
         backend.saveGroupPerServerWorldPerms(group, server, world);
         
         //recalc perms
-        group.recalcPerms(server,world);
+        for(Group g:groups)
+        {
+            g.recalcPerms(server,world);
+        }
         for(User u:users)
         {
             u.recalcPerms();
@@ -1290,7 +1334,10 @@ public class PermissionsManager implements Listener
         backend.saveGroupPerServerWorldPerms(group, server, world);
         
         //recalc perms
-        group.recalcPerms(server,world);
+        for(Group g:groups)
+        {
+            g.recalcPerms(server,world);
+        }
         for(User u:users)
         {
             u.recalcPerms();
@@ -1310,7 +1357,10 @@ public class PermissionsManager implements Listener
         backend.saveGroupInheritances(group);
         
         //recalc perms
-        group.recalcPerms();
+        for(Group g:groups)
+        {
+            g.recalcPerms();
+        }
         for(User u:users)
         {
             u.recalcPerms();
@@ -1329,7 +1379,10 @@ public class PermissionsManager implements Listener
         backend.saveGroupInheritances(group);
         
         //recalc perms
-        group.recalcPerms();
+        for(Group g:groups)
+        {
+            g.recalcPerms();
+        }
         for(User u:users)
         {
             u.recalcPerms();

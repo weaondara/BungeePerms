@@ -365,40 +365,40 @@ public class User
 			}
 			
 			//per server perms
-			Server srv=g.getServers().get(server.getName());
-			if(srv==null)
-			{
-				srv=new Server(server.getName(),new ArrayList<String>(),new HashMap<String,World>(),"","","");
-			}
-			List<String> serverperms=srv.getPerms();
-			for(String perm:serverperms)
-			{
-				boolean added=false;
-				for(int i=0;i<ret.size();i++)
-				{
-					if(ret.get(i).equalsIgnoreCase(perm))
-					{
-						added=true;
-						break;
-					}
-					else if(ret.get(i).equalsIgnoreCase("-"+perm))
-					{
-						ret.set(i,perm);
-						added=true;
-						break;
-					}
-					else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-					{
-						ret.remove(i);
-						added=true;
-						break;
-					}
-				}
-				if(!added)
-				{
-					ret.add(perm);
-				}
-			}
+//			Server srv=g.getServers().get(server.getName());
+//			if(srv==null)
+//			{
+//				srv=new Server(server.getName(),new ArrayList<String>(),new HashMap<String,World>(),"","","");
+//			}
+//			List<String> serverperms=srv.getPerms();
+//			for(String perm:serverperms)
+//			{
+//				boolean added=false;
+//				for(int i=0;i<ret.size();i++)
+//				{
+//					if(ret.get(i).equalsIgnoreCase(perm))
+//					{
+//						added=true;
+//						break;
+//					}
+//					else if(ret.get(i).equalsIgnoreCase("-"+perm))
+//					{
+//						ret.set(i,perm);
+//						added=true;
+//						break;
+//					}
+//					else if(perm.equalsIgnoreCase("-"+ret.get(i)))
+//					{
+//						ret.remove(i);
+//						added=true;
+//						break;
+//					}
+//				}
+//				if(!added)
+//				{
+//					ret.add(perm);
+//				}
+//			}
 		}
 		
 		
@@ -504,76 +504,76 @@ public class User
 			}
 			
 			//per server perms
-			Server srv=g.getServers().get(server.getName());
-			if(srv==null)
-			{
-				srv=new Server(server.getName(),new ArrayList<String>(),new HashMap<String,World>(),"","","");
-			}
-			List<String> serverperms=srv.getPerms();
-			for(String perm:serverperms)
-			{
-				boolean added=false;
-				for(int i=0;i<ret.size();i++)
-				{
-					if(ret.get(i).equalsIgnoreCase(perm))
-					{
-						added=true;
-						break;
-					}
-					else if(ret.get(i).equalsIgnoreCase("-"+perm))
-					{
-						ret.set(i,perm);
-						added=true;
-						break;
-					}
-					else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-					{
-						ret.remove(i);
-						added=true;
-						break;
-					}
-				}
-				if(!added)
-				{
-					ret.add(perm);
-				}
-			}
-            
-            //per server world perms
-            World w=srv.getWorlds().get(world);
-            if(w==null)
-            {
-                w=new World(server.getName(),new ArrayList<String>(),"","","");
-            }
-            List<String> serverworldperms=w.getPerms();
-            for(String perm:serverworldperms)
-            {
-                boolean added=false;
-                for(int i=0;i<ret.size();i++)
-                {
-                    if(ret.get(i).equalsIgnoreCase(perm))
-                    {
-                        added=true;
-                        break;
-                    }
-                    else if(ret.get(i).equalsIgnoreCase("-"+perm))
-                    {
-                        ret.set(i,perm);
-                        added=true;
-                        break;
-                    }
-                    else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-                    {
-                        ret.remove(i);
-                        added=true;
-                        break;
-                    }
-                }
-                if(!added)
-                {
-                    ret.add(perm);
-                }
-            }
+//			Server srv=g.getServers().get(server.getName());
+//			if(srv==null)
+//			{
+//				srv=new Server(server.getName(),new ArrayList<String>(),new HashMap<String,World>(),"","","");
+//			}
+//			List<String> serverperms=srv.getPerms();
+//			for(String perm:serverperms)
+//			{
+//				boolean added=false;
+//				for(int i=0;i<ret.size();i++)
+//				{
+//					if(ret.get(i).equalsIgnoreCase(perm))
+//					{
+//						added=true;
+//						break;
+//					}
+//					else if(ret.get(i).equalsIgnoreCase("-"+perm))
+//					{
+//						ret.set(i,perm);
+//						added=true;
+//						break;
+//					}
+//					else if(perm.equalsIgnoreCase("-"+ret.get(i)))
+//					{
+//						ret.remove(i);
+//						added=true;
+//						break;
+//					}
+//				}
+//				if(!added)
+//				{
+//					ret.add(perm);
+//				}
+//			}
+//            
+//            //per server world perms
+//            World w=srv.getWorlds().get(world);
+//            if(w==null)
+//            {
+//                w=new World(server.getName(),new ArrayList<String>(),"","","");
+//            }
+//            List<String> serverworldperms=w.getPerms();
+//            for(String perm:serverworldperms)
+//            {
+//                boolean added=false;
+//                for(int i=0;i<ret.size();i++)
+//                {
+//                    if(ret.get(i).equalsIgnoreCase(perm))
+//                    {
+//                        added=true;
+//                        break;
+//                    }
+//                    else if(ret.get(i).equalsIgnoreCase("-"+perm))
+//                    {
+//                        ret.set(i,perm);
+//                        added=true;
+//                        break;
+//                    }
+//                    else if(perm.equalsIgnoreCase("-"+ret.get(i)))
+//                    {
+//                        ret.remove(i);
+//                        added=true;
+//                        break;
+//                    }
+//                }
+//                if(!added)
+//                {
+//                    ret.add(perm);
+//                }
+//            }
 		}
 		
 		
