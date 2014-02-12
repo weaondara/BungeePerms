@@ -33,7 +33,7 @@ public class MysqlPermEntity
         while(res.next())
         {
             String key=res.getString("key");
-            String value=res.getString("key");
+            String value=res.getString("value");
             String server=res.getString("server");
             String world=null;
             if(res.wasNull())
