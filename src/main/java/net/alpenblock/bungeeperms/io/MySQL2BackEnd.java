@@ -79,6 +79,11 @@ public class MySQL2BackEnd implements BackEnd
 		for(String g:groups)
 		{
             MysqlPermEntity mpe = adapter.getGroup(g);
+            if(mpe==null)
+            {
+                return null;
+            }
+            
 			List<String> inheritances=getValue(mpe.getData("inheritances"));
 			boolean isdefault=getFirstValue(mpe.getData("default"),false);
 			int rank=getFirstValue(mpe.getData("rank"), 1000);
@@ -209,6 +214,11 @@ public class MySQL2BackEnd implements BackEnd
     public User loadUser(String user) 
     {
         MysqlPermEntity mpe = adapter.getUser(user);
+        if(mpe.getName()==null)
+        {
+            return null;
+        }
+        
         List<String> sgroups=getValue(mpe.getData("groups"));
         List<Group> lgroups=new ArrayList<>();
         for(String s:sgroups)
