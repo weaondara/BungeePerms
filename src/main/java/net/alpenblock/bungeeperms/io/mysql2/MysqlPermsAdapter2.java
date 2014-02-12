@@ -66,7 +66,7 @@ public class MysqlPermsAdapter2
         ResultSet res=null;
 		try 
         {
-            res=mysql.returnQuery("SELECT DISTINCT `name` FROM `"+table+"` WHERE NOT `type`="+EntityType.User.getCode()+" ORDER BY id ASC");
+            res=mysql.returnQuery("SELECT DISTINCT `name` FROM `"+table+"` WHERE `type`="+EntityType.User.getCode()+" ORDER BY id ASC");
             while(res.next())
             {
                 String name=res.getString("name");
