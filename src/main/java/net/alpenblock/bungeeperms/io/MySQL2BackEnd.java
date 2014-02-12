@@ -81,7 +81,7 @@ public class MySQL2BackEnd implements BackEnd
             MysqlPermEntity mpe = adapter.getGroup(g);
             if(mpe==null)
             {
-                return null;
+                continue;
             }
             
 			List<String> inheritances=getValue(mpe.getData("inheritances"));
