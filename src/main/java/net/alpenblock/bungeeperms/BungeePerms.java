@@ -125,7 +125,7 @@ public class BungeePerms extends Plugin implements Listener
                     {
                         pm.loadConfig();
                         pm.loadPerms();
-                        pm.sendPMAll("reload;all");
+                        pm.sendPMAll("reloadall");
                         sender.sendMessage("Permissions reloaded");
                     }
                     return true;
