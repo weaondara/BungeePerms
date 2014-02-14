@@ -205,9 +205,37 @@ public class MysqlPermsAdapter2
         }
     }
 
+    public List<String> getGroupUsers(String group) 
+    {
+        List<String> groups=new ArrayList<>();
+        
+        ResultSet res=null;
+		try 
+        {
+            res=mysql.returnQuery("SELECT DISTINCT `name` FROM `"+table+"` WHERE `type`="+EntityType.User.getCode()+" AND `key`='groups' AND `value`='"+group+"' ORDER BY id ASC");
+            while(res.next())
+            {
+                String name=res.getString("name");
+                groups.add(name);
+            }
+		} 
+        catch (Exception e) {e.printStackTrace();}
+        finally
+        {
+            try
+            {
+                res.close();
+            }
+            catch(Exception e){}
+        }
+        
+        return groups;
+    }
     
     public void clearTable(String table)
     {
         mysql.runQuery("TRUNCATE `"+table+"`");
     }
+
+    
 }

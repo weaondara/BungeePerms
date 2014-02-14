@@ -301,6 +301,11 @@ public class MySQL2BackEnd implements BackEnd
     {
         return adapter.getUsers();
     }
+    @Override
+    public List<String> getGroupUsers(Group group) 
+    {
+        return adapter.getGroupUsers(group.getName());
+    }
     
     @Override
     public synchronized void saveUser(User user,boolean savetodisk)

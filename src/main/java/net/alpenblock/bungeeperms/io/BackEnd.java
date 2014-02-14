@@ -25,6 +25,7 @@ public interface BackEnd
     
     public boolean isUserInDatabase(User user);
     public List<String> getRegisteredUsers();
+    public List<String> getGroupUsers(Group group);
     
     public void saveUser(User user, boolean savetodisk);
     public void saveGroup(Group group, boolean savetodisk);

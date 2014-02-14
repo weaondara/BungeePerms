@@ -429,6 +429,11 @@ public class PermissionsManager implements Listener
     {
         return backend.getRegisteredUsers();
     }
+    
+    public List<String> getGroupUsers(Group group)
+    {
+        return backend.getGroupUsers(group);
+    }
 	
 	/**
      * Deletes a user from cache and database.

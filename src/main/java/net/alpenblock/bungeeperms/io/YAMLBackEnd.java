@@ -212,6 +212,21 @@ public class YAMLBackEnd implements BackEnd
     {
         return permsconf.getSubNodes("users");
     }
+    @Override
+    public List<String> getGroupUsers(Group group) 
+    {
+        List<String> users=new ArrayList<>();
+        
+        for(String user:permsconf.getSubNodes("users"))
+        {
+            if(permsconf.getListString("users."+user+".groups", new ArrayList<String>()).contains(group.getName()))
+            {
+                users.add(user);
+            }
+        }
+        
+        return users;
+    }
     
     @Override
     public synchronized void saveUser(User user, boolean savetodisk)
