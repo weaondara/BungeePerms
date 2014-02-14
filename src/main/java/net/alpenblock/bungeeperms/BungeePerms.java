@@ -1541,6 +1541,7 @@ public class BungeePerms extends Plugin implements Listener
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.groups")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> groups"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Lists the groups the given user is in");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.groups")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms groups"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Lists the groups");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.info")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> info"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows information about the given group");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.group.users")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> users [-c]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Lists the users of the given group [or shows the amount of them]");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.create")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> create"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Create a group with the given name");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.delete")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> delete"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Create the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.inheritances.add")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> addinherit <group>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Adds a inheritance to the given group");}
