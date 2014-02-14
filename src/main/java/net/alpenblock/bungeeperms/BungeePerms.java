@@ -588,46 +588,7 @@ public class BungeePerms extends Plugin implements Listener
 								{
                                     List<Group> laddergroups=pm.getLadderGroups(group.getLadder());
                                     for(Group g:laddergroups)
-                                    {if(args.length==1)
-					{
-						if(pm.hasOrConsole(sender,"bungeeperms.users.list",true))
-						{
-                            List<String> users=pm.getRegisteredUsers();
-							if(users.size()>0)
-							{
-                                String out=Color.Text+"Following players are registered: ";
-								for(int i=0;i<users.size();i++)
-								{
-									out+=Color.User+users.get(i)+Color.Text+(i+1<users.size()?", ":"");
-								}
-                                sender.sendMessage(out);
-							}
-							else
-							{
-								sender.sendMessage(Color.Text+"No players found!");
-							}
-						}
-						return true;
-					}
-					else if(args.length==2)
-					{
-						if(pm.hasOrConsole(sender,"bungeeperms.users.list",true))
-						{
-							if(!args[1].equalsIgnoreCase("-c"))
-							{
-								return false;
-							}
-							if(pm.getRegisteredUsers().size()>0)
-							{
-								sender.sendMessage(Color.Text+"There are "+Color.Value+pm.getRegisteredUsers().size()+Color.Text+" players registered.");
-							}
-							else
-							{
-								sender.sendMessage(Color.Text+"No players found!");
-							}
-						}
-						return true;
-					}
+                                    {
                                         pm.removeUserGroup(u, g);
                                     }
                                     pm.addUserGroup(u, group);
