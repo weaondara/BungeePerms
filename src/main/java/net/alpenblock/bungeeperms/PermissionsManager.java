@@ -191,8 +191,6 @@ public class PermissionsManager implements Listener
             backend.saveUserGroups(u);
 		}
         
-        System.out.println("users.size()="+users.size());
-        
         //perms recalc and bukkit perms update
         for(User u:users)
         {
