@@ -149,7 +149,7 @@ public class MySQL2BackEnd implements BackEnd
                 
                 //world perms
                 Map<String,World> worlds=new HashMap<>();
-                for(String world:foundservers)
+                for(String world:foundworlds)
                 {
                     List<String> worldperms=new ArrayList<>();
                     for(ValueEntry e:permdata)
