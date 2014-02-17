@@ -56,4 +56,16 @@ public class Server
     public void setWorlds(Map<String, World> worlds) {
         this.worlds = worlds;
     }
+    
+    @Override
+    public String toString()
+    {
+        String string="server="+server+" "
+            +"perms="+perms+" "
+            +"display="+display+" "
+            +"prefix="+prefix+" "
+            +"suffix="+suffix+" "
+            +"worlds="+worlds;
+        return string;
+    }
 }

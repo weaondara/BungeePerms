@@ -49,4 +49,14 @@ public class World
         this.suffix = suffix;
     }
     
+    @Override
+    public String toString()
+    {
+        String string="world="+world+" "
+                +"perms="+perms+" "
+                +"display="+display+" "
+                +"prefix="+prefix+" "
+                +"suffix="+suffix;
+        return string;
+    }
 }
