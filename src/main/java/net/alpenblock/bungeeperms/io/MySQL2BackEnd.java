@@ -189,7 +189,7 @@ public class MySQL2BackEnd implements BackEnd
                 }
             }
 			
-			Group group=new Group(g, inheritances, globalperms, servers, rank, ladder, isdefault, display, prefix, suffix);
+			Group group=new Group(mpe.getName(), inheritances, globalperms, servers, rank, ladder, isdefault, display, prefix, suffix);
 			ret.add(group);
 		}
         Collections.sort(ret);
@@ -275,7 +275,7 @@ public class MySQL2BackEnd implements BackEnd
             }
         }
 
-        User u=new User(user, lgroups, globalperms, serverperms,serverworldperms);
+        User u=new User(mpe.getName(), lgroups, globalperms, serverperms,serverworldperms);
         return u;
     }
     @Override
