@@ -798,9 +798,14 @@ public class User
             {
                 BPPermission perm=new BPPermission(s,name,false,srv.getKey(),null);
                 ret.add(perm);
-
+                
                 //per server world perms
-                for(Map.Entry<String, List<String>> w:serverworldperms.get(srv.getKey()).entrySet())
+                Map<String, List<String>> worldperms = serverworldperms.get(srv.getKey());
+                if(worldperms==null)
+                {
+                    continue;
+                }
+                for(Map.Entry<String, List<String>> w:worldperms.entrySet())
                 {
                     //check for world
                     if(world!=null && !w.getKey().equalsIgnoreCase(world))
