@@ -791,11 +791,6 @@ public class Group implements Comparable<Group>
         cachedPerms.put(si.getName().toLowerCase()+";"+world.toLowerCase(), effperms);
     }
 
-    @Override
-    public int compareTo(Group g)
-    {
-        return -Integer.compare(rank, g.getRank());
-    }
     
     public List<BPPermission> getPermsWithOrigin(String server, String world)
     {
@@ -861,6 +856,11 @@ public class Group implements Comparable<Group>
     }
     
     
+    @Override
+    public int compareTo(Group g)
+    {
+        return -Integer.compare(rank, g.getRank());
+    }
     @Override
     public String toString()
     {
