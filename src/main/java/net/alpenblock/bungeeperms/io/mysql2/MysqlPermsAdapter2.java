@@ -165,12 +165,39 @@ public class MysqlPermsAdapter2
         doSaveData(name, type, key, values);
     }
     
-    public void saveData(String name, EntityType type, String key, List<ValueEntry> values, boolean whereserverisnull, boolean whereworldisnull)
+//    public void saveData(String name, EntityType type, String key, List<ValueEntry> values, boolean whereserverisnull, boolean whereworldisnull)
+//    {
+//        //delete entries
+//        String delq="DELETE FROM `"+table+"` WHERE `name`='"+name+"' AND `type`="+type.getCode()+" AND `key`='"+key+"' AND "
+//                + "`server` IS "+(!whereserverisnull?"NOT ":"")+"NULL AND "
+//                + "`world` IS "+(!whereworldisnull?"NOT ":"")+"NULL";
+//        mysql.runQuery(delq);
+//        
+//        //add values
+//        doSaveData(name, type, key, values);
+//    }
+    
+    public void saveData(String name, EntityType type, String key, List<ValueEntry> values, String server, String world)
     {
         //delete entries
-        String delq="DELETE FROM `"+table+"` WHERE `name`='"+name+"' AND `type`="+type.getCode()+" AND `key`='"+key+"' AND "
-                + "`server` IS "+(!whereserverisnull?"NOT ":"")+"NULL AND "
-                + "`world` IS "+(!whereworldisnull?"NOT ":"")+"NULL";
+        String delq="DELETE FROM `"+table+"` WHERE `name`='"+name+"' AND `type`="+type.getCode()+" AND `key`='"+key+"' AND ";
+        if(server==null)
+        {
+            delq+="`server` IS NULL";
+        }
+        else
+        {
+            delq+="`server`='"+server+"'";
+        }
+        delq+=" AND ";
+        if(world==null)
+        {
+            delq+="`world` IS NULL";
+        }
+        else
+        {
+            delq+="`world`='"+world+"'";
+        }
         mysql.runQuery(delq);
         
         //add values

@@ -386,33 +386,33 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveUserPerms(User user)
     {
-        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getExtraperms(),null,null), true, true);
+        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getExtraperms(),null,null), null, null);
     }
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server) 
     {
-        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getServerPerms().get(server),server,null), server==null, true);
+        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getServerPerms().get(server),server,null), server, null);
     }
     @Override
     public synchronized void saveUserPerServerWorldPerms(User user, String server, String world) 
     {
-        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getServerWorldPerms().get(server).get(world),server,world), server==null, world==null);
+        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getServerWorldPerms().get(server).get(world),server,world), server, world);
     }
 
     @Override
     public synchronized void saveGroupPerms(Group group)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getPerms(),null,null), true, true);
+        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getPerms(),null,null), null, null);
     }
     @Override
     public synchronized void saveGroupPerServerPerms(Group group, String server) 
     {
-        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServers().get(server).getPerms(),server,null), server==null, true);
+        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServers().get(server).getPerms(),server,null), server, null);
     }
     @Override
     public synchronized void saveGroupPerServerWorldPerms(Group group, String server, String world)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServers().get(server).getWorlds().get(world).getPerms(),server,world), server==null, world==null);
+        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServers().get(server).getWorlds().get(world).getPerms(),server,world), server, world);
     }
     @Override
     public synchronized void saveGroupInheritances(Group group)
@@ -437,17 +437,17 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveGroupDisplay(Group group,String server,String world)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "display", mkList(new ValueEntry(group.getDisplay(),server,world)), server==null, world==null);
+        adapter.saveData(group.getName(), EntityType.Group, "display", mkList(new ValueEntry(group.getDisplay(),server,world)), server, world);
     }
     @Override
     public synchronized void saveGroupPrefix(Group group,String server,String world)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "prefix", mkList(new ValueEntry(group.getPrefix(),server,world)), server==null, world==null);
+        adapter.saveData(group.getName(), EntityType.Group, "prefix", mkList(new ValueEntry(group.getPrefix(),server,world)), server, world);
     }
     @Override
     public synchronized void saveGroupSuffix(Group group,String server,String world)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "suffix", mkList(new ValueEntry(group.getSuffix(),server,world)), server==null, world==null);
+        adapter.saveData(group.getName(), EntityType.Group, "suffix", mkList(new ValueEntry(group.getSuffix(),server,world)), server, world);
     }
     
     @Override
