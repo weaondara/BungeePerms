@@ -85,8 +85,8 @@ public class User
 					{
 						if(index==0)
 						{
-							if( lperm.get(0).equalsIgnoreCase(lp.get(0))|
-								lp.get(0).equalsIgnoreCase("-"+lperm.get(0)))
+							if( lperm.get(0).equalsIgnoreCase(lp.get(0))| 
+                                    lp.get(0).equalsIgnoreCase("-"+lperm.get(0)))
 							{
 								index++;
 							}

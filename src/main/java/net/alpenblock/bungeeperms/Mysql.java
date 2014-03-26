@@ -220,7 +220,6 @@ public class Mysql
         } 
         catch (SQLException e) 
         {
-        	debug.log(e);
             try
             {
                 rs.close();
@@ -231,7 +230,7 @@ public class Mysql
                 stmt.close();
             }
             catch(Exception ex){}
-            rs=null;
+            throw new RuntimeException(e);
         }
         finally
         {
@@ -255,8 +254,7 @@ public class Mysql
         }
         catch (Exception e) 
         {
-        	debug.log(e);
-            return false;
+        	throw new RuntimeException(e);
         }
     }
     private long runQueryGetId(String query,boolean checkconnection) 
@@ -279,7 +277,7 @@ public class Mysql
         }
         catch (Exception e) 
         {
-        	debug.log(e);
+        	throw new RuntimeException(e);
         }
         finally
         {
