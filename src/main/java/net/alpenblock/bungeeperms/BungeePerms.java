@@ -707,6 +707,9 @@ public class BungeePerms extends Plugin implements Listener
                                 //group rank
                                 sender.sendMessage(Color.Text+"Rank: "+Color.Value+group.getRank());
 
+                                //group weight
+                                sender.sendMessage(Color.Text+"Weight: "+Color.Value+group.getWeight());
+
                                 //group ladder
                                 sender.sendMessage(Color.Text+"Ladder: "+Color.Value+group.getLadder());
 
@@ -802,7 +805,7 @@ public class BungeePerms extends Plugin implements Listener
                                 sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" already exists!");
                                 return true;
                             }
-                            Group group=new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String,Server>(), 1500, "default", false, "", "", "");
+                            Group group=new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String,Server>(), 1500, 1500, "default", false, "", "", "");
                             pm.addGroup(group);
                             sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" created.");
                         }
@@ -1167,6 +1170,39 @@ public class BungeePerms extends Plugin implements Listener
 								{
                                     pm.rankGroup(group,rank);
 									sender.sendMessage(Color.Text+"Group rank set for group "+Color.Value+group.getName()+Color.Text+".");
+									return true;
+								}
+								else
+								{
+									sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" does not exist!");
+								}
+							}
+							return true;
+						}
+                        else if(args[2].equalsIgnoreCase("weight"))
+						{
+							if(pm.hasOrConsole(sender,"bungeeperms.group.weight",true))
+							{
+								String groupname=args[1];
+								int weight;
+								try
+								{
+									weight=Integer.parseInt(args[3]);
+									if(weight<1)
+									{
+										throw new Exception();
+									}
+								}
+								catch(Exception e)
+								{
+									sender.sendMessage(Color.Error+"A whole number greater than 0 is required!");
+									return true;
+								}
+								Group group=pm.getGroup(groupname);
+								if(group!=null)
+								{
+                                    pm.weightGroup(group,weight);
+									sender.sendMessage(Color.Text+"Group weight set for group "+Color.Value+group.getName()+Color.Text+".");
 									return true;
 								}
 								else
@@ -1547,6 +1583,7 @@ public class BungeePerms extends Plugin implements Listener
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.inheritances.add")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> addinherit <group>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Adds a inheritance to the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.inheritances.remove")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> removeinherit <group>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Remove a inheritance from the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.rank")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> rank <new rank>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Sets the rank for the given group");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.group.weight")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> weight <new weight>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Sets the weight for the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.ladder")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> ladder <new ladder>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Sets the ladder for the given group");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.default")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> default <true|false>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Determines whether the given group is a default group or not");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.group.display")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms group <groupname> display <displayname> [server [world]]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Sets the display name for the given group");}

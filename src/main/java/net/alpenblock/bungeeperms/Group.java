@@ -20,88 +20,139 @@ public class Group implements Comparable<Group>
 	private List<String> perms;
 	private Map<String,Server> servers;
 	private int rank;
+	private int weight;
     private String ladder;
 	private boolean isdefault;
 	private String display;
 	private String prefix;
 	private String suffix;
-	
-	public Group(String name, List<String> inheritances, List<String> perms, Map<String,Server> servers, int rank, String ladder, boolean isdefault, String display, String prefix, String suffix) 
-	{
-        cachedPerms=new HashMap<>();
+
+    public Group(String name, List<String> inheritances, List<String> perms, Map<String, Server> servers, int rank, int weight, String ladder, boolean isdefault, String display, String prefix, String suffix)
+    {
+        this.name = name;
+        this.inheritances = inheritances;
+        this.perms = perms;
+        this.servers = servers;
+        this.rank = rank;
+        this.weight = weight;
+        this.ladder = ladder;
+        this.isdefault = isdefault;
+        this.display = display;
+        this.prefix = prefix;
+        this.suffix = suffix;
         
-		this.isdefault = isdefault;
-		this.name = name;
-		this.perms = perms;
-		this.servers = servers;
-		this.rank = rank;
-		this.ladder = ladder;
-		this.inheritances = inheritances;
-		this.display = display;
-		this.prefix = prefix;
-		this.suffix = suffix;
-	}
+        cachedPerms=new HashMap<>();
+    }
 	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public List<String> getInheritances() {
-		return inheritances;
-	}
-	public void setInheritances(List<String> inheritances) {
-		this.inheritances = inheritances;
-	}
-	public List<String> getPerms() {
-		return perms;
-	}
-	public void setPerms(List<String> perms) {
-		this.perms = perms;
-	}
-	public Map<String, Server> getServers() {
-		return servers;
-	}
-	public void setServers(Map<String, Server> servers) {
-		this.servers = servers;
-	}
-	public int getRank() {
-		return rank;
-	}
-	public void setRank(int rank) {
-		this.rank = rank;
-	}
-    public String getLadder() {
+	public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public List<String> getInheritances()
+    {
+        return inheritances;
+    }
+
+    public void setInheritances(List<String> inheritances)
+    {
+        this.inheritances = inheritances;
+    }
+
+    public List<String> getPerms()
+    {
+        return perms;
+    }
+
+    public void setPerms(List<String> perms)
+    {
+        this.perms = perms;
+    }
+
+    public Map<String, Server> getServers()
+    {
+        return servers;
+    }
+
+    public void setServers(Map<String, Server> servers)
+    {
+        this.servers = servers;
+    }
+
+    public int getRank()
+    {
+        return rank;
+    }
+
+    public void setRank(int rank)
+    {
+        this.rank = rank;
+    }
+
+    public int getWeight()
+    {
+        return weight;
+    }
+
+    public void setWeight(int weight)
+    {
+        this.weight = weight;
+    }
+
+    public String getLadder()
+    {
         return ladder;
     }
-    public void setLadder(String ladder) {
+
+    public void setLadder(String ladder)
+    {
         this.ladder = ladder;
     }
-	public boolean isDefault() {
-		return isdefault;
-	}
-	public void setIsdefault(boolean isdefault) {
-		this.isdefault = isdefault;
-	}
-	public String getDisplay() {
-		return display;
-	}
-	public void setDisplay(String display) {
-		this.display = display;
-	}
-	public String getPrefix() {
-		return prefix;
-	}
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
-	public String getSuffix() {
-		return suffix;
-	}
-	public void setSuffix(String suffix) {
-		this.suffix = suffix;
-	}
+
+    public boolean isDefault()
+    {
+        return isdefault;
+    }
+
+    public void setIsdefault(boolean isdefault)
+    {
+        this.isdefault = isdefault;
+    }
+
+    public String getDisplay()
+    {
+        return display;
+    }
+
+    public void setDisplay(String display)
+    {
+        this.display = display;
+    }
+
+    public String getPrefix()
+    {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix)
+    {
+        this.prefix = prefix;
+    }
+
+    public String getSuffix()
+    {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix)
+    {
+        this.suffix = suffix;
+    }
 	
 	public List<String> getEffectivePerms()
 	{
@@ -869,6 +920,7 @@ public class Group implements Comparable<Group>
                 + "perms="+perms+" "
                 + "servers="+servers+" "
                 + "rank="+rank+" "
+                + "weight="+weight+" "
                 + "ladder="+ladder+" "
                 + "isdefault="+isdefault+" "
                 + "display="+display+" "

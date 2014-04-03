@@ -87,6 +87,7 @@ public class MySQL2BackEnd implements BackEnd
 			List<String> inheritances=getValue(mpe.getData("inheritances"));
 			boolean isdefault=getFirstValue(mpe.getData("default"),false);
 			int rank=getFirstValue(mpe.getData("rank"), 1000);
+			int weight=getFirstValue(mpe.getData("weight"), 1000);
 			String ladder=getFirstValue(mpe.getData("ladder"), "default");
 			String display=getFirstValue(mpe.getData("display"), "");
 			String prefix=getFirstValue(mpe.getData("prefix"), "");
@@ -189,7 +190,7 @@ public class MySQL2BackEnd implements BackEnd
                 }
             }
 			
-			Group group=new Group(mpe.getName(), inheritances, globalperms, servers, rank, ladder, isdefault, display, prefix, suffix);
+			Group group=new Group(mpe.getName(), inheritances, globalperms, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
 			ret.add(group);
 		}
         Collections.sort(ret);
@@ -428,6 +429,11 @@ public class MySQL2BackEnd implements BackEnd
     public synchronized void saveGroupRank(Group group)
     {
         adapter.saveData(group.getName(), EntityType.Group, "rank", mkList(new ValueEntry(String.valueOf(group.getRank()),null,null)));
+    }
+    @Override
+    public synchronized void saveGroupWeight(Group group)
+    {
+        adapter.saveData(group.getName(), EntityType.Group, "weight", mkList(new ValueEntry(String.valueOf(group.getWeight()),null,null)));
     }
     @Override
     public synchronized void saveGroupDefault(Group group)

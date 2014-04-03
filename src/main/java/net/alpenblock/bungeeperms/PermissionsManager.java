@@ -238,7 +238,7 @@ public class PermissionsManager implements Listener
 		Group ret=player.getGroups().get(0);
 		for(int i=1;i<player.getGroups().size();i++)
 		{
-			if(player.getGroups().get(i).getRank()<ret.getRank())
+			if(player.getGroups().get(i).getWeight()<ret.getWeight())
 			{
 				ret=player.getGroups().get(i);
 			}
@@ -1430,6 +1430,23 @@ public class PermissionsManager implements Listener
         sendPMAll("reloadGroup;"+group.getName());
     }
     /**
+     * Sets the weight for the group.
+     * @param group
+     * @param weight
+     */
+    public void weightGroup(Group group, int weight) 
+    {
+        //cache
+        group.setWeight(weight);
+        Collections.sort(groups);
+        
+        //database
+        backend.saveGroupWeight(group);
+        
+        //send bukkit update info
+        sendPMAll("reloadGroup;"+group.getName());
+    }
+    /**
      * Sets if the the group is a default group.
      * @param group
      * @param isdefault
@@ -1449,6 +1466,8 @@ public class PermissionsManager implements Listener
      * Sets the displayname of the group
      * @param group
      * @param display
+     * @param server
+     * @param world
      */
     public void setGroupDisplay(Group group, String display, String server, String world) 
     {
@@ -1465,6 +1484,8 @@ public class PermissionsManager implements Listener
      * Sets the prefix for the group.
      * @param group
      * @param prefix
+     * @param server
+     * @param world
      */
     public void setGroupPrefix(Group group, String prefix, String server, String world)
     {
@@ -1481,6 +1502,8 @@ public class PermissionsManager implements Listener
      * Sets the suffix for the group.
      * @param group
      * @param suffix
+     * @param server
+     * @param world
      */
     public void setGroupSuffix(Group group, String suffix, String server, String world)
     {

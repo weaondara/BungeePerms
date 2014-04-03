@@ -42,6 +42,7 @@ public interface BackEnd
     public void saveGroupPerServerWorldPerms(Group group, String server, String world);
     public void saveGroupInheritances(Group group);
     public void saveGroupRank(Group group);
+    public void saveGroupWeight(Group group);
     public void saveGroupLadder(Group group);
     public void saveGroupDefault(Group group);
     public void saveGroupDisplay(Group group, String server, String world);
