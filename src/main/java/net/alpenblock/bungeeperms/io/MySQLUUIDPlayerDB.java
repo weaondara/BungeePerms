@@ -1,6 +1,8 @@
 package net.alpenblock.bungeeperms.io;
 
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Debug;
@@ -116,5 +118,45 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     {
         mysql.runQuery("DELETE FROM "+table+" WHERE uuid='"+uuid+"' OR player='"+player+"'");
         mysql.runQuery("INSERT IGNORE INTO "+table+" (uuid, player) VALUES ('"+uuid+"', '"+player+"')");
+    }
+
+    @Override
+    public Map<UUID, String> getAll()
+    {
+        Map<UUID,String> ret=new HashMap<>();
+        
+        ResultSet res=null;
+        try
+        {
+            String q="SELECT uuid, player FROM "+table;
+            res=mysql.returnQuery(q);
+            while(res.next())
+            {
+                UUID uuid=UUID.fromString(res.getString("uuid"));
+                String name=res.getString("player");
+                
+                ret.put(uuid, name);
+            }
+        }
+        catch(Exception e)
+        {
+            debug.log(e);
+        }
+        finally
+        {
+            try
+            {
+                res.close();
+            }
+            catch (Exception e){}
+        }
+        
+        return ret;
+    }
+
+    @Override
+    public void clear()
+    {
+        mysql.runQuery("TRUNCATE "+table);
     }
 }
