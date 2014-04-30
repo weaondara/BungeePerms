@@ -28,7 +28,7 @@ public class Migrate2MySQL implements Migrator
     @Override
     public void migrate(final List<Group> groups, final List<User> users, final int permsversion)
     {
-        BackEnd be=new MySQLBackEnd(bc,config,debug,true,false);
+        BackEnd be=new MySQLBackEnd(config,debug);
         be.clearDatabase();
         for(Group group:groups)
         {

@@ -27,7 +27,7 @@ public class Migrate2YAML implements Migrator
     @Override
     public void migrate(final List<Group> groups, final List<User> users, final int permsversion)
     {
-        BackEnd be=new YAMLBackEnd(bc,plugin,true,false);
+        BackEnd be=new YAMLBackEnd();
         be.clearDatabase();
         for(Group group:groups)
         {
