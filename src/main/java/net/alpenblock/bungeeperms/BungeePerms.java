@@ -1692,7 +1692,7 @@ public class BungeePerms extends Plugin implements Listener
                                 sender.sendMessage(Color.Message+"Finished migration.");
                             }
                         }
-                        else if(migratetype.equalsIgnoreCase("playeruuiddb"))
+                        else if(migratetype.equalsIgnoreCase("uuidplayerdb"))
                         {
                             if(args.length==2)
                             {
@@ -1730,6 +1730,10 @@ public class BungeePerms extends Plugin implements Listener
                                 sender.sendMessage(Color.Message+"Finished migration.");
                             }
                         }
+                        else
+                        {
+                            return false;
+                        }
                     }
                     return true;
                 }
@@ -1743,7 +1747,7 @@ public class BungeePerms extends Plugin implements Listener
 		sender.sendMessage(ChatColor.GOLD+"                  ------ BungeePerms - Help -----");
 		sender.sendMessage(ChatColor.GRAY+"Aliases: "+ChatColor.GOLD+"/bp");
 		sender.sendMessage(ChatColor.GOLD+"/bungeeperms"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Welcomes you to BungeePerms");
-		if(pm.hasPermOrConsole(sender,"bungeeperms.help")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms help"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows the help");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.help")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms help"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows this help");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.reload")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms reload"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Reloads the permissions");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.users")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms users [-c]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Lists the users [or shows the amount of them]");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.info")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> info"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows information to the given user");}
@@ -1777,7 +1781,8 @@ public class BungeePerms extends Plugin implements Listener
 		if(pm.hasPermOrConsole(sender,"bungeeperms.demote")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms demote <username> [ladder]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Demotes the given user to the previous rank");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.format")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms format"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Reformates the permission.yml or mysql table - "+ChatColor.RED+" BE CAREFUL");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.cleanup")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms cleanup"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Cleans up the permission.yml or mysql table - "+ChatColor.RED+" !BE VERY CAREFUL! - removes a lot of players from the permissions.yml if configured");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.backend")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms backend [yaml|mysql|mysql2]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows the used permissions database (file or mysql table) [or migrates to the given database] - "+ChatColor.RED+" !BE CAREFUL! - BungeePerms needs a mysql account on your server and general table permissions");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.backend")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms backend [yaml|mysql|mysql2]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows the used permissions database (file or mysql table) [or migrates to the given database] - "+ChatColor.RED+" !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.migrate")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms migrate <backend [yaml|mysql|mysql2]|useuuid [true|false]|uuidplayerdb [None,YAML|MySQL]>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Does migrations of different data (permissions, uuid) - "+ChatColor.RED+" !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");}
 		sender.sendMessage(ChatColor.GOLD+"---------------------------------------------------");
 	}
 	
