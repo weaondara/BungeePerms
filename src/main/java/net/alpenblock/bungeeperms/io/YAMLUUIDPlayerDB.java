@@ -64,7 +64,7 @@ public class YAMLUUIDPlayerDB implements UUIDPlayerDB
                 uuidconf.deleteNode(suuid);
             }
         }
-        uuidconf.setString(uuid.toString(), player);
+        uuidconf.setStringAndSave(uuid.toString(), player);
     }
 
     @Override
