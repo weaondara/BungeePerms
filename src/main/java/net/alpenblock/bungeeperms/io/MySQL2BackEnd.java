@@ -30,8 +30,6 @@ public class MySQL2BackEnd implements BackEnd
     private Plugin plugin;
     private Mysql mysql;
     
-    private PermissionsManager manager;
-    
     private MysqlPermsAdapter2 adapter;
     private String table;
     private String tablePrefix;
@@ -42,7 +40,6 @@ public class MySQL2BackEnd implements BackEnd
         config=conf;
         debug=d;
         
-        manager=BungeePerms.getInstance().getPermissionsManager();
         
         loadConfig();
         
@@ -206,7 +203,7 @@ public class MySQL2BackEnd implements BackEnd
         List<String> users=adapter.getUsers();
 		for(String u:users)
 		{
-			User user=manager.isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
+			User user=BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
 			ret.add(user);
 		}
         
@@ -225,7 +222,7 @@ public class MySQL2BackEnd implements BackEnd
         List<Group> lgroups=new ArrayList<>();
         for(String s:sgroups)
         {
-            Group g=manager.getGroup(s);
+            Group g=BungeePerms.getInstance().getPermissionsManager().getGroup(s);
             if(g!=null)
             {
                 lgroups.add(g);
@@ -277,7 +274,7 @@ public class MySQL2BackEnd implements BackEnd
             }
         }
 
-        UUID uuid=manager.getUUIDPlayerDB().getUUID(mpe.getName());
+        UUID uuid=BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(mpe.getName());
         User u=new User(mpe.getName(), uuid, lgroups, globalperms, serverperms,serverworldperms);
         return u;
     }
@@ -346,7 +343,7 @@ public class MySQL2BackEnd implements BackEnd
             }
         }
 
-        String username=manager.getUUIDPlayerDB().getPlayerName(user);
+        String username=BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
         User u=new User(username, user, lgroups, globalperms, serverperms,serverworldperms);
         return u;
     }
@@ -366,7 +363,7 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public boolean isUserInDatabase(User user)
     {
-        return adapter.isInBD(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User);
+        return adapter.isInBD(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User);
     }
     @Override
     public List<String> getRegisteredUsers() 
@@ -436,7 +433,7 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void deleteUser(User user)
     {
-        adapter.deleteEntity(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(),EntityType.User);
+        adapter.deleteEntity(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName(),EntityType.User);
     }
     @Override
     public synchronized void deleteGroup(Group group)
@@ -453,22 +450,22 @@ public class MySQL2BackEnd implements BackEnd
             savegroups.add(g.getName());
         }
         
-        adapter.saveData(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "groups", mkValueList(savegroups,null,null));
+        adapter.saveData(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "groups", mkValueList(savegroups,null,null));
     }
     @Override
     public synchronized void saveUserPerms(User user)
     {
-        adapter.saveData(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getExtraperms(),null,null), null, null);
+        adapter.saveData(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getExtraperms(),null,null), null, null);
     }
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server) 
     {
-        adapter.saveData(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getServerPerms().get(server),server,null), server, null);
+        adapter.saveData(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getServerPerms().get(server),server,null), server, null);
     }
     @Override
     public synchronized void saveUserPerServerWorldPerms(User user, String server, String world) 
     {
-        adapter.saveData(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getServerWorldPerms().get(server).get(world),server,world), server, world);
+        adapter.saveData(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getServerWorldPerms().get(server).get(world),server,world), server, world);
     }
 
     @Override

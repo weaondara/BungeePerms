@@ -25,8 +25,6 @@ public class YAMLBackEnd implements BackEnd
     private BungeeCord bc;
     private Plugin plugin;
     
-    private PermissionsManager manager;
-    
     private String permspath;
     private Config permsconf;
     
@@ -34,8 +32,6 @@ public class YAMLBackEnd implements BackEnd
     {
         bc=BungeeCord.getInstance();
         plugin=BungeePerms.getInstance();
-        
-        manager=BungeePerms.getInstance().getPermissionsManager();
         
         permspath="/permissions.yml";
         
@@ -114,7 +110,7 @@ public class YAMLBackEnd implements BackEnd
         List<String> users=permsconf.getSubNodes("users");
 		for(String u:users)
 		{
-			User user=manager.isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
+			User user=BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
 			ret.add(user);
 		}
         
@@ -157,7 +153,7 @@ public class YAMLBackEnd implements BackEnd
             serverworldperms.put(server, worldperms);
         }
 
-        UUID uuid=manager.getUUIDPlayerDB().getUUID(user);
+        UUID uuid=BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(user);
         User u=new User(user, uuid, lgroups, extrapermissions, serverperms,serverworldperms);
         return u;
     }
@@ -198,7 +194,7 @@ public class YAMLBackEnd implements BackEnd
             serverworldperms.put(server, worldperms);
         }
 
-        String username=manager.getUUIDPlayerDB().getPlayerName(user);
+        String username=BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
         User u=new User(username, user, lgroups, extrapermissions, serverperms,serverworldperms);
         return u;
     }
@@ -221,7 +217,7 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public boolean isUserInDatabase(User user)
     {
-        return permsconf.keyExists("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName()));
+        return permsconf.keyExists("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName()));
     }
     @Override
     public List<String> getRegisteredUsers() 
@@ -254,18 +250,18 @@ public class YAMLBackEnd implements BackEnd
             {
                 groups.add(g.getName());
             }
-            permsconf.setListString("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".groups", groups);
-            permsconf.setListString("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".permissions", user.getExtraperms());
+            permsconf.setListString("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName())+".groups", groups);
+            permsconf.setListString("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName())+".permissions", user.getExtraperms());
 
             for(Map.Entry<String, List<String>> se:user.getServerPerms().entrySet())
             {
-                permsconf.setListString("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+se.getKey()+".permissions", se.getValue());
+                permsconf.setListString("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+se.getKey()+".permissions", se.getValue());
             }
             for(Map.Entry<String, Map<String, List<String>>> swe:user.getServerWorldPerms().entrySet())
             {
                 for(Map.Entry<String, List<String>> we:swe.getValue().entrySet())
                 {
-                    permsconf.getListString("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+swe.getKey()+".worlds."+we.getKey()+".permissions", we.getValue());
+                    permsconf.getListString("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+swe.getKey()+".worlds."+we.getKey()+".permissions", we.getValue());
                 }
             }
 
@@ -311,7 +307,7 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public synchronized void deleteUser(User user)
     {
-        permsconf.deleteNode("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName()));
+        permsconf.deleteNode("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName()));
     }
     @Override
     public synchronized void deleteGroup(Group group)
@@ -328,22 +324,22 @@ public class YAMLBackEnd implements BackEnd
             savegroups.add(g.getName());
         }
         
-        permsconf.setListStringAndSave("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".groups", savegroups);
+        permsconf.setListStringAndSave("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName())+".groups", savegroups);
     }
     @Override
     public synchronized void saveUserPerms(User user)
     {
-        permsconf.setListStringAndSave("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".permissions", user.getExtraperms());
+        permsconf.setListStringAndSave("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName())+".permissions", user.getExtraperms());
     }
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server) 
     {
-        permsconf.setListStringAndSave("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+server+".permissions", user.getServerPerms().get(server));
+        permsconf.setListStringAndSave("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+server+".permissions", user.getServerPerms().get(server));
     }
     @Override
     public synchronized void saveUserPerServerWorldPerms(User user, String server, String world) 
     {
-        permsconf.setListStringAndSave("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+server+".worlds."+world+".permissions", user.getServerWorldPerms().get(server).get(world));
+        permsconf.setListStringAndSave("users."+(BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+server+".worlds."+world+".permissions", user.getServerWorldPerms().get(server).get(world));
     }
     
     @Override
