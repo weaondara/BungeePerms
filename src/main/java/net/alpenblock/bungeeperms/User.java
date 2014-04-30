@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import net.md_5.bungee.BungeeCord;
-
 import net.md_5.bungee.api.config.ServerInfo;
 
 public class User
@@ -13,50 +13,70 @@ public class User
     private Map<String,List<String>> cachedPerms;
     
 	private String name;
+    private UUID uuid;
 	private List<Group> groups;
 	private List<String> extraperms;
 	private Map<String, List<String>> serverperms;
     private Map<String, Map<String, List<String>>> serverworldperms;
 	
-	public User(String name, List<Group> groups, List<String> extraperms, Map<String, List<String>> serverperms, Map<String, Map<String, List<String>>> serverworldperms) 
+	public User(String name, UUID uuid, List<Group> groups, List<String> extraperms, Map<String, List<String>> serverperms, Map<String, Map<String, List<String>>> serverworldperms) 
 	{
         cachedPerms=new HashMap<>();
         
 		this.name = name;
+		this.uuid = uuid;
 		this.groups = groups;
 		this.extraperms = extraperms;
 		this.serverperms = serverperms;
 		this.serverworldperms = serverworldperms;
 	}
 	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public List<Group> getGroups() {
-		return groups;
-	}
-	public void setGroups(List<Group> groups) {
-		this.groups = groups;
-	}
-	public List<String> getExtraperms() {
-		return extraperms;
-	}
-	public void setExtraperms(List<String> extraperms) {
-		this.extraperms = extraperms;
-	}
-	public Map<String, List<String>> getServerPerms() {
-		return serverperms;
-	}
-	public void setServerPerms(Map<String, List<String>> serverperms) {
-		this.serverperms = serverperms;
-	}
-    public Map<String, Map<String, List<String>>> getServerWorldPerms() {
+    public String getName()
+    {
+        return name;
+    }
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    public UUID getUUID()
+    {
+        return uuid;
+    }
+    public void setUUID(UUID uuid)
+    {
+        this.uuid = uuid;
+    }
+    public List<Group> getGroups()
+    {
+        return groups;
+    }
+    public void setGroups(List<Group> groups)
+    {
+        this.groups = groups;
+    }
+    public List<String> getExtraperms()
+    {
+        return extraperms;
+    }
+    public void setExtraperms(List<String> extraperms)
+    {
+        this.extraperms = extraperms;
+    }
+    public Map<String, List<String>> getServerPerms()
+    {
+        return serverperms;
+    }
+    public void setServerPerms(Map<String, List<String>> serverperms)
+    {
+        this.serverperms = serverperms;
+    }
+    public Map<String, Map<String, List<String>>> getServerWorldPerms()
+    {
         return serverworldperms;
     }
-    public void setServerWorldPerms(Map<String, Map<String, List<String>>> serverworldperms) {
+    public void setServerWorldPerms(Map<String, Map<String, List<String>>> serverworldperms)
+    {
         this.serverworldperms = serverworldperms;
     }
 	

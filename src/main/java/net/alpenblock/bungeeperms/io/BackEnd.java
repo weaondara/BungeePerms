@@ -5,6 +5,7 @@
 package net.alpenblock.bungeeperms.io;
 
 import java.util.List;
+import java.util.UUID;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 
@@ -20,6 +21,7 @@ public interface BackEnd
     public List<Group> loadGroups();
     public List<User> loadUsers();
     public User loadUser(String user);
+    public User loadUser(UUID user);
     public int loadVersion();
     public void saveVersion(int version, boolean savetodisk);
     

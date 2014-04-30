@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
 import net.alpenblock.bungeeperms.io.BackEndType;
 
@@ -191,13 +192,14 @@ public class BungeePerms extends Plugin implements Listener
                             }
                             
                             String player=Statics.getFullPlayerName(bc,args[1]);
+                            UUID uuid=Statics.parseUUID(player);
                             String server=args.length>3?args[3]:null;
                             String world=args.length>4?args[4]:null;
 
-                            User user=pm.getUser(player);
+                            User user=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
                             if(user!=null)
                             {
-                                sender.sendMessage(Color.Text+"Permissions of the player "+Color.User+user.getName()+Color.Text+":");
+                                sender.sendMessage(Color.Text+"Permissions of the player "+Color.User+user.getName()+Color.Text+" ("+Color.User+user.getUUID()+Color.Text+"):");
                                 List<BPPermission> perms=user.getPermsWithOrigin(server,world);
                                 for(BPPermission perm:perms)
                                 {
@@ -226,7 +228,8 @@ public class BungeePerms extends Plugin implements Listener
                             }
                             
                             String player=Statics.getFullPlayerName(bc,args[1]);
-                            User user=pm.getUser(player);
+                            UUID uuid=Statics.parseUUID(player);
+                            User user=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
                             if(user!=null)
                             {
                                 sender.sendMessage(Color.Text+"Groups of the player "+Color.User+user.getName()+Color.Text+":");
@@ -252,7 +255,8 @@ public class BungeePerms extends Plugin implements Listener
                             }
                             
                             String player=Statics.getFullPlayerName(bc,args[1]);
-                            User user=pm.getUser(player);
+                            UUID uuid=Statics.parseUUID(player);
+                            User user=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
                             if(user==null)
                             {
                                 sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
@@ -277,10 +281,11 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.perms.add",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
+                                UUID uuid=Statics.parseUUID(player);
 								String perm=args[3].toLowerCase();
 								String server=args.length>4?args[4]:null;
                                 String world=args.length>5?args[5]:null;
-								User user=pm.getUser(player);
+								User user=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
 								if(user!=null)
 								{
 									if(server==null)
@@ -368,10 +373,11 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.perms.remove",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
+                                UUID uuid=Statics.parseUUID(player);
 								String perm=args[3].toLowerCase();
 								String server=args.length>4?args[4]:null;
                                 String world=args.length>5?args[5]:null;
-								User user=pm.getUser(player);
+								User user=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
 								if(user!=null)
 								{
 									if(server==null)
@@ -458,9 +464,10 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.perms.has",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-								User user=pm.getUser(player);
+                                UUID uuid=Statics.parseUUID(player);
 								String server=args.length>4?args[4]:null;
                                 String world=args.length>5?args[5]:null;
+								User user=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
 								if(user!=null)
 								{
 									if(server==null)
@@ -506,6 +513,7 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.group.add",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
+                                UUID uuid=Statics.parseUUID(player);
 								String groupname=args[3];
 								Group group=pm.getGroup(groupname);
 								if(group==null)
@@ -513,7 +521,7 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"The group "+Color.User+groupname+Color.Error+" does not exist!");
 									return true;
 								}
-								User u=pm.getUser(player);
+								User u=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
 								if(u!=null)
 								{
 									List<Group> groups=u.getGroups();
@@ -542,6 +550,7 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.group.remove",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
+                                UUID uuid=Statics.parseUUID(player);
 								String groupname=args[3];
 								Group group=pm.getGroup(groupname);
 								if(group==null)
@@ -549,7 +558,7 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"The group "+Color.User+groupname+Color.Error+" does not exist!");
 									return true;
 								}
-								User u=pm.getUser(player);
+								User u=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
 								if(u!=null)
 								{
 									List<Group> groups=u.getGroups();
@@ -576,6 +585,7 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.group.set",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
+                                UUID uuid=Statics.parseUUID(player);
 								String groupname=args[3];
 								Group group=pm.getGroup(groupname);
 								if(group==null)
@@ -583,7 +593,7 @@ public class BungeePerms extends Plugin implements Listener
 									sender.sendMessage(Color.Error+"The group "+Color.User+groupname+Color.Error+" does not exist!");
 									return true;
 								}
-								User u=pm.getUser(player);
+								User u=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
 								if(u!=null)
 								{
                                     List<Group> laddergroups=pm.getLadderGroups(group.getLadder());
@@ -1337,7 +1347,9 @@ public class BungeePerms extends Plugin implements Listener
 						if(pm.hasOrConsole(sender,"bungeeperms.promote",true))
 						{
 							//getting next group
-							User user=pm.getUser(Statics.getFullPlayerName(bc,args[1]));
+                            String player=Statics.getFullPlayerName(bc,args[1]);
+                            UUID uuid=Statics.parseUUID(player);
+							User user=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
 							if(user==null)
 							{
 								sender.sendMessage(Color.Error+"The player "+Color.User+args[1]+Color.Error+" does not exist!");
@@ -1382,7 +1394,7 @@ public class BungeePerms extends Plugin implements Listener
                             //permision checks if sender is a player
                             if(sender instanceof ProxiedPlayer)
                             {
-                                User issuer=pm.getUser(sender.getName());
+                                User issuer=pm.isUseUUIDs() ? pm.getUser(((ProxiedPlayer)sender).getUniqueId()) : pm.getUser(sender.getName());
 								if(issuer==null)
 								{
 									sender.sendMessage(Color.Error+"You do not exist!");
@@ -1421,7 +1433,9 @@ public class BungeePerms extends Plugin implements Listener
 						if(pm.hasOrConsole(sender,"bungeeperms.demote",true))
 						{
 							//getting next group
-							User user=pm.getUser(Statics.getFullPlayerName(bc,args[1]));
+                            String player=Statics.getFullPlayerName(bc,args[1]);
+                            UUID uuid=Statics.parseUUID(player);
+                            User user=uuid!=null && pm.isUseUUIDs() ? pm.getUser(uuid) : pm.getUser(player);
 							if(user==null)
 							{
 								sender.sendMessage(Color.Error+"The player "+Color.User+args[1]+Color.Error+" does not exist!");
@@ -1459,7 +1473,7 @@ public class BungeePerms extends Plugin implements Listener
 							//permision checks if sender is a player
 							if(sender instanceof ProxiedPlayer)
 							{
-								User issuer=pm.getUser(sender.getName());
+								User issuer=pm.isUseUUIDs() ? pm.getUser(((ProxiedPlayer)sender).getUniqueId()) : pm.getUser(sender.getName());
 								if(issuer==null)
 								{
 									sender.sendMessage(Color.Error+"You do not exist!");

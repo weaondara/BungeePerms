@@ -5,17 +5,24 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
+import lombok.Getter;
+import lombok.Setter;
 import net.alpenblock.bungeeperms.io.BackEnd;
 import net.alpenblock.bungeeperms.io.BackEndType;
-import net.alpenblock.bungeeperms.io.MySQLBackEnd;
 import net.alpenblock.bungeeperms.io.MySQL2BackEnd;
+import net.alpenblock.bungeeperms.io.MySQLBackEnd;
+import net.alpenblock.bungeeperms.io.MySQLUUIDPlayerDB;
+import net.alpenblock.bungeeperms.io.NoneUUIDPlayerDB;
+import net.alpenblock.bungeeperms.io.UUIDPlayerDB;
+import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.io.YAMLBackEnd;
+import net.alpenblock.bungeeperms.io.YAMLUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
-
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -45,10 +52,18 @@ public class PermissionsManager implements Listener
     private List<User> users;
     private int permsversion;
     
+    @Getter
     private boolean saveAllUsers;
+    @Getter
     private boolean deleteUsersOnCleanup;
     
-    private BackEnd backend;
+    @Getter @Setter
+    private BackEnd backEnd;
+    @Getter
+    private UUIDPlayerDB UUIDPlayerDB;
+    
+    @Getter
+    private boolean useUUIDs;
 	
 	public PermissionsManager(Plugin p,Config conf,Debug d)
 	{
@@ -79,18 +94,37 @@ public class PermissionsManager implements Listener
         saveAllUsers=config.getBoolean("saveAllUsers", true);
         deleteUsersOnCleanup=config.getBoolean("deleteUsersOnCleanup", false);
         
+        useUUIDs=config.getBoolean("useUUIDs", false);
+        
         BackEndType bet=config.getEnumValue("backendtype",BackEndType.YAML);
         if(bet==BackEndType.YAML)
         {
-            backend=new YAMLBackEnd(bc,plugin,saveAllUsers,deleteUsersOnCleanup);
+            backEnd=new YAMLBackEnd();
         }
         else if(bet==BackEndType.MySQL)
         {
-            backend=new MySQLBackEnd(bc,config,debug,saveAllUsers,deleteUsersOnCleanup);
+            backEnd=new MySQLBackEnd(config,debug);
         }
         else if(bet==BackEndType.MySQL2)
         {
-            backend=new MySQL2BackEnd(bc,config,debug,saveAllUsers,deleteUsersOnCleanup);
+            backEnd=new MySQL2BackEnd(config,debug);
+        }
+        
+        if(useUUIDs)
+        {
+            UUIDPlayerDBType updbt=config.getEnumValue("backendtype",UUIDPlayerDBType.None);
+            if(updbt==UUIDPlayerDBType.None)
+            {
+                UUIDPlayerDB=new NoneUUIDPlayerDB();
+            }
+            else if(updbt==UUIDPlayerDBType.YAML)
+            {
+                UUIDPlayerDB=new YAMLUUIDPlayerDB();
+            }
+            else if(updbt==UUIDPlayerDBType.MySQL)
+            {
+                UUIDPlayerDB=new MySQLUUIDPlayerDB(config,debug);
+            }
         }
     }
     
@@ -102,21 +136,28 @@ public class PermissionsManager implements Listener
 		bc.getLogger().info("[BungeePerms] loading permissions ...");
 		
         //load database
-        backend.load();
+        backEnd.load();
         
         //load all groups
-        groups=backend.loadGroups();
+        groups=backEnd.loadGroups();
         
         //load online players; allows reload
         users=new ArrayList<>();
         for(ProxiedPlayer pp:BungeeCord.getInstance().getPlayers())
         {
-            getUser(pp.getName());
+            if(useUUIDs)
+            {
+                getUser(pp.getUniqueId());
+            }
+            else
+            {
+                getUser(pp.getName());
+            }
         }
-        //users=backend.loadUsers();
+        //users=backEnd.loadUsers();
         
         //load permsversion
-        permsversion=backend.loadVersion();
+        permsversion=backEnd.loadVersion();
 		
 		bc.getLogger().info("[BungeePerms] permissions loaded");
 	}
@@ -165,7 +206,7 @@ public class PermissionsManager implements Listener
 					j--;
 				}
 			}
-            backend.saveGroupInheritances(group);
+            backEnd.saveGroupInheritances(group);
 		}
         //perms recalc and bukkit perms update
         for(Group g:groups)
@@ -188,7 +229,7 @@ public class PermissionsManager implements Listener
 					j--;
 				}
 			}
-            backend.saveUserGroups(u);
+            backEnd.saveUserGroups(u);
 		}
         
         //perms recalc and bukkit perms update
@@ -197,11 +238,18 @@ public class PermissionsManager implements Listener
             u.recalcPerms();
             
             //send bukkit update info
-            sendPM(u.getName(),"reloadUser;"+u.getName());
+            if(useUUIDs)
+            {
+                sendPM(u.getUUID(),"reloadUser;"+u.getUUID());
+            }
+            else
+            {
+                sendPM(u.getName(),"reloadUser;"+u.getName());
+            }
         }
         
-        //user groups check - backend
-        List<User> backendusers=backend.loadUsers();
+        //user groups check - backEnd
+        List<User> backendusers=backEnd.loadUsers();
         for(int i=0;i<backendusers.size();i++)
 		{
 			User u=users.get(i);
@@ -213,7 +261,7 @@ public class PermissionsManager implements Listener
 					j--;
 				}
 			}
-            backend.saveUserGroups(u);
+            backEnd.saveUserGroups(u);
 		}
 	}
 
@@ -377,21 +425,52 @@ public class PermissionsManager implements Listener
     
 	/**
      * Gets a user by its name. If the user is not loaded it will be loaded.
-     * @param username the name of the user to get
+     * @param usernameoruuid the name or the UUID of the user to get
      * @return the found user or null if it does not exist
      */
-    public synchronized User getUser(String username)
+    public synchronized User getUser(String usernameoruuid)
 	{
+        UUID uuid=Statics.parseUUID(usernameoruuid);
+        if(uuid!=null)
+        {
+            return getUser(uuid);
+        }
+        
 		for(User u:users)
 		{
-			if(u.getName().equalsIgnoreCase(username))
+			if(u.getName().equalsIgnoreCase(usernameoruuid))
 			{
 				return u;
 			}
 		}
         
         //load user from database
-        User u=backend.loadUser(username);
+        User u=backEnd.loadUser(usernameoruuid);
+        if(u!=null)
+        {
+            users.add(u);
+            return u;
+        }
+        
+		return null;
+	}
+    /**
+     * Gets a user by its UUID. If the user is not loaded it will be loaded.
+     * @param uuid the uuid of the user to get
+     * @return the found user or null if it does not exist
+     */
+    public synchronized User getUser(UUID uuid)
+	{
+		for(User u:users)
+		{
+			if(u.getUUID().equals(uuid))
+			{
+				return u;
+			}
+		}
+        
+        //load user from database
+        User u=backEnd.loadUser(uuid);
         if(u!=null)
         {
             users.add(u);
@@ -425,12 +504,12 @@ public class PermissionsManager implements Listener
      */
     public List<String> getRegisteredUsers()
     {
-        return backend.getRegisteredUsers();
+        return backEnd.getRegisteredUsers();
     }
     
     public List<String> getGroupUsers(Group group)
     {
-        return backend.getGroupUsers(group);
+        return backEnd.getGroupUsers(group);
     }
 	
 	/**
@@ -443,10 +522,17 @@ public class PermissionsManager implements Listener
         users.remove(user);
         
         //database
-		backend.deleteUser(user);
+		backEnd.deleteUser(user);
         
-        //send bukkit update info
-        sendPM(user.getName(),"deleteUser;"+user.getName());
+        //send bukkit update infoif(useUUIDs)
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"deleteUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"deleteUser;"+user.getName());
+        }
 	}
     
 	/**
@@ -459,7 +545,7 @@ public class PermissionsManager implements Listener
         groups.remove(group);
         
         //database
-		backend.deleteGroup(group);
+		backEnd.deleteGroup(group);
         
         //group validation
         BungeePerms.getInstance().getPermissionsManager().validateUsersGroups();
@@ -478,10 +564,17 @@ public class PermissionsManager implements Listener
         users.add(user);
         
         //database
-		backend.saveUser(user,true);
+		backEnd.saveUser(user,true);
         
         //send bukkit update info
-        sendPM(user.getName(),"reloadUser;"+user.getName());
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"reloadUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"reloadUser;"+user.getName());
+        }
 	}
     
     /**
@@ -495,7 +588,7 @@ public class PermissionsManager implements Listener
 		Collections.sort(groups);
         
         //database
-		backend.saveGroup(group,true);
+		backEnd.saveGroup(group,true);
         
         //send bukkit update info
         sendPM(group.getName(),"reloadGroup;"+group.getName());
@@ -506,22 +599,24 @@ public class PermissionsManager implements Listener
      * Do NOT call this function.
      * @param e
      */
-    @EventHandler(priority=-128)
+    @EventHandler(priority=Byte.MIN_VALUE)
 	public void onLogin(LoginEvent e)
 	{
         String playername=e.getConnection().getName();
-		bc.getLogger().log(Level.INFO, "[BungeePerms] Login by {0}", playername);
+        UUID uuid=e.getConnection().getUniqueId();
+		bc.getLogger().log(Level.INFO, "[BungeePerms] Login by {0} ({1})", new Object[]{playername, uuid});
         
-        User u=getUser(playername);
+        UUIDPlayerDB.update(uuid, playername);
+        User u=useUUIDs ? getUser(uuid) : getUser(playername);
         if(u==null)
         {
-			bc.getLogger().log(Level.INFO, "[BungeePerms] Adding default groups to {0}", playername);
+			bc.getLogger().log(Level.INFO, "[BungeePerms] Adding default groups to {0} ({1})", new Object[]{playername, uuid});
             
 			List<Group> groups=getDefaultGroups();
-			u=new User(playername, groups, new ArrayList<String>(),new HashMap<String, List<String>>(),new HashMap<String, Map<String, List<String>>>());
+			u=new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, List<String>>(), new HashMap<String, Map<String, List<String>>>());
             users.add(u);
             
-			backend.saveUser(u,true);
+			backEnd.saveUser(u,true);
         }
 	}
     
@@ -529,12 +624,12 @@ public class PermissionsManager implements Listener
      * Do NOT call this function.
      * @param e
      */
-    @EventHandler(priority=127)
+    @EventHandler(priority=Byte.MAX_VALUE)
 	public void onDisconnect(PlayerDisconnectEvent e)
 	{
-        String playername=e.getPlayer().getName();
+        UUID uuid=e.getPlayer().getUniqueId();
         
-        User u=getUser(playername);
+        User u=getUser(uuid);
         users.remove(u);
 	}
     
@@ -559,7 +654,7 @@ public class PermissionsManager implements Listener
 	{
 		if(sender instanceof ProxiedPlayer)
 		{
-			return getUser(sender.getName()).hasPerm(permission);
+			return (useUUIDs ? getUser(((ProxiedPlayer)sender).getUniqueId()) : getUser(sender.getName())).hasPerm(permission);
 		}
 		return false;
 	}
@@ -574,7 +669,7 @@ public class PermissionsManager implements Listener
 	{
 		if(sender instanceof ProxiedPlayer)
 		{
-			return getUser(sender.getName()).hasPerm(permission);
+			return (useUUIDs ? getUser(((ProxiedPlayer)sender).getUniqueId()) : getUser(sender.getName())).hasPerm(permission);
 		}
 		else if(sender instanceof ConsoleCommandSender)
 		{
@@ -672,7 +767,7 @@ public class PermissionsManager implements Listener
 	{
 		if(sender instanceof ProxiedPlayer)
 		{
-			User user=getUser(sender.getName());
+			User user=useUUIDs ? getUser(((ProxiedPlayer)sender).getUniqueId()) : getUser(sender.getName());
 			if(((ProxiedPlayer) sender).getServer()==null)
 			{
 				return user.hasPerm(permission);
@@ -692,7 +787,7 @@ public class PermissionsManager implements Listener
 	{
 		if(sender instanceof ProxiedPlayer)
 		{
-			User user=getUser(sender.getName());
+			User user=useUUIDs ? getUser(((ProxiedPlayer)sender).getUniqueId()) : getUser(sender.getName());
 			if(((ProxiedPlayer) sender).getServer()==null)
 			{
 				return user.hasPerm(permission);
@@ -717,12 +812,12 @@ public class PermissionsManager implements Listener
 	{
 		if(!sender.equalsIgnoreCase("CONSOLE"))
 		{
-			User p=getUser(sender);
-			if(p==null)
+			User u=getUser(sender);
+			if(u==null)
 			{
 				return false;
 			}
-			return p.hasPermOnServer(permission,server);
+			return u.hasPermOnServer(permission,server);
 		}
 		return false;
 	}
@@ -797,7 +892,7 @@ public class PermissionsManager implements Listener
 	{
 		if(sender instanceof ProxiedPlayer)
 		{
-			User user=getUser(sender.getName());
+			User user=useUUIDs ? getUser(((ProxiedPlayer)sender).getUniqueId()) : getUser(sender.getName());
             
             //per server
 			if(((ProxiedPlayer) sender).getServer()==null)
@@ -827,7 +922,7 @@ public class PermissionsManager implements Listener
 	{
 		if(sender instanceof ProxiedPlayer)
 		{
-			User user=getUser(sender.getName());
+			User user=useUUIDs ? getUser(((ProxiedPlayer)sender).getUniqueId()) : getUser(sender.getName());
 			if(((ProxiedPlayer) sender).getServer()==null)
 			{
 				return user.hasPerm(permission);
@@ -946,23 +1041,23 @@ public class PermissionsManager implements Listener
 
     //database and permission operations
     /**
-     * Formats the permissions backend.
+     * Formats the permissions backEnd.
      */
     public void format() 
     {
-        backend.format(backend.loadGroups(), backend.loadUsers(),permsversion);
-        backend.load();
+        backEnd.format(backEnd.loadGroups(), backEnd.loadUsers(),permsversion);
+        backEnd.load();
         sendPMAll("reload;all");
     }
     
     /**
-     * Cleans the permissions backend and wipes 0815 users.
+     * Cleans the permissions backEnd and wipes 0815 users.
      * @return the number of deleted users
      */
     public int cleanup() 
     {
-        int res=backend.cleanup(backend.loadGroups(), backend.loadUsers(),permsversion);
-        backend.load();
+        int res=backEnd.cleanup(backEnd.loadGroups(), backEnd.loadUsers(),permsversion);
+        backEnd.load();
         sendPMAll("reload;all");
         return res;
     }
@@ -979,13 +1074,20 @@ public class PermissionsManager implements Listener
         Collections.sort(user.getGroups());
         
         //database
-        backend.saveUserGroups(user);
+        backEnd.saveUserGroups(user);
         
         //recalc perms
         user.recalcPerms();
         
         //send bukkit update info
-        sendPM(user.getName(),"reloadUser;"+user.getName());
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"reloadUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"reloadUser;"+user.getName());
+        }
     }
     
     /**
@@ -1000,13 +1102,20 @@ public class PermissionsManager implements Listener
         Collections.sort(user.getGroups());
         
         //database
-        backend.saveUserGroups(user);
+        backEnd.saveUserGroups(user);
         
         //recalc perms
         user.recalcPerms();
         
         //send bukkit update info
-        sendPM(user.getName(),"reloadUser;"+user.getName());
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"reloadUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"reloadUser;"+user.getName());
+        }
     }
     
     /**
@@ -1020,13 +1129,20 @@ public class PermissionsManager implements Listener
         user.getExtraperms().add(perm);
         
         //database
-        backend.saveUserPerms(user);
+        backEnd.saveUserPerms(user);
         
         //recalc perms
         user.recalcPerms();
         
         //send bukkit update info
-        sendPM(user.getName(),"reloadUser;"+user.getName());
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"reloadUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"reloadUser;"+user.getName());
+        }
     }
     
     /**
@@ -1040,13 +1156,20 @@ public class PermissionsManager implements Listener
         user.getExtraperms().remove(perm);
         
         //database
-        backend.saveUserPerms(user);
+        backEnd.saveUserPerms(user);
         
         //recalc perms
         user.recalcPerms();
         
         //send bukkit update info
-        sendPM(user.getName(),"reloadUser;"+user.getName());
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"reloadUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"reloadUser;"+user.getName());
+        }
     }
 
     /**
@@ -1068,13 +1191,20 @@ public class PermissionsManager implements Listener
         user.getServerPerms().put(server, perserverperms);
         
         //database
-        backend.saveUserPerServerPerms(user, server);
+        backEnd.saveUserPerServerPerms(user, server);
         
         //recalc perms
         user.recalcPerms(server);
       
         //send bukkit update info
-        sendPM(user.getName(),"reloadUser;"+user.getName());
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"reloadUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"reloadUser;"+user.getName());
+        }
     }
     
     /**
@@ -1096,13 +1226,20 @@ public class PermissionsManager implements Listener
         user.getServerPerms().put(server, perserverperms);
         
         //database
-        backend.saveUserPerServerPerms(user, server);
+        backEnd.saveUserPerServerPerms(user, server);
         
         //recalc perms
         user.recalcPerms(server);
       
         //send bukkit update info
-        sendPM(user.getName(),"reloadUser;"+user.getName());
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"reloadUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"reloadUser;"+user.getName());
+        }
     }
     
     /**
@@ -1132,13 +1269,20 @@ public class PermissionsManager implements Listener
         user.getServerWorldPerms().put(server, perserverperms);
         
         //database
-        backend.saveUserPerServerWorldPerms(user, server, world);
+        backEnd.saveUserPerServerWorldPerms(user, server, world);
         
         //recalc perms
         user.recalcPerms(server,world);
         
         //send bukkit update info
-        sendPM(user.getName(),"reloadUser;"+user.getName());
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"reloadUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"reloadUser;"+user.getName());
+        }
     }
 
     /**
@@ -1168,13 +1312,20 @@ public class PermissionsManager implements Listener
         user.getServerWorldPerms().put(server, perserverperms);
         
         //database
-        backend.saveUserPerServerWorldPerms(user, server, world);
+        backEnd.saveUserPerServerWorldPerms(user, server, world);
         
         //recalc perms
         user.recalcPerms(server,world);
         
         //send bukkit update info
-        sendPM(user.getName(),"reloadUser;"+user.getName());
+        if(useUUIDs)
+        {
+            sendPM(user.getUUID(),"reloadUser;"+user.getUUID());
+        }
+        else
+        {
+            sendPM(user.getName(),"reloadUser;"+user.getName());
+        }
     }
 
     public void addGroupPerm(Group group, String perm)
@@ -1183,7 +1334,7 @@ public class PermissionsManager implements Listener
         group.getPerms().add(perm);
         
         //database
-        backend.saveGroupPerms(group);
+        backEnd.saveGroupPerms(group);
         
         //recalc perms
         for(Group g:groups)
@@ -1204,7 +1355,7 @@ public class PermissionsManager implements Listener
         group.getPerms().remove(perm);
         
         //database
-        backend.saveGroupPerms(group);
+        backEnd.saveGroupPerms(group);
         
         //recalc perms
         for(Group g:groups)
@@ -1234,7 +1385,7 @@ public class PermissionsManager implements Listener
         group.getServers().put(server, srv);
         
         //database
-        backend.saveGroupPerServerPerms(group, server);
+        backEnd.saveGroupPerServerPerms(group, server);
         
         //recalc perms
         for(Group g:groups)
@@ -1263,7 +1414,7 @@ public class PermissionsManager implements Listener
         group.getServers().put(server, srv);
         
         //database
-        backend.saveGroupPerServerPerms(group, server);
+        backEnd.saveGroupPerServerPerms(group, server);
         
         //recalc perms
         for(Group g:groups)
@@ -1299,7 +1450,7 @@ public class PermissionsManager implements Listener
         group.getServers().put(server, srv);
         
         //database
-        backend.saveGroupPerServerWorldPerms(group, server, world);
+        backEnd.saveGroupPerServerWorldPerms(group, server, world);
         
         //recalc perms
         for(Group g:groups)
@@ -1334,7 +1485,7 @@ public class PermissionsManager implements Listener
         group.getServers().put(server, srv);
         
         //database
-        backend.saveGroupPerServerWorldPerms(group, server, world);
+        backEnd.saveGroupPerServerWorldPerms(group, server, world);
         
         //recalc perms
         for(Group g:groups)
@@ -1357,7 +1508,7 @@ public class PermissionsManager implements Listener
         Collections.sort(group.getInheritances());
 
         //database
-        backend.saveGroupInheritances(group);
+        backEnd.saveGroupInheritances(group);
         
         //recalc perms
         for(Group g:groups)
@@ -1379,7 +1530,7 @@ public class PermissionsManager implements Listener
         Collections.sort(group.getInheritances());
 
         //database
-        backend.saveGroupInheritances(group);
+        backEnd.saveGroupInheritances(group);
         
         //recalc perms
         for(Group g:groups)
@@ -1406,7 +1557,7 @@ public class PermissionsManager implements Listener
         group.setLadder(ladder);
         
         //database
-        backend.saveGroupLadder(group);
+        backEnd.saveGroupLadder(group);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());
@@ -1424,7 +1575,7 @@ public class PermissionsManager implements Listener
         Collections.sort(groups);
         
         //database
-        backend.saveGroupRank(group);
+        backEnd.saveGroupRank(group);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());
@@ -1441,7 +1592,7 @@ public class PermissionsManager implements Listener
         Collections.sort(groups);
         
         //database
-        backend.saveGroupWeight(group);
+        backEnd.saveGroupWeight(group);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());
@@ -1457,7 +1608,7 @@ public class PermissionsManager implements Listener
         group.setIsdefault(isdefault);
         
         //database
-        backend.saveGroupDefault(group);
+        backEnd.saveGroupDefault(group);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());
@@ -1475,7 +1626,7 @@ public class PermissionsManager implements Listener
         group.setDisplay(display);
         
         //database
-        backend.saveGroupDisplay(group,server,world);
+        backEnd.saveGroupDisplay(group,server,world);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());
@@ -1493,7 +1644,7 @@ public class PermissionsManager implements Listener
         group.setPrefix(prefix);
         
         //database
-        backend.saveGroupPrefix(group,server,world);
+        backEnd.saveGroupPrefix(group,server,world);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());
@@ -1511,34 +1662,15 @@ public class PermissionsManager implements Listener
         group.setSuffix(suffix);
         
         //database
-        backend.saveGroupSuffix(group,server,world);
+        backEnd.saveGroupSuffix(group,server,world);
         
         //send bukkit update info
         sendPMAll("reloadGroup;"+group.getName());
     }
 
-    //backend things
-    /**
-     * Gets the currently use backend.
-     * @return the backend instance used
-     */
-    public BackEnd getBackEnd()
-    {
-        return backend;
-    }
-    
-    /**
-     * Sets the backend to use
-     * @param backend the new backend instance to use
-     */
-    public void setBackEnd(BackEnd backend)
-    {
-        this.backend = backend;
-    }
-    
     /**
      * Migrates the permissions to the given backnd type.
-     * @param bet the backend type to migrate to
+     * @param bet the backEnd type to migrate to
      */
     public synchronized void migrateBackEnd(BackEndType bet)
     {
@@ -1565,9 +1697,9 @@ public class PermissionsManager implements Listener
             throw new UnsupportedOperationException("bet=="+bet.name());
         }
         
-        migrator.migrate(backend.loadGroups(), backend.loadUsers(), permsversion);
+        migrator.migrate(backEnd.loadGroups(), backEnd.loadUsers(), permsversion);
         
-        backend.load();
+        backEnd.load();
     }
     
     //perms per world
@@ -1594,6 +1726,14 @@ public class PermissionsManager implements Listener
 
     //bukkit-bungeeperms reload information functions
     public void sendPM(String player,String msg)
+    {
+        ProxiedPlayer pp=BungeeCord.getInstance().getPlayer(player);
+        if(pp!=null)
+        {
+            pp.getServer().getInfo().sendData(channel, msg.getBytes());
+        }
+    }
+    public void sendPM(UUID player,String msg)
     {
         ProxiedPlayer pp=BungeeCord.getInstance().getPlayer(player);
         if(pp!=null)

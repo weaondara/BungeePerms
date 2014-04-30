@@ -2,6 +2,7 @@ package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -108,4 +109,28 @@ public class Statics {
 		}
 		return false;
 	}
+    public static UUID parseUUID(String s)
+    {
+        try
+        {
+            return UUID.fromString(s);
+        }
+        catch(Exception e) {}
+        
+        if(s.length()==32)
+        {
+            s=s.substring(0,8)+"-"+
+                    s.substring(8,12)+"-"+
+                    s.substring(12,16)+"-"+
+                    s.substring(16,20)+"-"+
+                    s.substring(20,32)+"-";
+            try
+            {
+                return UUID.fromString(s);
+            }
+            catch(Exception e) {}
+        }
+        
+        return null;
+    }
 }

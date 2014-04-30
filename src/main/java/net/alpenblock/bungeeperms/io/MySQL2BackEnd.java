@@ -5,17 +5,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Mysql;
-import net.alpenblock.bungeeperms.io.mysql2.MysqlPermsAdapter2;
+import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
 import net.alpenblock.bungeeperms.io.mysql2.EntityType;
 import net.alpenblock.bungeeperms.io.mysql2.MysqlPermEntity;
+import net.alpenblock.bungeeperms.io.mysql2.MysqlPermsAdapter2;
 import net.alpenblock.bungeeperms.io.mysql2.ValueEntry;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -28,20 +30,19 @@ public class MySQL2BackEnd implements BackEnd
     private Plugin plugin;
     private Mysql mysql;
     
+    private PermissionsManager manager;
+    
     private MysqlPermsAdapter2 adapter;
     private String table;
     private String tablePrefix;
     
-    private boolean saveAllUsers;
-    private boolean deleteUsersOnCleanup;
-    
-    public MySQL2BackEnd(BungeeCord bc, Config conf, Debug d, boolean saveAllUsers, boolean deleteUsersOnCleanup)
+    public MySQL2BackEnd(Config conf, Debug d)
     {
-        this.bc=bc;
+        bc=BungeeCord.getInstance();
         config=conf;
         debug=d;
-        this.saveAllUsers=saveAllUsers;
-        this.deleteUsersOnCleanup=deleteUsersOnCleanup;
+        
+        manager=BungeePerms.getInstance().getPermissionsManager();
         
         loadConfig();
         
@@ -205,7 +206,7 @@ public class MySQL2BackEnd implements BackEnd
         List<String> users=adapter.getUsers();
 		for(String u:users)
 		{
-			User user=loadUser(u);
+			User user=manager.isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
 			ret.add(user);
 		}
         
@@ -215,6 +216,75 @@ public class MySQL2BackEnd implements BackEnd
     public User loadUser(String user) 
     {
         MysqlPermEntity mpe = adapter.getUser(user);
+        if(mpe.getName()==null)
+        {
+            return null;
+        }
+        
+        List<String> sgroups=getValue(mpe.getData("groups"));
+        List<Group> lgroups=new ArrayList<>();
+        for(String s:sgroups)
+        {
+            Group g=manager.getGroup(s);
+            if(g!=null)
+            {
+                lgroups.add(g);
+            }
+        }
+
+
+        //perms
+        List<ValueEntry> permdata = mpe.getData("permissions");
+        if(permdata==null)
+        {
+            permdata=new ArrayList<>();
+        }
+        List<String> globalperms=new ArrayList<>();
+        Map<String,List<String>> serverperms=new HashMap<>();
+        Map<String,Map<String,List<String>>> serverworldperms=new HashMap<>();
+        for(ValueEntry e:permdata)
+        {
+            if(e.getServer()==null)
+            {
+                globalperms.add(e.getValue());
+            }
+            else if(e.getWorld()==null)
+            {
+                List<String> server = serverperms.get(e.getServer().toLowerCase());
+                if(server==null)
+                {
+                    server=new ArrayList<>();
+                    serverperms.put(e.getServer().toLowerCase(), server);
+                }
+                server.add(e.getValue());
+            }
+            else
+            {
+                Map<String, List<String>> server = serverworldperms.get(e.getServer().toLowerCase());
+                if(server==null)
+                {
+                    server=new HashMap<>();
+                    serverworldperms.put(e.getServer().toLowerCase(), server);
+                }
+
+                List<String> world = server.get(e.getWorld().toLowerCase());
+                if(world==null)
+                {
+                    world=new ArrayList<>();
+                    server.put(e.getWorld().toLowerCase(), world);
+                }
+                world.add(e.getValue());
+            }
+        }
+
+        UUID uuid=manager.getUUIDPlayerDB().getUUID(mpe.getName());
+        User u=new User(mpe.getName(), uuid, lgroups, globalperms, serverperms,serverworldperms);
+        return u;
+    }
+    @Override
+    public User loadUser(UUID user) 
+    {
+        MysqlPermEntity mpe = adapter.getUser(user.toString());
         if(mpe.getName()==null)
         {
             return null;
@@ -276,7 +346,8 @@ public class MySQL2BackEnd implements BackEnd
             }
         }
 
-        User u=new User(mpe.getName(), lgroups, globalperms, serverperms,serverworldperms);
+        String username=manager.getUUIDPlayerDB().getPlayerName(user);
+        User u=new User(username, user, lgroups, globalperms, serverperms,serverworldperms);
         return u;
     }
     @Override
@@ -295,7 +366,7 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public boolean isUserInDatabase(User user)
     {
-        return adapter.isInBD(user.getName(), EntityType.User);
+        return adapter.isInBD(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User);
     }
     @Override
     public List<String> getRegisteredUsers() 
@@ -311,7 +382,7 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveUser(User user,boolean savetodisk)
     {
-        if(saveAllUsers?true:!user.isNothingSpecial())
+        if(BungeePerms.getInstance().getPermissionsManager().isSaveAllUsers()?true:!user.isNothingSpecial())
         {
             List<String> groups=new ArrayList<>();
             for(Group g:user.getGroups())
@@ -365,7 +436,7 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void deleteUser(User user)
     {
-        adapter.deleteEntity(user.getName(),EntityType.User);
+        adapter.deleteEntity(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(),EntityType.User);
     }
     @Override
     public synchronized void deleteGroup(Group group)
@@ -382,22 +453,22 @@ public class MySQL2BackEnd implements BackEnd
             savegroups.add(g.getName());
         }
         
-        adapter.saveData(user.getName(), EntityType.User, "groups", mkValueList(savegroups,null,null));
+        adapter.saveData(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "groups", mkValueList(savegroups,null,null));
     }
     @Override
     public synchronized void saveUserPerms(User user)
     {
-        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getExtraperms(),null,null), null, null);
+        adapter.saveData(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getExtraperms(),null,null), null, null);
     }
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server) 
     {
-        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getServerPerms().get(server),server,null), server, null);
+        adapter.saveData(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getServerPerms().get(server),server,null), server, null);
     }
     @Override
     public synchronized void saveUserPerServerWorldPerms(User user, String server, String world) 
     {
-        adapter.saveData(user.getName(), EntityType.User, "permissions", mkValueList(user.getServerWorldPerms().get(server).get(world),server,world), server, world);
+        adapter.saveData(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getServerWorldPerms().get(server).get(world),server,world), server, world);
     }
 
     @Override
@@ -483,10 +554,12 @@ public class MySQL2BackEnd implements BackEnd
         for(int i=0;i<users.size();i++)
         {
             User u=users.get(i);
-            if(deleteUsersOnCleanup)
+            if(BungeePerms.getInstance().getPermissionsManager().isDeleteUsersOnCleanup())
             {
                 //check for additional permissions and non-default groups AND onlinecheck
-                if(u.isNothingSpecial()&BungeeCord.getInstance().getPlayer(u.getName())==null)
+                if(u.isNothingSpecial() && 
+                        bc.getPlayer(u.getName())==null && 
+                        bc.getPlayer(u.getUUID())==null)
                 {
                     deleted++;
                     continue;

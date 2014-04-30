@@ -8,9 +8,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
@@ -23,18 +25,17 @@ public class YAMLBackEnd implements BackEnd
     private BungeeCord bc;
     private Plugin plugin;
     
+    private PermissionsManager manager;
+    
     private String permspath;
     private Config permsconf;
     
-    private boolean saveAllUsers;
-    private boolean deleteUsersOnCleanup;
-    
-    public YAMLBackEnd(BungeeCord bc, Plugin p,boolean saveAllUsers, boolean deleteUsersOnCleanup)
+    public YAMLBackEnd()
     {
-        this.bc=bc;
-        plugin=p;
-        this.saveAllUsers=saveAllUsers;
-        this.deleteUsersOnCleanup=deleteUsersOnCleanup;
+        bc=BungeeCord.getInstance();
+        plugin=BungeePerms.getInstance();
+        
+        manager=BungeePerms.getInstance().getPermissionsManager();
         
         permspath="/permissions.yml";
         
@@ -113,35 +114,7 @@ public class YAMLBackEnd implements BackEnd
         List<String> users=permsconf.getSubNodes("users");
 		for(String u:users)
 		{
-			List<String> sgroups=permsconf.getListString("users."+u+".groups", new ArrayList<String>());
-			List<Group> lgroups=new ArrayList<>();
-			for(String s:sgroups)
-			{
-				Group g=BungeePerms.getInstance().getPermissionsManager().getGroup(s);
-				if(g!=null)
-				{
-					lgroups.add(g);
-				}
-			}
-			List<String> extrapermissions=permsconf.getListString("users."+u+".permissions", new ArrayList<String>());
-			
-			Map<String,List<String>> serverperms=new HashMap<>();
-			Map<String,Map<String,List<String>>> serverworldperms=new HashMap<>();
-			for(String server:permsconf.getSubNodes("users."+u+".servers"))
-			{
-                //per server perms
-				serverperms.put(server, permsconf.getListString("users."+u+".servers."+server+".permissions", new ArrayList<String>()));
-                
-                //per server world perms
-                Map<String,List<String>> worldperms=new HashMap<>();
-                for(String world:permsconf.getSubNodes("users."+u+".servers."+server+".worlds"))
-                {
-                    worldperms.put(world, permsconf.getListString("users."+u+".servers."+server+".worlds."+world+".permissions", new ArrayList<String>()));
-                }
-                serverworldperms.put(server, worldperms);
-			}
-			
-			User user=new User(u, lgroups, extrapermissions, serverperms,serverworldperms);
+			User user=manager.isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
 			ret.add(user);
 		}
         
@@ -184,7 +157,49 @@ public class YAMLBackEnd implements BackEnd
             serverworldperms.put(server, worldperms);
         }
 
-        User u=new User(user, lgroups, extrapermissions, serverperms,serverworldperms);
+        UUID uuid=manager.getUUIDPlayerDB().getUUID(user);
+        User u=new User(user, uuid, lgroups, extrapermissions, serverperms,serverworldperms);
+        return u;
+    }
+    @Override
+    public User loadUser(UUID user) 
+    {
+        if(!permsconf.keyExists("users."+user))
+        {
+            return null;
+        }
+        
+        //load user from database
+        List<String> sgroups=permsconf.getListString("users."+user+".groups", new ArrayList<String>());
+        List<Group> lgroups=new ArrayList<>();
+        for(String s:sgroups)
+        {
+            Group g=BungeePerms.getInstance().getPermissionsManager().getGroup(s);
+            if(g!=null)
+            {
+                lgroups.add(g);
+            }
+        }
+        List<String> extrapermissions=permsconf.getListString("users."+user+".permissions", new ArrayList<String>());
+
+        Map<String,List<String>> serverperms=new HashMap<>();
+        Map<String,Map<String,List<String>>> serverworldperms=new HashMap<>();
+        for(String server:permsconf.getSubNodes("users."+user+".servers"))
+        {
+            //per server perms
+            serverperms.put(server, permsconf.getListString("users."+user+".servers."+server+".permissions", new ArrayList<String>()));
+
+            //per server world perms
+            Map<String,List<String>> worldperms=new HashMap<>();
+            for(String world:permsconf.getSubNodes("users."+user+".servers."+server+".worlds"))
+            {
+                worldperms.put(world, permsconf.getListString("users."+user+".servers."+server+".worlds."+world+".permissions", new ArrayList<String>()));
+            }
+            serverworldperms.put(server, worldperms);
+        }
+
+        String username=manager.getUUIDPlayerDB().getPlayerName(user);
+        User u=new User(username, user, lgroups, extrapermissions, serverperms,serverworldperms);
         return u;
     }
     @Override
@@ -206,7 +221,7 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public boolean isUserInDatabase(User user)
     {
-        return permsconf.keyExists("users."+user.getName());
+        return permsconf.keyExists("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName()));
     }
     @Override
     public List<String> getRegisteredUsers() 
@@ -232,25 +247,25 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public synchronized void saveUser(User user, boolean savetodisk)
     {
-        if(saveAllUsers?true:!user.isNothingSpecial())
+        if(BungeePerms.getInstance().getPermissionsManager().isSaveAllUsers()?true:!user.isNothingSpecial())
         {
             List<String> groups=new ArrayList<>();
             for(Group g:user.getGroups())
             {
                 groups.add(g.getName());
             }
-            permsconf.setListString("users."+user.getName()+".groups", groups);
-            permsconf.setListString("users."+user.getName()+".permissions", user.getExtraperms());
+            permsconf.setListString("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".groups", groups);
+            permsconf.setListString("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".permissions", user.getExtraperms());
 
             for(Map.Entry<String, List<String>> se:user.getServerPerms().entrySet())
             {
-                permsconf.setListString("users."+user.getName()+".servers."+se.getKey()+".permissions", se.getValue());
+                permsconf.setListString("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+se.getKey()+".permissions", se.getValue());
             }
             for(Map.Entry<String, Map<String, List<String>>> swe:user.getServerWorldPerms().entrySet())
             {
                 for(Map.Entry<String, List<String>> we:swe.getValue().entrySet())
                 {
-                    permsconf.getListString("users."+user.getName()+".servers."+swe.getKey()+".worlds."+we.getKey()+".permissions", we.getValue());
+                    permsconf.getListString("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+swe.getKey()+".worlds."+we.getKey()+".permissions", we.getValue());
                 }
             }
 
@@ -296,7 +311,7 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public synchronized void deleteUser(User user)
     {
-        permsconf.deleteNode("users."+user.getName());
+        permsconf.deleteNode("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName()));
     }
     @Override
     public synchronized void deleteGroup(Group group)
@@ -313,22 +328,22 @@ public class YAMLBackEnd implements BackEnd
             savegroups.add(g.getName());
         }
         
-        permsconf.setListStringAndSave("users."+user.getName()+".groups", savegroups);
+        permsconf.setListStringAndSave("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".groups", savegroups);
     }
     @Override
     public synchronized void saveUserPerms(User user)
     {
-        permsconf.setListStringAndSave("users."+user.getName()+".permissions", user.getExtraperms());
+        permsconf.setListStringAndSave("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".permissions", user.getExtraperms());
     }
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server) 
     {
-        permsconf.setListStringAndSave("users."+user.getName()+".servers."+server+".permissions", user.getServerPerms().get(server));
+        permsconf.setListStringAndSave("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+server+".permissions", user.getServerPerms().get(server));
     }
     @Override
     public synchronized void saveUserPerServerWorldPerms(User user, String server, String world) 
     {
-        permsconf.setListStringAndSave("users."+user.getName()+".servers."+server+".worlds."+world+".permissions", user.getServerWorldPerms().get(server).get(world));
+        permsconf.setListStringAndSave("users."+(manager.isUseUUIDs() ? user.getUUID().toString() : user.getName())+".servers."+server+".worlds."+world+".permissions", user.getServerWorldPerms().get(server).get(world));
     }
     
     @Override
@@ -416,10 +431,12 @@ public class YAMLBackEnd implements BackEnd
         for(int i=0;i<users.size();i++)
         {
             User u=users.get(i);
-            if(deleteUsersOnCleanup)
+            if(BungeePerms.getInstance().getPermissionsManager().isDeleteUsersOnCleanup())
             {
                 //check for additional permissions and non-default groups AND onlinecheck
-                if(u.isNothingSpecial()&BungeeCord.getInstance().getPlayer(u.getName())==null)
+                if(u.isNothingSpecial() && 
+                        bc.getPlayer(u.getName())==null && 
+                        bc.getPlayer(u.getUUID())==null)
                 {
                     deleted++;
                     continue;
