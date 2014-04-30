@@ -427,10 +427,21 @@ public class PermissionsManager implements Listener
      */
     public synchronized User getUser(String usernameoruuid)
 	{
-        UUID uuid=Statics.parseUUID(usernameoruuid);
-        if(uuid!=null)
+        if(useUUIDs)
         {
-            return getUser(uuid);
+            UUID uuid=Statics.parseUUID(usernameoruuid);
+            if(uuid!=null)
+            {
+                return getUser(uuid);
+            }
+            else
+            {
+                uuid=UUIDPlayerDB.getUUID(usernameoruuid);
+                if(uuid!=null)
+                {
+                    return getUser(uuid);
+                }
+            }
         }
         
 		for(User u:users)
