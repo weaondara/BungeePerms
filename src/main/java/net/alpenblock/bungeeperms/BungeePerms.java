@@ -263,12 +263,17 @@ public class BungeePerms extends Plugin implements Listener
                                 sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
                                 return true;
                             }
+                            
+                            sender.sendMessage(Color.Text+"About "+Color.User+user.getName());
+                            
+                            sender.sendMessage(Color.Text+"UUID: "+Color.Value+user.getUUID());
+                            
                             String groups="";
                             for(int i=0;i<user.getGroups().size();i++)
                             {
                                 groups+=Color.Value+user.getGroups().get(i).getName()+Color.Text+" ("+Color.Value+user.getGroups().get(i).getPerms().size()+Color.Text+")"+(i+1<user.getGroups().size()?", ":"");
                             }
-                            sender.sendMessage(Color.Text+"Groups of the player "+Color.User+user.getName()+Color.Text+": "+groups);
+                            sender.sendMessage(Color.Text+"Groups: "+groups);
 
                             //all group perms
                             sender.sendMessage(Color.Text+"Effective permissions: "+Color.Value+user.getEffectivePerms().size());//TODO
