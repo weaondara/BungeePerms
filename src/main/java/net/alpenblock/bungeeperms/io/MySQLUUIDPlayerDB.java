@@ -32,7 +32,6 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     {
         tablePrefix=config.getString("tablePrefix", "bungeeperms_");
     }
-    
     private void createTable()
 	{
 		if(!mysql.tableExists(table))
@@ -45,6 +44,12 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
             mysql.runQuery(t);
         }
 	}
+    
+    @Override
+    public UUIDPlayerDBType getType()
+    {
+        return UUIDPlayerDBType.MySQL;
+    }
     
     @Override
     public UUID getUUID(String player)

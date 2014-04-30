@@ -5,6 +5,12 @@ import java.util.UUID;
 public class NoneUUIDPlayerDB implements UUIDPlayerDB
 {
     @Override
+    public UUIDPlayerDBType getType()
+    {
+        return UUIDPlayerDBType.None;
+    }
+    
+    @Override
     public UUID getUUID(String player)
     {
         return null;

@@ -15,6 +15,12 @@ public class YAMLUUIDPlayerDB implements UUIDPlayerDB
     }
     
     @Override
+    public UUIDPlayerDBType getType()
+    {
+        return UUIDPlayerDBType.YAML;
+    }
+    
+    @Override
     public UUID getUUID(String player)
     {
         UUID ret=null;
