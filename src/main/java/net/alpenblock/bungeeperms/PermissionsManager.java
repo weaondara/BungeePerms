@@ -1774,6 +1774,11 @@ public class PermissionsManager implements Listener
         {
             UUIDPlayerDB=new MySQLUUIDPlayerDB(config,debug);
         }
+        else
+        {
+            throw new UnsupportedOperationException("type=="+type);
+        }
+        config.setEnumAndSave("uuidplayerdb",UUIDPlayerDB.getType());
         UUIDPlayerDB.clear();
         
         for(Map.Entry<UUID, String> e:map.entrySet())
