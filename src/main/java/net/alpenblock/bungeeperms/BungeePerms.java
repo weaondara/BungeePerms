@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
 import net.alpenblock.bungeeperms.io.BackEndType;
-
+import net.alpenblock.bungeeperms.uuid.UUIDFetcher;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -95,7 +95,7 @@ public class BungeePerms extends Plugin implements Listener
         pm.disable();
 	}
 	
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
 	{
 		if(cmd.getName().equalsIgnoreCase("bungeeperms"))
 		{
@@ -1567,6 +1567,116 @@ public class BungeePerms extends Plugin implements Listener
                     }
                     return true;
                 }
+                else if(args[0].equalsIgnoreCase("migrate"))
+				{
+                    if(pm.hasOrConsole(sender,"bungeeperms.migrate",true))
+                    {
+                        if(args.length==1)
+                        {
+                            Messages.sendTooLessArgsMessage(sender);
+                            return true;
+                        }
+                        String migratetype=args[1];
+                        if(migratetype.equalsIgnoreCase("backend"))
+                        {
+                            if(args.length==2)
+                            {
+                                sender.sendMessage(Color.Text+"Currently using "+Color.Value+pm.getBackEnd().getType().name()+Color.Text+" as backend");
+                            }
+                            else if(args.length==3)
+                            {
+                                String stype=args[2];
+                                BackEndType type=null;
+                                for(BackEndType bet:BackEndType.values())
+                                {
+                                    if(stype.equalsIgnoreCase(bet.name()))
+                                    {
+                                        type=bet;
+                                        break;
+                                    }
+                                }
+                                if(type==null)
+                                {
+                                    sender.sendMessage(Color.Error+"Invalid backend type! "+
+                                            Color.Value+BackEndType.YAML.name()+Color.Error+", "+
+                                            Color.Value+BackEndType.MySQL.name()+Color.Error+" or "+
+                                            Color.Value+BackEndType.MySQL2.name()+Color.Error+" is required!");
+                                    return true;
+                                }
+
+                                if(type==pm.getBackEnd().getType())
+                                {
+                                    sender.sendMessage(Color.Error+"Invalid backend type! You can't migrate from "+Color.Value+pm.getBackEnd().getType().name()+Color.Error+" to "+Color.Value+type.name()+Color.Error+"!");
+                                    return true;
+                                }
+
+                                sender.sendMessage(Color.Text+"Migrating permissions to "+Color.Value+type.name()+Color.Text+" ...");
+                                pm.migrateBackEnd(type);
+                                sender.sendMessage(Color.Message+"Finished migration.");
+                            }
+                        }
+                        else if(migratetype.equalsIgnoreCase("useuuid"))
+                        {
+                            if(args.length==2)
+                            {
+                                sender.sendMessage(Color.Text+"Currently using "+Color.Value+pm.getUUIDPlayerDB().getType().name()+Color.Text+" as uuid player database");
+                            }
+                            else if(args.length==3)
+                            {
+                                String stype=args[2];
+                                Boolean type=null;
+                                try
+                                {
+                                    type=parseTrueFalse(stype);
+                                }
+                                catch(Exception e){}
+                                if(type==null)
+                                {
+                                    sender.sendMessage(Color.Error+"Invalid use-uuid type! "+
+                                            Color.Value+"true"+Color.Error+" or "+
+                                            Color.Value+"false"+Color.Error+" is required!");
+                                    return true;
+                                }
+
+                                if(type==pm.isUseUUIDs())
+                                {
+                                    sender.sendMessage(Color.Error+"Invalid use-uuid type! You can't migrate to same type!");
+                                    return true;
+                                }
+
+                                if(type)
+                                {
+                                    sender.sendMessage(Color.Text+"Migrating permissions using UUIDs for player identification ...");
+                                    
+                                    sender.sendMessage(Color.Text+"Fetching UUIDs ...");
+                                    UUIDFetcher fetcher=new UUIDFetcher(pm.getBackEnd().getRegisteredUsers());
+                                    fetcher.fetchUUIDs();
+                                    Map<String, UUID> uuids = fetcher.getUUIDs();
+                                    sender.sendMessage(Color.Message+"Finished fetching.");
+                                    
+                                    sender.sendMessage(Color.Text+"Migrating player identification ...");
+                                    pm.migrateUseUUID(uuids);
+                                }
+                                else
+                                {
+                                    sender.sendMessage(Color.Text+"Migrating permissions using player names for player identification ...");
+                                    
+                                    sender.sendMessage(Color.Text+"Fetching "+(type?"UUIDs":"player names")+" ...");
+                                    UUIDFetcher fetcher=new UUIDFetcher(pm.getBackEnd().getRegisteredUsers());
+                                    fetcher.fetchPlayerNames();
+                                    Map<UUID, String> playernames = fetcher.getPlayerNames();
+                                    sender.sendMessage(Color.Message+"Finished fetching.");
+                                    
+                                    sender.sendMessage(Color.Text+"Migrating player identification ...");
+                                    pm.migrateUsePlayerNames(playernames);
+                                }
+                                
+                                sender.sendMessage(Color.Message+"Finished migration.");
+                            }
+                        }
+                    }
+                    return true;
+                }
 			}
 		}
 		return false;
@@ -1621,12 +1731,20 @@ public class BungeePerms extends Plugin implements Listener
 				new Command("bungeeperms",null,"bp")
 				{
 					@Override 
-					public void execute(CommandSender sender, String[] args) 
+					public void execute(final CommandSender sender, final String[] args) 
 					{
-						if(!onCommand(sender, this, "", args))
-						{
-							sender.sendMessage(Color.Error+"[BungeePerms] Command not found");
-						}
+                        final Command cmd=this;
+                        new Thread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                if(!BungeePerms.this.onCommand(sender, cmd, "", args))
+                                {
+                                    sender.sendMessage(Color.Error+"[BungeePerms] Command not found");
+                                }
+                            }
+                        }).start();
 					}
 				});
 	}

@@ -110,21 +110,18 @@ public class PermissionsManager implements Listener
             backEnd=new MySQL2BackEnd(config,debug);
         }
         
-        if(useUUIDs)
+        UUIDPlayerDBType updbt=config.getEnumValue("uuidplayerdb",UUIDPlayerDBType.None);
+        if(updbt==UUIDPlayerDBType.None)
         {
-            UUIDPlayerDBType updbt=config.getEnumValue("backendtype",UUIDPlayerDBType.None);
-            if(updbt==UUIDPlayerDBType.None)
-            {
-                UUIDPlayerDB=new NoneUUIDPlayerDB();
-            }
-            else if(updbt==UUIDPlayerDBType.YAML)
-            {
-                UUIDPlayerDB=new YAMLUUIDPlayerDB();
-            }
-            else if(updbt==UUIDPlayerDBType.MySQL)
-            {
-                UUIDPlayerDB=new MySQLUUIDPlayerDB(config,debug);
-            }
+            UUIDPlayerDB=new NoneUUIDPlayerDB();
+        }
+        else if(updbt==UUIDPlayerDBType.YAML)
+        {
+            UUIDPlayerDB=new YAMLUUIDPlayerDB();
+        }
+        else if(updbt==UUIDPlayerDBType.MySQL)
+        {
+            UUIDPlayerDB=new MySQLUUIDPlayerDB(config,debug);
         }
     }
     
@@ -1700,6 +1697,54 @@ public class PermissionsManager implements Listener
         migrator.migrate(backEnd.loadGroups(), backEnd.loadUsers(), permsversion);
         
         backEnd.load();
+    }
+    public void migrateUseUUID(Map<String, UUID> uuids)
+    {
+        List<Group> groups=backEnd.loadGroups();
+        List<User> users=backEnd.loadUsers();
+        int version=backEnd.loadVersion();
+        useUUIDs=true;
+        config.setBoolAndSave("useUUIDs", useUUIDs);
+        
+        backEnd.clearDatabase();
+        for(Group g:groups)
+        {
+            backEnd.saveGroup(g, false);
+        }
+        for(User u:users)
+        {
+            UUID uuid=uuids.get(u.getName());
+            if(uuid!=null)
+            {
+                u.setUUID(uuid);
+                backEnd.saveUser(u, false);
+            }
+        }
+        backEnd.saveVersion(version, true);
+    }
+    public void migrateUsePlayerNames(Map<UUID, String> playernames)
+    {
+        List<Group> groups=backEnd.loadGroups();
+        List<User> users=backEnd.loadUsers();
+        int version=backEnd.loadVersion();
+        useUUIDs=false;
+        config.setBoolAndSave("useUUIDs", useUUIDs);
+        
+        backEnd.clearDatabase();
+        for(Group g:groups)
+        {
+            backEnd.saveGroup(g, false);
+        }
+        for(User u:users)
+        {
+            String playername=playernames.get(u.getUUID());
+            if(playername!=null)
+            {
+                u.setName(playername);
+                backEnd.saveUser(u, false);
+            }
+        }
+        backEnd.saveVersion(version, true);
     }
     
     //perms per world
