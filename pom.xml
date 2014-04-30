@@ -23,6 +23,27 @@
                 <encoding>${project.build.sourceEncoding}</encoding>
             </configuration>
         </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>2.1</version>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>com.mojang:AccountsClient</include>
+                  <include>com.google.code.gson:gson</include>
+                </includes>
+              </artifactSet>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
     </plugins>
   </build>
     <dependencies>
@@ -31,6 +52,17 @@
             <artifactId>BungeeCord</artifactId>
             <version>1.0</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.12.2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>AccountsClient</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <properties>
