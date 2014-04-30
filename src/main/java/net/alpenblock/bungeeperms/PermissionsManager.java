@@ -1747,6 +1747,30 @@ public class PermissionsManager implements Listener
         backEnd.saveVersion(version, true);
     }
     
+    public void migrateUUIDPlayerDB(UUIDPlayerDBType type)
+    {
+        Map<UUID, String> map=UUIDPlayerDB.getAll();
+        
+        if(type==UUIDPlayerDBType.None)
+        {
+            UUIDPlayerDB=new NoneUUIDPlayerDB();
+        }
+        else if(type==UUIDPlayerDBType.YAML)
+        {
+            UUIDPlayerDB=new YAMLUUIDPlayerDB();
+        }
+        else if(type==UUIDPlayerDBType.MySQL)
+        {
+            UUIDPlayerDB=new MySQLUUIDPlayerDB(config,debug);
+        }
+        UUIDPlayerDB.clear();
+        
+        for(Map.Entry<UUID, String> e:map.entrySet())
+        {
+            UUIDPlayerDB.update(e.getKey(), e.getValue());
+        }
+    }
+    
     //perms per world
     @EventHandler
     public void onMessage(PluginMessageEvent e)
@@ -1793,4 +1817,5 @@ public class PermissionsManager implements Listener
             si.sendData(channel, msg.getBytes());
         }
     }
+
 }
