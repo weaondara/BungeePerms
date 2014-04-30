@@ -1731,6 +1731,90 @@ public class BungeePerms extends Plugin implements Listener
                     }
                     return true;
                 }
+                else if(args[0].equalsIgnoreCase("uuid"))
+				{
+                    if(pm.hasOrConsole(sender,"bungeeperms.uuid",true))
+                    {
+                        boolean reverse=false;
+                        boolean mojang=false;
+                        if(args.length>1)
+                        {
+                            String what=args[1];
+                            UUID uuidwhat=Statics.parseUUID(what);
+                            if(args.length>2)
+                            {
+                                String params=args[2];
+                                if(params.startsWith("-"))
+                                {
+                                    reverse=params.contains("r");
+                                    mojang=params.contains("m");
+                                }
+                            }
+                            if(reverse)
+                            {
+                                if(uuidwhat==null)
+                                {
+                                    sender.sendMessage(Color.Error+"UUID invalid!");
+                                    return true;
+                                }
+                            }
+                            
+                            if(mojang && reverse)
+                            {
+                                String name=UUIDFetcher.getPlayerNameFromMojang(uuidwhat);
+                                if(name==null)
+                                {
+                                    sender.sendMessage(Color.Text+"Mojang does not know this player.");
+                                }
+                                else
+                                {
+                                    sender.sendMessage(Color.Text+"Mojang says: Player name of "+Color.Value+uuidwhat+Color.Text+" is "+Color.User+name+Color.Text+".");
+                                }
+                            }
+                            else if(mojang && !reverse)
+                            {
+                                UUID uuid=UUIDFetcher.getUUIDFromMojang(what,null);
+                                if(uuid==null)
+                                {
+                                    sender.sendMessage(Color.Text+"Mojang does not know this player.");
+                                }
+                                else
+                                {
+                                    sender.sendMessage(Color.Text+"Mojang says: UUID of "+Color.User+what+Color.Text+" is "+Color.Value+uuid+Color.Text+".");
+                                }
+                            }
+                            else if(!mojang && reverse)
+                            {
+                                String name=pm.getUUIDPlayerDB().getPlayerName(uuidwhat);
+                                if(name==null)
+                                {
+                                    sender.sendMessage(Color.Text+"The UUID-player database does not know this player.");
+                                }
+                                else
+                                {
+                                    sender.sendMessage(Color.Text+"The UUID-player database says: Player name of "+Color.Value+uuidwhat+Color.Text+" is "+Color.User+name+Color.Text+".");
+                                }
+                            }
+                            else if(!mojang && !reverse)
+                            {
+                                UUID uuid=pm.getUUIDPlayerDB().getUUID(what);
+                                if(uuid==null)
+                                {
+                                    sender.sendMessage(Color.Text+"The UUID-player database does not know this player.");
+                                }
+                                else
+                                {
+                                    sender.sendMessage(Color.Text+"The UUID-player database says: UUID of "+Color.User+what+Color.Text+" is "+Color.Value+uuid+Color.Text+".");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Messages.sendTooLessArgsMessage(sender);
+                        }
+                    }
+                    return true;
+                }
 			}
 		}
 		return false;
@@ -1777,6 +1861,7 @@ public class BungeePerms extends Plugin implements Listener
 		if(pm.hasPermOrConsole(sender,"bungeeperms.cleanup")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms cleanup"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Cleans up the permission.yml or mysql table - "+ChatColor.RED+" !BE VERY CAREFUL! - removes a lot of players from the permissions.yml if configured");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.backend")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms backend [yaml|mysql|mysql2]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows the used permissions database (file or mysql table) [or migrates to the given database] - "+ChatColor.RED+" !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.migrate")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms migrate <backend [yaml|mysql|mysql2]|useuuid [true|false]|uuidplayerdb [None,YAML|MySQL]>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Does migrations of different data (permissions, uuid) or shows status - "+ChatColor.RED+" !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.uuid")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms uuid <player|uuid> [-rm]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Gets the UUID of a player from database (-r: reverse; -m: ask mojang)");}
 		sender.sendMessage(ChatColor.GOLD+"---------------------------------------------------");
 	}
 	
