@@ -1782,7 +1782,7 @@ public class BungeePerms extends Plugin implements Listener
 		if(pm.hasPermOrConsole(sender,"bungeeperms.format")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms format"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Reformates the permission.yml or mysql table - "+ChatColor.RED+" BE CAREFUL");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.cleanup")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms cleanup"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Cleans up the permission.yml or mysql table - "+ChatColor.RED+" !BE VERY CAREFUL! - removes a lot of players from the permissions.yml if configured");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.backend")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms backend [yaml|mysql|mysql2]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows the used permissions database (file or mysql table) [or migrates to the given database] - "+ChatColor.RED+" !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");}
-		if(pm.hasPermOrConsole(sender,"bungeeperms.migrate")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms migrate <backend [yaml|mysql|mysql2]|useuuid [true|false]|uuidplayerdb [None,YAML|MySQL]>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Does migrations of different data (permissions, uuid) - "+ChatColor.RED+" !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.migrate")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms migrate <backend [yaml|mysql|mysql2]|useuuid [true|false]|uuidplayerdb [None,YAML|MySQL]>"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Does migrations of different data (permissions, uuid) or shows status - "+ChatColor.RED+" !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");}
 		sender.sendMessage(ChatColor.GOLD+"---------------------------------------------------");
 	}
 	
