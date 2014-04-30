@@ -193,7 +193,6 @@ public class BungeePerms extends Plugin implements Listener
                             }
                             
                             String player=Statics.getFullPlayerName(bc,args[1]);
-                            UUID uuid=Statics.parseUUID(player);
                             String server=args.length>3?args[3]:null;
                             String world=args.length>4?args[4]:null;
 
@@ -229,7 +228,6 @@ public class BungeePerms extends Plugin implements Listener
                             }
                             
                             String player=Statics.getFullPlayerName(bc,args[1]);
-                            UUID uuid=Statics.parseUUID(player);
                             User user=pm.getUser(player);
                             if(user!=null)
                             {
@@ -256,7 +254,6 @@ public class BungeePerms extends Plugin implements Listener
                             }
                             
                             String player=Statics.getFullPlayerName(bc,args[1]);
-                            UUID uuid=Statics.parseUUID(player);
                             User user=pm.getUser(player);
                             if(user==null)
                             {
@@ -287,7 +284,6 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.perms.add",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-                                UUID uuid=Statics.parseUUID(player);
 								String perm=args[3].toLowerCase();
 								String server=args.length>4?args[4]:null;
                                 String world=args.length>5?args[5]:null;
@@ -379,7 +375,6 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.perms.remove",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-                                UUID uuid=Statics.parseUUID(player);
 								String perm=args[3].toLowerCase();
 								String server=args.length>4?args[4]:null;
                                 String world=args.length>5?args[5]:null;
@@ -470,7 +465,6 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.perms.has",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-                                UUID uuid=Statics.parseUUID(player);
 								String server=args.length>4?args[4]:null;
                                 String world=args.length>5?args[5]:null;
 								User user=pm.getUser(player);
@@ -519,7 +513,6 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.group.add",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-                                UUID uuid=Statics.parseUUID(player);
 								String groupname=args[3];
 								Group group=pm.getGroup(groupname);
 								if(group==null)
@@ -556,7 +549,6 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.group.remove",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-                                UUID uuid=Statics.parseUUID(player);
 								String groupname=args[3];
 								Group group=pm.getGroup(groupname);
 								if(group==null)
@@ -591,7 +583,6 @@ public class BungeePerms extends Plugin implements Listener
 							if(pm.hasOrConsole(sender,"bungeeperms.user.group.set",true))
 							{
 								String player=Statics.getFullPlayerName(bc,args[1]);
-                                UUID uuid=Statics.parseUUID(player);
 								String groupname=args[3];
 								Group group=pm.getGroup(groupname);
 								if(group==null)
@@ -1354,7 +1345,6 @@ public class BungeePerms extends Plugin implements Listener
 						{
 							//getting next group
                             String player=Statics.getFullPlayerName(bc,args[1]);
-                            UUID uuid=Statics.parseUUID(player);
 							User user=pm.getUser(player);
 							if(user==null)
 							{
@@ -1440,7 +1430,6 @@ public class BungeePerms extends Plugin implements Listener
 						{
 							//getting next group
                             String player=Statics.getFullPlayerName(bc,args[1]);
-                            UUID uuid=Statics.parseUUID(player);
                             User user=pm.getUser(player);
 							if(user==null)
 							{
