@@ -138,20 +138,7 @@ public class PermissionsManager implements Listener
         //load all groups
         groups=backEnd.loadGroups();
         
-        //load online players; allows reload
         users=new ArrayList<>();
-        for(ProxiedPlayer pp:BungeeCord.getInstance().getPlayers())
-        {
-            if(useUUIDs)
-            {
-                getUser(pp.getUniqueId());
-            }
-            else
-            {
-                getUser(pp.getName());
-            }
-        }
-        //users=backEnd.loadUsers();
         
         //load permsversion
         permsversion=backEnd.loadVersion();
@@ -166,6 +153,19 @@ public class PermissionsManager implements Listener
     {
         if(!enabled)
         {
+            //load online players; allows reload
+            for(ProxiedPlayer pp:BungeeCord.getInstance().getPlayers())
+            {
+                if(useUUIDs)
+                {
+                    getUser(pp.getUniqueId());
+                }
+                else
+                {
+                    getUser(pp.getName());
+                }
+            }
+            
             bc.getPluginManager().registerListener(plugin,this);
             bc.registerChannel(channel);
             enabled=true;
