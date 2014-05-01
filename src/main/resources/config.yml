@@ -1,7 +1,3 @@
-saveAllUsers: true
-deleteUsersOnCleanup: false
-backendtype: YAML
-tablePrefix: bungeeperms_
 debug:
   path: plugins/BungeePerms/debug.log
   showexceptions: true
@@ -13,3 +9,9 @@ bungeeperms:
     mysqldb: bungeeperms
     mysqluser: bungeeperms
     mysqlpw: password
+backendtype: YAML
+tablePrefix: bungeeperms_
+uuidplayerdb: YAML
+useUUIDs: true
+saveAllUsers: true
+deleteUsersOnCleanup: false
