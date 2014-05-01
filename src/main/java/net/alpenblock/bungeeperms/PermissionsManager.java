@@ -934,7 +934,7 @@ public class PermissionsManager implements Listener
     /**
      * Checks if a user (or console) has a specific permission on the current server and in the current world.
      * @param sender the command sender to check a permission for
-     * @param perm the permission to check
+     * @param permission the permission to check
      * @return the result of the permission check
      */
     public boolean hasPermOrConsoleOnServerInWorld(CommandSender sender, String permission)
