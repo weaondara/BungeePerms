@@ -12,6 +12,6 @@ bungeeperms:
 backendtype: YAML
 tablePrefix: bungeeperms_
 uuidplayerdb: YAML
-useUUIDs: true
+useUUIDs: false
 saveAllUsers: true
 deleteUsersOnCleanup: false
