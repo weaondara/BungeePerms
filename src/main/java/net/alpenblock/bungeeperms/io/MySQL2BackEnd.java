@@ -11,7 +11,6 @@ import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Mysql;
-import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
@@ -65,8 +64,8 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public void load()
     {
-		//load from table
-		//permsconf.load();
+        //load from table
+        //permsconf.load();
     }
     @Override
     public List<Group> loadGroups()
@@ -74,22 +73,22 @@ public class MySQL2BackEnd implements BackEnd
         List<Group> ret=new ArrayList<>();
         
         List<String> groups=adapter.getGroups();
-		for(String g:groups)
-		{
+        for(String g:groups)
+        {
             MysqlPermEntity mpe = adapter.getGroup(g);
             if(mpe==null)
             {
                 continue;
             }
             
-			List<String> inheritances=getValue(mpe.getData("inheritances"));
-			boolean isdefault=getFirstValue(mpe.getData("default"),false);
-			int rank=getFirstValue(mpe.getData("rank"), 1000);
-			int weight=getFirstValue(mpe.getData("weight"), 1000);
-			String ladder=getFirstValue(mpe.getData("ladder"), "default");
-			String display=getFirstValue(mpe.getData("display"), "");
-			String prefix=getFirstValue(mpe.getData("prefix"), "");
-			String suffix=getFirstValue(mpe.getData("suffix"), "");
+            List<String> inheritances=getValue(mpe.getData("inheritances"));
+            boolean isdefault=getFirstValue(mpe.getData("default"),false);
+            int rank=getFirstValue(mpe.getData("rank"), 1000);
+            int weight=getFirstValue(mpe.getData("weight"), 1000);
+            String ladder=getFirstValue(mpe.getData("ladder"), "default");
+            String display=getFirstValue(mpe.getData("display"), "");
+            String prefix=getFirstValue(mpe.getData("prefix"), "");
+            String suffix=getFirstValue(mpe.getData("suffix"), "");
             
             //perms
             List<ValueEntry> permdata = mpe.getData("permissions");
@@ -187,10 +186,10 @@ public class MySQL2BackEnd implements BackEnd
                     world.getValue().setSuffix(wsuffix);
                 }
             }
-			
-			Group group=new Group(mpe.getName(), inheritances, globalperms, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
-			ret.add(group);
-		}
+            
+            Group group=new Group(mpe.getName(), inheritances, globalperms, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
+            ret.add(group);
+        }
         Collections.sort(ret);
         
         return ret;
@@ -201,11 +200,11 @@ public class MySQL2BackEnd implements BackEnd
         List<User> ret=new ArrayList<>();
         
         List<String> users=adapter.getUsers();
-		for(String u:users)
-		{
-			User user=BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
-			ret.add(user);
-		}
+        for(String u:users)
+        {
+            User user=BungeePerms.getInstance().getPermissionsManager().isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
+            ret.add(user);
+        }
         
         return ret;
     }
@@ -414,8 +413,8 @@ public class MySQL2BackEnd implements BackEnd
         saveGroupPrefix(group,null,null);
         saveGroupSuffix(group,null,null);
         
-		for(Map.Entry<String, Server> se:group.getServers().entrySet())
-		{
+        for(Map.Entry<String, Server> se:group.getServers().entrySet())
+        {
             saveGroupPerServerPerms(group,se.getKey());
             saveGroupDisplay(group,se.getKey(),null);
             saveGroupPrefix(group,se.getKey(),null);
@@ -428,7 +427,7 @@ public class MySQL2BackEnd implements BackEnd
                 saveGroupPrefix(group,se.getKey(),we.getKey());
                 saveGroupSuffix(group,se.getKey(),we.getKey());
             }
-		}
+        }
     }
     @Override
     public synchronized void deleteUser(User user)
