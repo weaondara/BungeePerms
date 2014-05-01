@@ -1389,6 +1389,11 @@ public class BungeePerms extends Plugin implements Listener
 								return true;
 							}
                             
+                            if(!pm.hasOrConsole(sender,"bungeeperms.promote."+nextgroup.getName(),true))
+                            {
+                                return true;
+                            }
+                            
                             //permision checks if sender is a player
                             if(sender instanceof ProxiedPlayer)
                             {
@@ -1466,6 +1471,11 @@ public class BungeePerms extends Plugin implements Listener
 								sender.sendMessage(Color.Error+"The player "+Color.User+user.getName()+Color.Error+" can't be demoted!");
 								return true;
 							}
+                            
+                            if(!pm.hasOrConsole(sender,"bungeeperms.demote."+previousgroup.getName(),true))
+                            {
+                                return true;
+                            }
                             
 							//permision checks if sender is a player
 							if(sender instanceof ProxiedPlayer)
