@@ -4,15 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.BungeeCord;
 
 import net.md_5.bungee.api.config.ServerInfo;
 
-/**
- * The Class Group.
- */
+@Getter
+@Setter
 public class Group implements Comparable<Group>
 {
+    @Getter(value = AccessLevel.PRIVATE)
+    @Setter(value = AccessLevel.PRIVATE)
     private Map<String,List<String>> cachedPerms;
     
 	private String name;
@@ -44,114 +48,13 @@ public class Group implements Comparable<Group>
         cachedPerms=new HashMap<>();
     }
 	
-	public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public List<String> getInheritances()
-    {
-        return inheritances;
-    }
-
-    public void setInheritances(List<String> inheritances)
-    {
-        this.inheritances = inheritances;
-    }
-
-    public List<String> getPerms()
-    {
-        return perms;
-    }
-
-    public void setPerms(List<String> perms)
-    {
-        this.perms = perms;
-    }
-
-    public Map<String, Server> getServers()
-    {
-        return servers;
-    }
-
-    public void setServers(Map<String, Server> servers)
-    {
-        this.servers = servers;
-    }
-
-    public int getRank()
-    {
-        return rank;
-    }
-
-    public void setRank(int rank)
-    {
-        this.rank = rank;
-    }
-
-    public int getWeight()
-    {
-        return weight;
-    }
-
-    public void setWeight(int weight)
-    {
-        this.weight = weight;
-    }
-
-    public String getLadder()
-    {
-        return ladder;
-    }
-
-    public void setLadder(String ladder)
-    {
-        this.ladder = ladder;
-    }
-
     public boolean isDefault()
     {
         return isdefault;
     }
-
     public void setIsdefault(boolean isdefault)
     {
         this.isdefault = isdefault;
-    }
-
-    public String getDisplay()
-    {
-        return display;
-    }
-
-    public void setDisplay(String display)
-    {
-        this.display = display;
-    }
-
-    public String getPrefix()
-    {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix)
-    {
-        this.prefix = prefix;
-    }
-
-    public String getSuffix()
-    {
-        return suffix;
-    }
-
-    public void setSuffix(String suffix)
-    {
-        this.suffix = suffix;
     }
 	
 	public List<String> getEffectivePerms()
