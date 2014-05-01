@@ -961,7 +961,7 @@ public class BungeePerms extends Plugin implements Listener
 										}
 										else
 										{
-											sender.sendMessage("The group "+Color.Value+group.getName()+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+".");
+											sender.sendMessage(Color.Text+"The group "+Color.Value+group.getName()+Color.Text+" never had the permission "+Color.Value+perm+Color.Text+".");
 										}
 									}
 									else
