@@ -103,6 +103,8 @@ public class BungeePerms extends Plugin implements Listener
 			if(args.length==0)
 			{
 				sender.sendMessage(ChatColor.GOLD+"Welcome to BungeePerms, a BungeeCord permissions plugin");
+				sender.sendMessage(Color.Text+"Version "+ChatColor.GOLD+this.getDescription().getVersion());
+				sender.sendMessage(Color.Text+"Author "+ChatColor.GOLD+this.getDescription().getAuthor());
 				return true;
 			}
 			else if(args.length>0)
