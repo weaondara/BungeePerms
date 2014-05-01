@@ -65,6 +65,12 @@ public class PermissionsManager implements Listener
     @Getter
     private boolean useUUIDs;
     
+    @Getter
+    private boolean useregexperms;
+    
+    @Getter
+    private PermissionsResolver resolver;
+    
     public PermissionsManager(Plugin p,Config conf,Debug d)
     {
         bc=BungeeCord.getInstance();
@@ -74,6 +80,8 @@ public class PermissionsManager implements Listener
         
         channel="bungeeperms";
         playerWorlds=new HashMap<>();
+        
+        resolver=new PermissionsResolver();
         
         //config
         loadConfig();
@@ -95,6 +103,9 @@ public class PermissionsManager implements Listener
         deleteUsersOnCleanup=config.getBoolean("deleteUsersOnCleanup", false);
         
         useUUIDs=config.getBoolean("useUUIDs", false);
+        
+        useregexperms=config.getBoolean("useregexperms", false);
+        resolver.setUseRegex(useregexperms);
         
         BackEndType bet=config.getEnumValue("backendtype",BackEndType.YAML);
         if(bet==BackEndType.YAML)

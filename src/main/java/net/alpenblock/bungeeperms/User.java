@@ -8,11 +8,13 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ServerInfo;
 
 @Getter
 @Setter
+@ToString
 public class User
 {
     @Getter(value = AccessLevel.PRIVATE)
@@ -41,171 +43,26 @@ public class User
 	public boolean hasPerm(String perm)
 	{
 		List<String> perms=getEffectivePerms();
-		boolean has=false;
-		for(String p:perms)
-		{
-			if(p.equalsIgnoreCase(perm))
-			{
-				has=true;
-			}
-			else if(p.equalsIgnoreCase("-"+perm))
-			{
-				has=false;
-			}
-			else if(p.endsWith("*"))
-			{
-				List<String> lp=Statics.toList(p, ".");
-				List<String> lperm=Statics.toList(perm, ".");
-				int index=0;
-				try
-				{
-					while(true)
-					{
-						if(index==0)
-						{
-							if( lperm.get(0).equalsIgnoreCase(lp.get(0))| 
-                                    lp.get(0).equalsIgnoreCase("-"+lperm.get(0)))
-							{
-								index++;
-							}
-							else
-							{
-								break;
-							}
-						}
-						else
-						{
-							if(lperm.get(index).equalsIgnoreCase(lp.get(index)))
-							{
-								index++;
-							}
-							else
-							{
-								break;
-							}
-						}
-					}
-					if(lp.get(index).equalsIgnoreCase("*"))
-					{
-						has=!lp.get(0).startsWith("-");
-					}
-				}
-				catch(Exception e){}
-			}
-		}
-		return has;
+        
+        Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
+		
+        return has!=null && has;
 	}
 	public boolean hasPermOnServer(String perm, ServerInfo server) 
 	{
 		List<String> perms=getEffectivePerms(server);
-		boolean has=false;
-		for(String p:perms)
-		{
-			if(p.equalsIgnoreCase(perm))
-			{
-				has=true;
-			}
-			else if(p.equalsIgnoreCase("-"+perm))
-			{
-				has=false;
-			}
-			else if(p.endsWith("*"))
-			{
-				List<String> lp=Statics.toList(p, ".");
-				List<String> lperm=Statics.toList(perm, ".");
-				int index=0;
-				try
-				{
-					while(true)
-					{
-						if(index==0)
-						{
-							if( lperm.get(0).equalsIgnoreCase(lp.get(0))| lp.get(0).equalsIgnoreCase("-"+lperm.get(0)))
-							{
-								index++;
-							}
-							else
-							{
-								break;
-							}
-						}
-						else
-						{
-							if(lperm.get(index).equalsIgnoreCase(lp.get(index)))
-							{
-								index++;
-							}
-							else
-							{
-								break;
-							}
-						}
-					}
-					if(lp.get(index).equalsIgnoreCase("*"))
-					{
-						has=!lp.get(0).startsWith("-");
-					}
-				}
-				catch(Exception e){}
-			}
-		}
-		return has;
+        
+        Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
+		
+        return has!=null && has;
 	}
     public boolean hasPermOnServerInWorld(String perm, ServerInfo server, String world) 
 	{
 		List<String> perms=getEffectivePerms(server,world);
-		boolean has=false;
-		for(String p:perms)
-		{
-			if(p.equalsIgnoreCase(perm))
-			{
-				has=true;
-			}
-			else if(p.equalsIgnoreCase("-"+perm))
-			{
-				has=false;
-			}
-			else if(p.endsWith("*"))
-			{
-				List<String> lp=Statics.toList(p, ".");
-				List<String> lperm=Statics.toList(perm, ".");
-				int index=0;
-				try
-				{
-					while(true)
-					{
-						if(index==0)
-						{
-							if( lperm.get(0).equalsIgnoreCase(lp.get(0))| lp.get(0).equalsIgnoreCase("-"+lperm.get(0)))
-							{
-								index++;
-							}
-							else
-							{
-								break;
-							}
-						}
-						else
-						{
-							if(lperm.get(index).equalsIgnoreCase(lp.get(index)))
-							{
-								index++;
-							}
-							else
-							{
-								break;
-							}
-						}
-					}
-					if(lp.get(index).equalsIgnoreCase("*"))
-					{
-						has=!lp.get(0).startsWith("-");
-					}
-				}
-				catch(Exception e){}
-			}
-		}
-		return has;
+		        
+        Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
+		
+        return has!=null && has;
 	}
 	
 	public List<String> getEffectivePerms()
@@ -248,63 +105,12 @@ public class User
 		for(Group g:groups)
 		{
 			List<String> gperms=g.getEffectivePerms();
-			for(String perm:gperms)
-			{
-				boolean added=false;
-				for(int i=0;i<ret.size();i++)
-				{
-					if(ret.get(i).equalsIgnoreCase(perm))
-					{
-						added=true;
-						break;
-					}
-					else if(ret.get(i).equalsIgnoreCase("-"+perm))
-					{
-						ret.set(i,perm);
-						added=true;
-						break;
-					}
-					else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-					{
-						ret.remove(i);
-						added=true;
-						break;
-					}
-				}
-				if(!added)
-				{
-					ret.add(perm);
-				}
-			}
+            ret.addAll(gperms);
 		}
-		for(String s:extraperms)
-		{
-			boolean added=false;
-			for(int i=0;i<ret.size();i++)
-			{
-				if(ret.get(i).equalsIgnoreCase(s))
-				{
-					added=true;
-					break;
-				}
-				else if(ret.get(i).equalsIgnoreCase("-"+s))
-				{
-					ret.set(i,s);
-					added=true;
-					break;
-				}
-				else if(s.equalsIgnoreCase("-"+ret.get(i)))
-				{
-					ret.remove(i);
-					added=true;
-					break;
-				}
-			}
-			if(!added)
-			{
-				ret.add(s);
-			}
-		}
+        ret.addAll(extraperms);
+        
+        ret=BungeePerms.getInstance().getPermissionsManager().getResolver().simplify(ret);
+        
 		return ret;
 	}
 	public List<String> calcEffectivePerms(ServerInfo server)
@@ -313,136 +119,18 @@ public class User
 		for(Group g:groups)
 		{
 			List<String> gperms=g.getEffectivePerms(server);
-			for(String perm:gperms)
-			{
-				boolean added=false;
-				for(int i=0;i<ret.size();i++)
-				{
-					if(ret.get(i).equalsIgnoreCase(perm))
-					{
-						added=true;
-						break;
-					}
-					else if(ret.get(i).equalsIgnoreCase("-"+perm))
-					{
-						ret.set(i,perm);
-						added=true;
-						break;
-					}
-					else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-					{
-						ret.remove(i);
-						added=true;
-						break;
-					}
-				}
-				if(!added)
-				{
-					ret.add(perm);
-				}
-			}
-			
-			//per server perms
-//			Server srv=g.getServers().get(server.getName());
-//			if(srv==null)
-//			{
-//				srv=new Server(server.getName(),new ArrayList<String>(),new HashMap<String,World>(),"","","");
-//			}
-//			List<String> serverPerms=srv.getPerms();
-//			for(String perm:serverPerms)
-//			{
-//				boolean added=false;
-//				for(int i=0;i<ret.size();i++)
-//				{
-//					if(ret.get(i).equalsIgnoreCase(perm))
-//					{
-//						added=true;
-//						break;
-//					}
-//					else if(ret.get(i).equalsIgnoreCase("-"+perm))
-//					{
-//						ret.set(i,perm);
-//						added=true;
-//						break;
-//					}
-//					else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-//					{
-//						ret.remove(i);
-//						added=true;
-//						break;
-//					}
-//				}
-//				if(!added)
-//				{
-//					ret.add(perm);
-//				}
-//			}
+			ret.addAll(gperms);
 		}
-		
-		
-		for(String s:extraperms)
-		{
-			boolean added=false;
-			for(int i=0;i<ret.size();i++)
-			{
-				if(ret.get(i).equalsIgnoreCase(s))
-				{
-					added=true;
-					break;
-				}
-				else if(ret.get(i).equalsIgnoreCase("-"+s))
-				{
-					ret.set(i,s);
-					added=true;
-					break;
-				}
-				else if(s.equalsIgnoreCase("-"+ret.get(i)))
-				{
-					ret.remove(i);
-					added=true;
-					break;
-				}
-			}
-			if(!added)
-			{
-				ret.add(s);
-			}
-		}
+		ret.addAll(extraperms);
 		
 		//per server perms
 		List<String> perserverPerms=serverPerms.get(server.getName().toLowerCase());
-		if(perserverPerms==null)
+		if(perserverPerms!=null)
 		{
-			perserverPerms=new ArrayList<>();
+			ret.addAll(perserverPerms);
 		}
-		for(String perm:perserverPerms)
-		{
-			boolean added=false;
-			for(int i=0;i<ret.size();i++)
-			{
-				if(ret.get(i).equalsIgnoreCase(perm))
-				{
-					added=true;
-					break;
-				}
-				else if(ret.get(i).equalsIgnoreCase("-"+perm))
-				{
-					ret.set(i,perm);
-					added=true;
-					break;
-				}
-				else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-				{
-					ret.remove(i);
-					added=true;
-					break;
-				}
-			}
-			if(!added)
-			{
-				ret.add(perm);
-			}
-		}
+        
+        ret=BungeePerms.getInstance().getPermissionsManager().getResolver().simplify(ret);
 		
 		return ret;
 	}
@@ -452,212 +140,30 @@ public class User
 		for(Group g:groups)
 		{
 			List<String> gperms=g.getEffectivePerms(server,world);
-			for(String perm:gperms)
-			{
-				boolean added=false;
-				for(int i=0;i<ret.size();i++)
-				{
-					if(ret.get(i).equalsIgnoreCase(perm))
-					{
-						added=true;
-						break;
-					}
-					else if(ret.get(i).equalsIgnoreCase("-"+perm))
-					{
-						ret.set(i,perm);
-						added=true;
-						break;
-					}
-					else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-					{
-						ret.remove(i);
-						added=true;
-						break;
-					}
-				}
-				if(!added)
-				{
-					ret.add(perm);
-				}
-			}
-			
-			//per server perms
-//			Server srv=g.getServers().get(server.getName());
-//			if(srv==null)
-//			{
-//				srv=new Server(server.getName(),new ArrayList<String>(),new HashMap<String,World>(),"","","");
-//			}
-//			List<String> serverPerms=srv.getPerms();
-//			for(String perm:serverPerms)
-//			{
-//				boolean added=false;
-//				for(int i=0;i<ret.size();i++)
-//				{
-//					if(ret.get(i).equalsIgnoreCase(perm))
-//					{
-//						added=true;
-//						break;
-//					}
-//					else if(ret.get(i).equalsIgnoreCase("-"+perm))
-//					{
-//						ret.set(i,perm);
-//						added=true;
-//						break;
-//					}
-//					else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-//					{
-//						ret.remove(i);
-//						added=true;
-//						break;
-//					}
-//				}
-//				if(!added)
-//				{
-//					ret.add(perm);
-//				}
-//			}
-//            
-//            //per server world perms
-//            World w=srv.getWorlds().get(world);
-//            if(w==null)
-//            {
-//                w=new World(server.getName(),new ArrayList<String>(),"","","");
-//            }
-//            List<String> serverWorldPerms=w.getPerms();
-//            for(String perm:serverWorldPerms)
-//            {
-//                boolean added=false;
-//                for(int i=0;i<ret.size();i++)
-//                {
-//                    if(ret.get(i).equalsIgnoreCase(perm))
-//                    {
-//                        added=true;
-//                        break;
-//                    }
-//                    else if(ret.get(i).equalsIgnoreCase("-"+perm))
-//                    {
-//                        ret.set(i,perm);
-//                        added=true;
-//                        break;
-//                    }
-//                    else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-//                    {
-//                        ret.remove(i);
-//                        added=true;
-//                        break;
-//                    }
-//                }
-//                if(!added)
-//                {
-//                    ret.add(perm);
-//                }
-//            }
+			ret.addAll(gperms);
 		}
 		
-		
-		for(String s:extraperms)
-		{
-			boolean added=false;
-			for(int i=0;i<ret.size();i++)
-			{
-				if(ret.get(i).equalsIgnoreCase(s))
-				{
-					added=true;
-					break;
-				}
-				else if(ret.get(i).equalsIgnoreCase("-"+s))
-				{
-					ret.set(i,s);
-					added=true;
-					break;
-				}
-				else if(s.equalsIgnoreCase("-"+ret.get(i)))
-				{
-					ret.remove(i);
-					added=true;
-					break;
-				}
-			}
-			if(!added)
-			{
-				ret.add(s);
-			}
-		}
+		ret.addAll(extraperms);
 		
 		//per server perms
 		List<String> perserverPerms=serverPerms.get(server.getName().toLowerCase());
-		if(perserverPerms==null)
+		if(perserverPerms!=null)
 		{
-			perserverPerms=new ArrayList<>();
-		}
-		for(String perm:perserverPerms)
-		{
-			boolean added=false;
-			for(int i=0;i<ret.size();i++)
-			{
-				if(ret.get(i).equalsIgnoreCase(perm))
-				{
-					added=true;
-					break;
-				}
-				else if(ret.get(i).equalsIgnoreCase("-"+perm))
-				{
-					ret.set(i,perm);
-					added=true;
-					break;
-				}
-				else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-				{
-					ret.remove(i);
-					added=true;
-					break;
-				}
-			}
-			if(!added)
-			{
-				ret.add(perm);
-			}
+			ret.addAll(perserverPerms);
 		}
         
         //per server world perms
         Map<String,List<String>> serverPerms=serverWorldPerms.get(server.getName().toLowerCase());
-        if(serverPerms==null)
+        if(serverPerms!=null)
         {
-            serverPerms=new HashMap<>();
-        }
-        List<String> serverWorldPerms=serverPerms.get(world.toLowerCase());
-        if(serverWorldPerms==null)
-        {
-            serverWorldPerms=new ArrayList<>();
-        }
-        for(String perm:serverWorldPerms)
-        {
-            boolean added=false;
-            for(int i=0;i<ret.size();i++)
+            List<String> serverWorldPerms=serverPerms.get(world.toLowerCase());
+            if(serverWorldPerms!=null)
             {
-                if(ret.get(i).equalsIgnoreCase(perm))
-                {
-                    added=true;
-                    break;
-                }
-                else if(ret.get(i).equalsIgnoreCase("-"+perm))
-                {
-                    ret.set(i,perm);
-                    added=true;
-                    break;
-                }
-                else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-                {
-                    ret.remove(i);
-                    added=true;
-                    break;
-                }
-            }
-            if(!added)
-            {
-                ret.add(perm);
+                ret.addAll(serverWorldPerms);
             }
         }
+        
+        ret=BungeePerms.getInstance().getPermissionsManager().getResolver().simplify(ret);
 		
 		return ret;
 	}
