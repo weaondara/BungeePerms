@@ -82,7 +82,8 @@ public class PermissionsResolver
             
             tocheck=tocheck
                 .replaceAll("\\.", "\\\\.")
-                .replaceAll("\\*", "\\.\\*");
+                .replaceAll("\\*", "\\.\\*")
+                .replaceAll("#", "\\.");
             
             boolean matches=perm.matches(tocheck);
             
@@ -160,7 +161,8 @@ public class PermissionsResolver
 
                 tocheck=tocheck
                     .replaceAll("\\.", "\\\\.")
-                    .replaceAll("\\*", "\\.\\*");
+                    .replaceAll("\\*", "\\.\\*")
+                    .replaceAll("#", "\\.");
 
                 boolean matches=ret.get(i).matches(tocheck);
 
