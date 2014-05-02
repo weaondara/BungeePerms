@@ -646,9 +646,10 @@ public class PermissionsManager implements Listener
     @EventHandler(priority=Byte.MAX_VALUE)
     public void onDisconnect(PlayerDisconnectEvent e)
     {
+        String playername=e.getPlayer().getName();
         UUID uuid=e.getPlayer().getUniqueId();
         
-        User u=getUser(uuid);
+        User u=useUUIDs ? getUser(uuid) : getUser(playername);
         users.remove(u);
     }
     
