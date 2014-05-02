@@ -232,6 +232,28 @@ public class PermissionsResolverTest
         
         assertFalse(resolver.has(perms, perm));
     }
+    @Test
+    public void testHasRegex6()
+    {
+        if(!resolver.isUseRegex()){return;}
+        
+        String perm="test.test1.test2";
+        List<String> perms=new ArrayList<>();
+        perms.add("-test.#####.test2");
+        
+        assertFalse(resolver.has(perms, perm));
+    }
+    @Test
+    public void testHasRegex7()
+    {
+        if(!resolver.isUseRegex()){return;}
+        
+        String perm="test.test1.test2";
+        List<String> perms=new ArrayList<>();
+        perms.add("-test.####.test2");
+        
+        assertNull(resolver.has(perms, perm));
+    }
 
     
     
@@ -331,5 +353,20 @@ public class PermissionsResolverTest
         List<String> s=resolver.simplify(perms);
         assertTrue(s.size()==1);
         assertTrue(s.get(0).equalsIgnoreCase("test.test1.test(2|3|4)"));
+    }
+    @Test
+    public void testSimplifyRegex7()
+    {
+        if(!resolver.isUseRegex()){return;}
+        
+        List<String> perms=new ArrayList<>();
+        perms.add("test.test1.test2");
+        perms.add("test.test1.test(2|3|4)");
+        perms.add("test.test1.test#");
+        
+        List<String> s=resolver.simplify(perms);
+        assertTrue(s.size()==2);
+        assertTrue(s.get(0).equalsIgnoreCase("test.test1.test(2|3|4)"));
+        assertTrue(s.get(1).equalsIgnoreCase("test.test1.test#"));
     }
 }
