@@ -57,7 +57,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.12.2</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>
