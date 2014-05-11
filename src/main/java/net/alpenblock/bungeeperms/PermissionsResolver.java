@@ -43,7 +43,7 @@ public class PermissionsResolver
                 int index=0;
                 try
                 {
-                    while(true)
+                    while(index<lp.size() && index<lperm.size())
                     {
                         if( lp.get(index).equalsIgnoreCase(lperm.get(index)) ||
                             (index==0 && lp.get(index).equalsIgnoreCase("-"+lperm.get(index))))
