@@ -23,6 +23,7 @@ import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
+import net.alpenblock.bungeeperms.util.ConcurrentList;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -149,7 +150,7 @@ public class PermissionsManager implements Listener
         //load all groups
         groups=backEnd.loadGroups();
         
-        users=new ArrayList<>();
+        users=new ConcurrentList<>();
         
         //load permsversion
         permsversion=backEnd.loadVersion();
@@ -260,7 +261,7 @@ public class PermissionsManager implements Listener
         List<User> backendusers=backEnd.loadUsers();
         for(int i=0;i<backendusers.size();i++)
         {
-            User u=users.get(i);
+            User u=backendusers.get(i);
             for(int j=0;j<u.getGroups().size();j++)
             {
                 if(getGroup(u.getGroups().get(j).getName())==null)
