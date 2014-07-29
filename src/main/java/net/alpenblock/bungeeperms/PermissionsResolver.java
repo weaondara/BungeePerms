@@ -41,26 +41,22 @@ public class PermissionsResolver
             {
                 List<String> lp=Statics.toList(p, ".");
                 int index=0;
-                try
+                while(index<lp.size() && index<lperm.size())
                 {
-                    while(index<lp.size() && index<lperm.size())
+                    if( lp.get(index).equalsIgnoreCase(lperm.get(index)) ||
+                        (index==0 && lp.get(index).equalsIgnoreCase("-"+lperm.get(index))))
                     {
-                        if( lp.get(index).equalsIgnoreCase(lperm.get(index)) ||
-                            (index==0 && lp.get(index).equalsIgnoreCase("-"+lperm.get(index))))
-                        {
-                            index++;
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        index++;
                     }
-                    if(lp.get(index).equalsIgnoreCase("*") || (index==0 && lp.get(0).equalsIgnoreCase("-*")))
+                    else
                     {
-                        has=!lp.get(0).startsWith("-");
+                        break;
                     }
                 }
-                catch(Exception e){e.printStackTrace();}
+                if(index<lp.size() && index<lperm.size() && (lp.get(index).equalsIgnoreCase("*") || (index==0 && lp.get(0).equalsIgnoreCase("-*"))))
+                {
+                    has=!lp.get(0).startsWith("-");
+                }
             }
         }
         
