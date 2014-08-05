@@ -37,6 +37,8 @@ public class BungeePerms extends Plugin implements Listener
 	private Debug debug;
     
 	private PermissionsManager pm;
+    
+    private int fetchercooldown;
 	
 	@Override
 	public void onLoad()
@@ -74,6 +76,7 @@ public class BungeePerms extends Plugin implements Listener
         
         config=new Config(this,"/config.yml");
         config.load();
+        loadConfig();
         debug=new Debug(this,config,"BP");
         
 		//load commands
@@ -81,6 +84,10 @@ public class BungeePerms extends Plugin implements Listener
         
 		pm=new PermissionsManager(this,config,debug);
 	}
+    private void loadConfig()
+    {
+        fetchercooldown=config.getInt("uuidfetcher.cooldown", 3000);
+    }
 	
 	@Override
 	public void onEnable()
@@ -1656,7 +1663,7 @@ public class BungeePerms extends Plugin implements Listener
                                     sender.sendMessage(Color.Text+"Migrating permissions using UUIDs for player identification ...");
                                     
                                     sender.sendMessage(Color.Text+"Fetching UUIDs ...");
-                                    UUIDFetcher fetcher=new UUIDFetcher(pm.getBackEnd().getRegisteredUsers());
+                                    UUIDFetcher fetcher=new UUIDFetcher(pm.getBackEnd().getRegisteredUsers(), fetchercooldown);
                                     fetcher.fetchUUIDs();
                                     Map<String, UUID> uuids = fetcher.getUUIDs();
                                     sender.sendMessage(Color.Message+"Finished fetching.");
@@ -1677,7 +1684,7 @@ public class BungeePerms extends Plugin implements Listener
                                     sender.sendMessage(Color.Text+"Migrating permissions using player names for player identification ...");
                                     
                                     sender.sendMessage(Color.Text+"Fetching "+(type?"UUIDs":"player names")+" ...");
-                                    UUIDFetcher fetcher=new UUIDFetcher(pm.getBackEnd().getRegisteredUsers());
+                                    UUIDFetcher fetcher=new UUIDFetcher(pm.getBackEnd().getRegisteredUsers(), fetchercooldown);
                                     fetcher.fetchPlayerNames();
                                     Map<UUID, String> playernames = fetcher.getPlayerNames();
                                     sender.sendMessage(Color.Message+"Finished fetching.");

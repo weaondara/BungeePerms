@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import net.alpenblock.bungeeperms.Statics;
 
 public class UUIDFetcher
@@ -24,17 +25,20 @@ public class UUIDFetcher
     private final Map<String,UUID> UUIDs;
     @Getter
     private final Map<UUID,String> playerNames;
+    
+    private int cooldown;
 
-    public UUIDFetcher(List<String> tofetch)
+    public UUIDFetcher(List<String> tofetch, int cooldown)
     {
         repo=new HttpProfileRepository();
         
         this.tofetch = tofetch;
         UUIDs=new HashMap<>();
         playerNames=new HashMap<>();
+        this.cooldown=cooldown;
     }
 
-    
+    @SneakyThrows
     public void fetchUUIDs()
     {
         for(String player:tofetch)
@@ -44,8 +48,10 @@ public class UUIDFetcher
             {
                 UUIDs.put(player, uuid);
             }
+            Thread.sleep(cooldown);
         }
     }
+    @SneakyThrows
     public void fetchPlayerNames()
     {
         for(String suuid:tofetch)
@@ -56,6 +62,7 @@ public class UUIDFetcher
             {
                 playerNames.put(uuid, playername);
             }
+            Thread.sleep(cooldown);
         }
     }
     
