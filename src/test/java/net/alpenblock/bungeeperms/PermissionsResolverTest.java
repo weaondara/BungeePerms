@@ -21,7 +21,7 @@ public class PermissionsResolverTest
     public PermissionsResolverTest()
     {
         resolver=new PermissionsResolver();
-        resolver.setUseRegex(true);
+        resolver.setUseRegex(false);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class PermissionsResolverTest
         String perm="test.test1.test2";
         List<String> perms=new ArrayList<>();
         
-        assertNull(resolver.has(perms, perm));
+        assertFalse(resolver.has(perms, perm));
     }
     @Test
     public void testHas6()
@@ -135,7 +135,7 @@ public class PermissionsResolverTest
         perms.add("test.test1.test2");
         perms.add("-test.*");
         perms.add("test.*");
-        perms.add("-test.test1.test2");
+        perms.add("-test.test1.test2");        
         
         assertFalse(resolver.has(perms, perm));
     }
@@ -174,6 +174,16 @@ public class PermissionsResolverTest
         perms.add("test.*");
         perms.add("-*");
         
+        assertFalse(resolver.has(perms, perm));
+    }
+    @Test
+    public void testHas15()
+    {
+        String perm="test";
+        List<String> perms=new ArrayList<String>();
+        perms.add("test.test1.test2");
+        perms.add("test.*"); 
+        perms.add("test.test1.test2");        
         assertFalse(resolver.has(perms, perm));
     }
     

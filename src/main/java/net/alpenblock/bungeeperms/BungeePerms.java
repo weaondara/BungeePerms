@@ -56,7 +56,7 @@ public class BungeePerms extends Plugin implements Listener
             f.getParentFile().mkdirs();
             try 
 			{
-				//file Ã–ffnen
+				//file Öffnen
 				ClassLoader cl=this.getClass().getClassLoader();
 	            URL url = cl.getResource("config.yml");
 	            if(url!=null)

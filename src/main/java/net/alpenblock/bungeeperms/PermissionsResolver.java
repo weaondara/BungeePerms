@@ -1,7 +1,10 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,12 +26,15 @@ public class PermissionsResolver
     }
     public static Boolean hasNormal(List<String> perms, String perm)
     {
-        Boolean has=null;
+        Boolean has=false;
         
-        List<String> lperm=Statics.toList(perm, ".");
+        String[] lperm = perm.split(Pattern.quote("."));
+        
+        System.out.println(Arrays.toString(lperm));
         
         for(String p:perms)
         {
+        	System.out.println(p);
             if(p.equalsIgnoreCase(perm))
             {
                 has=true;
@@ -39,23 +45,29 @@ public class PermissionsResolver
             }
             else if(p.endsWith("*"))
             {
-                List<String> lp=Statics.toList(p, ".");
+                String[] lp = p.split(Pattern.quote("."));
                 int index=0;
-                while(index<lp.size() && index<lperm.size())
+                System.out.println(Arrays.toString(lp));
+                while(index<lp.length && index<lperm.length)
                 {
-                    if( lp.get(index).equalsIgnoreCase(lperm.get(index)) ||
-                        (index==0 && lp.get(index).equalsIgnoreCase("-"+lperm.get(index))))
+                	System.out.println("IN");
+                	if( lp[index].equalsIgnoreCase(lperm[index]) ||
+                        (index==0 && lp[index].equalsIgnoreCase("-"+lperm[index])))
                     {
-                        index++;
+                		System.out.println("IF");
+                        index = index + 1;
                     }
                     else
                     {
+                    	System.out.println("Break");
                         break;
                     }
                 }
-                if(index<lp.size() && index<lperm.size() && (lp.get(index).equalsIgnoreCase("*") || (index==0 && lp.get(0).equalsIgnoreCase("-*"))))
+                if(index<lp.length && index<lperm.length)
                 {
-                    has=!lp.get(0).startsWith("-");
+                	if (lp[index].equalsIgnoreCase("*") || (index==0 && lp[0].equalsIgnoreCase("-*"))) {
+                		has=!lp[0].startsWith("-");
+                	}
                 }
             }
         }
@@ -64,7 +76,7 @@ public class PermissionsResolver
     }
     public static Boolean hasRegex(List<String> perms, String perm)
     {
-        Boolean has=null;
+        Boolean has=false;
         
         for(String p:perms)
         {
