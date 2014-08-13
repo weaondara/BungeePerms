@@ -177,7 +177,7 @@ public class Group implements Comparable<Group>
         
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has;
+        return has != null && has;
 	}
 	public boolean hasOnServer(String perm,ServerInfo server) 
 	{
@@ -185,7 +185,7 @@ public class Group implements Comparable<Group>
         
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has;
+        return has != null && has;
 	}
 	public boolean hasOnServerInWorld(String perm,ServerInfo server,String world) 
 	{
@@ -193,7 +193,7 @@ public class Group implements Comparable<Group>
 		        
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has;
+        return has != null && has;
 	}
     
     public void recalcPerms() 

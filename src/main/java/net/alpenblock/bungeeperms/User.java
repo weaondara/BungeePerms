@@ -48,7 +48,7 @@ public class User
         
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has;
+        return has != null && has;
 	}
 	public boolean hasPermOnServer(String perm, ServerInfo server) 
 	{
@@ -56,7 +56,7 @@ public class User
         
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has;
+        return has != null && has;
 	}
     public boolean hasPermOnServerInWorld(String perm, ServerInfo server, String world) 
 	{
@@ -64,7 +64,7 @@ public class User
 		        
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has;
+        return has != null && has;
 	}
 	
 	public List<String> getEffectivePerms()

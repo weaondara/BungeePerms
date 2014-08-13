@@ -72,7 +72,7 @@ public class PermissionsResolverTest
         String perm="test.test1.test2";
         List<String> perms=new ArrayList<>();
         
-        assertFalse(resolver.has(perms, perm));
+        assertNull(resolver.has(perms, perm));
     }
     @Test
     public void testHas6()
@@ -184,7 +184,7 @@ public class PermissionsResolverTest
         perms.add("test.test1.test2");
         perms.add("test.*"); 
         perms.add("test.test1.test2");        
-        assertFalse(resolver.has(perms, perm));
+        assertNull(resolver.has(perms, perm));
     }
     
     @Test

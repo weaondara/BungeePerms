@@ -1,7 +1,6 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -26,15 +25,12 @@ public class PermissionsResolver
     }
     public static Boolean hasNormal(List<String> perms, String perm)
     {
-        Boolean has=false;
+        Boolean has=null;
         
         String[] lperm = perm.split(Pattern.quote("."));
         
-        System.out.println(Arrays.toString(lperm));
-        
         for(String p:perms)
         {
-        	System.out.println(p);
             if(p.equalsIgnoreCase(perm))
             {
                 has=true;
@@ -47,28 +43,21 @@ public class PermissionsResolver
             {
                 String[] lp = p.split(Pattern.quote("."));
                 int index=0;
-                System.out.println(Arrays.toString(lp));
                 while(index<lp.length && index<lperm.length)
                 {
-                	System.out.println("IN");
                 	if( lp[index].equalsIgnoreCase(lperm[index]) ||
                         (index==0 && lp[index].equalsIgnoreCase("-"+lperm[index])))
                     {
-                		System.out.println("IF");
-                        index = index + 1;
+                        index++;
                     }
-                    else
+                    else 
                     {
-                    	System.out.println("Break");
                         break;
                     }
                 }
-                if(index<lp.length && index<lperm.length)
-                {
-                	if (lp[index].equalsIgnoreCase("*") || (index==0 && lp[0].equalsIgnoreCase("-*"))) {
-                		has=!lp[0].startsWith("-");
-                	}
-                }
+                if (index<lp.length && index<lperm.length && (lp[index].equalsIgnoreCase("*") || (index==0 && lp[0].equalsIgnoreCase("-*")))) {
+            		has=!lp[0].startsWith("-");
+            	}
             }
         }
         
