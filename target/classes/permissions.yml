@@ -1,0 +1,32 @@
+groups:
+  Builder:
+    rank: 1000
+    default: true
+    display: '&7[Builder]'
+    prefix: '&7[B]'
+    suffix: ''
+    inheritances: []
+    permissions: []
+  Mod:
+    rank: 500
+    default: false
+    display: '&1[Mod]'
+    prefix: '&1[M]'
+    suffix: ''
+    inheritances:
+    - Builder
+    permissions:
+    - bungeeperms.promote
+    - bungeeperms.demote
+    - bungeeperms.user.groups
+  Admin:
+    rank: 1
+    default: false
+    display: '&4[Admin]'
+    prefix: '&4[A]'
+    suffix: ''
+    inheritances:
+    - Builder
+    - Mod
+    permissions:
+    - bungeeperms.*
