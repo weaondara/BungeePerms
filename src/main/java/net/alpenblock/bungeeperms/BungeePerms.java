@@ -54,7 +54,7 @@ public class BungeePerms extends Plugin implements Listener
             f.getParentFile().mkdirs();
             try 
 			{
-				//file öffnen
+				//file Ã¶ffnen
 				ClassLoader cl=this.getClass().getClassLoader();
 	            URL url = cl.getResource("config.yml");
 	            if(url!=null)
@@ -1886,17 +1886,26 @@ public class BungeePerms extends Plugin implements Listener
 					public void execute(final CommandSender sender, final String[] args) 
 					{
                         final Command cmd=this;
-                        new Thread(new Runnable()
-                        {
+                     //   new Thread(new Runnable()
+                       // {
+                     //       @Override
+                    //        public void run()
+                    //        {
+                     //           if(!BungeePerms.this.onCommand(sender, cmd, "", args))
+                   //             {
+//sender.sendMessage(Color.Error+"[BungeePerms] Command not found");
+                     //           }
+                    //        }
+                    //    }).start();
+                      getProxy().getScheduler().runAsync(BungeePerms.this, new Runnable() {
                             @Override
-                            public void run()
-                            {
-                                if(!BungeePerms.this.onCommand(sender, cmd, "", args))
-                                {
-                                    sender.sendMessage(Color.Error+"[BungeePerms] Command not found");
+                            public void run() {
+                                if (!BungeePerms.this.onCommand(sender, cmd, "", args)) {
+                                    sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
                                 }
+
                             }
-                        }).start();
+                        });
 					}
 				});
 	}
