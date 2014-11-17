@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.alpenblock.bungeeperms.io.BackEnd;
@@ -1809,11 +1811,13 @@ public class PermissionsManager implements Listener
         }
         
         String msg=new String(e.getData());
-        List<String> data=Statics.toList(msg, ";");
-        if(data.get(0).equalsIgnoreCase("updateplayerworld"))
+        
+        String[] data = msg.split(Pattern.quote(";"));
+        
+        if(data[0].equalsIgnoreCase("updateplayerworld"))
         {
-            String player=data.get(1);
-            String world=data.get(2);
+            String player=data[1];
+            String world=data[2];
             
             playerWorlds.put(player, world);
         }

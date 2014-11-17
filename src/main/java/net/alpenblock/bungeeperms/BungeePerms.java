@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
@@ -54,7 +56,7 @@ public class BungeePerms extends Plugin implements Listener
             f.getParentFile().mkdirs();
             try 
 			{
-				//file öffnen
+				//file Öffnen
 				ClassLoader cl=this.getClass().getClassLoader();
 	            URL url = cl.getResource("config.yml");
 	            if(url!=null)
@@ -1886,7 +1888,7 @@ public class BungeePerms extends Plugin implements Listener
 					public void execute(final CommandSender sender, final String[] args) 
 					{
                         final Command cmd=this;
-                        new Thread(new Runnable()
+                        bc.getScheduler().schedule(getInstance(), new Runnable()
                         {
                             @Override
                             public void run()
@@ -1896,7 +1898,7 @@ public class BungeePerms extends Plugin implements Listener
                                     sender.sendMessage(Color.Error+"[BungeePerms] Command not found");
                                 }
                             }
-                        }).start();
+                        }, 0L, TimeUnit.MILLISECONDS);
 					}
 				});
 	}

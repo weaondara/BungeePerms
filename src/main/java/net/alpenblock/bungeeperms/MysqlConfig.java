@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -216,10 +217,11 @@ public class MysqlConfig
             if(isSubNode(node,key))
             {
                 String rest=key.substring(node.length()+1);
-                List<String> list=Statics.toList(rest, ".");
-                if(list.size()>0)
+                String[] array = rest.split(Pattern.quote("."));
+                
+                if(array.length>0)
                 {
-                    String subnode=list.get(0);
+                    String subnode=array[0];
                     if(!ret.contains(subnode))
                     {
                         ret.add(subnode);

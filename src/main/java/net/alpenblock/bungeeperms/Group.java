@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -175,7 +177,7 @@ public class Group implements Comparable<Group>
         
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has!=null && has;
+        return has != null && has;
 	}
 	public boolean hasOnServer(String perm,ServerInfo server) 
 	{
@@ -183,7 +185,7 @@ public class Group implements Comparable<Group>
         
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has!=null && has;
+        return has != null && has;
 	}
 	public boolean hasOnServerInWorld(String perm,ServerInfo server,String world) 
 	{
@@ -191,7 +193,7 @@ public class Group implements Comparable<Group>
 		        
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has!=null && has;
+        return has != null && has;
 	}
     
     public void recalcPerms() 
@@ -199,10 +201,10 @@ public class Group implements Comparable<Group>
         for(Map.Entry<String, List<String>> e:cachedPerms.entrySet())
         {
             String where=e.getKey();
-            List<String> l=Statics.toList(where, ";");
-            String server=l.get(0);
+            String[] l = where.split(Pattern.quote(";"));
+            String server=l[0];
             
-            if(l.size()==1)
+            if(l.length==1)
             {
                 if(server.equalsIgnoreCase("global"))
                 {
@@ -215,9 +217,9 @@ public class Group implements Comparable<Group>
                     cachedPerms.put(si.getName().toLowerCase(), effperms);
                 }
             }
-            else if(l.size()==2)
+            else if(l.length==2)
             {
-                String world=l.get(1);
+                String world=l[1];
                 
                 recalcPerms(server,world);
             }
@@ -228,20 +230,20 @@ public class Group implements Comparable<Group>
         for(Map.Entry<String, List<String>> e:cachedPerms.entrySet())
         {
             String where=e.getKey();
-            List<String> l=Statics.toList(where, ";");
-            String lserver=l.get(0);
+            String[] l = where.split(Pattern.quote(";"));
+            String lserver=l[0];
             
             if(lserver.equalsIgnoreCase(server))
             {
-                if(l.size()==1)
+                if(l.length==1)
                 {
                     ServerInfo si=BungeeCord.getInstance().config.getServers().get(lserver);
                     List<String> effperms=calcEffectivePerms(si);
                     cachedPerms.put(si.getName().toLowerCase(), effperms);
                 }
-                else if(l.size()==2)
+                else if(l.length==2)
                 {
-                    String world=l.get(1);
+                    String world=l[1];
                     recalcPerms(server,world);
                 }
             }

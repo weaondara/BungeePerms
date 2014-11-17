@@ -2,6 +2,8 @@ package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +27,7 @@ public class PermissionsResolver
     {
         Boolean has=null;
         
-        List<String> lperm=Statics.toList(perm, ".");
+        String[] lperm = perm.split(Pattern.quote("."));
         
         for(String p:perms)
         {
@@ -39,28 +41,23 @@ public class PermissionsResolver
             }
             else if(p.endsWith("*"))
             {
-                List<String> lp=Statics.toList(p, ".");
+                String[] lp = p.split(Pattern.quote("."));
                 int index=0;
-                try
+                while(index<lp.length && index<lperm.length)
                 {
-                    while(index<lp.size() && index<lperm.size())
+                	if( lp[index].equalsIgnoreCase(lperm[index]) ||
+                        (index==0 && lp[index].equalsIgnoreCase("-"+lperm[index])))
                     {
-                        if( lp.get(index).equalsIgnoreCase(lperm.get(index)) ||
-                            (index==0 && lp.get(index).equalsIgnoreCase("-"+lperm.get(index))))
-                        {
-                            index++;
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        index++;
                     }
-                    if(lp.get(index).equalsIgnoreCase("*") || (index==0 && lp.get(0).equalsIgnoreCase("-*")))
+                    else 
                     {
-                        has=!lp.get(0).startsWith("-");
+                        break;
                     }
                 }
-                catch(Exception e){e.printStackTrace();}
+                if (index<lp.length && index<lperm.length && (lp[index].equalsIgnoreCase("*") || (index==0 && lp[0].equalsIgnoreCase("-*")))) {
+            		has=!lp[0].startsWith("-");
+            	}
             }
         }
         
@@ -68,7 +65,7 @@ public class PermissionsResolver
     }
     public static Boolean hasRegex(List<String> perms, String perm)
     {
-        Boolean has=null;
+        Boolean has=false;
         
         for(String p:perms)
         {
