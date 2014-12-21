@@ -1893,7 +1893,7 @@ public class BungeePerms extends Plugin implements Listener
 					public void execute(final CommandSender sender, final String[] args) 
 					{
                         final Command cmd=this;
-                        new Thread(new Runnable()
+                        BungeeCord.getInstance().getScheduler().runAsync(instance, new Runnable()
                         {
                             @Override
                             public void run()
@@ -1903,7 +1903,7 @@ public class BungeePerms extends Plugin implements Listener
                                     sender.sendMessage(Color.Error+"[BungeePerms] Command not found");
                                 }
                             }
-                        }).start();
+                        });
 					}
 				});
 	}
