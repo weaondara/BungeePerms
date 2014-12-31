@@ -27,10 +27,17 @@ public class User
 	private List<String> extraperms;
 	private Map<String, List<String>> serverPerms;
     private Map<String, Map<String, List<String>>> serverWorldPerms;
+    
+    private Map<String, Boolean> checkResults;
+    private Map<String, Map<String, Boolean>> serverCheckResults;
+    private Map<String, Map<String, Map<String, Boolean>>> serverWorldCheckResults;
 	
 	public User(String name, UUID UUID, List<Group> groups, List<String> extraperms, Map<String, List<String>> serverPerms, Map<String, Map<String, List<String>>> serverWorldPerms) 
 	{
         cachedPerms=new HashMap<>();
+        checkResults=new HashMap<>();
+        serverCheckResults=new HashMap<>();
+        serverWorldCheckResults=new HashMap<>();
         
 		this.name = name;
 		this.UUID = UUID;
@@ -42,27 +49,78 @@ public class User
 	
 	public boolean hasPerm(String perm)
 	{
+        Boolean cached=checkResults.get(perm.toLowerCase());
+        if(cached!=null)
+        {
+            return cached;
+        }
+        
 		List<String> perms=getEffectivePerms();
         
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has!=null && has;
+        boolean res = has!=null && has;
+        
+        checkResults.put(perm.toLowerCase(), res);
+        
+        return res;
 	}
 	public boolean hasPermOnServer(String perm, ServerInfo server) 
 	{
+        Map<String, Boolean> serverresults = serverCheckResults.get(server.getName());
+        if(serverresults == null)
+        {
+            serverresults=new HashMap<>();
+            serverCheckResults.put(server.getName(), serverresults);
+        }
+        
+        Boolean cached=serverresults.get(perm.toLowerCase());
+        if(cached!=null)
+        {
+            return cached;
+        }
+        
 		List<String> perms=getEffectivePerms(server);
         
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has!=null && has;
+        boolean res = has!=null && has;
+        
+        serverresults.put(perm.toLowerCase(), res);
+        
+        return res;
 	}
     public boolean hasPermOnServerInWorld(String perm, ServerInfo server, String world) 
 	{
-		List<String> perms=getEffectivePerms(server,world);
+        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server.getName());
+        if(serverresults == null)
+        {
+            serverresults=new HashMap<>();
+            serverWorldCheckResults.put(server.getName(), serverresults);
+        }
+        
+        Map<String, Boolean> worldresults = serverresults.get(world);
+        if(worldresults == null)
+        {
+            worldresults=new HashMap<>();
+            serverresults.put(world, worldresults);
+        }
+        
+        Boolean cached=worldresults.get(perm.toLowerCase());
+        if(cached!=null)
+        {
+            return cached;
+        }
+        
+		List<String> perms=getEffectivePerms(server, world);
 		        
         Boolean has=BungeePerms.getInstance().getPermissionsManager().getResolver().has(perms, perm);
 		
-        return has!=null && has;
+        boolean res = has!=null && has;
+        
+        worldresults.put(perm.toLowerCase(), res);
+        
+        return res;
 	}
 	
 	public List<String> getEffectivePerms()
@@ -196,6 +254,10 @@ public class User
                 recalcPerms(server,world);
             }
         }
+        
+        checkResults.clear();
+        serverCheckResults.clear();
+        serverWorldCheckResults.clear();
     }
     public void recalcPerms(String server)
     {
@@ -220,12 +282,34 @@ public class User
                 }
             }
         }
+        
+        Map<String, Boolean> serverresults = serverCheckResults.get(server);
+        if(serverresults != null)
+        {
+            serverresults.clear();
+        }
+        
+        Map<String, Map<String, Boolean>> worldresults = serverWorldCheckResults.get(server);
+        if(worldresults != null)
+        {
+            worldresults.clear();
+        }
     }
     public void recalcPerms(String server,String world)
     {
         ServerInfo si=BungeeCord.getInstance().config.getServers().get(server);
         List<String> effperms=calcEffectivePerms(si,world);
         cachedPerms.put(si.getName().toLowerCase()+";"+world.toLowerCase(), effperms);
+        
+        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server);
+        if(serverresults != null)
+        {
+            Map<String, Boolean> worldresults = serverresults.get(world);
+            if(worldresults != null)
+            {
+                worldresults.clear();
+            }
+        }
     }
     
     public boolean isNothingSpecial() 
