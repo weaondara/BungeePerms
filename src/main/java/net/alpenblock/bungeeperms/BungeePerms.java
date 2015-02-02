@@ -286,6 +286,29 @@ public class BungeePerms extends Plugin implements Listener
                         }
                         return true;
                     }
+                    else if(args[2].equalsIgnoreCase("delete"))
+                    {
+                        if(pm.hasOrConsole(sender,"bungeeperms.user.delete",true))
+                        {
+                            if(!matchArgs(sender,args,3))
+                            {
+                                return true;
+                            }
+                            
+                            String player=Statics.getFullPlayerName(bc,args[1]);
+                            User user=pm.getUser(player);
+                            if(user==null)
+                            {
+                                sender.sendMessage(Color.Error+"The player "+Color.User+player+Color.Error+" does not exist!");
+                                return true;
+                            }
+                            
+                            pm.deleteUser(user);
+
+                            sender.sendMessage(Color.Text+"User deleted");
+                        }
+                        return true;
+                    }
 					else if(args.length>=4)
 					{
 						if(Statics.ArgAlias(args[2], new String[]{"add","addperm","addpermission"}))
@@ -1848,6 +1871,7 @@ public class BungeePerms extends Plugin implements Listener
 		if(pm.hasPermOrConsole(sender,"bungeeperms.reload")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms reload"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Reloads the permissions");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.users")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms users [-c]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Lists the users [or shows the amount of them]");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.info")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> info"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Shows information to the given user");}
+		if(pm.hasPermOrConsole(sender,"bungeeperms.user.delete")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> delete"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Deletes the given user");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.add")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> addperm <permission> [server [world]]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Adds a permission to the given user");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.remove")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> removeperm <permission> [server [world]]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Remove a permission from the given user");}
 		if(pm.hasPermOrConsole(sender,"bungeeperms.user.perms.has")){sender.sendMessage(ChatColor.GOLD+"/bungeeperms user <username> has <permission> [server [world]]"+ChatColor.WHITE+" - "+ChatColor.GRAY+"Checks if the given user has the given permission");}
