@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.plugin.Plugin;
 
 @Getter
 @Setter
@@ -20,6 +22,7 @@ public class Group implements Comparable<Group>
     @Setter(value = AccessLevel.PRIVATE)
     private Map<String,List<String>> cachedPerms;
     
+    private ProxyServer bc;
 	private String name;
 	private List<String> inheritances;
 	private List<String> perms;
@@ -32,8 +35,9 @@ public class Group implements Comparable<Group>
 	private String prefix;
 	private String suffix;
 
-    public Group(String name, List<String> inheritances, List<String> perms, Map<String, Server> servers, int rank, int weight, String ladder, boolean isdefault, String display, String prefix, String suffix)
+    public Group(Plugin plugin, String name, List<String> inheritances, List<String> perms, Map<String, Server> servers, int rank, int weight, String ladder, boolean isdefault, String display, String prefix, String suffix)
     {
+    	bc = plugin.getProxy();
         this.name = name;
         this.inheritances = inheritances;
         this.perms = perms;
@@ -210,7 +214,7 @@ public class Group implements Comparable<Group>
                 }
                 else
                 {
-                    ServerInfo si=BungeeCord.getInstance().config.getServers().get(server);
+                    ServerInfo si=bc.getConfig().getServers().get(server);
                     List<String> effperms=calcEffectivePerms(si);
                     cachedPerms.put(si.getName().toLowerCase(), effperms);
                 }
@@ -235,7 +239,7 @@ public class Group implements Comparable<Group>
             {
                 if(l.size()==1)
                 {
-                    ServerInfo si=BungeeCord.getInstance().config.getServers().get(lserver);
+                    ServerInfo si=bc.getConfig().getServers().get(lserver);
                     List<String> effperms=calcEffectivePerms(si);
                     cachedPerms.put(si.getName().toLowerCase(), effperms);
                 }
@@ -249,7 +253,7 @@ public class Group implements Comparable<Group>
     }
     public void recalcPerms(String server,String world)
     {
-        ServerInfo si=BungeeCord.getInstance().config.getServers().get(server);
+        ServerInfo si=bc.getConfig().getServers().get(server);
         List<String> effperms=calcEffectivePerms(si,world);
         cachedPerms.put(si.getName().toLowerCase()+";"+world.toLowerCase(), effperms);
     }

@@ -5,18 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.plugin.Plugin;
 
 @Getter
 @Setter
 @ToString
 public class User
 {
+	private Plugin p;
+	
     @Getter(value = AccessLevel.PRIVATE)
     @Setter(value = AccessLevel.PRIVATE)
     private Map<String,List<String>> cachedPerms;
@@ -32,8 +35,9 @@ public class User
     private Map<String, Map<String, Boolean>> serverCheckResults;
     private Map<String, Map<String, Map<String, Boolean>>> serverWorldCheckResults;
 	
-	public User(String name, UUID UUID, List<Group> groups, List<String> extraperms, Map<String, List<String>> serverPerms, Map<String, Map<String, List<String>>> serverWorldPerms) 
+	public User(Plugin p, String name, UUID UUID, List<Group> groups, List<String> extraperms, Map<String, List<String>> serverPerms, Map<String, Map<String, List<String>>> serverWorldPerms) 
 	{
+		this.p = p;
         cachedPerms=new HashMap<>();
         checkResults=new HashMap<>();
         serverCheckResults=new HashMap<>();
@@ -242,7 +246,7 @@ public class User
                 }
                 else
                 {
-                    ServerInfo si=BungeeCord.getInstance().config.getServers().get(server);
+                    ServerInfo si=p.getProxy().getConfig().getServers().get(server);
                     List<String> effperms=calcEffectivePerms(si);
                     cachedPerms.put(si.getName().toLowerCase(), effperms);
                 }
@@ -271,7 +275,7 @@ public class User
             {
                 if(l.size()==1)
                 {
-                    ServerInfo si=BungeeCord.getInstance().config.getServers().get(lserver);
+                    ServerInfo si=p.getProxy().getConfig().getServers().get(lserver);
                     List<String> effperms=calcEffectivePerms(si);
                     cachedPerms.put(si.getName().toLowerCase(), effperms);
                 }
@@ -297,7 +301,7 @@ public class User
     }
     public void recalcPerms(String server,String world)
     {
-        ServerInfo si=BungeeCord.getInstance().config.getServers().get(server);
+        ServerInfo si=p.getProxy().getConfig().getServers().get(server);
         List<String> effperms=calcEffectivePerms(si,world);
         cachedPerms.put(si.getName().toLowerCase()+";"+world.toLowerCase(), effperms);
         

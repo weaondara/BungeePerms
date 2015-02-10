@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 // TODO: Auto-generated Javadoc
@@ -40,7 +40,7 @@ public class Statics {
 	 * @param player the player
 	 * @return the full player name
 	 */
-	public static String getFullPlayerName(BungeeCord s,String player)
+	public static String getFullPlayerName(ProxyServer s,String player)
 	{
 		ProxiedPlayer p = s.getPlayer(player);
 		if(p!=null) 

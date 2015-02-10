@@ -8,13 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.uuid.UUIDFetcher;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -32,7 +33,7 @@ public class BungeePerms extends Plugin implements Listener
 		return instance;
 	}
 	
-	private BungeeCord bc;
+	private ProxyServer bc;
 	private Config config;
 	private Debug debug;
     
@@ -46,7 +47,7 @@ public class BungeePerms extends Plugin implements Listener
 		//static
 		instance=this;
 		
-		bc=BungeeCord.getInstance();
+		bc=this.getProxy();
         
         //check for config file existance
         File f=new File(getDataFolder(),"/config.yml");
@@ -488,7 +489,7 @@ public class BungeePerms extends Plugin implements Listener
 									{
                                         if(world==null)
                                         {
-                                            ServerInfo si=bc.config.getServers().get(server);
+                                            ServerInfo si=bc.getConfig().getServers().get(server);
                                             if(si==null)
                                             {
                                                 sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
@@ -499,7 +500,7 @@ public class BungeePerms extends Plugin implements Listener
                                         }
                                         else
                                         {
-                                            ServerInfo si=bc.config.getServers().get(server);
+                                            ServerInfo si=bc.getConfig().getServers().get(server);
                                             if(si==null)
                                             {
                                                 sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
@@ -821,7 +822,7 @@ public class BungeePerms extends Plugin implements Listener
                                 sender.sendMessage(Color.Error+"The group "+Color.Value+groupname+Color.Error+" already exists!");
                                 return true;
                             }
-                            Group group=new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String,Server>(), 1500, 1500, "default", false, "", "", "");
+                            Group group=new Group(this, groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String,Server>(), 1500, 1500, "default", false, "", "", "");
                             pm.addGroup(group);
                             sender.sendMessage(Color.Text+"Group "+Color.Value+groupname+Color.Text+" created.");
                         }
@@ -1057,7 +1058,7 @@ public class BungeePerms extends Plugin implements Listener
 									{
                                         if(world==null)
                                         {
-                                            ServerInfo si=bc.config.getServers().get(server);
+                                            ServerInfo si=bc.getConfig().getServers().get(server);
                                             if(si==null)
                                             {
                                                 sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
@@ -1068,7 +1069,7 @@ public class BungeePerms extends Plugin implements Listener
                                         }
                                         else
                                         {
-                                            ServerInfo si=bc.config.getServers().get(server);
+                                            ServerInfo si=bc.getConfig().getServers().get(server);
                                             if(si==null)
                                             {
                                                 sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
@@ -1893,7 +1894,7 @@ public class BungeePerms extends Plugin implements Listener
 					public void execute(final CommandSender sender, final String[] args) 
 					{
                         final Command cmd=this;
-                        BungeeCord.getInstance().getScheduler().runAsync(instance, new Runnable()
+                        bc.getScheduler().runAsync(instance, new Runnable()
                         {
                             @Override
                             public void run()

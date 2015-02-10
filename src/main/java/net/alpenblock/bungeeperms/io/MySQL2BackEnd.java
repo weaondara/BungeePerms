@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Debug;
@@ -18,12 +19,12 @@ import net.alpenblock.bungeeperms.io.mysql2.EntityType;
 import net.alpenblock.bungeeperms.io.mysql2.MysqlPermEntity;
 import net.alpenblock.bungeeperms.io.mysql2.MysqlPermsAdapter2;
 import net.alpenblock.bungeeperms.io.mysql2.ValueEntry;
-import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class MySQL2BackEnd implements BackEnd
 {
-    private BungeeCord bc;
+    private ProxyServer bc;
     private Config config;
     private Debug debug;
     private Plugin plugin;
@@ -33,9 +34,9 @@ public class MySQL2BackEnd implements BackEnd
     private String table;
     private String tablePrefix;
     
-    public MySQL2BackEnd(Config conf, Debug d)
+    public MySQL2BackEnd(Plugin p, Config conf, Debug d)
     {
-        bc=BungeeCord.getInstance();
+        bc=p.getProxy();
         config=conf;
         debug=d;
         
@@ -187,7 +188,7 @@ public class MySQL2BackEnd implements BackEnd
                 }
             }
             
-            Group group=new Group(mpe.getName(), inheritances, globalperms, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
+            Group group=new Group(plugin, mpe.getName(), inheritances, globalperms, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
             ret.add(group);
         }
         Collections.sort(ret);
@@ -274,7 +275,7 @@ public class MySQL2BackEnd implements BackEnd
         }
 
         UUID uuid=BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(mpe.getName());
-        User u=new User(mpe.getName(), uuid, lgroups, globalperms, serverperms,serverworldperms);
+        User u=new User(plugin, mpe.getName(), uuid, lgroups, globalperms, serverperms,serverworldperms);
         return u;
     }
     @Override
@@ -343,7 +344,7 @@ public class MySQL2BackEnd implements BackEnd
         }
 
         String username=BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
-        User u=new User(username, user, lgroups, globalperms, serverperms,serverworldperms);
+        User u=new User(plugin, username, user, lgroups, globalperms, serverperms,serverworldperms);
         return u;
     }
     @Override
