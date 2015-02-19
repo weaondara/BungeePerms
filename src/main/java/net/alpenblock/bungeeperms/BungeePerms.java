@@ -39,6 +39,9 @@ public class BungeePerms extends Plugin implements Listener
 	private PermissionsManager pm;
     
     private int fetchercooldown;
+    private boolean tabcomplete;
+    
+    private Listener tablistener;
 	
 	@Override
 	public void onLoad()
@@ -87,6 +90,7 @@ public class BungeePerms extends Plugin implements Listener
     private void loadConfig()
     {
         fetchercooldown=config.getInt("uuidfetcher.cooldown", 3000);
+        tabcomplete = config.getBoolean("tabcomplete", false);
     }
 	
 	@Override
@@ -94,6 +98,11 @@ public class BungeePerms extends Plugin implements Listener
 	{
 		bc.getLogger().info("Activating BungeePerms ...");
         pm.enable();
+        if(tabcomplete)
+        {
+            tablistener = new TabListener();
+            BungeeCord.getInstance().getPluginManager().registerListener(this, tablistener);
+        }
 	}
 	
 	@Override
@@ -101,6 +110,10 @@ public class BungeePerms extends Plugin implements Listener
 	{
 		bc.getLogger().info("Deactivating BungeePerms ...");
         pm.disable();
+        if(tabcomplete)
+        {
+            BungeeCord.getInstance().getPluginManager().registerListener(this, tablistener);
+        }
 	}
 	
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
