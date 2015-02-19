@@ -631,10 +631,21 @@ public class PermissionsManager implements Listener
     public void onLogin(LoginEvent e)
     {
         String playername=e.getConnection().getName();
-        UUID uuid=e.getConnection().getUniqueId();
-        bc.getLogger().log(Level.INFO, "[BungeePerms] Login by {0} ({1})", new Object[]{playername, uuid});
+        UUID uuid = null;
+        if(useUUIDs)
+        {
+            uuid=e.getConnection().getUniqueId();
+            bc.getLogger().log(Level.INFO, "[BungeePerms] Login by {0} ({1})", new Object[]{playername, uuid});
+            
+            //update uuid player db
+            UUIDPlayerDB.update(uuid, playername);
+        }
+        else
+        {
+            bc.getLogger().log(Level.INFO, "[BungeePerms] Login by {0}", new Object[]{playername});
+        }
         
-        UUIDPlayerDB.update(uuid, playername);
+        
         User u=useUUIDs ? getUser(uuid) : getUser(playername);
         if(u==null)
         {
