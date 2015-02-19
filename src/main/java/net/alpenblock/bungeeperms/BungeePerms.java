@@ -645,7 +645,7 @@ public class BungeePerms extends Plugin implements Listener
 				}
 				else if(args[0].equalsIgnoreCase("groups"))
 				{
-                    if(pm.hasOrConsole(sender,"bungeeperms.groups.list",true))
+                    if(pm.hasOrConsole(sender,"bungeeperms.groups",true))
                     {
                         if(!matchArgs(sender,args,1))
                         {
