@@ -465,10 +465,17 @@ public class PermissionsManager implements Listener
         }
         
         //load user from database
-        User u;
-        if(useUUIDs && uuid != null)
+        User u = null;
+        if(useUUIDs)
         {
-            u=backEnd.loadUser(uuid);
+            if(uuid == null)
+            {
+                uuid=UUIDPlayerDB.getUUID(usernameoruuid);
+            }
+            if(uuid != null)
+            {
+                u=backEnd.loadUser(uuid);
+            }
         }
         else
         {
