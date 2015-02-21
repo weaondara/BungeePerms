@@ -49,8 +49,8 @@
     <dependencies>
         <dependency>
             <groupId>net.md-5</groupId>
-            <artifactId>BungeeCord</artifactId>
-            <version>1.0</version>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.8-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -62,6 +62,9 @@
             <groupId>com.mojang</groupId>
             <artifactId>AccountsClient</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        	<groupId>junit</groupId>
+        	<artifactId>junit</artifactId>
+        	<version>4.11</version>
         </dependency>
     </dependencies>
     <properties>

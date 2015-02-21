@@ -6,8 +6,6 @@ import java.io.PrintStream;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.plugin.Plugin;
 
 /**
@@ -102,7 +100,8 @@ public class Debug {
 		logger.info(str);
 		if(showlogs)
 		{
-			BungeeCord.getInstance().getLogger().info("["+plugin.getDescription().getName()+"] [Debug] "+str);
+			
+			plugin.getProxy().getLogger().info("["+plugin.getDescription().getName()+"] [Debug] "+str);
 		}
 	}
 	

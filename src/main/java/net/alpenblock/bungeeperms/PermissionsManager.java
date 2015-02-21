@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.alpenblock.bungeeperms.io.BackEnd;
@@ -24,9 +25,9 @@ import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
 import net.alpenblock.bungeeperms.util.ConcurrentList;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
@@ -35,12 +36,11 @@ import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.command.ConsoleCommandSender;
 import net.md_5.bungee.event.EventHandler;
 
 public class PermissionsManager implements Listener
 {
-    private BungeeCord bc;
+    private ProxyServer bc;
     private Plugin plugin;
     private Config config;
     private Debug debug;
@@ -74,7 +74,7 @@ public class PermissionsManager implements Listener
     
     public PermissionsManager(Plugin p,Config conf,Debug d)
     {
-        bc=BungeeCord.getInstance();
+        bc=p.getProxy();
         plugin=p;
         config=conf;
         debug=d;
@@ -111,15 +111,15 @@ public class PermissionsManager implements Listener
         BackEndType bet=config.getEnumValue("backendtype",BackEndType.YAML);
         if(bet==BackEndType.YAML)
         {
-            backEnd=new YAMLBackEnd();
+            backEnd=new YAMLBackEnd(plugin);
         }
         else if(bet==BackEndType.MySQL)
         {
-            backEnd=new MySQLBackEnd(config,debug);
+            backEnd = new MySQLBackEnd(plugin, config, debug);
         }
         else if(bet==BackEndType.MySQL2)
         {
-            backEnd=new MySQL2BackEnd(config,debug);
+            backEnd=new MySQL2BackEnd(plugin, config,debug);
         }
         
         UUIDPlayerDBType updbt=config.getEnumValue("uuidplayerdb",UUIDPlayerDBType.None);
@@ -166,7 +166,7 @@ public class PermissionsManager implements Listener
         if(!enabled)
         {
             //load online players; allows reload
-            for(ProxiedPlayer pp:BungeeCord.getInstance().getPlayers())
+            for(ProxiedPlayer pp:bc.getPlayers())
             {
                 if(useUUIDs)
                 {
@@ -659,7 +659,7 @@ public class PermissionsManager implements Listener
             bc.getLogger().log(Level.INFO, "[BungeePerms] Adding default groups to {0} ({1})", new Object[]{playername, uuid});
             
             List<Group> groups=getDefaultGroups();
-            u=new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, List<String>>(), new HashMap<String, Map<String, List<String>>>());
+            u=new User(plugin, playername, uuid, groups, new ArrayList<String>(), new HashMap<String, List<String>>(), new HashMap<String, Map<String, List<String>>>());
             users.add(u);
             
             backEnd.saveUser(u,true);
@@ -1851,7 +1851,7 @@ public class PermissionsManager implements Listener
     //bukkit-bungeeperms reload information functions
     public void sendPM(String player,String msg)
     {
-        ProxiedPlayer pp=BungeeCord.getInstance().getPlayer(player);
+        ProxiedPlayer pp=bc.getPlayer(player);
         if(pp!=null)
         {
             pp.getServer().getInfo().sendData(channel, msg.getBytes());
@@ -1859,7 +1859,7 @@ public class PermissionsManager implements Listener
     }
     public void sendPM(UUID player,String msg)
     {
-        ProxiedPlayer pp=BungeeCord.getInstance().getPlayer(player);
+        ProxiedPlayer pp=bc.getPlayer(player);
         if(pp!=null)
         {
             pp.getServer().getInfo().sendData(channel, msg.getBytes());
@@ -1867,7 +1867,7 @@ public class PermissionsManager implements Listener
     }
     public void sendPMAll(String msg) 
     {
-        for(ServerInfo si:BungeeCord.getInstance().config.getServers().values())
+        for(ServerInfo si:bc.getConfig().getServers().values())
         {
             si.sendData(channel, msg.getBytes());
         }

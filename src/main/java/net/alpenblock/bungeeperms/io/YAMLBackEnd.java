@@ -9,28 +9,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Group;
-import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
-import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class YAMLBackEnd implements BackEnd
 {
-    private BungeeCord bc;
     private Plugin plugin;
+    private ProxyServer bc;
     
     private String permspath;
     private Config permsconf;
     
-    public YAMLBackEnd()
+    public YAMLBackEnd(Plugin p)
     {
-        bc=BungeeCord.getInstance();
         plugin=BungeePerms.getInstance();
         
         permspath="/permissions.yml";
@@ -95,7 +94,7 @@ public class YAMLBackEnd implements BackEnd
                 servers.put(server, new Server(server,serverperms,worlds,sdisplay,sprefix,ssuffix));
 			}
 			
-			Group group=new Group(g, inheritances, permissions, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
+			Group group=new Group(plugin, g, inheritances, permissions, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
 			ret.add(group);
 		}
         Collections.sort(ret);
@@ -154,7 +153,7 @@ public class YAMLBackEnd implements BackEnd
         }
 
         UUID uuid=BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(user);
-        User u=new User(user, uuid, lgroups, extrapermissions, serverperms,serverworldperms);
+        User u=new User(plugin, user, uuid, lgroups, extrapermissions, serverperms,serverworldperms);
         return u;
     }
     @Override
@@ -195,7 +194,7 @@ public class YAMLBackEnd implements BackEnd
         }
 
         String username=BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
-        User u=new User(username, user, lgroups, extrapermissions, serverperms,serverworldperms);
+        User u=new User(plugin, username, user, lgroups, extrapermissions, serverperms,serverworldperms);
         return u;
     }
     @Override
