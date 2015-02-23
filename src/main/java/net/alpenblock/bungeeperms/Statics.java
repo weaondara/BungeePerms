@@ -23,12 +23,12 @@ public class Statics
         return count;
     }
 
-    public static String getFullPlayerName(BungeeCord s, String player)
+    public static String getFullPlayerName(String player)
     {
-        ProxiedPlayer p = s.getPlayer(player);
+        ProxiedPlayer p = BungeeCord.getInstance().getPlayer(player);
         if (p != null)
         {
-            for (ProxiedPlayer pp : s.getPlayers())
+            for (ProxiedPlayer pp : BungeeCord.getInstance().getPlayers())
             {
                 if (pp.getName().startsWith(player))
                 {
@@ -67,7 +67,7 @@ public class Statics
         return l;
     }
 
-    public static boolean ArgAlias(String arg, String[] aliases)
+    public static boolean argAlias(String arg, String... aliases)
     {
         for (int i = 0; i < aliases.length; i++)
         {
