@@ -1122,6 +1122,7 @@ public class BungeePerms extends Plugin implements Listener
         Group group = pm.getGroup(groupname);
         if (group != null)
         {
+            sender.sendMessage(Color.Text + "Group deletion in progress ... this may take a while (backend integrity check).");
             pm.deleteGroup(group);
             sender.sendMessage(Color.Text + "Group " + Color.Value + group.getName() + Color.Text + " deleted.");
         }
