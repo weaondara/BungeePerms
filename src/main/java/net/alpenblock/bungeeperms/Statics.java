@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class Statics
@@ -106,5 +107,35 @@ public class Statics
         }
 
         return null;
+    }
+    
+    public static boolean matchArgs(CommandSender sender, String[] args, int length)
+    {
+        if (args.length > length)
+        {
+            Messages.sendTooManyArgsMessage(sender);
+            return false;
+        }
+        else if (args.length < length)
+        {
+            Messages.sendTooLessArgsMessage(sender);
+            return false;
+        }
+        return true;
+    }
+    
+    public static boolean matchArgs(CommandSender sender, String[] args, int min, int max)
+    {
+        if (args.length > max)
+        {
+            Messages.sendTooManyArgsMessage(sender);
+            return false;
+        }
+        else if (args.length < min)
+        {
+            Messages.sendTooLessArgsMessage(sender);
+            return false;
+        }
+        return true;
     }
 }
