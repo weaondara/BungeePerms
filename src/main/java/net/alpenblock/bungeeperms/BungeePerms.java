@@ -39,6 +39,8 @@ public class BungeePerms extends Plugin implements Listener
 
     private int fetchercooldown;
     private boolean tabcomplete;
+    private boolean notifypromote;
+    private boolean notifydemote;
 
     private Listener tablistener;
 
@@ -91,6 +93,8 @@ public class BungeePerms extends Plugin implements Listener
     {
         fetchercooldown = config.getInt("uuidfetcher.cooldown", 3000);
         tabcomplete = config.getBoolean("tabcomplete", false);
+        notifypromote = config.getBoolean("notify.promote", false);
+        notifydemote = config.getBoolean("notify.demote", false);
     }
 
     @Override
@@ -1790,7 +1794,17 @@ public class BungeePerms extends Plugin implements Listener
         }
         pm.addUserGroup(user, nextgroup);
         sender.sendMessage(Color.User + user.getName() + Color.Text + " is now " + Color.Value + nextgroup.getName() + Color.Text + "!");
-        //todo: add promote msg
+        
+        //promote msg to user
+        if(notifypromote)
+        {
+            ProxiedPlayer pp = bc.getPlayer(user.getName());
+            if(pp != null)
+            {
+                pp.sendMessage(Color.Text + "You were promoted to " + Color.Value + nextgroup.getName() + Color.Text + "!");
+            }
+        }
+        
         return true;
     }
 
@@ -1885,7 +1899,16 @@ public class BungeePerms extends Plugin implements Listener
         }
         pm.addUserGroup(user, previousgroup);
         sender.sendMessage(Color.User + user.getName() + Color.Text + " is now " + Color.Value + previousgroup.getName() + Color.Text + "!");
-        //todo: add demote msg
+        
+        //demote msg to user
+        if(notifydemote)
+        {
+            ProxiedPlayer pp = bc.getPlayer(user.getName());
+            if(pp != null)
+            {
+                pp.sendMessage(Color.Text + "You were demoted to " + Color.Value + previousgroup.getName() + Color.Text + "!");
+            }
+        }
         return true;
     }
 
