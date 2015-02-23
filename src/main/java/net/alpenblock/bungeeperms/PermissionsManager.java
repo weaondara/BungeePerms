@@ -819,7 +819,7 @@ public class PermissionsManager implements Listener
             {
                 return user.hasPerm(permission);
             }
-            return user.hasPermOnServer(permission,((ProxiedPlayer) sender).getServer().getInfo());
+            return user.hasPermOnServer(permission,((ProxiedPlayer) sender).getServer().getInfo().getName());
         }
         return false;
     }
@@ -839,7 +839,7 @@ public class PermissionsManager implements Listener
             {
                 return user.hasPerm(permission);
             }
-            return user.hasPermOnServer(permission,((ProxiedPlayer) sender).getServer().getInfo());
+            return user.hasPermOnServer(permission,((ProxiedPlayer) sender).getServer().getInfo().getName());
         }
         else if(sender instanceof ConsoleCommandSender)
         {
@@ -864,7 +864,7 @@ public class PermissionsManager implements Listener
             {
                 return false;
             }
-            return u.hasPermOnServer(permission,server);
+            return u.hasPermOnServer(permission,server.getName());
         }
         return false;
     }
@@ -889,7 +889,7 @@ public class PermissionsManager implements Listener
             {
                 return false;
             }
-            return u.hasPermOnServer(permission,server);
+            return u.hasPermOnServer(permission,server.getName());
         }
     }
     
@@ -951,10 +951,10 @@ public class PermissionsManager implements Listener
             String world=playerWorlds.get(sender.getName());
             if(world==null)
             {
-                return user.hasPermOnServer(permission,((ProxiedPlayer) sender).getServer().getInfo());
+                return user.hasPermOnServer(permission,((ProxiedPlayer) sender).getServer().getInfo().getName());
             }
             
-            return user.hasPermOnServerInWorld(permission,((ProxiedPlayer) sender).getServer().getInfo(),world);
+            return user.hasPermOnServerInWorld(permission,((ProxiedPlayer) sender).getServer().getInfo().getName(),world);
         }
         return false;
     }
@@ -979,10 +979,10 @@ public class PermissionsManager implements Listener
             String world=playerWorlds.get(sender.getName());
             if(world==null)
             {
-                return user.hasPermOnServer(permission,((ProxiedPlayer) sender).getServer().getInfo());
+                return user.hasPermOnServer(permission,((ProxiedPlayer) sender).getServer().getInfo().getName());
             }
             
-            return user.hasPermOnServerInWorld(permission,((ProxiedPlayer) sender).getServer().getInfo(),world);
+            return user.hasPermOnServerInWorld(permission,((ProxiedPlayer) sender).getServer().getInfo().getName(),world);
         }
         else if(sender instanceof ConsoleCommandSender)
         {
@@ -1014,7 +1014,7 @@ public class PermissionsManager implements Listener
                 return hasPermOnServer(sender,permission,server);
             }
                 
-            return u.hasPermOnServerInWorld(permission,server,world);
+            return u.hasPermOnServerInWorld(permission,server.getName(),world);
         }
         return false;
     }
@@ -1046,7 +1046,7 @@ public class PermissionsManager implements Listener
                 return hasPermOnServer(sender,permission,server);
             }
                 
-            return u.hasPermOnServerInWorld(permission,server,world);
+            return u.hasPermOnServerInWorld(permission,server.getName(),world);
         }
     }
     

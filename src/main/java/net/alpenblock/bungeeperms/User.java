@@ -9,8 +9,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.api.config.ServerInfo;
 
 @Getter
 @Setter
@@ -65,13 +63,13 @@ public class User
         
         return res;
 	}
-	public boolean hasPermOnServer(String perm, ServerInfo server) 
+	public boolean hasPermOnServer(String perm, String server) 
 	{
-        Map<String, Boolean> serverresults = serverCheckResults.get(server.getName());
+        Map<String, Boolean> serverresults = serverCheckResults.get(server);
         if(serverresults == null)
         {
             serverresults=new HashMap<>();
-            serverCheckResults.put(server.getName(), serverresults);
+            serverCheckResults.put(server, serverresults);
         }
         
         Boolean cached=serverresults.get(perm.toLowerCase());
@@ -90,13 +88,13 @@ public class User
         
         return res;
 	}
-    public boolean hasPermOnServerInWorld(String perm, ServerInfo server, String world) 
+    public boolean hasPermOnServerInWorld(String perm, String server, String world) 
 	{
-        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server.getName());
+        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server);
         if(serverresults == null)
         {
             serverresults=new HashMap<>();
-            serverWorldCheckResults.put(server.getName(), serverresults);
+            serverWorldCheckResults.put(server, serverresults);
         }
         
         Map<String, Boolean> worldresults = serverresults.get(world);
@@ -134,24 +132,24 @@ public class User
         
         return effperms;
     }
-    public List<String> getEffectivePerms(ServerInfo server) 
+    public List<String> getEffectivePerms(String server) 
 	{
-        List<String> effperms=cachedPerms.get(server.getName().toLowerCase());
+        List<String> effperms=cachedPerms.get(server.toLowerCase());
         if(effperms==null)
         {
             effperms=calcEffectivePerms(server);
-            cachedPerms.put(server.getName().toLowerCase(), effperms);
+            cachedPerms.put(server.toLowerCase(), effperms);
         }
         
         return effperms;
     }
-    public List<String> getEffectivePerms(ServerInfo server, String world) 
+    public List<String> getEffectivePerms(String server, String world) 
 	{
-        List<String> effperms=cachedPerms.get(server.getName().toLowerCase()+";"+world.toLowerCase());
+        List<String> effperms=cachedPerms.get(server.toLowerCase()+";"+world.toLowerCase());
         if(effperms==null)
         {
             effperms=calcEffectivePerms(server,world);
-            cachedPerms.put(server.getName().toLowerCase()+";"+world.toLowerCase(), effperms);
+            cachedPerms.put(server.toLowerCase()+";"+world.toLowerCase(), effperms);
         }
         
         return effperms;
@@ -171,7 +169,7 @@ public class User
         
 		return ret;
 	}
-	public List<String> calcEffectivePerms(ServerInfo server)
+	public List<String> calcEffectivePerms(String server)
 	{
 		List<String> ret=new ArrayList<>();
 		for(Group g:groups)
@@ -182,7 +180,7 @@ public class User
 		ret.addAll(extraperms);
 		
 		//per server perms
-		List<String> perserverPerms=serverPerms.get(server.getName().toLowerCase());
+		List<String> perserverPerms=serverPerms.get(server.toLowerCase());
 		if(perserverPerms!=null)
 		{
 			ret.addAll(perserverPerms);
@@ -192,7 +190,7 @@ public class User
 		
 		return ret;
 	}
-	public List<String> calcEffectivePerms(ServerInfo server, String world)
+	public List<String> calcEffectivePerms(String server, String world)
 	{
 		List<String> ret=new ArrayList<>();
 		for(Group g:groups)
@@ -204,14 +202,14 @@ public class User
 		ret.addAll(extraperms);
 		
 		//per server perms
-		List<String> perserverPerms=serverPerms.get(server.getName().toLowerCase());
+		List<String> perserverPerms=serverPerms.get(server.toLowerCase());
 		if(perserverPerms!=null)
 		{
 			ret.addAll(perserverPerms);
 		}
         
         //per server world perms
-        Map<String,List<String>> serverPerms=serverWorldPerms.get(server.getName().toLowerCase());
+        Map<String,List<String>> serverPerms=serverWorldPerms.get(server.toLowerCase());
         if(serverPerms!=null)
         {
             List<String> serverWorldPerms=serverPerms.get(world.toLowerCase());
@@ -242,9 +240,8 @@ public class User
                 }
                 else
                 {
-                    ServerInfo si=BungeeCord.getInstance().config.getServers().get(server);
-                    List<String> effperms=calcEffectivePerms(si);
-                    cachedPerms.put(si.getName().toLowerCase(), effperms);
+                    List<String> effperms=calcEffectivePerms(server);
+                    cachedPerms.put(server.toLowerCase(), effperms);
                 }
             }
             else if(l.size()==2)
@@ -271,9 +268,8 @@ public class User
             {
                 if(l.size()==1)
                 {
-                    ServerInfo si=BungeeCord.getInstance().config.getServers().get(lserver);
-                    List<String> effperms=calcEffectivePerms(si);
-                    cachedPerms.put(si.getName().toLowerCase(), effperms);
+                    List<String> effperms=calcEffectivePerms(lserver);
+                    cachedPerms.put(lserver.toLowerCase(), effperms);
                 }
                 else if(l.size()==2)
                 {
@@ -297,9 +293,8 @@ public class User
     }
     public void recalcPerms(String server,String world)
     {
-        ServerInfo si=BungeeCord.getInstance().config.getServers().get(server);
-        List<String> effperms=calcEffectivePerms(si,world);
-        cachedPerms.put(si.getName().toLowerCase()+";"+world.toLowerCase(), effperms);
+        List<String> effperms=calcEffectivePerms(server,world);
+        cachedPerms.put(server.toLowerCase()+";"+world.toLowerCase(), effperms);
         
         Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server);
         if(serverresults != null)
