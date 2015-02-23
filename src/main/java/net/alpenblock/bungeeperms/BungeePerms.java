@@ -459,7 +459,7 @@ public class BungeePerms extends Plugin implements Listener
                                             }
                                             else if(!perserverperms.contains("-"+perm))
                                             {
-                                                pm.removeUserPerServerPerm(user, server, "-"+perm);
+                                                pm.addUserPerServerPerm(user, server, "-"+perm);
                                                 sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+".");
                                             }
                                             else
@@ -488,7 +488,7 @@ public class BungeePerms extends Plugin implements Listener
                                             }
                                             else if(!perserverworldperms.contains("-"+perm))
                                             {
-                                                pm.removeUserPerServerWorldPerm(user, server,world, "-"+perm);
+                                                pm.addUserPerServerWorldPerm(user, server,world, "-"+perm);
                                                 sender.sendMessage(Color.Text+"Removed permission "+Color.Value+perm+Color.Text+" from player "+Color.User+user.getName()+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+".");
                                             }
                                             else
