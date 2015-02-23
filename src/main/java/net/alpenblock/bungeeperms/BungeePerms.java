@@ -176,10 +176,11 @@ public class BungeePerms extends Plugin implements Listener
             {
                 return handleCleanup(sender, args);
             }
-            else if (args[0].equalsIgnoreCase("backend"))
-            {
-                return handleBackend(sender, args); //todo: remove this
-            }
+            //todo: remove some time
+//            else if (args[0].equalsIgnoreCase("backend"))
+//            {
+//                return handleBackend(sender, args);
+//            }
             else if (args[0].equalsIgnoreCase("migrate"))
             {
                 return handleMigrate(sender, args);
@@ -1795,17 +1796,17 @@ public class BungeePerms extends Plugin implements Listener
         }
         pm.addUserGroup(user, nextgroup);
         sender.sendMessage(Color.User + user.getName() + Color.Text + " is now " + Color.Value + nextgroup.getName() + Color.Text + "!");
-        
+
         //promote msg to user
-        if(notifypromote)
+        if (notifypromote)
         {
             ProxiedPlayer pp = bc.getPlayer(user.getName());
-            if(pp != null)
+            if (pp != null)
             {
                 pp.sendMessage(Color.Text + "You were promoted to " + Color.Value + nextgroup.getName() + Color.Text + "!");
             }
         }
-        
+
         return true;
     }
 
@@ -1900,12 +1901,12 @@ public class BungeePerms extends Plugin implements Listener
         }
         pm.addUserGroup(user, previousgroup);
         sender.sendMessage(Color.User + user.getName() + Color.Text + " is now " + Color.Value + previousgroup.getName() + Color.Text + "!");
-        
+
         //demote msg to user
-        if(notifydemote)
+        if (notifydemote)
         {
             ProxiedPlayer pp = bc.getPlayer(user.getName());
-            if(pp != null)
+            if (pp != null)
             {
                 pp.sendMessage(Color.Text + "You were demoted to " + Color.Value + previousgroup.getName() + Color.Text + "!");
             }
@@ -1939,6 +1940,7 @@ public class BungeePerms extends Plugin implements Listener
         return true;
     }
 
+    //todo: remove some time
     private boolean handleBackend(CommandSender sender, String args[])
     {
         if (!pm.hasOrConsole(sender, "bungeeperms.backend", true))
@@ -2199,7 +2201,7 @@ public class BungeePerms extends Plugin implements Listener
                 mojang = params.contains("m");
             }
         }
-        
+
         if (reverse)
         {
             if (uuidwhat == null)
@@ -2405,10 +2407,11 @@ public class BungeePerms extends Plugin implements Listener
         {
             sender.sendMessage(ChatColor.GOLD + "/bungeeperms cleanup" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Cleans up the permission.yml or mysql table - " + ChatColor.RED + " !BE VERY CAREFUL! - removes a lot of players from the permissions.yml if configured");
         }
-        if (pm.hasPermOrConsole(sender, "bungeeperms.backend"))
-        {
-            sender.sendMessage(ChatColor.GOLD + "/bungeeperms backend [yaml|mysql|mysql2]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Shows the used permissions database (file or mysql table) [or migrates to the given database] - " + ChatColor.RED + " !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");
-        }
+        //todo: remove some time
+//        if (pm.hasPermOrConsole(sender, "bungeeperms.backend"))
+//        {
+//            sender.sendMessage(ChatColor.GOLD + "/bungeeperms backend [yaml|mysql|mysql2]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Shows the used permissions database (file or mysql table) [or migrates to the given database] - " + ChatColor.RED + " !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");
+//        }
         if (pm.hasPermOrConsole(sender, "bungeeperms.migrate"))
         {
             sender.sendMessage(ChatColor.GOLD + "/bungeeperms migrate <backend [yaml|mysql|mysql2]|useuuid [true|false]|uuidplayerdb [None,YAML|MySQL]>" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Does migrations of different data (permissions, uuid) or shows status - " + ChatColor.RED + " !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");
