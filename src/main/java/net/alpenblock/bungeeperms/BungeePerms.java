@@ -1093,25 +1093,25 @@ public class BungeePerms extends Plugin implements Listener
 									{
                                         if(world==null)
                                         {
-                                            ServerInfo si=bc.config.getServers().get(server);
-                                            if(si==null)
-                                            {
-                                                sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
-                                                return true;
-                                            }
-                                            boolean has=group.hasOnServer(perm.toLowerCase(),si);
+//                                            ServerInfo si=bc.config.getServers().get(server);
+//                                            if(si==null)
+//                                            {
+//                                                sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
+//                                                return true;
+//                                            }
+                                            boolean has=group.hasOnServer(perm.toLowerCase(),server);
                                             sender.sendMessage(Color.Text+"Group "+Color.Value+group.getName()+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
                                         }
                                         else
                                         {
-                                            ServerInfo si=bc.config.getServers().get(server);
-                                            if(si==null)
-                                            {
-                                                sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
-                                                return true;
-                                            }
+//                                            ServerInfo si=bc.config.getServers().get(server);
+//                                            if(si==null)
+//                                            {
+//                                                sender.sendMessage(Color.Error+"The server "+Color.Value+server+Color.Error+" does not exist!");
+//                                                return true;
+//                                            }
                                             
-                                            boolean has=group.hasOnServerInWorld(perm.toLowerCase(),si,world);
+                                            boolean has=group.hasOnServerInWorld(perm.toLowerCase(),server,world);
                                             sender.sendMessage(Color.Text+"Group "+Color.Value+group.getName()+Color.Text+" has the permission "+Color.Value+args[3]+Color.Text+" on server "+Color.Value+server+Color.Text+" in world "+Color.Value+world+Color.Text+": "+(has?ChatColor.GREEN:ChatColor.RED)+String.valueOf(has).toUpperCase());
                                         }
 									}
