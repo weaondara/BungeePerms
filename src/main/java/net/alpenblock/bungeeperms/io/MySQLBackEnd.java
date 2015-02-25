@@ -17,6 +17,7 @@ import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class MySQLBackEnd implements BackEnd
@@ -61,6 +62,8 @@ public class MySQLBackEnd implements BackEnd
     @Override
     public void load()
     {
+        BungeeCord.getInstance().getConsole().sendMessage(ChatColor.RED + "The MySQL backend is deprecated! Please consider to use MySQL2.");
+        
 		//load from table
 		permsconf.load();
     }

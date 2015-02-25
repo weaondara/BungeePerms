@@ -2020,6 +2020,10 @@ public class BungeePerms extends Plugin implements Listener
         if (args.length == 2)
         {
             sender.sendMessage(Color.Text + "Currently using " + Color.Value + pm.getBackEnd().getType().name() + Color.Text + " as backend");
+            if(pm.getBackEnd().getType() == BackEndType.MySQL)
+            {
+                sender.sendMessage(ChatColor.RED + "The MySQL backend is deprecated! Please consider to use MySQL2.");
+            }
         }
         else if (args.length == 3)
         {
@@ -2028,9 +2032,16 @@ public class BungeePerms extends Plugin implements Listener
             if (type == null)
             {
                 sender.sendMessage(Color.Error + "Invalid backend type! "
-                        + Color.Value + BackEndType.YAML.name() + Color.Error + ", "
-                        + Color.Value + BackEndType.MySQL.name() + Color.Error + " or "
+                        + Color.Value + BackEndType.YAML.name() + Color.Error + " or "//, "
+//                        + Color.Value + BackEndType.MySQL.name() + Color.Error + " or "
                         + Color.Value + BackEndType.MySQL2.name() + Color.Error + " is required!");
+                return true;
+            }
+            
+            //disallow mysql backend
+            if(pm.getBackEnd().getType() == BackEndType.MySQL)
+            {
+                sender.sendMessage(ChatColor.RED + "The MySQL backend is deprecated! Please use MySQL2.");
                 return true;
             }
 
