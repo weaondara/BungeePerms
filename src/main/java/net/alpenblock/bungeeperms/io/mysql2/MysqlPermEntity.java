@@ -7,74 +7,77 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MysqlPermEntity 
+public class MysqlPermEntity
 {
+
     private String name;
     private EntityType type;
-    private Map<String,List<ValueEntry>> data;
-    
-    
+    private Map<String, List<ValueEntry>> data;
+
     public MysqlPermEntity(ResultSet res) throws SQLException
     {
-        data=new HashMap<>();
+        data = new HashMap<>();
         load(res);
     }
-    
+
     private void load(ResultSet res) throws SQLException
     {
-        if(res.first())
+        if (res.first())
         {
-            name=res.getString("name");
-            type=EntityType.getByCode(res.getInt("type"));
+            name = res.getString("name");
+            type = EntityType.getByCode(res.getInt("type"));
         }
-        
+
         res.beforeFirst();
-        
-        while(res.next())
+
+        while (res.next())
         {
-            String key=res.getString("key");
-            String value=res.getString("value");
-            String server=res.getString("server");
-            String world=null;
-            if(res.wasNull())
+            String key = res.getString("key");
+            String value = res.getString("value");
+            String server = res.getString("server");
+            String world = null;
+            if (res.wasNull())
             {
-                server=null;
+                server = null;
             }
             else
             {
-                world=res.getString("world");
-                if(res.wasNull())
+                world = res.getString("world");
+                if (res.wasNull())
                 {
-                    world=null;
+                    world = null;
                 }
             }
-            
+
             //add entry
-            ValueEntry ve=new ValueEntry(value,server,world);
-            
+            ValueEntry ve = new ValueEntry(value, server, world);
+
             List<ValueEntry> e = data.get(key);
-            if(e==null)
+            if (e == null)
             {
-                e=new ArrayList<>();
+                e = new ArrayList<>();
                 data.put(key, e);
             }
-            
+
             e.add(ve);
         }
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public EntityType getType() {
+    public EntityType getType()
+    {
         return type;
     }
 
-    public Map<String,List<ValueEntry>> getAllData() {
+    public Map<String, List<ValueEntry>> getAllData()
+    {
         return data;
     }
-    
+
     public List<ValueEntry> getData(String type)
     {
         return data.get(type);
