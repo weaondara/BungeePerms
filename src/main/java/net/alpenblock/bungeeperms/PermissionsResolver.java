@@ -109,82 +109,84 @@ public class PermissionsResolver
     }
     public static List<String> simplifyNormal(List<String> perms)
     {
-        List<String> ret=new ArrayList<>();
-        
-        for(String perm:perms)
-        {
-            boolean added=false;
-            for(int i=0;i<ret.size();i++)
-            {
-                if(ret.get(i).equalsIgnoreCase(perm))
-                {
-                    added=true;
-                    break;
-                }
-                else if(ret.get(i).equalsIgnoreCase("-"+perm))
-                {
-                    ret.set(i,perm);
-                    added=true;
-                    break;
-                }
-                else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-                {
-                    ret.remove(i);
-                    added=true;
-                    break;
-                }
-            }
-            if(!added)
-            {
-                ret.add(perm);
-            }
-        }
-        
-        return ret;
+//        List<String> ret=new ArrayList<>();
+//        
+//        for(String perm:perms)
+//        {
+//            boolean added=false;
+//            for(int i=0;i<ret.size();i++)
+//            {
+//                if(ret.get(i).equalsIgnoreCase(perm))
+//                {
+//                    added=true;
+//                    break;
+//                }
+//                else if(ret.get(i).equalsIgnoreCase("-"+perm))
+//                {
+//                    ret.set(i,perm);
+//                    added=true;
+//                    break;
+//                }
+//                else if(perm.equalsIgnoreCase("-"+ret.get(i)))
+//                {
+//                    ret.remove(i);
+//                    added=true;
+//                    break;
+//                }
+//            }
+//            if(!added)
+//            {
+//                ret.add(perm);
+//            }
+//        }
+//        
+//        return ret;
+        return perms;
     }
     public static List<String> simplifyRegex(List<String> perms)
     {
-        List<String> ret=new ArrayList<>();
-        
-        for(String perm:perms)
-        {
-            boolean added=false;
-            for(int i=0;i<ret.size();i++)
-            {
-                String tocheck=perm;
-                boolean negate=false;
-                if(tocheck.startsWith("-"))
-                {
-                    negate=true;
-                    tocheck=tocheck.substring(1);
-                }
-
-                tocheck=tocheck
-                    .replaceAll("\\.", "\\\\.")
-                    .replaceAll("\\*", "\\.\\*")
-                    .replaceAll("#", "\\.");
-
-                boolean matches=ret.get(i).matches(tocheck);
-
-                if(matches)
-                {
-                    if(negate)
-                    {
-                        ret.remove(i--);
-                    }
-                    else
-                    {
-                        ret.set(i, perm);
-                    }
-                    added=true;
-                }
-            }
-            if(!added)
-            {
-                ret.add(perm);
-            }
-        }
-        
-        return ret;
+//        List<String> ret=new ArrayList<>();
+//        
+//        for(String perm:perms)
+//        {
+//            boolean added=false;
+//            for(int i=0;i<ret.size();i++)
+//            {
+//                String tocheck=perm;
+//                boolean negate=false;
+//                if(tocheck.startsWith("-"))
+//                {
+//                    negate=true;
+//                    tocheck=tocheck.substring(1);
+//                }
+//
+//                tocheck=tocheck
+//                    .replaceAll("\\.", "\\\\.")
+//                    .replaceAll("\\*", "\\.\\*")
+//                    .replaceAll("#", "\\.");
+//
+//                boolean matches=ret.get(i).matches(tocheck);
+//
+//                if(matches)
+//                {
+//                    if(negate)
+//                    {
+//                        ret.remove(i--);
+//                    }
+//                    else
+//                    {
+//                        ret.set(i, perm);
+//                    }
+//                    added=true;
+//                }
+//            }
+//            if(!added)
+//            {
+//                ret.add(perm);
+//            }
+//        }
+//        
+//        return ret;
+        return perms;
     }
 }
