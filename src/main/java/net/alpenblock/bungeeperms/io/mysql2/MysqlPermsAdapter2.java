@@ -44,7 +44,7 @@ public class MysqlPermsAdapter2
             res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.Group.getCode() + " ORDER BY id ASC");
             while (res.next())
             {
-                String name = res.getString("name");
+                String name = Mysql.unescape(res.getString("name"));
                 groups.add(name);
             }
         }
@@ -76,7 +76,7 @@ public class MysqlPermsAdapter2
             res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " ORDER BY id ASC");
             while (res.next())
             {
-                String name = res.getString("name");
+                String name = Mysql.unescape(res.getString("name"));
                 groups.add(name);
             }
         }
@@ -106,7 +106,7 @@ public class MysqlPermsAdapter2
         try
         {
             res = mysql.returnQuery("SELECT `name`,`type`,`key`,`value`,`server`,`world` FROM `" + table + "` "
-                    + "WHERE `type`=" + type.getCode() + " AND `name`='" + name + "' ORDER BY id ASC");
+                    + "WHERE `type`=" + type.getCode() + " AND `name`='" + Mysql.escape(name) + "' ORDER BY id ASC");
 
             mpe = new MysqlPermEntity(res);
         }
@@ -150,7 +150,7 @@ public class MysqlPermsAdapter2
         ResultSet res = null;
         try
         {
-            res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `name`='" + name + "' AND `type`=" + type.getCode() + " ORDER BY id ASC");
+            res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `name`='" + Mysql.escape(name) + "' AND `type`=" + type.getCode() + " ORDER BY id ASC");
             if (res.next())
             {
                 found = true;
@@ -177,41 +177,30 @@ public class MysqlPermsAdapter2
 
     public void deleteEntity(String name, EntityType type)
     {
-        mysql.runQuery("DELETE FROM `" + table + "` WHERE `name`='" + name + "' AND `type`=" + type.getCode());
+        mysql.runQuery("DELETE FROM `" + table + "` WHERE `name`='" + Mysql.escape(name) + "' AND `type`=" + type.getCode());
     }
 
     public void saveData(String name, EntityType type, String key, List<ValueEntry> values)
     {
         //delete entries
-        String delq = "DELETE FROM `" + table + "` WHERE `name`='" + name + "' AND `type`=" + type.getCode() + " AND `key`='" + key + "'";
+        String delq = "DELETE FROM `" + table + "` WHERE `name`='" + Mysql.escape(name) + "' AND `type`=" + type.getCode() + " AND `key`='" + Mysql.escape(key) + "'";
         mysql.runQuery(delq);
 
         //add values
         doSaveData(name, type, key, values);
     }
 
-//    public void saveData(String name, EntityType type, String key, List<ValueEntry> values, boolean whereserverisnull, boolean whereworldisnull)
-//    {
-//        //delete entries
-//        String delq="DELETE FROM `"+table+"` WHERE `name`='"+name+"' AND `type`="+type.getCode()+" AND `key`='"+key+"' AND "
-//                + "`server` IS "+(!whereserverisnull?"NOT ":"")+"NULL AND "
-//                + "`world` IS "+(!whereworldisnull?"NOT ":"")+"NULL";
-//        mysql.runQuery(delq);
-//        
-//        //add values
-//        doSaveData(name, type, key, values);
-//    }
     public void saveData(String name, EntityType type, String key, List<ValueEntry> values, String server, String world)
     {
         //delete entries
-        String delq = "DELETE FROM `" + table + "` WHERE `name`='" + name + "' AND `type`=" + type.getCode() + " AND `key`='" + key + "' AND ";
+        String delq = "DELETE FROM `" + table + "` WHERE `name`='" + Mysql.escape(name) + "' AND `type`=" + type.getCode() + " AND `key`='" + Mysql.escape(key) + "' AND ";
         if (server == null)
         {
             delq += "`server` IS NULL";
         }
         else
         {
-            delq += "`server`='" + server + "'";
+            delq += "`server`='" + Mysql.escape(server) + "'";
         }
         delq += " AND ";
         if (world == null)
@@ -220,7 +209,7 @@ public class MysqlPermsAdapter2
         }
         else
         {
-            delq += "`world`='" + world + "'";
+            delq += "`world`='" + Mysql.escape(world) + "'";
         }
         mysql.runQuery(delq);
 
@@ -233,21 +222,21 @@ public class MysqlPermsAdapter2
         for (ValueEntry val : values)
         {
             String insq = "INSERT INTO `" + table + "` (`name`,`type`,`key`,`value`,`server`,`world`) VALUES"
-                    + "('" + name + "'," + type.getCode() + ",'" + key + "','" + val.getValue() + "',";
+                    + "('" + Mysql.escape(name) + "'," + type.getCode() + ",'" + Mysql.escape(key) + "','" + Mysql.escape(val.getValue()) + "',";
             if (val.getServer() == null)
             {
                 insq += "null,null";
             }
             else
             {
-                insq += "'" + val.getServer() + "',";
+                insq += "'" + Mysql.escape(val.getServer()) + "',";
                 if (val.getWorld() == null)
                 {
                     insq += "null";
                 }
                 else
                 {
-                    insq += "'" + val.getWorld() + "'";
+                    insq += "'" + Mysql.escape(val.getWorld()) + "'";
                 }
             }
 
@@ -263,10 +252,10 @@ public class MysqlPermsAdapter2
         ResultSet res = null;
         try
         {
-            res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " AND `key`='groups' AND `value`='" + group + "' ORDER BY id ASC");
+            res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " AND `key`='groups' AND `value`='" + Mysql.escape(group) + "' ORDER BY id ASC");
             while (res.next())
             {
-                String name = res.getString("name");
+                String name = Mysql.unescape(res.getString("name"));
                 groups.add(name);
             }
         }

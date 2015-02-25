@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
+import net.alpenblock.bungeeperms.Mysql;
 
+@Getter
 public class MysqlPermEntity
 {
 
@@ -24,7 +27,7 @@ public class MysqlPermEntity
     {
         if (res.first())
         {
-            name = res.getString("name");
+            name = Mysql.unescape(res.getString("name"));
             type = EntityType.getByCode(res.getInt("type"));
         }
 
@@ -32,21 +35,13 @@ public class MysqlPermEntity
 
         while (res.next())
         {
-            String key = res.getString("key");
-            String value = res.getString("value");
-            String server = res.getString("server");
+            String key = Mysql.unescape(res.getString("key"));
+            String value = Mysql.unescape(res.getString("value"));
+            String server = Mysql.unescape(res.getString("server"));
             String world = null;
-            if (res.wasNull())
+            if (server != null)
             {
-                server = null;
-            }
-            else
-            {
-                world = res.getString("world");
-                if (res.wasNull())
-                {
-                    world = null;
-                }
+                world = Mysql.unescape(res.getString("world"));
             }
 
             //add entry
@@ -61,21 +56,8 @@ public class MysqlPermEntity
 
             e.add(ve);
         }
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public EntityType getType()
-    {
-        return type;
-    }
-
-    public Map<String, List<ValueEntry>> getAllData()
-    {
-        return data;
+        
+        //todo: close res?
     }
 
     public List<ValueEntry> getData(String type)
