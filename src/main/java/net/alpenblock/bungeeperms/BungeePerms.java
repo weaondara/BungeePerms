@@ -2425,7 +2425,7 @@ public class BungeePerms extends Plugin implements Listener
 //        }
         if (pm.hasPermOrConsole(sender, "bungeeperms.migrate"))
         {
-            sender.sendMessage(ChatColor.GOLD + "/bungeeperms migrate <backend [yaml|mysql|mysql2]|useuuid [true|false]|uuidplayerdb [None,YAML|MySQL]>" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Does migrations of different data (permissions, uuid) or shows status - " + ChatColor.RED + " !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms migrate <backend [yaml|mysql|mysql2]|useuuid [true|false]|uuidplayerdb [None|YAML|MySQL]>" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Does migrations of different data (permissions, uuid) or shows status - " + ChatColor.RED + " !BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)");
         }
         if (pm.hasPermOrConsole(sender, "bungeeperms.uuid"))
         {
