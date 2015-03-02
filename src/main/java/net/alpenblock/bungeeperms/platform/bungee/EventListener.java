@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms.platform.bungee;
 
+import net.alpenblock.bungeeperms.BungeePerms;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
