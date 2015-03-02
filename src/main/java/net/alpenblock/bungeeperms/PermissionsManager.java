@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import net.alpenblock.bungeeperms.platform.bungee.BungeePerms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ public class PermissionsManager implements Listener
 
     @Getter
     private PermissionsResolver resolver;
-
+    
     public PermissionsManager(Plugin p, Config conf, Debug d)
     {
         bc = BungeeCord.getInstance();
@@ -644,77 +645,6 @@ public class PermissionsManager implements Listener
 
         //send bukkit update info
         sendPM(group.getName(), "reloadGroup;" + group.getName());
-    }
-
-    /**
-     * Do NOT call this function.
-     *
-     * @param e
-     */
-    @EventHandler(priority = Byte.MIN_VALUE)
-    public void onLogin(LoginEvent e)
-    {
-        String playername = e.getConnection().getName();
-        UUID uuid = null;
-        if (useUUIDs)
-        {
-            uuid = e.getConnection().getUniqueId();
-            bc.getLogger().log(Level.INFO, "[BungeePerms] Login by {0} ({1})", new Object[]
-                       {
-                           playername, uuid
-            });
-
-            //update uuid player db
-            UUIDPlayerDB.update(uuid, playername);
-        }
-        else
-        {
-            bc.getLogger().log(Level.INFO, "[BungeePerms] Login by {0}", new Object[]
-                       {
-                           playername
-            });
-        }
-
-        User u = useUUIDs ? getUser(uuid) : getUser(playername);
-        if (u == null)
-        {
-            bc.getLogger().log(Level.INFO, "[BungeePerms] Adding default groups to {0} ({1})", new Object[]
-                       {
-                           playername, uuid
-            });
-
-            List<Group> groups = getDefaultGroups();
-            u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, List<String>>(), new HashMap<String, Map<String, List<String>>>());
-            users.add(u);
-
-            backEnd.saveUser(u, true);
-        }
-    }
-
-    /**
-     * Do NOT call this function.
-     *
-     * @param e
-     */
-    @EventHandler(priority = Byte.MAX_VALUE)
-    public void onDisconnect(PlayerDisconnectEvent e)
-    {
-        String playername = e.getPlayer().getName();
-        UUID uuid = e.getPlayer().getUniqueId();
-
-        User u = useUUIDs ? getUser(uuid) : getUser(playername);
-        users.remove(u);
-    }
-
-    /**
-     * Do NOT call this function.
-     *
-     * @param e
-     */
-    @EventHandler
-    public void onPermissionCheck(PermissionCheckEvent e)
-    {
-        e.setHasPermission(hasPermOrConsoleOnServerInWorld(e.getSender(), e.getPermission()));
     }
 
     //possible permission checks
@@ -1990,5 +1920,14 @@ public class PermissionsManager implements Listener
             si.sendData(channel, msg.getBytes());
         }
     }
-
+    
+//internal functions
+    public void addUserToCache(User u)
+    {
+        users.add(u);
+    }
+    public void removeUserFromCache(User u)
+    {
+        users.remove(u);
+    }
 }
