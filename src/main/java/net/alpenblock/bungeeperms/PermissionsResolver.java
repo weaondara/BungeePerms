@@ -1,18 +1,19 @@
 package net.alpenblock.bungeeperms;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-public class PermissionsResolver 
+public class PermissionsResolver
 {
-    @Getter @Setter
-    private boolean useRegex=false;
-    
+
+    @Getter
+    @Setter
+    private boolean useRegex = false;
+
     public Boolean has(List<String> perms, String perm)
     {
-        if(useRegex)
+        if (useRegex)
         {
             return hasRegex(perms, perm);
         }
@@ -21,32 +22,33 @@ public class PermissionsResolver
             return hasNormal(perms, perm);
         }
     }
+
     public static Boolean hasNormal(List<String> perms, String perm)
     {
-        Boolean has=null;
-        
-        List<String> lperm=Statics.toList(perm, ".");
-        
-        for(String p:perms)
+        Boolean has = null;
+
+        List<String> lperm = Statics.toList(perm, ".");
+
+        for (String p : perms)
         {
-            if(p.equalsIgnoreCase(perm))
+            if (p.equalsIgnoreCase(perm))
             {
-                has=true;
+                has = true;
             }
-            else if(p.equalsIgnoreCase("-"+perm))
+            else if (p.equalsIgnoreCase("-" + perm))
             {
-                has=false;
+                has = false;
             }
-            else if(p.endsWith("*"))
+            else if (p.endsWith("*"))
             {
-                List<String> lp=Statics.toList(p, ".");
-                int index=0;
+                List<String> lp = Statics.toList(p, ".");
+                int index = 0;
                 try
                 {
-                    while(index<lp.size() && index<lperm.size())
+                    while (index < lp.size() && index < lperm.size())
                     {
-                        if( lp.get(index).equalsIgnoreCase(lperm.get(index)) ||
-                            (index==0 && lp.get(index).equalsIgnoreCase("-"+lperm.get(index))))
+                        if (lp.get(index).equalsIgnoreCase(lperm.get(index))
+                                || (index == 0 && lp.get(index).equalsIgnoreCase("-" + lperm.get(index))))
                         {
                             index++;
                         }
@@ -55,50 +57,54 @@ public class PermissionsResolver
                             break;
                         }
                     }
-                    if(lp.get(index).equalsIgnoreCase("*") || (index==0 && lp.get(0).equalsIgnoreCase("-*")))
+                    if (lp.get(index).equalsIgnoreCase("*") || (index == 0 && lp.get(0).equalsIgnoreCase("-*")))
                     {
-                        has=!lp.get(0).startsWith("-");
+                        has = !lp.get(0).startsWith("-");
                     }
                 }
-                catch(Exception e){e.printStackTrace();}
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
-        
+
         return has;
     }
+
     public static Boolean hasRegex(List<String> perms, String perm)
     {
-        Boolean has=null;
-        
-        for(String p:perms)
+        Boolean has = null;
+
+        for (String p : perms)
         {
-            String tocheck=p;
-            boolean negate=false;
-            if(p.startsWith("-"))
+            String tocheck = p;
+            boolean negate = false;
+            if (p.startsWith("-"))
             {
-                negate=true;
-                tocheck=p.substring(1);
+                negate = true;
+                tocheck = p.substring(1);
             }
-            
-            tocheck=tocheck
-                .replaceAll("\\.", "\\\\.")
-                .replaceAll("\\*", "\\.\\*")
-                .replaceAll("#", "\\.");
-            
-            boolean matches=perm.matches(tocheck);
-            
-            if(matches)
+
+            tocheck = tocheck
+                    .replaceAll("\\.", "\\\\.")
+                    .replaceAll("\\*", "\\.\\*")
+                    .replaceAll("#", "\\.");
+
+            boolean matches = perm.matches(tocheck);
+
+            if (matches)
             {
-                has=!negate;
+                has = !negate;
             }
         }
-        
+
         return has;
     }
 
     public List<String> simplify(List<String> perms)
     {
-        if(useRegex)
+        if (useRegex)
         {
             return simplifyRegex(perms);
         }
@@ -107,6 +113,7 @@ public class PermissionsResolver
             return simplifyNormal(perms);
         }
     }
+
     public static List<String> simplifyNormal(List<String> perms)
     {
 //        List<String> ret=new ArrayList<>();
@@ -143,6 +150,7 @@ public class PermissionsResolver
 //        return ret;
         return perms;
     }
+
     public static List<String> simplifyRegex(List<String> perms)
     {
 //        List<String> ret=new ArrayList<>();

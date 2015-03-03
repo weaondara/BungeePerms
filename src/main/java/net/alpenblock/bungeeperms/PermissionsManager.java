@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import net.alpenblock.bungeeperms.platform.Sender;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,37 +24,17 @@ import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
 import net.alpenblock.bungeeperms.util.ConcurrentList;
-import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PluginMessageEvent;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.command.ConsoleCommandSender;
-import net.md_5.bungee.event.EventHandler;
 
-public class PermissionsManager implements Listener
+public class PermissionsManager
 {
 
-    private BungeeCord bc;
-    private Plugin plugin;
-    private Config config;
+    private BPConfig config;
     private Debug debug;
-    private boolean enabled;
-
-    private String channel;
-    private Map<String, String> playerWorlds;
+    private boolean enabled = false;
 
     private List<Group> groups;
     private List<User> users;
     private int permsversion;
-
-    @Getter
-    private boolean saveAllUsers;
-    @Getter
-    private boolean deleteUsersOnCleanup;
 
     @Getter
     @Setter
@@ -62,23 +43,12 @@ public class PermissionsManager implements Listener
     private UUIDPlayerDB UUIDPlayerDB;
 
     @Getter
-    private boolean useUUIDs;
-
-    @Getter
-    private boolean useregexperms;
-
-    @Getter
     private PermissionsResolver resolver;
-    
-    public PermissionsManager(Plugin p, Config conf, Debug d)
+
+    public PermissionsManager(BPConfig conf, Debug d)
     {
-        bc = BungeeCord.getInstance();
-        plugin = p;
         config = conf;
         debug = d;
-
-        channel = "bungeeperms";
-        playerWorlds = new HashMap<>();
 
         resolver = new PermissionsResolver();
 
@@ -87,8 +57,6 @@ public class PermissionsManager implements Listener
 
         //perms
         loadPerms();
-
-        enabled = false;
     }
 
     /**
@@ -96,31 +64,23 @@ public class PermissionsManager implements Listener
      */
     public final void loadConfig()
     {
-        config.load();
+        resolver.setUseRegex(config.isUseRegexPerms());
 
-        saveAllUsers = config.getBoolean("saveAllUsers", true);
-        deleteUsersOnCleanup = config.getBoolean("deleteUsersOnCleanup", false);
-
-        useUUIDs = config.getBoolean("useUUIDs", false);
-
-        useregexperms = config.getBoolean("useregexperms", false);
-        resolver.setUseRegex(useregexperms);
-
-        BackEndType bet = config.getEnumValue("backendtype", BackEndType.YAML);
+        BackEndType bet = config.getBackEndType();
         if (bet == BackEndType.YAML)
         {
             backEnd = new YAMLBackEnd();
         }
         else if (bet == BackEndType.MySQL)
         {
-            backEnd = new MySQLBackEnd(config, debug);
+            backEnd = new MySQLBackEnd();
         }
         else if (bet == BackEndType.MySQL2)
         {
-            backEnd = new MySQL2BackEnd(config, debug);
+            backEnd = new MySQL2BackEnd();
         }
 
-        UUIDPlayerDBType updbt = config.getEnumValue("uuidplayerdb", UUIDPlayerDBType.None);
+        UUIDPlayerDBType updbt = config.getUUIDPlayerDBType();
         if (updbt == UUIDPlayerDBType.None)
         {
             UUIDPlayerDB = new NoneUUIDPlayerDB();
@@ -131,7 +91,7 @@ public class PermissionsManager implements Listener
         }
         else if (updbt == UUIDPlayerDBType.MySQL)
         {
-            UUIDPlayerDB = new MySQLUUIDPlayerDB(config, debug);
+            UUIDPlayerDB = new MySQLUUIDPlayerDB();
         }
     }
 
@@ -140,7 +100,7 @@ public class PermissionsManager implements Listener
      */
     public final void loadPerms()
     {
-        bc.getLogger().info("[BungeePerms] loading permissions ...");
+        BungeePerms.getLogger().info("loading permissions ...");
 
         //load database
         backEnd.load();
@@ -153,7 +113,7 @@ public class PermissionsManager implements Listener
         //load permsversion
         permsversion = backEnd.loadVersion();
 
-        bc.getLogger().info("[BungeePerms] permissions loaded");
+        BungeePerms.getLogger().info("permissions loaded");
     }
 
     /**
@@ -161,25 +121,25 @@ public class PermissionsManager implements Listener
      */
     public void enable()
     {
-        if (!enabled)
+        if (enabled)
         {
-            //load online players; allows reload
-            for (ProxiedPlayer pp : BungeeCord.getInstance().getPlayers())
-            {
-                if (useUUIDs)
-                {
-                    getUser(pp.getUniqueId());
-                }
-                else
-                {
-                    getUser(pp.getName());
-                }
-            }
-
-            bc.getPluginManager().registerListener(plugin, this);
-            bc.registerChannel(channel);
-            enabled = true;
+            return;
         }
+
+        //load online players; allows reload
+        for (Sender s : BungeePerms.getInstance().getPlugin().getPlayers())
+        {
+            if (config.isUseUUIDs())
+            {
+                getUser(s.getUUID());
+            }
+            else
+            {
+                getUser(s.getName());
+            }
+        }
+
+        enabled = true;
     }
 
     /**
@@ -187,12 +147,11 @@ public class PermissionsManager implements Listener
      */
     public void disable()
     {
-        if (enabled)
+        if (!enabled)
         {
-            bc.getPluginManager().unregisterListener(this);
-            bc.unregisterChannel(channel);
-            enabled = false;
+            return;
         }
+        enabled = false;
     }
 
     /**
@@ -221,7 +180,7 @@ public class PermissionsManager implements Listener
             g.recalcPerms();
 
             //send bukkit update info
-            sendPM(g.getName(), "reloadGroup;" + g.getName());
+            BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g);
         }
 
         //user check
@@ -245,14 +204,7 @@ public class PermissionsManager implements Listener
             u.recalcPerms();
 
             //send bukkit update info
-            if (useUUIDs)
-            {
-                sendPM(u.getUUID(), "reloadUser;" + u.getUUID());
-            }
-            else
-            {
-                sendPM(u.getName(), "reloadUser;" + u.getName());
-            }
+            BungeePerms.getInstance().getNetworkNotifier().reloadUser(u);
         }
 
         //user groups check - backEnd
@@ -444,20 +396,12 @@ public class PermissionsManager implements Listener
     public synchronized User getUser(String usernameoruuid)
     {
         UUID uuid = Statics.parseUUID(usernameoruuid);
-        if (useUUIDs)
+        if (config.isUseUUIDs())
         {
             if (uuid != null)
             {
                 return getUser(uuid);
             }
-//            else
-//            {
-//                uuid=UUIDPlayerDB.getUUID(usernameoruuid);
-//                if(uuid!=null)
-//                {
-//                    return getUser(uuid);
-//                }
-//            }
         }
 
         for (User u : users)
@@ -470,7 +414,7 @@ public class PermissionsManager implements Listener
 
         //load user from database
         User u = null;
-        if (useUUIDs)
+        if (config.isUseUUIDs())
         {
             if (uuid == null)
             {
@@ -570,14 +514,7 @@ public class PermissionsManager implements Listener
         backEnd.deleteUser(user);
 
         //send bukkit update infoif(useUUIDs)
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "deleteUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "deleteUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().deleteUser(user);
     }
 
     /**
@@ -594,10 +531,10 @@ public class PermissionsManager implements Listener
         backEnd.deleteGroup(group);
 
         //group validation
-        BungeePerms.getInstance().getPermissionsManager().validateUsersGroups();
+        validateUsersGroups();
 
         //send bukkit update info
-        sendPM(group.getName(), "deleteGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().deleteGroup(group);
     }
 
     /**
@@ -614,14 +551,7 @@ public class PermissionsManager implements Listener
         backEnd.saveUser(user, true);
 
         //send bukkit update info
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "reloadUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "reloadUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
     }
 
     /**
@@ -639,464 +569,7 @@ public class PermissionsManager implements Listener
         backEnd.saveGroup(group, true);
 
         //send bukkit update info
-        sendPM(group.getName(), "reloadGroup;" + group.getName());
-    }
-
-    //possible permission checks
-    /**
-     * Checks if a user (no console) has a specific permission (globally).
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @return the result of the permission check
-     */
-    public boolean hasPerm(CommandSender sender, String permission)
-    {
-        if (sender instanceof ProxiedPlayer)
-        {
-            return (useUUIDs ? getUser(((ProxiedPlayer) sender).getUniqueId()) : getUser(sender.getName())).hasPerm(permission);
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission (globally). If sender is console this function return true.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @return the result of the permission check
-     */
-    public boolean hasPermOrConsole(CommandSender sender, String permission)
-    {
-        if (sender instanceof ProxiedPlayer)
-        {
-            return (useUUIDs ? getUser(((ProxiedPlayer) sender).getUniqueId()) : getUser(sender.getName())).hasPerm(permission);
-        }
-        else if (sender instanceof ConsoleCommandSender)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a user (no console) has a specific permission (globally).
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @return the result of the permission check
-     */
-    public boolean hasPerm(String sender, String permission)
-    {
-        if (!sender.equalsIgnoreCase("CONSOLE"))
-        {
-            User u = getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-            return u.hasPerm(permission);
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission (globally). If sender is console this function return true.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @return the result of the permission check
-     */
-    public boolean hasPermOrConsole(String sender, String permission)
-    {
-        if (sender.equalsIgnoreCase("CONSOLE"))
-        {
-            return true;
-        }
-        else
-        {
-            User u = getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-            return u.hasPerm(permission);
-        }
-    }
-
-    /**
-     * Checks if a user (no console) has a specific permission (globally).
-     *
-     * @param sender the command sender to check a permission for
-     * @param perm the permission to check
-     * @param msg if a no-permission message is send to the sender
-     * @return the result of the permission check
-     */
-    public boolean has(CommandSender sender, String perm, boolean msg)
-    {
-        if (sender instanceof ProxiedPlayer)
-        {
-            boolean isperm = (hasPerm(sender, perm));
-            if (!isperm & msg)
-            {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
-            }
-            return isperm;
-        }
-        else
-        {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
-            return false;
-        }
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission (globally).
-     *
-     * @param sender the command sender to check a permission for
-     * @param perm the permission to check
-     * @param msg if a no-permission message is send to the sender
-     * @return the result of the permission check
-     */
-    public boolean hasOrConsole(CommandSender sender, String perm, boolean msg)
-    {
-        boolean isperm = (hasPerm(sender, perm) | (sender instanceof ConsoleCommandSender));
-        if (!isperm & msg)
-        {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
-        }
-        return isperm;
-    }
-
-    /**
-     * Checks if a user (no console) has a specific permission on the current server.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @return the result of the permission check
-     */
-    public boolean hasPermOnServer(CommandSender sender, String permission)
-    {
-        if (sender instanceof ProxiedPlayer)
-        {
-            User user = useUUIDs ? getUser(((ProxiedPlayer) sender).getUniqueId()) : getUser(sender.getName());
-            if (((ProxiedPlayer) sender).getServer() == null)
-            {
-                return user.hasPerm(permission);
-            }
-            return user.hasPermOnServer(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName());
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission on the current server.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @return the result of the permission check
-     */
-    public boolean hasPermOrConsoleOnServer(CommandSender sender, String permission)
-    {
-        if (sender instanceof ProxiedPlayer)
-        {
-            User user = useUUIDs ? getUser(((ProxiedPlayer) sender).getUniqueId()) : getUser(sender.getName());
-            if (((ProxiedPlayer) sender).getServer() == null)
-            {
-                return user.hasPerm(permission);
-            }
-            return user.hasPermOnServer(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName());
-        }
-        else if (sender instanceof ConsoleCommandSender)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a user (no console) has a specific permission on the given server.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @param server the server for additional permissions
-     * @return the result of the permission check
-     */
-    public boolean hasPermOnServer(String sender, String permission, String server)
-    {
-        if (!sender.equalsIgnoreCase("CONSOLE"))
-        {
-            User u = getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-            return u.hasPermOnServer(permission, server);
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission on the given server.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @param server the server for additional permissions
-     * @return the result of the permission check
-     */
-    public boolean hasPermOrConsoleOnServer(String sender, String permission, String server)
-    {
-        if (sender.equalsIgnoreCase("CONSOLE"))
-        {
-            return true;
-        }
-        else
-        {
-            User u = getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-            return u.hasPermOnServer(permission, server);
-        }
-    }
-
-    /**
-     * Checks if a user (no console) has a specific permission on the current server.
-     *
-     * @param sender the command sender to check a permission for
-     * @param perm the permission to check
-     * @param msg if a no-permission message is send to the sender
-     * @return the result of the permission check
-     */
-    public boolean hasOnServer(CommandSender sender, String perm, boolean msg)
-    {
-        if (sender instanceof ProxiedPlayer)
-        {
-            boolean isperm = hasPermOnServer(sender, perm);
-            if (!isperm & msg)
-            {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
-            }
-            return isperm;
-        }
-        else
-        {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
-            return false;
-        }
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission on the current server.
-     *
-     * @param sender the command sender to check a permission for
-     * @param perm the permission to check
-     * @param msg if a no-permission message is send to the sender
-     * @return the result of the permission check
-     */
-    public boolean hasOrConsoleOnServer(CommandSender sender, String perm, boolean msg)
-    {
-        boolean isperm = (hasPermOnServer(sender, perm) | (sender instanceof ConsoleCommandSender));
-        if (!isperm & msg)
-        {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
-        }
-        return isperm;
-    }
-
-    /**
-     * Checks if a user (no console) has a specific permission on the current server and in the current world.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @return the result of the permission check
-     */
-    public boolean hasPermOnServerInWorld(CommandSender sender, String permission)
-    {
-        if (sender instanceof ProxiedPlayer)
-        {
-            User user = useUUIDs ? getUser(((ProxiedPlayer) sender).getUniqueId()) : getUser(sender.getName());
-
-            //per server
-            if (((ProxiedPlayer) sender).getServer() == null)
-            {
-                return user.hasPerm(permission);
-            }
-
-            //per server and world
-            String world = playerWorlds.get(sender.getName());
-            if (world == null)
-            {
-                return user.hasPermOnServer(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName());
-            }
-
-            return user.hasPermOnServerInWorld(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), world);
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission on the current server and in the current world.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @return the result of the permission check
-     */
-    public boolean hasPermOrConsoleOnServerInWorld(CommandSender sender, String permission)
-    {
-        if (sender instanceof ProxiedPlayer)
-        {
-            User user = useUUIDs ? getUser(((ProxiedPlayer) sender).getUniqueId()) : getUser(sender.getName());
-            if (((ProxiedPlayer) sender).getServer() == null)
-            {
-                return user.hasPerm(permission);
-            }
-
-            //per server and world
-            String world = playerWorlds.get(sender.getName());
-            if (world == null)
-            {
-                return user.hasPermOnServer(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName());
-            }
-
-            return user.hasPermOnServerInWorld(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), world);
-        }
-        else if (sender instanceof ConsoleCommandSender)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a user (no console) has a specific permission on the given server and in the given world.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @param server the server for additional permissions
-     * @param world the world for additional permissions
-     * @return the result of the permission check
-     */
-    public boolean hasPermOnServerInWorld(String sender, String permission, String server, String world)
-    {
-        if (!sender.equalsIgnoreCase("CONSOLE"))
-        {
-            User u = getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-
-            if (world == null)
-            {
-                return hasPermOnServer(sender, permission, server);
-            }
-
-            return u.hasPermOnServerInWorld(permission, server, world);
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission on the given server and in the given world.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @param server the server for additional permissions
-     * @param world the world for additional permissions
-     * @return the result of the permission check
-     */
-    public boolean hasPermOrConsoleOnServerInWorld(String sender, String permission, String server, String world)
-    {
-        if (sender.equalsIgnoreCase("CONSOLE"))
-        {
-            return true;
-        }
-        else
-        {
-            User u = getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-
-            if (world == null)
-            {
-                return hasPermOnServer(sender, permission, server);
-            }
-
-            return u.hasPermOnServerInWorld(permission, server, world);
-        }
-    }
-
-//todo: remove wrappers
-    @Deprecated
-    public boolean hasPermOnServer(String sender, String permission, ServerInfo server)
-    {
-        return hasPermOnServer(sender, permission, server.getName());
-    }
-
-    @Deprecated
-    public boolean hasPermOrConsoleOnServer(String sender, String permission, ServerInfo server)
-    {
-        return hasPermOrConsoleOnServer(sender, permission, server.getName());
-    }
-
-    @Deprecated
-    public boolean hasPermOnServerInWorld(String sender, String permission, ServerInfo server, String world)
-    {
-        return hasPermOnServerInWorld(sender, permission, server.getName(), world);
-    }
-
-    @Deprecated
-    public boolean hasPermOrConsoleOnServerInWorld(String sender, String permission, ServerInfo server, String world)
-    {
-        return hasPermOrConsoleOnServerInWorld(sender, permission, server.getName(), world);
-    }
-
-    /**
-     * Checks if a user (no console) has a specific permission on the current server and in the given world.
-     *
-     * @param sender the command sender to check a permission for
-     * @param perm the permission to check
-     * @param msg if a no-permission message is send to the sender
-     * @return the result of the permission check
-     */
-    public boolean hasOnServerInWorld(CommandSender sender, String perm, boolean msg)
-    {
-        if (sender instanceof ProxiedPlayer)
-        {
-            boolean isperm = hasPermOnServerInWorld(sender, perm);
-            if (!isperm & msg)
-            {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
-            }
-            return isperm;
-        }
-        else
-        {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
-            return false;
-        }
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission on the current server and in the given world.
-     *
-     * @param sender the command sender to check a permission for
-     * @param perm the permission to check
-     * @param msg if a no-permission message is send to the sender
-     * @return the result of the permission check
-     */
-    public boolean hasOrConsoleOnServerInWorld(CommandSender sender, String perm, boolean msg)
-    {
-        boolean isperm = (hasPermOnServerInWorld(sender, perm) | (sender instanceof ConsoleCommandSender));
-        if (!isperm & msg)
-        {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
-        }
-        return isperm;
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     //database and permission operations
@@ -1107,7 +580,7 @@ public class PermissionsManager implements Listener
     {
         backEnd.format(backEnd.loadGroups(), backEnd.loadUsers(), permsversion);
         backEnd.load();
-        sendPMAll("reload;all");
+        BungeePerms.getInstance().getNetworkNotifier().reloadAll();
     }
 
     /**
@@ -1119,7 +592,7 @@ public class PermissionsManager implements Listener
     {
         int res = backEnd.cleanup(backEnd.loadGroups(), backEnd.loadUsers(), permsversion);
         backEnd.load();
-        sendPMAll("reload;all");
+        BungeePerms.getInstance().getNetworkNotifier().reloadAll();
         return res;
     }
 
@@ -1142,14 +615,7 @@ public class PermissionsManager implements Listener
         user.recalcPerms();
 
         //send bukkit update info
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "reloadUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "reloadUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
     }
 
     /**
@@ -1171,14 +637,7 @@ public class PermissionsManager implements Listener
         user.recalcPerms();
 
         //send bukkit update info
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "reloadUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "reloadUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
     }
 
     /**
@@ -1199,14 +658,7 @@ public class PermissionsManager implements Listener
         user.recalcPerms();
 
         //send bukkit update info
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "reloadUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "reloadUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
     }
 
     /**
@@ -1227,14 +679,7 @@ public class PermissionsManager implements Listener
         user.recalcPerms();
 
         //send bukkit update info
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "reloadUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "reloadUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
     }
 
     /**
@@ -1263,14 +708,7 @@ public class PermissionsManager implements Listener
         user.recalcPerms(server);
 
         //send bukkit update info
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "reloadUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "reloadUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
     }
 
     /**
@@ -1299,14 +737,7 @@ public class PermissionsManager implements Listener
         user.recalcPerms(server);
 
         //send bukkit update info
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "reloadUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "reloadUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
     }
 
     /**
@@ -1343,14 +774,7 @@ public class PermissionsManager implements Listener
         user.recalcPerms(server, world);
 
         //send bukkit update info
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "reloadUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "reloadUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
     }
 
     /**
@@ -1387,14 +811,7 @@ public class PermissionsManager implements Listener
         user.recalcPerms(server, world);
 
         //send bukkit update info
-        if (useUUIDs)
-        {
-            sendPM(user.getUUID(), "reloadUser;" + user.getUUID());
-        }
-        else
-        {
-            sendPM(user.getName(), "reloadUser;" + user.getName());
-        }
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
     }
 
     public void addGroupPerm(Group group, String perm)
@@ -1416,7 +833,7 @@ public class PermissionsManager implements Listener
         }
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     public void removeGroupPerm(Group group, String perm)
@@ -1438,7 +855,7 @@ public class PermissionsManager implements Listener
         }
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     public void addGroupPerServerPerm(Group group, String server, String perm)
@@ -1468,7 +885,7 @@ public class PermissionsManager implements Listener
         }
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     public void removeGroupPerServerPerm(Group group, String server, String perm)
@@ -1498,7 +915,7 @@ public class PermissionsManager implements Listener
         }
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     public void addGroupPerServerWorldPerm(Group group, String server, String world, String perm)
@@ -1534,7 +951,7 @@ public class PermissionsManager implements Listener
         }
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     public void removeGroupPerServerWorldPerm(Group group, String server, String world, String perm)
@@ -1570,7 +987,7 @@ public class PermissionsManager implements Listener
         }
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     public void addGroupInheritance(Group group, Group toadd)
@@ -1593,7 +1010,7 @@ public class PermissionsManager implements Listener
         }
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     public void removeGroupInheritance(Group group, Group toremove)
@@ -1616,7 +1033,7 @@ public class PermissionsManager implements Listener
         }
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     /**
@@ -1634,7 +1051,7 @@ public class PermissionsManager implements Listener
         backEnd.saveGroupLadder(group);
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     /**
@@ -1653,7 +1070,7 @@ public class PermissionsManager implements Listener
         backEnd.saveGroupRank(group);
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     /**
@@ -1672,7 +1089,7 @@ public class PermissionsManager implements Listener
         backEnd.saveGroupWeight(group);
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     /**
@@ -1690,7 +1107,7 @@ public class PermissionsManager implements Listener
         backEnd.saveGroupDefault(group);
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     /**
@@ -1710,7 +1127,7 @@ public class PermissionsManager implements Listener
         backEnd.saveGroupDisplay(group, server, world);
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     /**
@@ -1730,7 +1147,7 @@ public class PermissionsManager implements Listener
         backEnd.saveGroupPrefix(group, server, world);
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     /**
@@ -1750,7 +1167,7 @@ public class PermissionsManager implements Listener
         backEnd.saveGroupSuffix(group, server, world);
 
         //send bukkit update info
-        sendPMAll("reloadGroup;" + group.getName());
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
     }
 
     /**
@@ -1775,7 +1192,7 @@ public class PermissionsManager implements Listener
         }
         else if (bet == BackEndType.YAML)
         {
-            migrator = new Migrate2YAML(plugin, config);
+            migrator = new Migrate2YAML(config);
         }
 
         if (migrator == null)
@@ -1793,8 +1210,7 @@ public class PermissionsManager implements Listener
         List<Group> groups = backEnd.loadGroups();
         List<User> users = backEnd.loadUsers();
         int version = backEnd.loadVersion();
-        useUUIDs = true;
-        config.setBoolAndSave("useUUIDs", useUUIDs);
+        BungeePerms.getInstance().getConfig().setUseUUIDs(true);
 
         backEnd.clearDatabase();
         for (Group g : groups)
@@ -1818,8 +1234,7 @@ public class PermissionsManager implements Listener
         List<Group> groups = backEnd.loadGroups();
         List<User> users = backEnd.loadUsers();
         int version = backEnd.loadVersion();
-        useUUIDs = false;
-        config.setBoolAndSave("useUUIDs", useUUIDs);
+        BungeePerms.getInstance().getConfig().setUseUUIDs(false);
 
         backEnd.clearDatabase();
         for (Group g : groups)
@@ -1852,13 +1267,13 @@ public class PermissionsManager implements Listener
         }
         else if (type == UUIDPlayerDBType.MySQL)
         {
-            UUIDPlayerDB = new MySQLUUIDPlayerDB(config, debug);
+            UUIDPlayerDB = new MySQLUUIDPlayerDB();
         }
         else
         {
             throw new UnsupportedOperationException("type==" + type);
         }
-        config.setEnumAndSave("uuidplayerdb", UUIDPlayerDB.getType());
+        BungeePerms.getInstance().getConfig().setUUIDPlayerDB(UUIDPlayerDB.getType());
         UUIDPlayerDB.clear();
 
         for (Map.Entry<UUID, String> e : map.entrySet())
@@ -1867,60 +1282,12 @@ public class PermissionsManager implements Listener
         }
     }
 
-    //perms per world
-    @EventHandler
-    public void onMessage(PluginMessageEvent e)
-    {
-        if (!e.getTag().equalsIgnoreCase(channel))
-        {
-            return;
-        }
-
-        String msg = new String(e.getData());
-        List<String> data = Statics.toList(msg, ";");
-        if (data.get(0).equalsIgnoreCase("updateplayerworld"))
-        {
-            String player = data.get(1);
-            String world = data.get(2);
-
-            playerWorlds.put(player, world);
-        }
-
-        e.setCancelled(true);
-    }
-
-    //bukkit-bungeeperms reload information functions
-    public void sendPM(String player, String msg)
-    {
-        ProxiedPlayer pp = BungeeCord.getInstance().getPlayer(player);
-        if (pp != null)
-        {
-            pp.getServer().getInfo().sendData(channel, msg.getBytes());
-        }
-    }
-
-    public void sendPM(UUID player, String msg)
-    {
-        ProxiedPlayer pp = BungeeCord.getInstance().getPlayer(player);
-        if (pp != null)
-        {
-            pp.getServer().getInfo().sendData(channel, msg.getBytes());
-        }
-    }
-
-    public void sendPMAll(String msg)
-    {
-        for (ServerInfo si : BungeeCord.getInstance().config.getServers().values())
-        {
-            si.sendData(channel, msg.getBytes());
-        }
-    }
-    
 //internal functions
     public void addUserToCache(User u)
     {
         users.add(u);
     }
+
     public void removeUserFromCache(User u)
     {
         users.remove(u);

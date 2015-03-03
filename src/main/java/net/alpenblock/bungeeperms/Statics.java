@@ -1,12 +1,9 @@
 package net.alpenblock.bungeeperms;
 
+import net.alpenblock.bungeeperms.platform.Sender;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class Statics
 {
@@ -26,10 +23,10 @@ public class Statics
 
     public static String getFullPlayerName(String player)
     {
-        ProxiedPlayer p = BungeeCord.getInstance().getPlayer(player);
+        Sender p = BungeePerms.getInstance().getPlugin().getPlayer(player);
         if (p != null)
         {
-            for (ProxiedPlayer pp : BungeeCord.getInstance().getPlayers())
+            for (Sender pp : BungeePerms.getInstance().getPlugin().getPlayers())
             {
                 if (pp.getName().startsWith(player))
                 {
@@ -109,7 +106,7 @@ public class Statics
         return null;
     }
     
-    public static boolean matchArgs(CommandSender sender, String[] args, int length)
+    public static boolean matchArgs(Sender sender, String[] args, int length)
     {
         if (args.length > length)
         {
@@ -124,7 +121,7 @@ public class Statics
         return true;
     }
     
-    public static boolean matchArgs(CommandSender sender, String[] args, int min, int max)
+    public static boolean matchArgs(Sender sender, String[] args, int min, int max)
     {
         if (args.length > max)
         {

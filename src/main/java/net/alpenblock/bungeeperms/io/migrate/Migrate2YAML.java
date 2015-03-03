@@ -1,48 +1,41 @@
 package net.alpenblock.bungeeperms.io.migrate;
 
 import java.util.List;
+import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.BungeePerms;
-import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.io.BackEnd;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.YAMLBackEnd;
-import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.api.plugin.Plugin;
 
 public class Migrate2YAML implements Migrator
 {
-    private BungeeCord bc;
-    private Plugin plugin;
-    private Config config;
-    
-    public Migrate2YAML(Plugin plugin,Config conf)
+
+    private final BPConfig config;
+
+    public Migrate2YAML(BPConfig conf)
     {
-        bc=BungeeCord.getInstance();
-        this.plugin = plugin;
-        config=conf;
+        config = conf;
     }
-    
+
     @Override
     public void migrate(final List<Group> groups, final List<User> users, final int permsversion)
     {
-        BackEnd be=new YAMLBackEnd();
+        BackEnd be = new YAMLBackEnd();
         be.clearDatabase();
-        for(Group group:groups)
+        for (Group group : groups)
         {
-            be.saveGroup(group,false);
+            be.saveGroup(group, false);
         }
-        for(User user:users)
+        for (User user : users)
         {
-            be.saveUser(user,false);
+            be.saveUser(user, false);
         }
-        be.saveVersion(permsversion,true);
-        
-        
-        config.setEnumValue("backendtype",BackEndType.YAML);
-        config.save();
-        
+        be.saveVersion(permsversion, true);
+
+        config.setBackendType(BackEndType.YAML);
+
         BungeePerms.getInstance().getPermissionsManager().setBackEnd(be);
     }
 }

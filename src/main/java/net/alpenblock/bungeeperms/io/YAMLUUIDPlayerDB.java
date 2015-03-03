@@ -6,60 +6,64 @@ import java.util.Map;
 import java.util.UUID;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 
 public class YAMLUUIDPlayerDB implements UUIDPlayerDB
 {
+
     private Config uuidconf;
-    
+
     public YAMLUUIDPlayerDB()
     {
-        uuidconf=new Config(BungeePerms.getInstance(), "/uuidplayerdb.yml");
+        uuidconf = new Config(BungeePerms.getInstance().getPlugin(), "/uuidplayerdb.yml");
         uuidconf.load();
     }
-    
+
     @Override
     public UUIDPlayerDBType getType()
     {
         return UUIDPlayerDBType.YAML;
     }
-    
+
     @Override
     public UUID getUUID(String player)
     {
-        UUID ret=null;
-        
-        for(String uuid:uuidconf.getSubNodes(""))
+        UUID ret = null;
+
+        for (String uuid : uuidconf.getSubNodes(""))
         {
-            String p=uuidconf.getString(uuid, "");
-            if(p.equalsIgnoreCase(player))
+            String p = uuidconf.getString(uuid, "");
+            if (p.equalsIgnoreCase(player))
             {
-                ret=UUID.fromString(uuid);
+                ret = UUID.fromString(uuid);
             }
         }
-        
+
         return ret;
     }
+
     @Override
     public String getPlayerName(UUID uuid)
     {
-        String ret=null;
-        
-        for(String suuid:uuidconf.getSubNodes(""))
+        String ret = null;
+
+        for (String suuid : uuidconf.getSubNodes(""))
         {
-            if(suuid.equalsIgnoreCase(uuid.toString()))
+            if (suuid.equalsIgnoreCase(uuid.toString()))
             {
-                ret=uuidconf.getString(suuid, "");
+                ret = uuidconf.getString(suuid, "");
             }
         }
-        
+
         return ret;
     }
+
     @Override
     public void update(UUID uuid, String player)
     {
-        for(String suuid:uuidconf.getSubNodes(""))
+        for (String suuid : uuidconf.getSubNodes(""))
         {
-            if(suuid.equalsIgnoreCase(uuid.toString()) || uuidconf.getString(suuid, "").equalsIgnoreCase(player))
+            if (suuid.equalsIgnoreCase(uuid.toString()) || uuidconf.getString(suuid, "").equalsIgnoreCase(player))
             {
                 uuidconf.deleteNode(suuid);
             }
@@ -70,21 +74,21 @@ public class YAMLUUIDPlayerDB implements UUIDPlayerDB
     @Override
     public Map<UUID, String> getAll()
     {
-        Map<UUID, String> ret=new HashMap<>();
-        
-        for(String suuid:uuidconf.getSubNodes(""))
+        Map<UUID, String> ret = new HashMap<>();
+
+        for (String suuid : uuidconf.getSubNodes(""))
         {
             ret.put(UUID.fromString(suuid), uuidconf.getString(suuid, ""));
         }
-        
+
         return ret;
     }
 
     @Override
     public void clear()
     {
-        new File(BungeePerms.getInstance().getDataFolder(),"/uuidplayerdb.yml").delete();
-        uuidconf=new Config(BungeePerms.getInstance(), "/uuidplayerdb.yml");
+        new File(BungeePerms.getInstance().getPlugin().getPluginFolder(), "/uuidplayerdb.yml").delete();
+        uuidconf = new Config(BungeePerms.getInstance().getPlugin(), "/uuidplayerdb.yml");
         uuidconf.load();
     }
 }

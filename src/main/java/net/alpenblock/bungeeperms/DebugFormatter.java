@@ -7,9 +7,6 @@ import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
-/**
- * The Class DebugFormatter.
- */
 public final class DebugFormatter extends Formatter 
 {
     @Override

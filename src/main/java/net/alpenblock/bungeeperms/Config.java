@@ -1,13 +1,12 @@
 package net.alpenblock.bungeeperms;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.alpenblock.bungeeperms.config.FileConfiguration;
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
-import net.md_5.bungee.api.plugin.Plugin;
+import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 
 public class Config
 {
@@ -16,9 +15,17 @@ public class Config
     private FileConfiguration fconfig;
     private String path;
 
-    public Config(Plugin p, String path)
+    public Config(PlatformPlugin p, String path)
     {
-        this.path = p.getDataFolder() + path;
+        this.path = p.getPluginFolder() + path;
+        createFile();
+        fconfig = YamlConfiguration.loadConfiguration(new File(this.path));
+        allowsave = false;
+    }
+
+    public Config(String path)
+    {
+        this.path = path;
         createFile();
         fconfig = YamlConfiguration.loadConfiguration(new File(this.path));
         allowsave = false;

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.alpenblock.bungeeperms.io;
 
 import java.util.List;
@@ -9,10 +5,6 @@ import java.util.UUID;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 
-/**
- *
- * @author Alex
- */
 public interface BackEnd
 {
     public BackEndType getType();

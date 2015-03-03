@@ -1,4 +1,4 @@
 name: BungeePerms
-main: net.alpenblock.bungeeperms.BungeePerms
+main: net.alpenblock.bungeeperms.platform.bungee.BungeePlugin
 version: 2.6.0
 author: wea_ondara

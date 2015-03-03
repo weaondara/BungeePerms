@@ -1,62 +1,23 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-public class World 
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode
+public class World
 {
+
     private String world;
     private List<String> perms;
     private String display;
     private String prefix;
     private String suffix;
-    public World(String world, List<String> perms, String display, String prefix, String suffix) 
-    {
-		this.world = world;
-		this.perms = perms;
-		this.display = display;
-		this.prefix = prefix;
-		this.suffix = suffix;
-	}
-
-    public String getWorld() {
-        return world;
-    }
-    public void setWorld(String world) {
-        this.world = world;
-    }
-    public List<String> getPerms() {
-        return perms;
-    }
-    public void setPerms(List<String> perms) {
-        this.perms = perms;
-    }
-    public String getDisplay() {
-        return display;
-    }
-    public void setDisplay(String display) {
-        this.display = display;
-    }
-    public String getPrefix() {
-        return prefix;
-    }
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-    public String getSuffix() {
-        return suffix;
-    }
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
-    
-    @Override
-    public String toString()
-    {
-        String string="world="+world+" "
-                +"perms="+perms+" "
-                +"display="+display+" "
-                +"prefix="+prefix+" "
-                +"suffix="+suffix;
-        return string;
-    }
 }

@@ -1,7 +1,5 @@
 package net.alpenblock.bungeeperms;
 
-import net.md_5.bungee.api.ChatColor;
-
 public class Color
 {
 
