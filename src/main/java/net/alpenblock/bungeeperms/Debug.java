@@ -71,7 +71,7 @@ public class Debug
         logger.info(str);
         if (showlogs)
         {
-            BungeePerms.getLogger().info("[" + plugin.getName() + "] [Debug] " + str);
+            BungeePerms.getLogger().info("[Debug] " + str);
         }
     }
 
