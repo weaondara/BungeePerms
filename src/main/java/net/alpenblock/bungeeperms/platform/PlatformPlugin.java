@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 public interface PlatformPlugin 
 {
-    public String getName();
+    public String getPluginName();
     public String getVersion();
     public String getAuthor();
     public String getPluginFolderPath();

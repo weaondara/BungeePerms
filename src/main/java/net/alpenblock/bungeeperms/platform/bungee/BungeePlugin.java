@@ -105,7 +105,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
 
 //plugin info
     @Override
-    public String getName()
+    public String getPluginName()
     {
         return this.getDescription().getName();
     }
