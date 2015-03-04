@@ -12,7 +12,7 @@ public class BungeePerms
 {
 
     public final static String CHANNEL = "bungeeperms";
-    
+
     @Getter
     private static BungeePerms instance;
     @Getter
@@ -28,29 +28,35 @@ public class BungeePerms
     private final PluginMessageSender pluginMessageSender;
     private final NetworkNotifier networkNotifier;
     private final EventListener eventListener;
+    private final PermissionsResolver permissionsResolver;
+    
+    private boolean enabled;
 
     public BungeePerms(PlatformPlugin plugin, BPConfig config, PluginMessageSender pluginMessageSender, NetworkNotifier networkNotifier, EventListener eventListener)
     {
         //static
         instance = this;
         logger = plugin.getLogger();
-        
+
         //basic
         this.plugin = plugin;
         this.config = config;
         debug = new Debug(plugin, config.getConfig(), "BP");
-        
+
         //adv
-        permissionsManager = new PermissionsManager(config, debug);
+        permissionsManager = new PermissionsManager(plugin, config, debug);
         permissionsChecker = new PermissionsChecker();
         commandHandler = new CommandHandler(plugin, permissionsChecker, config);
         this.pluginMessageSender = pluginMessageSender;
         this.networkNotifier = networkNotifier;
         this.eventListener = eventListener;
+        permissionsResolver = new PermissionsResolver();
     }
 
-    public void onLoad()
+    public void load()
     {
+        permissionsResolver.setUseRegex(config.isUseRegexPerms());
+
         //static
         //check for config file existance
 //        File f = new File(plugin.getPluginFolder(), "/config.yml");
@@ -79,17 +85,38 @@ public class BungeePerms
 //        }
     }
 
-    public void onEnable()
+    public void enable()
     {
+        if (enabled)
+        {
+            return;
+        }
+        enabled = true;
+        
         logger.info("Activating BungeePerms ...");
         permissionsManager.enable();
         eventListener.enable();
     }
 
-    public void onDisable()
+    public void disable()
     {
+        if (!enabled)
+        {
+            return;
+        }
+        enabled = false;
+        
         logger.info("Deactivating BungeePerms ...");
         eventListener.disable();
         permissionsManager.disable();
+    }
+
+    public void reload()
+    {
+        disable();
+        load();
+        permissionsManager.reload();
+        networkNotifier.reloadAll();
+        enable();
     }
 }

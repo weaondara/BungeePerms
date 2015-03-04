@@ -15,9 +15,9 @@ import net.alpenblock.bungeeperms.uuid.UUIDFetcher;
 @AllArgsConstructor
 public class CommandHandler
 {
-    private PlatformPlugin plugin;
-    private PermissionsChecker checker;
-    private BPConfig config;
+    protected PlatformPlugin plugin;
+    protected PermissionsChecker checker;
+    protected BPConfig config;
     
     public boolean onCommand(Sender sender, String cmd, String label, String[] args)
     {
@@ -106,9 +106,7 @@ public class CommandHandler
             return true;
         }
 
-        pm().loadConfig();
-        pm().loadPerms();
-        BungeePerms.getInstance().getNetworkNotifier().reloadAll();
+        BungeePerms.getInstance().reload();
         sender.sendMessage(Color.Text + "Permissions reloaded");
         return true;
     }
@@ -367,12 +365,12 @@ public class CommandHandler
 
         if (server == null)
         {
-            if (user.getExtraperms().contains("-" + perm))
+            if (user.getExtraPerms().contains("-" + perm))
             {
                 pm().removeUserPerm(user, "-" + perm);
                 sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + ".");
             }
-            else if (!user.getExtraperms().contains(perm))
+            else if (!user.getExtraPerms().contains(perm))
             {
                 pm().addUserPerm(user, perm);
                 sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + ".");
@@ -468,12 +466,12 @@ public class CommandHandler
 
         if (server == null)
         {
-            if (user.getExtraperms().contains(perm))
+            if (user.getExtraPerms().contains(perm))
             {
                 pm().removeUserPerm(user, perm);
                 sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + ".");
             }
-            else if (!user.getExtraperms().contains("-" + perm))
+            else if (!user.getExtraPerms().contains("-" + perm))
             {
                 pm().addUserPerm(user, "-" + perm);
                 sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + ".");

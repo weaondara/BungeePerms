@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.UUID;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
-import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 
 public class YAMLUUIDPlayerDB implements UUIDPlayerDB
 {

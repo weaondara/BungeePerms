@@ -1,21 +1,20 @@
 package net.alpenblock.bungeeperms.io;
 
 import java.io.File;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
-import net.alpenblock.bungeeperms.config.YamlConfiguration;
+import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 
 public class YAMLBackEnd implements BackEnd
 {
@@ -23,13 +22,19 @@ public class YAMLBackEnd implements BackEnd
     private final String permspath;
     private Config permsconf;
 
+    private final PlatformPlugin plugin;
+    private final BPConfig config;
+
     public YAMLBackEnd()
     {
+        plugin = BungeePerms.getInstance().getPlugin();
+        config = BungeePerms.getInstance().getConfig();
+
         permspath = "/permissions.yml";
 
         checkPermFile();
 
-        permsconf = new Config(BungeePerms.getInstance().getPlugin(), permspath);
+        permsconf = new Config(plugin, permspath);
     }
 
     @Override
@@ -53,43 +58,7 @@ public class YAMLBackEnd implements BackEnd
         List<String> groups = permsconf.getSubNodes("groups");
         for (String g : groups)
         {
-            List<String> inheritances = permsconf.getListString("groups." + g + ".inheritances", new ArrayList<String>());
-            List<String> permissions = permsconf.getListString("groups." + g + ".permissions", new ArrayList<String>());
-            boolean isdefault = permsconf.getBoolean("groups." + g + ".default", false);
-            int rank = permsconf.getInt("groups." + g + ".rank", 1000);
-            int weight = permsconf.getInt("groups." + g + ".weight", 1000);
-            String ladder = permsconf.getString("groups." + g + ".ladder", "default");
-            String display = permsconf.getString("groups." + g + ".display", "");
-            String prefix = permsconf.getString("groups." + g + ".prefix", "");
-            String suffix = permsconf.getString("groups." + g + ".suffix", "");
-
-            //per server perms
-            Map<String, Server> servers = new HashMap<>();
-            for (String server : permsconf.getSubNodes("groups." + g + ".servers"))
-            {
-                List<String> serverperms = permsconf.getListString("groups." + g + ".servers." + server + ".permissions", new ArrayList<String>());
-                String sdisplay = permsconf.getString("groups." + g + ".servers." + server + ".display", "");
-                String sprefix = permsconf.getString("groups." + g + ".servers." + server + ".prefix", "");
-                String ssuffix = permsconf.getString("groups." + g + ".servers." + server + ".suffix", "");
-
-                //per server world perms
-                Map<String, World> worlds = new HashMap<>();
-                for (String world : permsconf.getSubNodes("groups." + g + ".servers." + server + ".worlds"))
-                {
-                    List<String> worldperms = permsconf.getListString("groups." + g + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
-                    String wdisplay = permsconf.getString("groups." + g + ".servers." + server + ".worlds." + world + ".display", "");
-                    String wprefix = permsconf.getString("groups." + g + ".servers." + server + ".worlds." + world + ".prefix", "");
-                    String wsuffix = permsconf.getString("groups." + g + ".servers." + server + ".worlds." + world + ".suffix", "");
-
-                    World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
-                    worlds.put(world, w);
-                }
-
-                servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
-            }
-
-            Group group = new Group(g, inheritances, permissions, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
-            ret.add(group);
+            ret.add(loadGroup(g));
         }
         Collections.sort(ret);
 
@@ -109,6 +78,48 @@ public class YAMLBackEnd implements BackEnd
         }
 
         return ret;
+    }
+
+    @Override
+    public Group loadGroup(String group)
+    {
+        List<String> inheritances = permsconf.getListString("groups." + group + ".inheritances", new ArrayList<String>());
+        List<String> permissions = permsconf.getListString("groups." + group + ".permissions", new ArrayList<String>());
+        boolean isdefault = permsconf.getBoolean("groups." + group + ".default", false);
+        int rank = permsconf.getInt("groups." + group + ".rank", 1000);
+        int weight = permsconf.getInt("groups." + group + ".weight", 1000);
+        String ladder = permsconf.getString("groups." + group + ".ladder", "default");
+        String display = permsconf.getString("groups." + group + ".display", "");
+        String prefix = permsconf.getString("groups." + group + ".prefix", "");
+        String suffix = permsconf.getString("groups." + group + ".suffix", "");
+
+        //per server perms
+        Map<String, Server> servers = new HashMap<>();
+        for (String server : permsconf.getSubNodes("groups." + group + ".servers"))
+        {
+            List<String> serverperms = permsconf.getListString("groups." + group + ".servers." + server + ".permissions", new ArrayList<String>());
+            String sdisplay = permsconf.getString("groups." + group + ".servers." + server + ".display", "");
+            String sprefix = permsconf.getString("groups." + group + ".servers." + server + ".prefix", "");
+            String ssuffix = permsconf.getString("groups." + group + ".servers." + server + ".suffix", "");
+
+            //per server world perms
+            Map<String, World> worlds = new HashMap<>();
+            for (String world : permsconf.getSubNodes("groups." + group + ".servers." + server + ".worlds"))
+            {
+                List<String> worldperms = permsconf.getListString("groups." + group + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
+                String wdisplay = permsconf.getString("groups." + group + ".servers." + server + ".worlds." + world + ".display", "");
+                String wprefix = permsconf.getString("groups." + group + ".servers." + server + ".worlds." + world + ".prefix", "");
+                String wsuffix = permsconf.getString("groups." + group + ".servers." + server + ".worlds." + world + ".suffix", "");
+
+                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(world, w);
+            }
+
+            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
+        }
+
+        Group g = new Group(group, inheritances, permissions, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
+        return g;
     }
 
     @Override
@@ -218,6 +229,15 @@ public class YAMLBackEnd implements BackEnd
         return permsconf.keyExists("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()));
     }
 
+    private void checkPermFile()
+    {
+        File f = new File(plugin.getPluginFolder(), permspath);
+        if (!f.exists() | !f.isFile())
+        {
+            BungeePerms.getLogger().info("no permissions file found !!!");
+        }
+    }
+
     @Override
     public List<String> getRegisteredUsers()
     {
@@ -251,7 +271,7 @@ public class YAMLBackEnd implements BackEnd
                 groups.add(g.getName());
             }
             permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".groups", groups);
-            permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".permissions", user.getExtraperms());
+            permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".permissions", user.getExtraPerms());
 
             for (Map.Entry<String, List<String>> se : user.getServerPerms().entrySet())
             {
@@ -333,7 +353,7 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public synchronized void saveUserPerms(User user)
     {
-        permsconf.setListStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".permissions", user.getExtraperms());
+        permsconf.setListStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".permissions", user.getExtraPerms());
     }
 
     @Override
@@ -473,31 +493,96 @@ public class YAMLBackEnd implements BackEnd
         permsconf = new Config(BungeePerms.getInstance().getPlugin(), permspath);
     }
 
-    private void checkPermFile()
+    @Override
+    public void reloadGroup(Group group)
     {
-        File f = new File(BungeePerms.getInstance().getPlugin().getPluginFolder(), permspath);
-        if (!f.exists() | !f.isFile())
+        permsconf.load();
+
+        //load group from database
+        List<String> inheritances = permsconf.getListString("groups." + group.getName() + ".inheritances", new ArrayList<String>());
+        List<String> permissions = permsconf.getListString("groups." + group.getName() + ".permissions", new ArrayList<String>());
+        boolean isdefault = permsconf.getBoolean("groups." + group.getName() + ".default", false);
+        int rank = permsconf.getInt("groups." + group.getName() + ".rank", 1000);
+        int weight = permsconf.getInt("groups." + group.getName() + ".weight", 1000);
+        String ladder = permsconf.getString("groups." + group.getName() + ".ladder", "default");
+        String display = permsconf.getString("groups." + group.getName() + ".display", "");
+        String prefix = permsconf.getString("groups." + group.getName() + ".prefix", "");
+        String suffix = permsconf.getString("groups." + group.getName() + ".suffix", "");
+
+        //per server perms
+        Map<String, Server> servers = new HashMap<>();
+        for (String server : permsconf.getSubNodes("groups." + group.getName() + ".servers"))
         {
-            BungeePerms.getLogger().info("[BungeePerms] no permissions file found -> copy packed default permissions.yml to data folder ...");
-            f.getParentFile().mkdirs();
-            try
+            List<String> serverperms = permsconf.getListString("groups." + group.getName() + ".servers." + server + ".permissions", new ArrayList<String>());
+            String sdisplay = permsconf.getString("groups." + group.getName() + ".servers." + server + ".display", "");
+            String sprefix = permsconf.getString("groups." + group.getName() + ".servers." + server + ".prefix", "");
+            String ssuffix = permsconf.getString("groups." + group.getName() + ".servers." + server + ".suffix", "");
+
+            //per server world perms
+            Map<String, World> worlds = new HashMap<>();
+            for (String world : permsconf.getSubNodes("groups." + group.getName() + ".servers." + server + ".worlds"))
             {
-                //file öffnen
-                ClassLoader cl = this.getClass().getClassLoader();
-                URL url = cl.getResource("permissions.yml");
-                if (url != null)
-                {
-                    URLConnection connection = url.openConnection();
-                    connection.setUseCaches(false);
-                    YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(connection.getInputStream());
-                    defConfig.save(f);
-                }
+                List<String> worldperms = permsconf.getListString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
+                String wdisplay = permsconf.getString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".display", "");
+                String wprefix = permsconf.getString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".prefix", "");
+                String wsuffix = permsconf.getString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".suffix", "");
+
+                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(world, w);
             }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-            BungeePerms.getLogger().info("[BungeePerms] copied default permissions.yml to data folder");
+
+            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
+
+        group.setInheritances(inheritances);
+        group.setPerms(permissions);
+        group.setIsdefault(isdefault);
+        group.setRank(rank);
+        group.setWeight(weight);
+        group.setLadder(ladder);
+        group.setDisplay(display);
+        group.setPrefix(prefix);
+        group.setSuffix(suffix);
+        group.setServers(servers);
+    }
+
+    @Override
+    public void reloadUser(User user)
+    {
+        permsconf.load();
+
+        //load user from database
+        List<String> sgroups = permsconf.getListString("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".groups", new ArrayList<String>());
+        List<Group> lgroups = new ArrayList<>();
+        for (String s : sgroups)
+        {
+            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
+            if (g != null)
+            {
+                lgroups.add(g);
+            }
+        }
+        List<String> extrapermissions = permsconf.getListString("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".permissions", new ArrayList<String>());
+
+        Map<String, List<String>> serverperms = new HashMap<>();
+        Map<String, Map<String, List<String>>> serverworldperms = new HashMap<>();
+        for (String server : permsconf.getSubNodes("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers"))
+        {
+            //per server perms
+            serverperms.put(server, permsconf.getListString("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".permissions", new ArrayList<String>()));
+
+            //per server world perms
+            Map<String, List<String>> worldperms = new HashMap<>();
+            for (String world : permsconf.getSubNodes("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds"))
+            {
+                worldperms.put(world, permsconf.getListString("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>()));
+            }
+            serverworldperms.put(server, worldperms);
+        }
+
+        user.setGroups(lgroups);
+        user.setExtraPerms(extrapermissions);
+        user.setServerPerms(serverperms);
+        user.setServerWorldPerms(serverworldperms);
     }
 }

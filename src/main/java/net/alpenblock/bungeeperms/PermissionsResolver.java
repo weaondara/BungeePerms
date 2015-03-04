@@ -1,12 +1,57 @@
 package net.alpenblock.bungeeperms;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import net.alpenblock.bungeeperms.platform.Sender;
 
 public class PermissionsResolver
 {
 
+    public final List<PermissionsPreProcessor> preprocessors = new ArrayList<>();
+    public final List<PermissionsPostProcessor> postprocessors = new ArrayList<>();
+
+    public void registerProcessor(PermissionsPreProcessor processor)
+    {
+        preprocessors.add(processor);
+    }
+
+    public void unregisterProcessor(PermissionsPreProcessor processor)
+    {
+        preprocessors.remove(processor);
+    }
+
+    public void registerProcessor(PermissionsPostProcessor processor)
+    {
+        postprocessors.add(processor);
+    }
+
+    public void unregisterProcessor(PermissionsPostProcessor processor)
+    {
+        postprocessors.remove(processor);
+    }
+
+    public List<String> preprocess(List<String> perms, Sender s)
+    {
+        for (PermissionsPreProcessor p : preprocessors)
+        {
+            perms = p.process(perms, s);
+        }
+
+        return perms;
+    }
+
+    public Boolean postprocess(String perm, Boolean result, Sender s)
+    {
+        for (PermissionsPostProcessor p : postprocessors)
+        {
+            result = p.process(perm, result, s);
+        }
+
+        return result;
+    }
+    
     @Getter
     @Setter
     private boolean useRegex = false;

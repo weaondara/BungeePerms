@@ -76,4 +76,10 @@ public class BungeeSender implements Sender
     {
         return sender instanceof ProxiedPlayer;
     }
+
+    @Override
+    public boolean isOperator()
+    {
+        return false;
+    }
 }

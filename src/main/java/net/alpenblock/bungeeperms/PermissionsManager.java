@@ -23,34 +23,32 @@ import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
+import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.util.ConcurrentList;
 
 public class PermissionsManager
 {
 
-    private BPConfig config;
-    private Debug debug;
+    private final PlatformPlugin plugin;
+    private final BPConfig config;
+    private final Debug debug;
     private boolean enabled = false;
-
-    private List<Group> groups;
-    private List<User> users;
-    private int permsversion;
-
+    
     @Getter
     @Setter
     private BackEnd backEnd;
     @Getter
     private UUIDPlayerDB UUIDPlayerDB;
+    
+    private List<Group> groups;
+    private List<User> users;
+    private int permsversion;
 
-    @Getter
-    private PermissionsResolver resolver;
-
-    public PermissionsManager(BPConfig conf, Debug d)
+    public PermissionsManager(PlatformPlugin p, BPConfig conf, Debug d)
     {
+        plugin = p;
         config = conf;
         debug = d;
-
-        resolver = new PermissionsResolver();
 
         //config
         loadConfig();
@@ -64,8 +62,6 @@ public class PermissionsManager
      */
     public final void loadConfig()
     {
-        resolver.setUseRegex(config.isUseRegexPerms());
-
         BackEndType bet = config.getBackEndType();
         if (bet == BackEndType.YAML)
         {
@@ -152,6 +148,19 @@ public class PermissionsManager
             return;
         }
         enabled = false;
+    }
+
+    public void reload()
+    {
+        disable();
+
+        //config
+        loadConfig();
+
+        //perms
+        loadPerms();
+
+        enable();
     }
 
     /**
@@ -649,7 +658,7 @@ public class PermissionsManager
     public void addUserPerm(User user, String perm)
     {
         //cache
-        user.getExtraperms().add(perm);
+        user.getExtraPerms().add(perm);
 
         //database
         backEnd.saveUserPerms(user);
@@ -670,7 +679,7 @@ public class PermissionsManager
     public void removeUserPerm(User user, String perm)
     {
         //cache
-        user.getExtraperms().remove(perm);
+        user.getExtraPerms().remove(perm);
 
         //database
         backEnd.saveUserPerms(user);
@@ -1283,6 +1292,76 @@ public class PermissionsManager
     }
 
 //internal functions
+    public void reloadUser(String user)
+    {
+        User u = getUser(user);
+        if (u == null)
+        {
+            debug.log("User " + user + " not found!!!");
+            return;
+        }
+        backEnd.reloadUser(u);
+        u.recalcPerms();
+    }
+
+    public void reloadUser(UUID uuid)
+    {
+        User u = getUser(uuid);
+        if (u == null)
+        {
+            debug.log("User " + uuid + " not found!!!");
+            return;
+        }
+        backEnd.reloadUser(u);
+        u.recalcPerms();
+    }
+
+    public void reloadGroup(String group)
+    {
+        Group g = getGroup(group);
+        if (g == null)
+        {
+            debug.log("Group " + group + " not found!!!");
+            return;
+        }
+        backEnd.reloadGroup(g);
+        Collections.sort(groups);
+        for (Group gr : groups)
+        {
+            gr.recalcPerms();
+        }
+        for (User u : users)
+        {
+            u.recalcPerms();
+        }
+    }
+
+    public void reloadUsers()
+    {
+        for (User u : users)
+        {
+            backEnd.reloadUser(u);
+            u.recalcPerms();
+        }
+    }
+
+    public void reloadGroups()
+    {
+        for (Group g : groups)
+        {
+            backEnd.reloadGroup(g);
+        }
+        Collections.sort(groups);
+        for (Group g : groups)
+        {
+            g.recalcPerms();
+        }
+        for (User u : users)
+        {
+            u.recalcPerms();
+        }
+    }
+
     public void addUserToCache(User u)
     {
         users.add(u);
@@ -1291,5 +1370,15 @@ public class PermissionsManager
     public void removeUserFromCache(User u)
     {
         users.remove(u);
+    }
+
+    public void addGroupToCache(Group g)
+    {
+        groups.add(g);
+    }
+
+    public void removeGroupFromCache(Group g)
+    {
+        groups.remove(g);
     }
 }

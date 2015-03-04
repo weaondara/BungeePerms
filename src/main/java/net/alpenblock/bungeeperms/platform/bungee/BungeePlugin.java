@@ -21,12 +21,8 @@ import net.md_5.bungee.api.plugin.Plugin;
 public class BungeePlugin extends Plugin implements PlatformPlugin
 {
 
+    @Getter
     private static BungeePlugin instance;
-
-    public static BungeePlugin getInstance()
-    {
-        return instance;
-    }
 
     private BungeeConfig config;
 
@@ -57,20 +53,20 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
         pmsender = new BungeePluginMessageSender();
 
         bungeeperms = new BungeePerms(this, config, pmsender, notifier, listener);
-        bungeeperms.onLoad();
+        bungeeperms.load();
     }
 
     @Override
     public void onEnable()
     {
         BungeeCord.getInstance().registerChannel(BungeePerms.CHANNEL);
-        bungeeperms.onEnable();
+        bungeeperms.enable();
     }
 
     @Override
     public void onDisable()
     {
-        bungeeperms.onDisable();
+        bungeeperms.disable();
         BungeeCord.getInstance().unregisterChannel(BungeePerms.CHANNEL);
     }
 
@@ -137,15 +133,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     @Override
     public Sender getPlayer(String name)
     {
-        CommandSender sender;
-        if (name.equalsIgnoreCase("console"))
-        {
-            sender = BungeeCord.getInstance().getConsole();
-        }
-        else
-        {
-            sender = BungeeCord.getInstance().getPlayer(name);
-        }
+        CommandSender sender = BungeeCord.getInstance().getPlayer(name);
 
         Sender s = null;
 
@@ -160,15 +148,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     @Override
     public Sender getPlayer(UUID uuid)
     {
-        CommandSender sender;
-        if (UUID.fromString("00000000-0000-0000-0000-000000000000").equals("uuid"))
-        {
-            sender = BungeeCord.getInstance().getConsole();
-        }
-        else
-        {
-            sender = BungeeCord.getInstance().getPlayer(uuid);
-        }
+        CommandSender sender = BungeeCord.getInstance().getPlayer(uuid);
 
         Sender s = null;
 
