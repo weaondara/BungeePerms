@@ -76,7 +76,7 @@ public class User
         has = BungeePerms.getInstance().getPermissionsResolver().postprocess(perm, has, s);
 
         //only true if really true
-        has = has == true;
+        has = has != null && has;
 
         //cache
         checkResults.put(perm.toLowerCase(), has);
@@ -120,7 +120,7 @@ public class User
         has = BungeePerms.getInstance().getPermissionsResolver().postprocess(perm, has, s);
 
         //only true if really true
-        has = has == true;
+        has = has != null && has;
 
         //cache
         serverresults.put(perm.toLowerCase(), has);
@@ -171,7 +171,7 @@ public class User
         has = BungeePerms.getInstance().getPermissionsResolver().postprocess(perm, has, s);
 
         //only true if really true
-        has = has == true;
+        has = has != null && has;
 
         //cache
         worldresults.put(perm.toLowerCase(), has);
