@@ -51,7 +51,7 @@ public class User
     {
         //ops have every permission so *
         Sender s = BungeePerms.getInstance().getPlugin().getPlayer(name);
-        if (s.isOperator())
+        if (s != null && s.isOperator())
         {
             return true;
         }
@@ -88,7 +88,7 @@ public class User
     {
         //ops have every permission so *
         Sender s = BungeePerms.getInstance().getPlugin().getPlayer(name);
-        if (s.isOperator())
+        if (s != null && s.isOperator())
         {
             return true;
         }
@@ -132,7 +132,7 @@ public class User
     {
         //ops have every permission so *
         Sender s = getSender();
-        if (s.isOperator())
+        if (s != null && s.isOperator())
         {
             return true;
         }
