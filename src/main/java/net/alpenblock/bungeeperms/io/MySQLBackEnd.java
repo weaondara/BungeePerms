@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Mysql;
@@ -17,7 +18,6 @@ import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
-import net.md_5.bungee.api.ChatColor;
 
 public class MySQLBackEnd implements BackEnd
 {
