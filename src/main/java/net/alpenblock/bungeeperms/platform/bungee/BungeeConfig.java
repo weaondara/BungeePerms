@@ -1,5 +1,8 @@
 package net.alpenblock.bungeeperms.platform.bungee;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.Config;
@@ -8,6 +11,9 @@ import net.alpenblock.bungeeperms.Config;
 public class BungeeConfig extends BPConfig
 {
 
+    private NetworkType networkType;
+    private List<String> networkServers;
+    
     public BungeeConfig(Config config)
     {
         super(config);
@@ -17,5 +23,19 @@ public class BungeeConfig extends BPConfig
     public void load()
     {
         super.load();
+        
+        networkType = config.getEnumValue("networktype", NetworkType.Global);
+        if(networkType == NetworkType.ServerDependend)
+        {
+            networkServers = config.getListString("networkservers", Arrays.asList("lobby"));
+        }
+        else
+        {
+            //create option if not in  server dependend
+            if(!config.keyExists("networkservers"))
+            {
+                config.setListString("networkservers", new ArrayList<String>());
+            }
+        }
     }
 }

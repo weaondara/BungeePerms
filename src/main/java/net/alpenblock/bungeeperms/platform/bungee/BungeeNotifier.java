@@ -38,26 +38,68 @@ public class BungeeNotifier implements NetworkNotifier
     //bukkit-bungeeperms reload information functions
     private void sendPM(String player, String msg)
     {
+        //if standalone no network messages
+        if (config.getNetworkType() == NetworkType.Standalone)
+        {
+            return;
+        }
+
         ProxiedPlayer pp = BungeeCord.getInstance().getPlayer(player);
         if (pp != null && pp.getServer() != null)
         {
+            //ignore servers not in config and netork type is server dependend
+            if (config.getNetworkType() == NetworkType.ServerDependend
+                    && !config.getNetworkServers().contains(pp.getServer().getInfo().getName()))
+            {
+                return;
+            }
+            
+            //send message
             pp.getServer().getInfo().sendData(BungeePerms.CHANNEL, msg.getBytes());
         }
     }
 
     private void sendPM(UUID player, String msg)
     {
+        //if standalone no network messages
+        if (config.getNetworkType() == NetworkType.Standalone)
+        {
+            return;
+        }
+        
         ProxiedPlayer pp = BungeeCord.getInstance().getPlayer(player);
         if (pp != null && pp.getServer() != null)
         {
+            //ignore servers not in config and netork type is server dependend
+            if (config.getNetworkType() == NetworkType.ServerDependend
+                    && !config.getNetworkServers().contains(pp.getServer().getInfo().getName()))
+            {
+                return;
+            }
+            
+            //send message
             pp.getServer().getInfo().sendData(BungeePerms.CHANNEL, msg.getBytes());
         }
     }
 
     private void sendPMAll(String msg)
     {
+        //if standalone no network messages
+        if (config.getNetworkType() == NetworkType.Standalone)
+        {
+            return;
+        }
+        
         for (ServerInfo si : BungeeCord.getInstance().config.getServers().values())
         {
+            //ignore servers not in config and netork type is server dependend
+            if (config.getNetworkType() == NetworkType.ServerDependend
+                    && !config.getNetworkServers().contains(si.getName()))
+            {
+                return;
+            }
+            
+            //send message
             si.sendData(BungeePerms.CHANNEL, msg.getBytes());
         }
     }
