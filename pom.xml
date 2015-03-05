@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>BungeePerms</groupId>
     <artifactId>BungeePerms</artifactId>
-    <version>2.6.0</version>
+    <version>3.0.0</version>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
@@ -62,6 +62,36 @@
             <groupId>com.mojang</groupId>
             <artifactId>AccountsClient</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldguard</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.milkbowl</groupId>
+            <artifactId>vault</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.earth2me.essentials</groupId>
+            <artifactId>Essentials</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <properties>

@@ -1,10 +1,16 @@
 package net.alpenblock.bungeeperms;
 
 import java.lang.reflect.Field;
-import net.alpenblock.bungeeperms.platform.Sender;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.SneakyThrows;
+import net.alpenblock.bungeeperms.platform.Sender;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 
 public class Statics
 {
@@ -207,5 +213,22 @@ public class Statics
             return false;
         }
         return true;
+    }
+
+    @SneakyThrows
+    public static void unregisterListener(Listener l)
+    {
+        for (Method m : l.getClass().getDeclaredMethods())
+        {
+            if (m.getAnnotation(EventHandler.class) != null && m.getParameterTypes().length > 0)
+            {
+                Class eventclass = m.getParameterTypes()[0];
+                if (Event.class.isAssignableFrom(eventclass))
+                {
+                    HandlerList hl = (HandlerList) eventclass.getMethod("getHandlerList").invoke(null);
+                    hl.unregister(l);
+                }
+            }
+        }
     }
 }

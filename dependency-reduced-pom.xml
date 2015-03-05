@@ -58,6 +58,36 @@
       <version>1.12.2</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.bukkit</groupId>
+      <artifactId>spigot</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sk89q</groupId>
+      <artifactId>worldedit</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sk89q</groupId>
+      <artifactId>worldguard</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.milkbowl</groupId>
+      <artifactId>vault</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.earth2me.essentials</groupId>
+      <artifactId>Essentials</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>

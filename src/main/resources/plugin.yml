@@ -1,0 +1,13 @@
+name: BungeePermsBukkit
+main: net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin
+version: 3.0.0
+author: wea_ondara
+load: startup
+
+commands:
+    bungeepermsbukkitbridge:
+        description: base command
+        aliases: bpbb
+    bungeepermsbukkitbridge reload:
+        description: reinjects Bungeeperms into all found/supported plugins
+        
