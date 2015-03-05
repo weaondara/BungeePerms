@@ -50,9 +50,11 @@ public class User
     public boolean hasPerm(String perm)
     {
         //ops have every permission so *
-        Sender s = BungeePerms.getInstance().getPlugin().getPlayer(name);
+        Sender s = getSender();
         if (s != null && s.isOperator())
         {
+            //debug mode
+            debug(perm, true);
             return true;
         }
 
@@ -60,6 +62,8 @@ public class User
         Boolean cached = checkResults.get(perm.toLowerCase());
         if (cached != null)
         {
+            //debug mode
+            debug(perm, cached);
             return cached;
         }
 
@@ -82,10 +86,7 @@ public class User
         checkResults.put(perm.toLowerCase(), has);
 
         //debug mode
-        if (BungeePerms.getInstance().getConfig().isDebug())
-        {
-            BungeePerms.getLogger().info("perm check: " + name + " has " + perm + ": " + has);
-        }
+        debug(perm, has);
 
         return has;
     }
@@ -93,9 +94,11 @@ public class User
     public boolean hasPermOnServer(String perm, String server)
     {
         //ops have every permission so *
-        Sender s = BungeePerms.getInstance().getPlugin().getPlayer(name);
+        Sender s = getSender();
         if (s != null && s.isOperator())
         {
+            //debug mode
+            debug(perm, true);
             return true;
         }
 
@@ -110,6 +113,8 @@ public class User
         Boolean cached = serverresults.get(perm.toLowerCase());
         if (cached != null)
         {
+            //debug mode
+            debug(perm, cached);
             return cached;
         }
 
@@ -132,10 +137,7 @@ public class User
         serverresults.put(perm.toLowerCase(), has);
 
         //debug mode
-        if (BungeePerms.getInstance().getConfig().isDebug())
-        {
-            BungeePerms.getLogger().info("perm check: " + name + " has " + perm + ": " + has);
-        }
+        debug(perm, has);
         
         return has;
     }
@@ -146,6 +148,8 @@ public class User
         Sender s = getSender();
         if (s != null && s.isOperator())
         {
+            //debug mode
+            debug(perm, true);
             return true;
         }
 
@@ -167,6 +171,8 @@ public class User
         Boolean cached = worldresults.get(perm.toLowerCase());
         if (cached != null)
         {
+            //debug mode
+            debug(perm, cached);
             return cached;
         }
 
@@ -189,10 +195,7 @@ public class User
         worldresults.put(perm.toLowerCase(), has);
 
         //debug mode
-        if (BungeePerms.getInstance().getConfig().isDebug())
-        {
-            BungeePerms.getLogger().info("perm check: " + name + " has " + perm + ": " + has);
-        }
+        debug(perm, has);
         
         return has;
     }
@@ -487,5 +490,13 @@ public class User
         return BungeePerms.getInstance().getConfig().isUseUUIDs()
                ? BungeePerms.getInstance().getPlugin().getPlayer(UUID)
                : BungeePerms.getInstance().getPlugin().getPlayer(name);
+    }
+    
+    private void debug(String perm, boolean result)
+    {
+        if (BungeePerms.getInstance().getConfig().isDebug())
+        {
+            BungeePerms.getLogger().info("perm check: " + name + " has " + perm + ": " + result);
+        }
     }
 }
