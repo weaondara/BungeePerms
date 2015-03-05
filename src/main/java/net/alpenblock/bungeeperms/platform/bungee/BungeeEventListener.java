@@ -155,12 +155,54 @@ public class BungeeEventListener implements Listener, EventListener
 
         String msg = new String(e.getData());
         List<String> data = Statics.toList(msg, ";");
-        if (data.get(0).equalsIgnoreCase("updateplayerworld"))
+        
+        String cmd = data.get(0);
+        String userorgroup = data.size() > 1 ? data.get(1) : null;
+        
+        if (cmd.equalsIgnoreCase("updateplayerworld"))
         {
             String player = data.get(1);
             String world = data.get(2);
 
             playerWorlds.put(player, world);
+        }
+        else if (cmd.equalsIgnoreCase("deleteuser"))
+        {
+            User u = pm().getUser(userorgroup);
+            pm().removeUserFromCache(u);
+        }
+        else if (cmd.equalsIgnoreCase("deletegroup"))
+        {
+            Group g = pm().getGroup(userorgroup);
+            pm().removeGroupFromCache(g);
+            for (Group gr : pm().getGroups())
+            {
+                gr.recalcPerms();
+            }
+            for (User u : pm().getUsers())
+            {
+                u.recalcPerms();
+            }
+        }
+        else if (cmd.equalsIgnoreCase("reloaduser"))
+        {
+            pm().reloadUser(userorgroup);
+        }
+        else if (cmd.equalsIgnoreCase("reloadgroup"))
+        {
+            pm().reloadGroup(userorgroup);
+        }
+        else if (cmd.equalsIgnoreCase("reloadusers"))
+        {
+            pm().reloadUsers();
+        }
+        else if (cmd.equalsIgnoreCase("reloadgroups"))
+        {
+            pm().reloadGroups();
+        }
+        else if (cmd.equalsIgnoreCase("reloadall"))
+        {
+            BungeePerms.getInstance().reload();
         }
 
         e.setCancelled(true);
