@@ -1,4 +1,4 @@
-name: BungeePermsBukkit
+name: BungeePerms
 main: net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin
 version: 3.0.0
 author: wea_ondara
