@@ -11,6 +11,8 @@ public class BukkitConfig extends BPConfig
     private String servername;
     private boolean allowops;
     private boolean superpermscompat;
+    
+    private boolean standalone;
 
     public BukkitConfig(Config config)
     {
@@ -24,5 +26,7 @@ public class BukkitConfig extends BPConfig
         servername = config.getString("servername", "servername");
         allowops = config.getBoolean("allowops", false);
         superpermscompat = config.getBoolean("superpermscompat", false);
+        
+        standalone = config.getBoolean("standalone", false);
     }
 }

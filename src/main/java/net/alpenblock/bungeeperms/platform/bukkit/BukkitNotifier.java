@@ -18,6 +18,12 @@ public class BukkitNotifier implements NetworkNotifier
     @Override
     public void deleteUser(User u)
     {
+        //if standalone don't notify bungee
+        if(config.isStandalone())
+        {
+            return;
+        }
+        
         if (config.isUseUUIDs())
         {
             sendPM(u.getUUID(), "deleteUser;" + u.getUUID());
@@ -31,6 +37,12 @@ public class BukkitNotifier implements NetworkNotifier
     @Override
     public void deleteGroup(Group g)
     {
+        //if standalone don't notify bungee
+        if(config.isStandalone())
+        {
+            return;
+        }
+        
         sendPMAll("deleteGroup;" + g.getName());
     }
 
@@ -65,6 +77,12 @@ public class BukkitNotifier implements NetworkNotifier
     @Override
     public void reloadUser(User u)
     {
+        //if standalone don't notify bungee
+        if(config.isStandalone())
+        {
+            return;
+        }
+        
         if (config.isUseUUIDs())
         {
             sendPM(u.getUUID(), "reloadUser;" + u.getUUID());
@@ -78,17 +96,35 @@ public class BukkitNotifier implements NetworkNotifier
     @Override
     public void reloadGroup(Group g)
     {
+        //if standalone don't notify bungee
+        if(config.isStandalone())
+        {
+            return;
+        }
+        
         sendPMAll("reloadGroup;" + g.getName());
     }
 
     @Override
     public void reloadAll()
     {
+        //if standalone don't notify bungee
+        if(config.isStandalone())
+        {
+            return;
+        }
+        
         sendPMAll("reloadall");
     }
 
     public void sendWorldUpdate(Player p)
     {
+        //if standalone don't notify bungee
+        if(config.isStandalone())
+        {
+            return;
+        }
+        
         p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, ("playerworldupdate;" + p.getName() + ";" + p.getWorld().getName()).getBytes());
     }
 }
