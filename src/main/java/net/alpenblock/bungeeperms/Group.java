@@ -67,7 +67,7 @@ public class Group implements Comparable<Group>
             cachedPerms.put("global", effperms);
         }
 
-        return effperms;
+        return new ArrayList<>(effperms);
     }
 
     public List<String> getEffectivePerms(String server)
@@ -79,7 +79,7 @@ public class Group implements Comparable<Group>
             cachedPerms.put(server.toLowerCase(), effperms);
         }
 
-        return effperms;
+        return new ArrayList<>(effperms);
     }
 
     public List<String> getEffectivePerms(String server, String world)
@@ -91,7 +91,7 @@ public class Group implements Comparable<Group>
             cachedPerms.put(server.toLowerCase() + ";" + world.toLowerCase(), effperms);
         }
 
-        return effperms;
+        return new ArrayList<>(effperms);
     }
 
     public List<String> calcEffectivePerms()

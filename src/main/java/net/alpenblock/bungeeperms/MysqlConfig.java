@@ -9,10 +9,10 @@ import java.util.Map;
 public class MysqlConfig
 {
 
-    private Mysql mysql;
-    private String table;
+    private final Mysql mysql;
+    private final String table;
 
-    private Map<String, List<String>> data;
+    private final Map<String, List<String>> data;
 
     public MysqlConfig(Mysql m, String table)
     {

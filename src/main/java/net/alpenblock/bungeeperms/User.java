@@ -138,7 +138,7 @@ public class User
 
         //debug mode
         debug(perm, has);
-        
+
         return has;
     }
 
@@ -196,7 +196,7 @@ public class User
 
         //debug mode
         debug(perm, has);
-        
+
         return has;
     }
 
@@ -491,7 +491,7 @@ public class User
                ? BungeePerms.getInstance().getPlugin().getPlayer(UUID)
                : BungeePerms.getInstance().getPlugin().getPlayer(name);
     }
-    
+
     private void debug(String perm, boolean result)
     {
         if (BungeePerms.getInstance().getConfig().isDebug())

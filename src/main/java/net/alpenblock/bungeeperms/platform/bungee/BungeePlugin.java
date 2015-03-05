@@ -10,6 +10,7 @@ import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
+import net.alpenblock.bungeeperms.platform.PlatformType;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.CommandSender;
@@ -32,6 +33,8 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     private PluginMessageSender pmsender;
 
     private BungeePerms bungeeperms;
+    
+    private final PlatformType platformType = PlatformType.BungeeCord;
 
     @Override
     public void onLoad()

@@ -3,7 +3,6 @@ package net.alpenblock.bungeeperms;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.alpenblock.bungeeperms.config.FileConfiguration;
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;

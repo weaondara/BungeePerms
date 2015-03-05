@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import java.lang.reflect.Field;
 import net.alpenblock.bungeeperms.platform.Sender;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +78,78 @@ public class Statics
         return false;
     }
 
+    public static <T> T replaceField(Object instance, T var, String varname)
+    {
+        try
+        {
+            Field f = instance.getClass().getDeclaredField(varname);
+            f.setAccessible(true);
+            T old = (T) f.get(instance);
+            f.set(instance, var);
+            return old;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
+    public static <T> T getField(Object instance, Class<T> type, String varname)
+    {
+        try
+        {
+            Field f = instance.getClass().getDeclaredField(varname);
+            f.setAccessible(true);
+            T old = (T) f.get(instance);
+            return old;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
+    public static <T> T getField(Class clazz, Object instance, Class<T> type, String varname)
+    {
+        try
+        {
+            Field f = clazz.getDeclaredField(varname);
+            f.setAccessible(true);
+            T old = (T) f.get(instance);
+            return old;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
+    public static void setField(Object instance, Object var, String varname)
+    {
+        try
+        {
+            Field f = instance.getClass().getDeclaredField(varname);
+            f.setAccessible(true);
+            f.set(instance, var);
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+
+    public static void setField(Class clazz, Object instance, Object var, String varname)
+    {
+        try
+        {
+            Field f = clazz.getDeclaredField(varname);
+            f.setAccessible(true);
+            f.set(instance, var);
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+
     public static UUID parseUUID(String s)
     {
         try
@@ -105,7 +178,7 @@ public class Statics
 
         return null;
     }
-    
+
     public static boolean matchArgs(Sender sender, String[] args, int length)
     {
         if (args.length > length)
@@ -120,7 +193,7 @@ public class Statics
         }
         return true;
     }
-    
+
     public static boolean matchArgs(Sender sender, String[] args, int min, int max)
     {
         if (args.length > max)

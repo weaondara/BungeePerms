@@ -1,6 +1,5 @@
 package net.alpenblock.bungeeperms;
 
-import net.alpenblock.bungeeperms.platform.Sender;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +23,7 @@ import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
+import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.util.ConcurrentList;
 
 public class PermissionsManager
@@ -33,13 +33,13 @@ public class PermissionsManager
     private final BPConfig config;
     private final Debug debug;
     private boolean enabled = false;
-    
+
     @Getter
     @Setter
     private BackEnd backEnd;
     @Getter
     private UUIDPlayerDB UUIDPlayerDB;
-    
+
     private List<Group> groups;
     private List<User> users;
     private int permsversion;

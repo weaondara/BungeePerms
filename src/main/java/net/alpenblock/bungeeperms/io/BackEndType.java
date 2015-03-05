@@ -11,7 +11,7 @@ public enum BackEndType
     {
         for (BackEndType t : values())
         {
-            if(t.name().equalsIgnoreCase(name))
+            if (t.name().equalsIgnoreCase(name))
             {
                 return t;
             }

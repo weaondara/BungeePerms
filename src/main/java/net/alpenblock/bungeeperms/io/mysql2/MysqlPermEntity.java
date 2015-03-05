@@ -56,7 +56,7 @@ public class MysqlPermEntity
 
             e.add(ve);
         }
-        
+
         //todo: close res?
     }
 

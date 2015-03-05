@@ -1,6 +1,5 @@
 package net.alpenblock.bungeeperms;
 
-import net.alpenblock.bungeeperms.platform.Sender;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +9,7 @@ import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
+import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.uuid.UUIDFetcher;
 
 @AllArgsConstructor

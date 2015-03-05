@@ -29,7 +29,7 @@ public class BungeePerms
     private final NetworkNotifier networkNotifier;
     private final EventListener eventListener;
     private final PermissionsResolver permissionsResolver;
-    
+
     private boolean enabled;
 
     public BungeePerms(PlatformPlugin plugin, BPConfig config, PluginMessageSender pluginMessageSender, NetworkNotifier networkNotifier, EventListener eventListener)
@@ -56,33 +56,6 @@ public class BungeePerms
     public void load()
     {
         permissionsResolver.setUseRegex(config.isUseRegexPerms());
-
-        //static
-        //check for config file existance
-//        File f = new File(plugin.getPluginFolder(), "/config.yml");
-//        if (!f.exists() | !f.isFile())
-//        {
-//            bc.getLogger().info("[BungeePerms] no config file found -> copy packed default config.yml to data folder ...");
-//            f.getParentFile().mkdirs();
-//            try
-//            {
-//                //file öffnen
-//                ClassLoader cl = this.getClass().getClassLoader();
-//                URL url = cl.getResource("config.yml");
-//                if (url != null)
-//                {
-//                    URLConnection connection = url.openConnection();
-//                    connection.setUseCaches(false);
-//                    YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(connection.getInputStream());
-//                    defConfig.save(f);
-//                }
-//            }
-//            catch (Exception e)
-//            {
-//                e.printStackTrace();
-//            }
-//            bc.getLogger().info("[BungeePerms] copied default config.yml to data folder");
-//        }
     }
 
     public void enable()
@@ -92,7 +65,7 @@ public class BungeePerms
             return;
         }
         enabled = true;
-        
+
         logger.info("Activating BungeePerms ...");
         permissionsManager.enable();
         eventListener.enable();
@@ -105,7 +78,7 @@ public class BungeePerms
             return;
         }
         enabled = false;
-        
+
         logger.info("Deactivating BungeePerms ...");
         eventListener.disable();
         permissionsManager.disable();

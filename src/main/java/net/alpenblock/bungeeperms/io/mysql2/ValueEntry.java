@@ -7,8 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ValueEntry 
+public class ValueEntry
 {
+
     private String value;
     private String server;
     private String world;
