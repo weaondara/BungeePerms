@@ -24,8 +24,12 @@ public class SuperPermsPreProcessor implements PermissionsPreProcessor
         for (int i = 0; i < perms.size(); i++)
         {
             //add all child perms
-            Permission p = Bukkit.getPluginManager().getPermission(perms.get(i));
-            if(p == null || p.getChildren().isEmpty())
+            String perm = perms.get(i);
+            boolean neg = perm.startsWith("-");
+            perm = neg ? perm.substring(1) : perm;
+
+            Permission p = Bukkit.getPluginManager().getPermission(perm);
+            if (p == null || p.getChildren().isEmpty())
             {
                 continue;
             }
@@ -34,7 +38,7 @@ public class SuperPermsPreProcessor implements PermissionsPreProcessor
             {
                 if (e.getValue())
                 {
-                    perms.add(++i, e.getKey());
+                    perms.add(++i, (neg ? "-" : "") + e.getKey());
                 }
             }
         }
