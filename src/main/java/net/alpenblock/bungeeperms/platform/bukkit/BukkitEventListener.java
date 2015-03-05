@@ -138,8 +138,6 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         {
             User u = pm().getUser(userorgroup);
             pm().removeUserFromCache(u);
-
-            //refreshBukkitPermissions(userorgroup);
         }
         else if (cmd.equalsIgnoreCase("deletegroup"))
         {
