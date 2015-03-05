@@ -81,6 +81,12 @@ public class User
         //cache
         checkResults.put(perm.toLowerCase(), has);
 
+        //debug mode
+        if (BungeePerms.getInstance().getConfig().isDebug())
+        {
+            BungeePerms.getLogger().info("perm check: " + name + " has " + perm + ": " + has);
+        }
+
         return has;
     }
 
@@ -125,6 +131,12 @@ public class User
         //cache
         serverresults.put(perm.toLowerCase(), has);
 
+        //debug mode
+        if (BungeePerms.getInstance().getConfig().isDebug())
+        {
+            BungeePerms.getLogger().info("perm check: " + name + " has " + perm + ": " + has);
+        }
+        
         return has;
     }
 
@@ -176,6 +188,12 @@ public class User
         //cache
         worldresults.put(perm.toLowerCase(), has);
 
+        //debug mode
+        if (BungeePerms.getInstance().getConfig().isDebug())
+        {
+            BungeePerms.getLogger().info("perm check: " + name + " has " + perm + ": " + has);
+        }
+        
         return has;
     }
 

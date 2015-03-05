@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 
@@ -26,6 +27,10 @@ public class BPConfig
     private boolean notifyPromote;
     private boolean notifyDemote;
     private boolean tabComplete;
+    
+    //tmp at runtime
+    @Setter
+    private boolean debug;
 
     public BPConfig(Config config)
     {

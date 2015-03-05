@@ -15,10 +15,11 @@ import net.alpenblock.bungeeperms.uuid.UUIDFetcher;
 @AllArgsConstructor
 public class CommandHandler
 {
+
     protected PlatformPlugin plugin;
     protected PermissionsChecker checker;
     protected BPConfig config;
-    
+
     public boolean onCommand(Sender sender, String cmd, String label, String[] args)
     {
         if (!cmd.equalsIgnoreCase("bungeeperms"))
@@ -42,6 +43,10 @@ public class CommandHandler
             else if (args[0].equalsIgnoreCase("reload"))
             {
                 return handleReload(sender, args);
+            }
+            else if (args[0].equalsIgnoreCase("debug"))
+            {
+                return handleDebug(sender, args);
             }
             else if (args[0].equalsIgnoreCase("users"))
             {
@@ -109,6 +114,37 @@ public class CommandHandler
         BungeePerms.getInstance().reload();
         sender.sendMessage(Color.Text + "Permissions reloaded");
         return true;
+    }
+
+    private boolean handleDebug(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.debug", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 2))
+        {
+            return true;
+        }
+
+        if (args[1].equalsIgnoreCase("on"))
+        {
+            config.setDebug(true);
+            sender.sendMessage(Color.Text + "Debug mode enabled.");
+            return true;
+        }
+        else if (args[1].equalsIgnoreCase("off"))
+        {
+            config.setDebug(false);
+            sender.sendMessage(Color.Text + "Debug mode disabled.");
+            return true;
+        }
+        else
+        {
+            sender.sendMessage(Color.Error + "'on' or 'off' is required!");
+            return true;
+        }
     }
 
     private boolean handleUsers(Sender sender, String[] args)
@@ -1831,48 +1867,6 @@ public class CommandHandler
         return true;
     }
 
-    //todo: remove some time
-    private boolean handleBackend(Sender sender, String[] args)
-    {
-        if (!checker.hasOrConsole(sender, "bungeeperms.backend", true))
-        {
-            return true;
-        }
-
-        if (args.length == 1)
-        {
-            sender.sendMessage(Color.Text + "Currently using " + Color.Value + pm().getBackEnd().getType().name() + Color.Text + " as backend");
-        }
-        else if (args.length == 2)
-        {
-            String stype = args[1];
-            BackEndType type = BackEndType.getByName(stype);
-            if (type == null)
-            {
-                sender.sendMessage(Color.Error + "Invalid backend type! "
-                        + Color.Value + BackEndType.YAML.name() + Color.Error + ", "
-                        + Color.Value + BackEndType.MySQL.name() + Color.Error + " or "
-                        + Color.Value + BackEndType.MySQL2.name() + Color.Error + " is required!");
-                return true;
-            }
-
-            if (type == pm().getBackEnd().getType())
-            {
-                sender.sendMessage(Color.Error + "Invalid backend type! You can't migrate from " + Color.Value + pm().getBackEnd().getType().name() + Color.Error + " to " + Color.Value + type.name() + Color.Error + "!");
-                return true;
-            }
-
-            sender.sendMessage(Color.Text + "Migrating permissions to " + Color.Value + type.name() + Color.Text + " ...");
-            pm().migrateBackEnd(type);
-            sender.sendMessage(Color.Message + "Finished migration.");
-        }
-        else
-        {
-            Messages.sendTooManyArgsMessage(sender);
-        }
-        return true;
-    }
-
     private boolean handleMigrate(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.migrate", true))
@@ -2163,7 +2157,7 @@ public class CommandHandler
         }
         return true;
     }
-    
+
     private void showHelp(Sender sender)
     {
         sender.sendMessage(ChatColor.GOLD + "                  ------ BungeePerms - Help -----");
@@ -2319,13 +2313,13 @@ public class CommandHandler
         }
         sender.sendMessage(ChatColor.GOLD + "---------------------------------------------------");
     }
-    
+
     private PermissionsManager pm()
     {
         return BungeePerms.getInstance().getPermissionsManager();
     }
-    
-        private boolean parseTrueFalse(String truefalse)
+
+    private boolean parseTrueFalse(String truefalse)
     {
         if (Statics.argAlias(truefalse, "true", "yes", "t", "y", "+"))
         {
