@@ -6,9 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 import lombok.Getter;
-import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
@@ -117,15 +115,7 @@ public class BungeeEventListener implements Listener, EventListener
     public void onPermissionCheck(PermissionCheckEvent e)
     {
         CommandSender s = e.getSender();
-        String server = null;
-        String world = null;
-        if (s instanceof ProxiedPlayer)
-        {
-            ProxiedPlayer pp = (ProxiedPlayer) s;
-            server = pp.getServer() != null ? pp.getServer().getInfo().getName() : null;
-            world = server != null ? playerWorlds.get(e.getSender().getName()) : null;
-        }
-        e.setHasPermission(BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BungeeSender(s), e.getPermission(), server, world));
+        e.setHasPermission(BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BungeeSender(s), e.getPermission()));
     }
 
     @EventHandler

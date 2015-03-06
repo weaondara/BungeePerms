@@ -80,7 +80,7 @@ class BungeePermsHandler implements IPermissionsHandler
     public boolean hasPermission(Player player, String node)
     {
         BukkitConfig config = (BukkitConfig) perms.getConfig();
-        return perms.getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BukkitSender(player), node, config.getServername(), player.getWorld().getName());
+        return perms.getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BukkitSender(player), node);
     }
 
     @Override

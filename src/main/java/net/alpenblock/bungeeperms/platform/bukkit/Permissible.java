@@ -64,12 +64,7 @@ public class Permissible extends PermissibleBase
     @Override
     public boolean hasPermission(String permission)
     {
-        boolean res = BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(
-                new BukkitSender(sender),
-                permission,
-                ((BukkitConfig)BungeePerms.getInstance().getConfig()).getServername(),
-                (sender instanceof Player ? ((Player) sender).getWorld().getName() : null));
-//        System.out.println(sender.getName()+" has perm "+permission+"="+res);
+        boolean res = BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BukkitSender(sender), permission);
 //        if(sender instanceof ConsoleCommandSender)
 //        {
 //            System.out.println("console :D");

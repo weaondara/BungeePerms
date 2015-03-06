@@ -1,11 +1,9 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
 import lombok.AllArgsConstructor;
-import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.PermissionsChecker;
-import net.alpenblock.bungeeperms.User;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -13,8 +11,9 @@ import org.bukkit.entity.Player;
 @AllArgsConstructor
 public class BukkitPermissionsChecker extends PermissionsChecker
 {
+
     private final BukkitConfig config;
-    
+
 //without message
     /**
      * Checks if a user (no console) has a specific permission (globally).
@@ -25,11 +24,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasPerm(CommandSender sender, String permission)
     {
-        if (sender instanceof Player)
-        {
-            return (config.isUseUUIDs() ? pm().getUser(((Player) sender).getUniqueId()) : pm().getUser(sender.getName())).hasPerm(permission);
-        }
-        return false;
+        return hasPerm(new BukkitSender(sender), permission);
     }
 
     /**
@@ -41,15 +36,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOrConsole(CommandSender sender, String permission)
     {
-        if (sender instanceof Player)
-        {
-            return (config.isUseUUIDs() ? pm().getUser(((Player) sender).getUniqueId()) : pm().getUser(sender.getName())).hasPerm(permission);
-        }
-        else if (sender instanceof ConsoleCommandSender)
-        {
-            return true;
-        }
-        return false;
+        return hasPermOrConsole(new BukkitSender(sender), permission);
     }
 
     /**
@@ -61,17 +48,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOnServer(CommandSender sender, String permission)
     {
-        if (sender instanceof Player)
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((Player) sender).getUniqueId()) : pm().getUser(sender.getName());
-            if (((Player) sender).getServer() == null)
-            {
-                return user.hasPerm(permission);
-            }
-            String server = ((BukkitConfig)BungeePerms.getInstance().getConfig()).getServername();
-            return user.hasPermOnServer(permission, server);
-        }
-        return false;
+        return hasPermOnServer(new BukkitSender(sender), permission);
     }
 
     /**
@@ -83,21 +60,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOrConsoleOnServer(CommandSender sender, String permission)
     {
-        if (sender instanceof Player)
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((Player) sender).getUniqueId()) : pm().getUser(sender.getName());
-            if (((Player) sender).getServer() == null)
-            {
-                return user.hasPerm(permission);
-            }
-            String server = ((BukkitConfig)BungeePerms.getInstance().getConfig()).getServername();
-            return user.hasPermOnServer(permission, server);
-        }
-        else if (sender instanceof ConsoleCommandSender)
-        {
-            return true;
-        }
-        return false;
+        return hasPermOrConsoleOnServer(new BukkitSender(sender), permission);
     }
 
     /**
@@ -109,27 +72,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOnServerInWorld(CommandSender sender, String permission)
     {
-        if (sender instanceof Player)
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((Player) sender).getUniqueId()) : pm().getUser(sender.getName());
-
-            //per server
-            if (((Player) sender).getServer() == null)
-            {
-                return user.hasPerm(permission);
-            }
-
-            //per server and world
-            String server = ((BukkitConfig)BungeePerms.getInstance().getConfig()).getServername();
-            String world = BukkitPlugin.getInstance().getListener().getPlayerWorlds().get(sender.getName());
-            if (world == null)
-            {
-                return user.hasPermOnServer(permission, server);
-            }
-
-            return user.hasPermOnServerInWorld(permission, server, world);
-        }
-        return false;
+        return hasPermOnServerInWorld(new BukkitSender(sender), permission);
     }
 
     /**
@@ -141,29 +84,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOrConsoleOnServerInWorld(CommandSender sender, String permission)
     {
-        if (sender instanceof Player)
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((Player) sender).getUniqueId()) : pm().getUser(sender.getName());
-            if (((Player) sender).getServer() == null)
-            {
-                return user.hasPerm(permission);
-            }
-
-            //per server and world
-            String server = ((BukkitConfig)BungeePerms.getInstance().getConfig()).getServername();
-            String world = BukkitPlugin.getInstance().getListener().getPlayerWorlds().get(sender.getName());
-            if (world == null)
-            {
-                return user.hasPermOnServer(permission, server);
-            }
-
-            return user.hasPermOnServerInWorld(permission, server, world);
-        }
-        else if (sender instanceof ConsoleCommandSender)
-        {
-            return true;
-        }
-        return false;
+        return hasPermOrConsoleOnServerInWorld(new BukkitSender(sender), permission);
     }
 
 //with message
@@ -254,7 +175,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
         }
         return isperm;
     }
-    
+
     /**
      * Checks if a user (no console) has a specific permission on the current server and in the current world.
      *
