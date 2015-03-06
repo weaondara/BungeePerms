@@ -2262,6 +2262,18 @@ public class CommandHandler
         {
             sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> delete" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Deletes the given user");
         }
+        if (checker.hasPermOrConsole(sender, "bungeeperms.user.display"))
+        {
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> display [displayname> [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the display name for the given user");
+        }
+        if (checker.hasPermOrConsole(sender, "bungeeperms.user.prefix"))
+        {
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> prefix [prefix> [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the prefix for the given user");
+        }
+        if (checker.hasPermOrConsole(sender, "bungeeperms.user.suffix"))
+        {
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> suffix [suffix> [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the suffix for the given user");
+        }
         if (checker.hasPermOrConsole(sender, "bungeeperms.user.perms.add"))
         {
             sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> addperm <permission> [server [world]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Adds a permission to the given user");
