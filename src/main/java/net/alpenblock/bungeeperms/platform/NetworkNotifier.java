@@ -14,5 +14,9 @@ public interface NetworkNotifier
 
     public void reloadGroup(Group g, String origin);
 
+    public void reloadUsers(String origin);
+
+    public void reloadGroups(String origin);
+
     public void reloadAll(String origin);
 }
