@@ -256,6 +256,21 @@ public class CommandHandler
         {
             return handleUserCommandsSuffix(sender, args);
         }
+
+        //alias handling
+        else if (Statics.argAlias(args[2], "group", "perm", "permission"))
+        {
+            if (!Statics.matchArgs(sender, args, 5))
+            {
+                return true;
+            }
+
+            String[] newargs =
+            {
+                args[0], args[1], args[3] + args[2], args[4]
+            };
+            return onCommand(sender, "bungeeperms", "bp", newargs);
+        }
         return false;
     }
 
@@ -367,7 +382,7 @@ public class CommandHandler
 
         //all group perms
         sender.sendMessage(Lang.translate(MessageType.USER_ALL_PERMISSIONS_COUNT, user.getPermissionsCount()));
-        
+
         //display
         sender.sendMessage(Lang.translate(MessageType.DISPLAY, (user.getDisplay().length() > 0 ? user.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
@@ -948,6 +963,21 @@ public class CommandHandler
         else if (args[2].equalsIgnoreCase("suffix"))
         {
             return handleGroupCommandsSuffix(sender, args);
+        }
+
+        //alias handling
+        else if (Statics.argAlias(args[2], "perm", "permission"))
+        {
+            if (!Statics.matchArgs(sender, args, 5))
+            {
+                return true;
+            }
+
+            String[] newargs =
+            {
+                args[0], args[1], args[3] + args[2], args[4]
+            };
+            return onCommand(sender, "bungeeperms", "bp", newargs);
         }
         return false;
     }
