@@ -245,6 +245,18 @@ public class CommandHandler
         {
             return handleUserCommandsGroupSet(sender, args);
         }
+        else if (args[2].equalsIgnoreCase("display"))
+        {
+            return handleUserCommandsDisplay(sender, args);
+        }
+        else if (args[2].equalsIgnoreCase("prefix"))
+        {
+            return handleUserCommandsPrefix(sender, args);
+        }
+        else if (args[2].equalsIgnoreCase("suffix"))
+        {
+            return handleUserCommandsSuffix(sender, args);
+        }
         return false;
     }
 
@@ -418,21 +430,21 @@ public class CommandHandler
         }
         else
         {
+            Server srv = user.getServers().get(server);
+            if (srv == null)
+            {
+                srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+                user.getServers().put(server, srv);
+            }
+
             if (world == null)
             {
-                List<String> perserverperms = user.getServerPerms().get(server);
-                if (perserverperms == null)
-                {
-                    perserverperms = new ArrayList<>();
-                    user.getServerPerms().put(server, perserverperms);
-                }
-
-                if (perserverperms.contains("-" + perm))
+                if (srv.getPerms().contains("-" + perm))
                 {
                     pm().removeUserPerServerPerm(user, server, "-" + perm);
                     sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
                 }
-                else if (!perserverperms.contains(perm))
+                else if (!srv.getPerms().contains(perm))
                 {
                     pm().addUserPerServerPerm(user, server, perm);
                     sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
@@ -444,26 +456,19 @@ public class CommandHandler
             }
             else
             {
-                Map<String, List<String>> perserverperms = user.getServerWorldPerms().get(server);
-                if (perserverperms == null)
+                World w = srv.getWorlds().get(world);
+                if (w == null)
                 {
-                    perserverperms = new HashMap<>();
-                    user.getServerWorldPerms().put(server, perserverperms);
+                    w = new World(world, new ArrayList<String>(), "", "", "");
+                    srv.getWorlds().put(world, w);
                 }
 
-                List<String> perserverworldperms = perserverperms.get(world);
-                if (perserverworldperms == null)
-                {
-                    perserverworldperms = new ArrayList<>();
-                    perserverperms.put(world, perserverworldperms);
-                }
-
-                if (perserverworldperms.contains("-" + perm))
+                if (w.getPerms().contains("-" + perm))
                 {
                     pm().removeUserPerServerWorldPerm(user, server, world, "-" + perm);
                     sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
                 }
-                else if (!perserverworldperms.contains(perm))
+                else if (!w.getPerms().contains(perm))
                 {
                     pm().addUserPerServerWorldPerm(user, server, world, perm);
                     sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
@@ -519,21 +524,21 @@ public class CommandHandler
         }
         else
         {
+            Server srv = user.getServers().get(server);
+            if (srv == null)
+            {
+                srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+                user.getServers().put(server, srv);
+            }
+
             if (world == null)
             {
-                List<String> perserverperms = user.getServerPerms().get(server);
-                if (perserverperms == null)
-                {
-                    perserverperms = new ArrayList<>();
-                    user.getServerPerms().put(server, perserverperms);
-                }
-
-                if (perserverperms.contains(perm))
+                if (srv.getPerms().contains(perm))
                 {
                     pm().removeUserPerServerPerm(user, server, perm);
                     sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
                 }
-                else if (!perserverperms.contains("-" + perm))
+                else if (!srv.getPerms().contains("-" + perm))
                 {
                     pm().addUserPerServerPerm(user, server, "-" + perm);
                     sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
@@ -545,26 +550,19 @@ public class CommandHandler
             }
             else
             {
-                Map<String, List<String>> perserverperms = user.getServerWorldPerms().get(server);
-                if (perserverperms == null)
+                World w = srv.getWorlds().get(world);
+                if (w == null)
                 {
-                    perserverperms = new HashMap<>();
-                    user.getServerWorldPerms().put(server, perserverperms);
+                    w = new World(world, new ArrayList<String>(), "", "", "");
+                    srv.getWorlds().put(world, w);
                 }
 
-                List<String> perserverworldperms = perserverperms.get(world);
-                if (perserverworldperms == null)
-                {
-                    perserverworldperms = new ArrayList<>();
-                    perserverperms.put(world, perserverworldperms);
-                }
-
-                if (perserverworldperms.contains(perm))
+                if (w.getPerms().contains(perm))
                 {
                     pm().removeUserPerServerWorldPerm(user, server, world, perm);
                     sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
                 }
-                else if (!perserverworldperms.contains("-" + perm))
+                else if (!w.getPerms().contains("-" + perm))
                 {
                     pm().addUserPerServerWorldPerm(user, server, world, "-" + perm);
                     sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
@@ -742,6 +740,87 @@ public class CommandHandler
 
         pm().addUserGroup(u, group);
         sender.sendMessage(Color.Text + "Set group " + Color.Value + groupname + Color.Text + " for player " + Color.User + u.getName() + Color.Text + ".");
+        return true;
+    }
+
+    private boolean handleUserCommandsDisplay(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.user.display", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 3, 6))
+        {
+            return true;
+        }
+
+        String player = Statics.getFullPlayerName(args[1]);
+        String display = args.length > 3 ? args[3] : "";
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
+        User user = pm().getUser(player);
+        if (user == null)
+        {
+            sender.sendMessage(Color.Error + "The user " + Color.Value + player + Color.Error + " does not exist!");
+            return true;
+        }
+        pm().setUserDisplay(user, display, server, world);
+        sender.sendMessage(Color.Text + "Set display name for user " + Color.Value + user.getName() + Color.Text + ".");
+        return true;
+    }
+
+    private boolean handleUserCommandsPrefix(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.user.prefix", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 3, 6))
+        {
+            return true;
+        }
+
+        String player = Statics.getFullPlayerName(args[1]);
+        String prefix = args.length > 3 ? args[3] : "";
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
+        User user = pm().getUser(player);
+        if (user == null)
+        {
+            sender.sendMessage(Color.Error + "The user " + Color.Value + player + Color.Error + " does not exist!");
+            return true;
+        }
+        pm().setUserPrefix(user, prefix, server, world);
+        sender.sendMessage(Color.Text + "Set prefix for user " + Color.Value + user.getName() + Color.Text + ".");
+        return true;
+    }
+
+    private boolean handleUserCommandsSuffix(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.user.suffix", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 3, 6))
+        {
+            return true;
+        }
+
+        String player = Statics.getFullPlayerName(args[1]);
+        String suffix = args.length > 3 ? args[3] : "";
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
+        User user = pm().getUser(player);
+        if (user == null)
+        {
+            sender.sendMessage(Color.Error + "The user " + Color.Value + player + Color.Error + " does not exist!");
+            return true;
+        }
+        pm().setUserSuffix(user, suffix, server, world);
+        sender.sendMessage(Color.Text + "Set suffix for user " + Color.Value + user.getName() + Color.Text + ".");
         return true;
     }
 //end user commands

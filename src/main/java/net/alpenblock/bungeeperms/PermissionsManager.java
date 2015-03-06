@@ -711,14 +711,14 @@ public class PermissionsManager
     public void addUserPerServerPerm(User user, String server, String perm)
     {
         //cache
-        List<String> perserverperms = user.getServerPerms().get(server);
-        if (perserverperms == null)
+        Server srv = user.getServers().get(server);
+        if (srv == null)
         {
-            perserverperms = new ArrayList<>();
+            srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            user.getServers().put(server, srv);
         }
 
-        perserverperms.add(perm);
-        user.getServerPerms().put(server, perserverperms);
+        srv.getPerms().add(perm);
 
         //database
         backEnd.saveUserPerServerPerms(user, server);
@@ -740,14 +740,14 @@ public class PermissionsManager
     public void removeUserPerServerPerm(User user, String server, String perm)
     {
         //cache
-        List<String> perserverperms = user.getServerPerms().get(server);
-        if (perserverperms == null)
+        Server srv = user.getServers().get(server);
+        if (srv == null)
         {
-            perserverperms = new ArrayList<>();
+            srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            user.getServers().put(server, srv);
         }
 
-        perserverperms.remove(perm);
-        user.getServerPerms().put(server, perserverperms);
+        srv.getPerms().remove(perm);
 
         //database
         backEnd.saveUserPerServerPerms(user, server);
@@ -770,21 +770,22 @@ public class PermissionsManager
     public void addUserPerServerWorldPerm(User user, String server, String world, String perm)
     {
         //cache
-        Map<String, List<String>> perserverperms = user.getServerWorldPerms().get(server);
-        if (perserverperms == null)
+        //cache
+        Server srv = user.getServers().get(server);
+        if (srv == null)
         {
-            perserverperms = new HashMap<>();
+            srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            user.getServers().put(server, srv);
         }
 
-        List<String> perserverworldperms = perserverperms.get(world);
-        if (perserverworldperms == null)
+        World w = srv.getWorlds().get(world);
+        if (w == null)
         {
-            perserverworldperms = new ArrayList<>();
+            w = new World(world, new ArrayList<String>(), "", "", "");
+            srv.getWorlds().put(world, w);
         }
 
-        perserverworldperms.add(perm);
-        perserverperms.put(world, perserverworldperms);
-        user.getServerWorldPerms().put(server, perserverperms);
+        w.getPerms().add(perm);
 
         //database
         backEnd.saveUserPerServerWorldPerms(user, server, world);
@@ -807,27 +808,87 @@ public class PermissionsManager
     public void removeUserPerServerWorldPerm(User user, String server, String world, String perm)
     {
         //cache
-        Map<String, List<String>> perserverperms = user.getServerWorldPerms().get(server);
-        if (perserverperms == null)
+        Server srv = user.getServers().get(server);
+        if (srv == null)
         {
-            perserverperms = new HashMap<>();
+            srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            user.getServers().put(server, srv);
         }
 
-        List<String> perserverworldperms = perserverperms.get(world);
-        if (perserverworldperms == null)
+        World w = srv.getWorlds().get(world);
+        if (w == null)
         {
-            perserverworldperms = new ArrayList<>();
+            w = new World(world, new ArrayList<String>(), "", "", "");
+            srv.getWorlds().put(world, w);
         }
 
-        perserverworldperms.remove(perm);
-        perserverperms.put(world, perserverworldperms);
-        user.getServerWorldPerms().put(server, perserverperms);
+        w.getPerms().remove(perm);
 
         //database
         backEnd.saveUserPerServerWorldPerms(user, server, world);
 
         //recalc perms
         user.recalcPerms(server, world);
+
+        //send bukkit update info
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+    }
+
+    /**
+     * Sets the displayname of the group
+     *
+     * @param user
+     * @param display
+     * @param server
+     * @param world
+     */
+    public void setUserDisplay(User user, String display, String server, String world)
+    {
+        //cache
+        user.setDisplay(display);
+
+        //database
+        backEnd.saveUserDisplay(user, server, world);
+
+        //send bukkit update info
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+    }
+
+    /**
+     * Sets the prefix for the group.
+     *
+     * @param user
+     * @param prefix
+     * @param server
+     * @param world
+     */
+    public void setUserPrefix(User user, String prefix, String server, String world)
+    {
+        //cache
+        user.setPrefix(prefix);
+
+        //database
+        backEnd.saveUserPrefix(user, server, world);
+
+        //send bukkit update info
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+    }
+
+    /**
+     * Sets the suffix for the group.
+     *
+     * @param user
+     * @param suffix
+     * @param server
+     * @param world
+     */
+    public void setUserSuffix(User user, String suffix, String server, String world)
+    {
+        //cache
+        user.setSuffix(suffix);
+
+        //database
+        backEnd.saveUserSuffix(user, server, world);
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
@@ -903,11 +964,10 @@ public class PermissionsManager
         if (srv == null)
         {
             srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            group.getServers().put(server, srv);
         }
 
         srv.getPerms().add(perm);
-
-        group.getServers().put(server, srv);
 
         //database
         backEnd.saveGroupPerServerPerms(group, server);
@@ -940,11 +1000,10 @@ public class PermissionsManager
         if (srv == null)
         {
             srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            group.getServers().put(server, srv);
         }
 
         srv.getPerms().remove(perm);
-
-        group.getServers().put(server, srv);
 
         //database
         backEnd.saveGroupPerServerPerms(group, server);
@@ -978,17 +1037,17 @@ public class PermissionsManager
         if (srv == null)
         {
             srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            group.getServers().put(server, srv);
         }
 
         World w = srv.getWorlds().get(world);
         if (w == null)
         {
             w = new World(world, new ArrayList<String>(), "", "", "");
+            srv.getWorlds().put(world, w);
         }
 
         w.getPerms().add(perm);
-        srv.getWorlds().put(world, w);
-        group.getServers().put(server, srv);
 
         //database
         backEnd.saveGroupPerServerWorldPerms(group, server, world);
@@ -1022,17 +1081,17 @@ public class PermissionsManager
         if (srv == null)
         {
             srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            group.getServers().put(server, srv);
         }
 
         World w = srv.getWorlds().get(world);
         if (w == null)
         {
             w = new World(world, new ArrayList<String>(), "", "", "");
+            srv.getWorlds().put(world, w);
         }
 
         w.getPerms().remove(perm);
-        srv.getWorlds().put(world, w);
-        group.getServers().put(server, srv);
 
         //database
         backEnd.saveGroupPerServerWorldPerms(group, server, world);

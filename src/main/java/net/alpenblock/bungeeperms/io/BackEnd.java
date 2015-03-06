@@ -52,6 +52,12 @@ public interface BackEnd
 
     public void saveUserPerServerWorldPerms(User user, String server, String world);
 
+    public void saveUserDisplay(User user, String server, String world);
+
+    public void saveUserPrefix(User user, String server, String world);
+
+    public void saveUserSuffix(User user, String server, String world);
+
     public void saveGroupPerms(Group group);
 
     public void saveGroupPerServerPerms(Group group, String server);

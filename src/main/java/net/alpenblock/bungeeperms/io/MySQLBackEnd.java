@@ -154,6 +154,11 @@ public class MySQLBackEnd implements BackEnd
 
         //load user from database
         List<String> sgroups = permsconf.getListString("users." + user + ".groups", new ArrayList<String>());
+        List<String> perms = permsconf.getListString("users." + user + ".permissions", new ArrayList<String>());
+        String display = permsconf.getString("users." + user + ".display", "");
+        String prefix = permsconf.getString("users." + user + ".prefix", "");
+        String suffix = permsconf.getString("users." + user + ".suffix", "");
+
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
         {
@@ -163,26 +168,34 @@ public class MySQLBackEnd implements BackEnd
                 lgroups.add(g);
             }
         }
-        List<String> extrapermissions = permsconf.getListString("users." + user + ".permissions", new ArrayList<String>());
 
-        Map<String, List<String>> serverperms = new HashMap<>();
-        Map<String, Map<String, List<String>>> serverworldperms = new HashMap<>();
+        //per server perms
+        Map<String, Server> servers = new HashMap<>();
         for (String server : permsconf.getSubNodes("users." + user + ".servers"))
         {
-            //per server perms
-            serverperms.put(server, permsconf.getListString("users." + user + ".servers." + server + ".permissions", new ArrayList<String>()));
+            List<String> serverperms = permsconf.getListString("users." + user + ".servers." + server + ".permissions", new ArrayList<String>());
+            String sdisplay = permsconf.getString("users." + user + ".servers." + server + ".display", "");
+            String sprefix = permsconf.getString("users." + user + ".servers." + server + ".prefix", "");
+            String ssuffix = permsconf.getString("users." + user + ".servers." + server + ".suffix", "");
 
             //per server world perms
-            Map<String, List<String>> worldperms = new HashMap<>();
+            Map<String, World> worlds = new HashMap<>();
             for (String world : permsconf.getSubNodes("users." + user + ".servers." + server + ".worlds"))
             {
-                worldperms.put(world, permsconf.getListString("users." + user + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>()));
+                List<String> worldperms = permsconf.getListString("users." + user + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
+                String wdisplay = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".display", "");
+                String wprefix = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".prefix", "");
+                String wsuffix = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".suffix", "");
+
+                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(world, w);
             }
-            serverworldperms.put(server, worldperms);
+
+            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         UUID uuid = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(user);
-        User u = new User(user, uuid, lgroups, extrapermissions, serverperms, serverworldperms);
+        User u = new User(user, uuid, lgroups, perms, servers, display, prefix, suffix);
         return u;
     }
 
@@ -196,6 +209,11 @@ public class MySQLBackEnd implements BackEnd
 
         //load user from database
         List<String> sgroups = permsconf.getListString("users." + user + ".groups", new ArrayList<String>());
+        List<String> perms = permsconf.getListString("users." + user + ".permissions", new ArrayList<String>());
+        String display = permsconf.getString("users." + user + ".display", "");
+        String prefix = permsconf.getString("users." + user + ".prefix", "");
+        String suffix = permsconf.getString("users." + user + ".suffix", "");
+
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
         {
@@ -205,26 +223,34 @@ public class MySQLBackEnd implements BackEnd
                 lgroups.add(g);
             }
         }
-        List<String> extrapermissions = permsconf.getListString("users." + user + ".permissions", new ArrayList<String>());
 
-        Map<String, List<String>> serverperms = new HashMap<>();
-        Map<String, Map<String, List<String>>> serverworldperms = new HashMap<>();
+        //per server perms
+        Map<String, Server> servers = new HashMap<>();
         for (String server : permsconf.getSubNodes("users." + user + ".servers"))
         {
-            //per server perms
-            serverperms.put(server, permsconf.getListString("users." + user + ".servers." + server + ".permissions", new ArrayList<String>()));
+            List<String> serverperms = permsconf.getListString("users." + user + ".servers." + server + ".permissions", new ArrayList<String>());
+            String sdisplay = permsconf.getString("users." + user + ".servers." + server + ".display", "");
+            String sprefix = permsconf.getString("users." + user + ".servers." + server + ".prefix", "");
+            String ssuffix = permsconf.getString("users." + user + ".servers." + server + ".suffix", "");
 
             //per server world perms
-            Map<String, List<String>> worldperms = new HashMap<>();
+            Map<String, World> worlds = new HashMap<>();
             for (String world : permsconf.getSubNodes("users." + user + ".servers." + server + ".worlds"))
             {
-                worldperms.put(world, permsconf.getListString("users." + user + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>()));
+                List<String> worldperms = permsconf.getListString("users." + user + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
+                String wdisplay = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".display", "");
+                String wprefix = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".prefix", "");
+                String wsuffix = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".suffix", "");
+
+                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(world, w);
             }
-            serverworldperms.put(server, worldperms);
+
+            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         String username = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
-        User u = new User(username, user, lgroups, extrapermissions, serverperms, serverworldperms);
+        User u = new User(username, user, lgroups, perms, servers, display, prefix, suffix);
         return u;
     }
 
@@ -278,18 +304,25 @@ public class MySQLBackEnd implements BackEnd
             {
                 groups.add(g.getName());
             }
-            permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".groups", groups);
-            permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".permissions", user.getExtraPerms());
 
-            for (Map.Entry<String, List<String>> se : user.getServerPerms().entrySet())
+            String uname = BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName();
+
+            permsconf.setListString("users." + uname + ".groups", groups);
+            permsconf.setListString("users." + uname + ".permissions", user.getExtraPerms());
+
+            for (Map.Entry<String, Server> se : user.getServers().entrySet())
             {
-                permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + se.getKey() + ".permissions", se.getValue());
-            }
-            for (Map.Entry<String, Map<String, List<String>>> swe : user.getServerWorldPerms().entrySet())
-            {
-                for (Map.Entry<String, List<String>> we : swe.getValue().entrySet())
+                permsconf.setListString("users." + uname + ".servers." + se.getKey() + ".permissions", se.getValue().getPerms());
+                permsconf.setString("users." + uname + ".servers." + se.getKey() + ".display", se.getValue().getDisplay());
+                permsconf.setString("users." + uname + ".servers." + se.getKey() + ".prefix", se.getValue().getPrefix());
+                permsconf.setString("users." + uname + ".servers." + se.getKey() + ".suffix", se.getValue().getSuffix());
+
+                for (Map.Entry<String, World> we : se.getValue().getWorlds().entrySet())
                 {
-                    permsconf.getListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + swe.getKey() + ".worlds." + we.getKey() + ".permissions", we.getValue());
+                    permsconf.setListString("users." + uname + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".permissions", we.getValue().getPerms());
+                    permsconf.setString("users." + uname + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".display", we.getValue().getDisplay());
+                    permsconf.setString("users." + uname + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".prefix", we.getValue().getPrefix());
+                    permsconf.setString("users." + uname + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".suffix", we.getValue().getSuffix());
                 }
             }
         }
@@ -357,13 +390,31 @@ public class MySQLBackEnd implements BackEnd
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server)
     {
-        permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".permissions", user.getServerPerms().get(server));
+        permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".permissions", user.getServers().get(server).getPerms());
     }
 
     @Override
     public synchronized void saveUserPerServerWorldPerms(User user, String server, String world)
     {
-        permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds." + world + ".permissions", user.getServerWorldPerms().get(server).get(world));
+        permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds." + world + ".permissions", user.getServers().get(server).getWorlds().get(world).getPerms());
+    }
+
+    @Override
+    public synchronized void saveUserDisplay(User user, String server, String world)
+    {
+        permsconf.setString("users." + user.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".display", user.getDisplay());
+    }
+
+    @Override
+    public synchronized void saveUserPrefix(User user, String server, String world)
+    {
+        permsconf.setString("users." + user.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".prefix", user.getPrefix());
+    }
+
+    @Override
+    public synchronized void saveUserSuffix(User user, String server, String world)
+    {
+        permsconf.setString("users." + user.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".suffix", user.getSuffix());
     }
 
     @Override
@@ -570,8 +621,15 @@ public class MySQLBackEnd implements BackEnd
         {
         }
 
+        String uname = config.isUseUUIDs() ? user.getUUID().toString() : user.getName();
+
         //load user from database
-        List<String> sgroups = permsconf.getListString("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".groups", new ArrayList<String>());
+        List<String> sgroups = permsconf.getListString("users." + uname + ".groups", new ArrayList<String>());
+        List<String> globalperms = permsconf.getListString("users." + uname + ".permissions", new ArrayList<String>());
+        String display = permsconf.getString("users." + uname + ".display", "");
+        String prefix = permsconf.getString("users." + uname + ".prefix", "");
+        String suffix = permsconf.getString("users." + uname + ".suffix", "");
+
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
         {
@@ -581,27 +639,37 @@ public class MySQLBackEnd implements BackEnd
                 lgroups.add(g);
             }
         }
-        List<String> extrapermissions = permsconf.getListString("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".permissions", new ArrayList<String>());
 
-        Map<String, List<String>> serverperms = new HashMap<>();
-        Map<String, Map<String, List<String>>> serverworldperms = new HashMap<>();
-        for (String server : permsconf.getSubNodes("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers"))
+        //per server perms
+        Map<String, Server> servers = new HashMap<>();
+        for (String server : permsconf.getSubNodes("users." + uname + ".servers"))
         {
-            //per server perms
-            serverperms.put(server, permsconf.getListString("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".permissions", new ArrayList<String>()));
+            List<String> serverperms = permsconf.getListString("users." + uname + ".servers." + server + ".permissions", new ArrayList<String>());
+            String sdisplay = permsconf.getString("users." + uname + ".servers." + server + ".display", "");
+            String sprefix = permsconf.getString("users." + uname + ".servers." + server + ".prefix", "");
+            String ssuffix = permsconf.getString("users." + uname + ".servers." + server + ".suffix", "");
 
             //per server world perms
-            Map<String, List<String>> worldperms = new HashMap<>();
-            for (String world : permsconf.getSubNodes("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds"))
+            Map<String, World> worlds = new HashMap<>();
+            for (String world : permsconf.getSubNodes("users." + uname + ".servers." + server + ".worlds"))
             {
-                worldperms.put(world, permsconf.getListString("users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>()));
+                List<String> worldperms = permsconf.getListString("users." + uname + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
+                String wdisplay = permsconf.getString("users." + uname + ".servers." + server + ".worlds." + world + ".display", "");
+                String wprefix = permsconf.getString("users." + uname + ".servers." + server + ".worlds." + world + ".prefix", "");
+                String wsuffix = permsconf.getString("users." + uname + ".servers." + server + ".worlds." + world + ".suffix", "");
+
+                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(world, w);
             }
-            serverworldperms.put(server, worldperms);
+
+            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         user.setGroups(lgroups);
-        user.setExtraPerms(extrapermissions);
-        user.setServerPerms(serverperms);
-        user.setServerWorldPerms(serverworldperms);
+        user.setExtraPerms(globalperms);
+        user.setDisplay(display);
+        user.setPrefix(prefix);
+        user.setSuffix(suffix);
+        user.setServers(servers);
     }
 }

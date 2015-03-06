@@ -11,6 +11,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.PermissionsManager;
+import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.EventListener;
@@ -96,7 +97,7 @@ public class BungeeEventListener implements Listener, EventListener
             });
 
             List<Group> groups = pm().getDefaultGroups();
-            u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, List<String>>(), new HashMap<String, Map<String, List<String>>>());
+            u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), "", "", "");
             pm().addUserToCache(u);
 
             pm().getBackEnd().saveUser(u, true);

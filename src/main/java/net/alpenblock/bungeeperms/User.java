@@ -20,19 +20,27 @@ public class User
     @Getter(value = AccessLevel.PRIVATE)
     @Setter(value = AccessLevel.PRIVATE)
     private Map<String, List<String>> cachedPerms;
+    @Getter(value = AccessLevel.PRIVATE)
+    @Setter(value = AccessLevel.PRIVATE)
+    private Map<String, Boolean> checkResults;
+    @Getter(value = AccessLevel.PRIVATE)
+    @Setter(value = AccessLevel.PRIVATE)
+    private Map<String, Map<String, Boolean>> serverCheckResults;
+    @Getter(value = AccessLevel.PRIVATE)
+    @Setter(value = AccessLevel.PRIVATE)
+    private Map<String, Map<String, Map<String, Boolean>>> serverWorldCheckResults;
 
     private String name;
     private UUID UUID;
     private List<Group> groups;
     private List<String> extraPerms;
-    private Map<String, List<String>> serverPerms;
-    private Map<String, Map<String, List<String>>> serverWorldPerms;
+    private Map<String, Server> servers;
 
-    private Map<String, Boolean> checkResults;
-    private Map<String, Map<String, Boolean>> serverCheckResults;
-    private Map<String, Map<String, Map<String, Boolean>>> serverWorldCheckResults;
+    private String display;
+    private String prefix;
+    private String suffix;
 
-    public User(String name, UUID UUID, List<Group> groups, List<String> extraPerms, Map<String, List<String>> serverPerms, Map<String, Map<String, List<String>>> serverWorldPerms)
+    public User(String name, UUID UUID, List<Group> groups, List<String> extraPerms, Map<String, Server> servers, String display, String prefix, String suffix)
     {
         cachedPerms = new HashMap<>();
         checkResults = new HashMap<>();
@@ -43,8 +51,11 @@ public class User
         this.UUID = UUID;
         this.groups = groups;
         this.extraPerms = extraPerms;
-        this.serverPerms = serverPerms;
-        this.serverWorldPerms = serverWorldPerms;
+        this.servers = servers;
+
+        this.display = display;
+        this.prefix = prefix;
+        this.suffix = suffix;
     }
 
     public boolean hasPerm(String perm)
@@ -262,10 +273,11 @@ public class User
         ret.addAll(extraPerms);
 
         //per server perms
-        List<String> perserverPerms = serverPerms.get(server.toLowerCase());
-        if (perserverPerms != null)
+        Server srv = servers.get(server.toLowerCase());
+        if (srv != null)
         {
-            ret.addAll(perserverPerms);
+            List<String> perserverperms = srv.getPerms();
+            ret.addAll(perserverperms);
         }
 
         ret = BungeePerms.getInstance().getPermissionsResolver().simplify(ret);
@@ -285,20 +297,17 @@ public class User
         ret.addAll(extraPerms);
 
         //per server perms
-        List<String> perserverPerms = serverPerms.get(server.toLowerCase());
-        if (perserverPerms != null)
+        Server srv = servers.get(server.toLowerCase());
+        if (srv != null)
         {
-            ret.addAll(perserverPerms);
-        }
+            List<String> perserverperms = srv.getPerms();
+            ret.addAll(perserverperms);
 
-        //per server world perms
-        Map<String, List<String>> serverPerms = serverWorldPerms.get(server.toLowerCase());
-        if (serverPerms != null)
-        {
-            List<String> serverWorldPerms = serverPerms.get(world.toLowerCase());
-            if (serverWorldPerms != null)
+            World w = srv.getWorlds().get(world.toLowerCase());
+            if (w != null)
             {
-                ret.addAll(serverWorldPerms);
+                List<String> serverworldperms = w.getPerms();
+                ret.addAll(serverworldperms);
             }
         }
 
@@ -401,7 +410,21 @@ public class User
                 return false;
             }
         }
-        return serverWorldPerms.isEmpty() & serverPerms.isEmpty() & extraPerms.isEmpty();
+        for (Server s : servers.values())
+        {
+            if (!s.getPerms().isEmpty() || !s.getDisplay().isEmpty() || !s.getDisplay().isEmpty() || !s.getDisplay().isEmpty())
+            {
+                return false;
+            }
+            for (World w : s.getWorlds().values())
+            {
+                if (!s.getPerms().isEmpty() || !w.getDisplay().isEmpty() || !w.getDisplay().isEmpty() || !w.getDisplay().isEmpty())
+                {
+                    return false;
+                }
+            }
+        }
+        return extraPerms.isEmpty() && display.isEmpty() && prefix.isEmpty() && suffix.isEmpty();
     }
 
     public Group getGroupByLadder(String ladder)
@@ -433,42 +456,38 @@ public class User
         }
 
         //per server perms
-        for (Map.Entry<String, List<String>> srv : serverPerms.entrySet())
+        for (Map.Entry<String, Server> srv : servers.entrySet())
         {
             //check for server
-            if (server != null && !srv.getKey().equalsIgnoreCase(server))
+            if (server == null || !srv.getKey().equalsIgnoreCase(server))
             {
                 continue;
             }
 
-            List<String> perserverPerms = srv.getValue();
+            List<String> perserverPerms = srv.getValue().getPerms();
             for (String s : perserverPerms)
             {
                 BPPermission perm = new BPPermission(s, name, false, srv.getKey(), null);
                 ret.add(perm);
+            }
 
-                //per server world perms
-                Map<String, List<String>> worldperms = serverWorldPerms.get(srv.getKey());
-                if (worldperms == null)
+            //per server world perms
+            for (Map.Entry<String, World> w : srv.getValue().getWorlds().entrySet())
+            {
+                //check for world
+                if (world == null || !w.getKey().equalsIgnoreCase(world))
                 {
                     continue;
                 }
-                for (Map.Entry<String, List<String>> w : worldperms.entrySet())
-                {
-                    //check for world
-                    if (world != null && !w.getKey().equalsIgnoreCase(world))
-                    {
-                        continue;
-                    }
 
-                    List<String> perserverWorldPerms = w.getValue();
-                    for (String s2 : perserverWorldPerms)
-                    {
-                        BPPermission perm2 = new BPPermission(s2, name, false, srv.getKey(), w.getKey());
-                        ret.add(perm2);
-                    }
+                List<String> perserverWorldPerms = w.getValue().getPerms();
+                for (String s2 : perserverWorldPerms)
+                {
+                    BPPermission perm2 = new BPPermission(s2, name, false, srv.getKey(), w.getKey());
+                    ret.add(perm2);
                 }
             }
+
         }
 
         return ret;
@@ -489,16 +508,12 @@ public class User
     {
         int count = extraPerms.size();
 
-        for (List<String> s : serverPerms.values())
+        for (Server s : servers.values())
         {
-            count += s.size();
-        }
-
-        for (Map<String, List<String>> s : serverWorldPerms.values())
-        {
-            for (List<String> w : s.values())
+            count += s.getPerms().size();
+            for (World w : s.getWorlds().values())
             {
-                count += w.size();
+                count += w.getPerms().size();
             }
         }
 
