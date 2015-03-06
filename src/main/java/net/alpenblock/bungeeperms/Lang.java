@@ -147,8 +147,8 @@ public class Lang
         DISPLAY("common.display", Color.Text.alt() + "Dislay: " + ChatColor.RESET.alt() + "{0}"),
         PREFIX("common.prefix", Color.Text.alt() + "Prefix: " + ChatColor.RESET.alt() + "{0}"),
         SUFFIX("common.suffix", Color.Text.alt() + "Suffix: " + ChatColor.RESET.alt() + "{0}"),
+        PERMISSIONS_LIST_ITEM("common.permissions-list-item", Color.Text.alt() + "- " + Color.Value.alt() + "{0}" + Color.Text.alt() + " (" + Color.Value.alt() + "{1}" + Color.Text.alt() + "{2}{3})"),
         //util & partss
-        PERMISSIONS_LIST_ITEM("general.permissions-list-item", Color.Text.alt() + "- " + Color.Value.alt() + "{0}" + Color.Text.alt() + " (" + Color.Value.alt() + "{1}" + Color.Text.alt() + "{2}{3})"),
         OWN("general.own", "own"),
         NONE("general.none", "none"),
         DEFAULT("general.default", "default"),

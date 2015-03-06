@@ -85,9 +85,6 @@ group:
   weight: '&7Weight: &6{0}'
   ladder: '&7Ladder: &6{0}'
   default: '&7Default: {0}'
-  display: '&7Dislay name: &r{0}'
-  prefix: '&7Prefix: &r{0}'
-  suffix: '&7Suffix: &r{0}'
   users-header: '&7Following players are in group &6{0}&7: '
   users-header-count: '&7There are &6{0}&7 players in group &6{1}&7.'
   created: '&7Group {0} created'
@@ -127,8 +124,12 @@ group:
   set-display: '&7Set display name for group &6{0}&7.'
   set-prefix: '&7Set prefix for group &6{0}&7.'
   set-suffix: '&7Set suffix for group &6{0}&7.'
-general:
+common:
+  display: '&7Dislay: &r{0}'
+  prefix: '&7Prefix: &r{0}'
+  suffix: '&7Suffix: &r{0}'
   permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3})'
+general:
   own: own
   none: none
   default: default
