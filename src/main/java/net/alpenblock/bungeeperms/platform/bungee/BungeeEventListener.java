@@ -82,19 +82,13 @@ public class BungeeEventListener implements Listener, EventListener
         }
         else
         {
-            BungeePerms.getLogger().log(Level.INFO, "Login by {0}", new Object[]
-                                {
-                                    playername
-            });
+            BungeePerms.getLogger().log(Level.INFO, Statics.format("Login by {0}", playername));
         }
 
         User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
         if (u == null)
         {
-            BungeePerms.getLogger().log(Level.INFO, "Adding default groups to {0} ({1})", new Object[]
-                                {
-                                    playername, uuid
-            });
+            BungeePerms.getLogger().log(Level.INFO, Statics.format("Adding default groups to {0} ({1})", playername, uuid));
 
             List<Group> groups = pm().getDefaultGroups();
             u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), "", "", "");

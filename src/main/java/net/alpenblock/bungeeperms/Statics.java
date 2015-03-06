@@ -215,6 +215,11 @@ public class Statics
         return true;
     }
 
+    public static String format(String format, Object... args)
+    {
+        return String.format(format, args);
+    }
+
     @SneakyThrows
     public static void unregisterListener(Listener l)
     {
