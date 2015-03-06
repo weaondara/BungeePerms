@@ -84,6 +84,7 @@ public class BungeeEventListener implements Listener, EventListener
         User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
         if (u == null)
         {
+            //create user and add default groups
             if(config.isUseUUIDs())
             {
                 BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.ADDING_DEFAULT_GROUPS_UUID, playername, uuid));
