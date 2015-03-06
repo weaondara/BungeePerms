@@ -92,6 +92,12 @@ public class BukkitNotifier implements NetworkNotifier
     //bukkit-bungeeperms reload information functions
     private void sendPM(String player, String msg, String origin)
     {
+        //if standalone don't notify bungee
+        if (config.isStandalone())
+        {
+            return;
+        }
+        
         Player p = Bukkit.getPlayer(player);
         if (p != null)
         {
@@ -101,6 +107,12 @@ public class BukkitNotifier implements NetworkNotifier
 
     private void sendPM(UUID player, String msg, String origin)
     {
+        //if standalone don't notify bungee
+        if (config.isStandalone())
+        {
+            return;
+        }
+        
         Player p = Bukkit.getPlayer(player);
         if (p != null)
         {
@@ -110,6 +122,12 @@ public class BukkitNotifier implements NetworkNotifier
 
     private void sendPMAll(String msg, String origin)
     {
+        //if standalone don't notify bungee
+        if (config.isStandalone())
+        {
+            return;
+        }
+        
         Player p = Bukkit.getOnlinePlayers().iterator().hasNext() ? Bukkit.getOnlinePlayers().iterator().next() : null;
         if (p != null)
         {
