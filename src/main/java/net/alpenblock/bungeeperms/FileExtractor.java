@@ -20,7 +20,7 @@ public class FileExtractor
 
     public static void extractAll()
     {
-        for(Map.Entry<String, String> e : allFiles.entrySet())
+        for (Map.Entry<String, String> e : allFiles.entrySet())
         {
             extract(e.getKey(), e.getValue());
         }
@@ -50,7 +50,9 @@ public class FileExtractor
         }
         catch (Exception e)
         {
+            BungeePerms.getLogger().info("could not extract file " + file + ": " + e.getMessage());
             e.printStackTrace();
+            return;
         }
         BungeePerms.getLogger().info("extracted " + file);
     }
