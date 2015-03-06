@@ -11,6 +11,7 @@ import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
@@ -260,7 +261,7 @@ public class YAMLBackEnd implements BackEnd
         File f = new File(plugin.getPluginFolder(), permspath);
         if (!f.exists() | !f.isFile())
         {
-            BungeePerms.getLogger().info("no permissions file found !!!");
+            BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.NO_PERM_FILE));
         }
     }
 
