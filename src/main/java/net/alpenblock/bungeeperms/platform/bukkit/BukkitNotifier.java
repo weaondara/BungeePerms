@@ -16,38 +16,81 @@ public class BukkitNotifier implements NetworkNotifier
     private final BukkitConfig config;
 
     @Override
-    public void deleteUser(User u)
+    public void deleteUser(User u, String origin)
     {
         //if standalone don't notify bungee
-        if(config.isStandalone())
+        if (config.isStandalone())
         {
             return;
         }
-        
+
         if (config.isUseUUIDs())
         {
-            sendPM(u.getUUID(), "deleteUser;" + u.getUUID());
+            sendPM(u.getUUID(), "deleteUser;" + u.getUUID(), origin);
         }
         else
         {
-            sendPM(u.getName(), "deleteUser;" + u.getName());
+            sendPM(u.getName(), "deleteUser;" + u.getName(), origin);
         }
     }
 
     @Override
-    public void deleteGroup(Group g)
+    public void deleteGroup(Group g, String origin)
     {
         //if standalone don't notify bungee
-        if(config.isStandalone())
+        if (config.isStandalone())
         {
             return;
         }
-        
-        sendPMAll("deleteGroup;" + g.getName());
+
+        sendPMAll("deleteGroup;" + g.getName(), origin);
+    }
+
+    @Override
+    public void reloadUser(User u, String origin)
+    {
+        //if standalone don't notify bungee
+        if (config.isStandalone())
+        {
+            return;
+        }
+
+        if (config.isUseUUIDs())
+        {
+            sendPM(u.getUUID(), "reloadUser;" + u.getUUID(), origin);
+        }
+        else
+        {
+            sendPM(u.getName(), "reloadUser;" + u.getName(), origin);
+        }
+    }
+
+    @Override
+    public void reloadGroup(Group g, String origin)
+    {
+        //if standalone don't notify bungee
+        if (config.isStandalone())
+        {
+            return;
+        }
+
+        sendPMAll("reloadGroup;" + g.getName(), origin);
+    }
+
+    @Override
+    public void reloadAll(String origin)
+    {
+        //if standalone don't notify bungee
+        if (config.isStandalone())
+        {
+            return;
+        }
+
+        sendPMAll("reloadall", origin);
     }
 
     //bukkit-bungeeperms reload information functions
-    private void sendPM(String player, String msg)
+    private void sendPM(String player, String msg, String origin)
     {
         Player p = Bukkit.getPlayer(player);
         if (p != null)
@@ -56,7 +99,7 @@ public class BukkitNotifier implements NetworkNotifier
         }
     }
 
-    private void sendPM(UUID player, String msg)
+    private void sendPM(UUID player, String msg, String origin)
     {
         Player p = Bukkit.getPlayer(player);
         if (p != null)
@@ -65,7 +108,7 @@ public class BukkitNotifier implements NetworkNotifier
         }
     }
 
-    private void sendPMAll(String msg)
+    private void sendPMAll(String msg, String origin)
     {
         Player p = Bukkit.getOnlinePlayers().iterator().hasNext() ? Bukkit.getOnlinePlayers().iterator().next() : null;
         if (p != null)
@@ -74,57 +117,14 @@ public class BukkitNotifier implements NetworkNotifier
         }
     }
 
-    @Override
-    public void reloadUser(User u)
-    {
-        //if standalone don't notify bungee
-        if(config.isStandalone())
-        {
-            return;
-        }
-        
-        if (config.isUseUUIDs())
-        {
-            sendPM(u.getUUID(), "reloadUser;" + u.getUUID());
-        }
-        else
-        {
-            sendPM(u.getName(), "reloadUser;" + u.getName());
-        }
-    }
-
-    @Override
-    public void reloadGroup(Group g)
-    {
-        //if standalone don't notify bungee
-        if(config.isStandalone())
-        {
-            return;
-        }
-        
-        sendPMAll("reloadGroup;" + g.getName());
-    }
-
-    @Override
-    public void reloadAll()
-    {
-        //if standalone don't notify bungee
-        if(config.isStandalone())
-        {
-            return;
-        }
-        
-        sendPMAll("reloadall");
-    }
-
     public void sendWorldUpdate(Player p)
     {
         //if standalone don't notify bungee
-        if(config.isStandalone())
+        if (config.isStandalone())
         {
             return;
         }
-        
+
         p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, ("playerworldupdate;" + p.getName() + ";" + p.getWorld().getName()).getBytes());
     }
 }

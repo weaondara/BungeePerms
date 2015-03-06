@@ -17,26 +17,51 @@ public class BungeeNotifier implements NetworkNotifier
     private final BungeeConfig config;
 
     @Override
-    public void deleteUser(User u)
+    public void deleteUser(User u, String origin)
     {
         if (config.isUseUUIDs())
         {
-            sendPM(u.getUUID(), "deleteUser;" + u.getUUID());
+            sendPM(u.getUUID(), "deleteUser;" + u.getUUID(), origin);
         }
         else
         {
-            sendPM(u.getName(), "deleteUser;" + u.getName());
+            sendPM(u.getName(), "deleteUser;" + u.getName(), origin);
         }
     }
 
     @Override
-    public void deleteGroup(Group g)
+    public void deleteGroup(Group g, String origin)
     {
-        sendPMAll("deleteGroup;" + g.getName());
+        sendPMAll("deleteGroup;" + g.getName(), origin);
+    }
+
+    @Override
+    public void reloadUser(User u, String origin)
+    {
+        if (config.isUseUUIDs())
+        {
+            sendPM(u.getUUID(), "reloadUser;" + u.getUUID(), origin);
+        }
+        else
+        {
+            sendPM(u.getName(), "reloadUser;" + u.getName(), origin);
+        }
+    }
+
+    @Override
+    public void reloadGroup(Group g, String origin)
+    {
+        sendPMAll("reloadGroup;" + g.getName(), origin);
+    }
+
+    @Override
+    public void reloadAll(String origin)
+    {
+        sendPMAll("reloadall", origin);
     }
 
     //bukkit-bungeeperms reload information functions
-    private void sendPM(String player, String msg)
+    private void sendPM(String player, String msg, String origin)
     {
         //if standalone no network messages
         if (config.getNetworkType() == NetworkType.Standalone)
@@ -54,19 +79,25 @@ public class BungeeNotifier implements NetworkNotifier
                 return;
             }
             
+            //no feedback loop
+            if(pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
+            {
+                return;
+            }
+
             //send message
             pp.getServer().getInfo().sendData(BungeePerms.CHANNEL, msg.getBytes());
         }
     }
 
-    private void sendPM(UUID player, String msg)
+    private void sendPM(UUID player, String msg, String origin)
     {
         //if standalone no network messages
         if (config.getNetworkType() == NetworkType.Standalone)
         {
             return;
         }
-        
+
         ProxiedPlayer pp = BungeeCord.getInstance().getPlayer(player);
         if (pp != null && pp.getServer() != null)
         {
@@ -77,19 +108,25 @@ public class BungeeNotifier implements NetworkNotifier
                 return;
             }
             
+            //no feedback loop
+            if(pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
+            {
+                return;
+            }
+
             //send message
             pp.getServer().getInfo().sendData(BungeePerms.CHANNEL, msg.getBytes());
         }
     }
 
-    private void sendPMAll(String msg)
+    private void sendPMAll(String msg, String origin)
     {
         //if standalone no network messages
         if (config.getNetworkType() == NetworkType.Standalone)
         {
             return;
         }
-        
+
         for (ServerInfo si : BungeeCord.getInstance().config.getServers().values())
         {
             //ignore servers not in config and netork type is server dependend
@@ -99,33 +136,14 @@ public class BungeeNotifier implements NetworkNotifier
                 return;
             }
             
+            //no feedback loop
+            if(si.getName().equalsIgnoreCase(origin))
+            {
+                continue;
+            }
+
             //send message
             si.sendData(BungeePerms.CHANNEL, msg.getBytes());
         }
-    }
-
-    @Override
-    public void reloadUser(User u)
-    {
-        if (config.isUseUUIDs())
-        {
-            sendPM(u.getUUID(), "reloadUser;" + u.getUUID());
-        }
-        else
-        {
-            sendPM(u.getName(), "reloadUser;" + u.getName());
-        }
-    }
-
-    @Override
-    public void reloadGroup(Group g)
-    {
-        sendPMAll("reloadGroup;" + g.getName());
-    }
-
-    @Override
-    public void reloadAll()
-    {
-        sendPMAll("reloadall");
     }
 }
