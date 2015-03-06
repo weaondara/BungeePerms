@@ -8,12 +8,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import lombok.Getter;
+import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.EventListener;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
@@ -70,8 +72,8 @@ public class BungeeEventListener implements Listener, EventListener
         {
             uuid = e.getConnection().getUniqueId();
             BungeePerms.getLogger().log(Level.INFO, "Login by {0} ({1})", new Object[]
-                                             {
-                                                 playername, uuid
+                                {
+                                    playername, uuid
             });
 
             //update uuid player db
@@ -80,8 +82,8 @@ public class BungeeEventListener implements Listener, EventListener
         else
         {
             BungeePerms.getLogger().log(Level.INFO, "Login by {0}", new Object[]
-                                             {
-                                                 playername
+                                {
+                                    playername
             });
         }
 
@@ -89,8 +91,8 @@ public class BungeeEventListener implements Listener, EventListener
         if (u == null)
         {
             BungeePerms.getLogger().log(Level.INFO, "Adding default groups to {0} ({1})", new Object[]
-                                             {
-                                                 playername, uuid
+                                {
+                                    playername, uuid
             });
 
             List<Group> groups = pm().getDefaultGroups();
@@ -153,12 +155,30 @@ public class BungeeEventListener implements Listener, EventListener
             return;
         }
 
+        if (!(e.getReceiver() instanceof ProxiedPlayer))
+        {
+            //lock out silly hackers
+            BungeePerms.getLogger().severe(Color.Error + "Possible intrusion detected. Sender is " + e.getSender());
+            e.setCancelled(true);
+            return;
+        }
+
+        ServerConnection scon = (ServerConnection) e.getSender();
+
+        //check network type // ignore if standalone or not registered server
+        if (config.getNetworkType() == NetworkType.Standalone
+                || (config.getNetworkType() == NetworkType.ServerDependend && !config.getNetworkServers().contains(scon.getInfo().getName())))
+        {
+            return;
+        }
+
+        //process message
         String msg = new String(e.getData());
         List<String> data = Statics.toList(msg, ";");
-        
+
         String cmd = data.get(0);
         String userorgroup = data.size() > 1 ? data.get(1) : null;
-        
+
         if (cmd.equalsIgnoreCase("updateplayerworld"))
         {
             String player = data.get(1);
@@ -170,6 +190,9 @@ public class BungeeEventListener implements Listener, EventListener
         {
             User u = pm().getUser(userorgroup);
             pm().removeUserFromCache(u);
+
+            //forward plugin message to network
+            BungeePerms.getInstance().getNetworkNotifier().deleteUser(u, scon.getInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("deletegroup"))
         {
@@ -183,26 +206,55 @@ public class BungeeEventListener implements Listener, EventListener
             {
                 u.recalcPerms();
             }
+
+            //forward plugin message to network
+            BungeePerms.getInstance().getNetworkNotifier().deleteGroup(g, scon.getInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloaduser"))
         {
             pm().reloadUser(userorgroup);
+
+            //forward plugin message to network
+            User u = pm().getUser(userorgroup);
+            if (u == null)
+            {
+                return;
+            }
+            BungeePerms.getInstance().getNetworkNotifier().reloadUser(u, scon.getInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloadgroup"))
         {
             pm().reloadGroup(userorgroup);
+
+            //forward plugin message to network
+            Group g = pm().getGroup(userorgroup);
+            if (g == null)
+            {
+                return;
+            }
+            BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g, scon.getInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloadusers"))
         {
             pm().reloadUsers();
+
+            //forward plugin message to network
+            BungeePerms.getInstance().getNetworkNotifier().reloadUsers(scon.getInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloadgroups"))
         {
             pm().reloadGroups();
+
+            //forward plugin message to network
+            BungeePerms.getInstance().getNetworkNotifier().reloadGroups(scon.getInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloadall"))
         {
             BungeePerms.getInstance().reload();
+
+            //this would be bad
+//            //forward plugin message to network
+//            BungeePerms.getInstance().getNetworkNotifier().reloadAll(scon.getInfo().getName());
         }
 
         e.setCancelled(true);
