@@ -2,8 +2,10 @@ package net.alpenblock.bungeeperms;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import lombok.SneakyThrows;
 import net.alpenblock.bungeeperms.platform.Sender;
@@ -217,7 +219,12 @@ public class Statics
 
     public static String format(String format, Object... args)
     {
-        return String.format(format, args);
+        return MessageFormat.format(format, args);
+    }
+
+    public static String localeString(Locale locale)
+    {
+        return locale.getLanguage() + (locale.getCountry().isEmpty() ? "" : "-" + locale.getCountry());
     }
 
     @SneakyThrows
