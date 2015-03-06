@@ -33,6 +33,11 @@ public enum ChatColor
 
     private final char code;
 
+    public String alt()
+    {
+        return "&" + code;
+    }
+
     @Override
     public String toString()
     {
