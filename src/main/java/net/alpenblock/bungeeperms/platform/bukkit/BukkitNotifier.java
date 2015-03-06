@@ -76,6 +76,30 @@ public class BukkitNotifier implements NetworkNotifier
 
         sendPMAll("reloadGroup;" + g.getName(), origin);
     }
+    
+    @Override
+    public void reloadUsers(String origin)
+    {
+        //if standalone don't notify bungee
+        if (config.isStandalone())
+        {
+            return;
+        }
+
+        sendPMAll("reloadUsers;", origin);
+    }
+
+    @Override
+    public void reloadGroups(String origin)
+    {
+        //if standalone don't notify bungee
+        if (config.isStandalone())
+        {
+            return;
+        }
+
+        sendPMAll("reloadGroups", origin);
+    }
 
     @Override
     public void reloadAll(String origin)

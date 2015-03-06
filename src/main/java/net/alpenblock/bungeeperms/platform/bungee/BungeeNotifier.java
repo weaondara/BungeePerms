@@ -55,6 +55,18 @@ public class BungeeNotifier implements NetworkNotifier
     }
 
     @Override
+    public void reloadUsers(String origin)
+    {
+        sendPMAll("reloadUsers" , origin);
+    }
+
+    @Override
+    public void reloadGroups(String origin)
+    {
+        sendPMAll("reloadGroups", origin);
+    }
+
+    @Override
     public void reloadAll(String origin)
     {
         sendPMAll("reloadall", origin);
@@ -78,9 +90,9 @@ public class BungeeNotifier implements NetworkNotifier
             {
                 return;
             }
-            
+
             //no feedback loop
-            if(origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
+            if (origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
             {
                 return;
             }
@@ -107,9 +119,9 @@ public class BungeeNotifier implements NetworkNotifier
             {
                 return;
             }
-            
+
             //no feedback loop
-            if(origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
+            if (origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
             {
                 return;
             }
@@ -135,9 +147,9 @@ public class BungeeNotifier implements NetworkNotifier
             {
                 return;
             }
-            
+
             //no feedback loop
-            if(origin != null && si.getName().equalsIgnoreCase(origin))
+            if (origin != null && si.getName().equalsIgnoreCase(origin))
             {
                 continue;
             }
