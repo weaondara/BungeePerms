@@ -42,6 +42,9 @@ public class BungeePerms
         this.plugin = plugin;
         this.config = config;
         debug = new Debug(plugin, config.getConfig(), "BP");
+        
+        //extract packed files
+        FileExtractor.extractAll();
 
         //adv
         permissionsManager = new PermissionsManager(plugin, config, debug);
