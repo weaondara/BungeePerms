@@ -183,13 +183,14 @@ public class PermissionsManager
             }
             backEnd.saveGroupInheritances(group);
         }
+        
         //perms recalc and bukkit perms update
         for (Group g : groups)
         {
             g.recalcPerms();
 
             //send bukkit update info
-            BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g);
+            BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g, null);
         }
 
         //user check
@@ -213,7 +214,7 @@ public class PermissionsManager
             u.recalcPerms();
 
             //send bukkit update info
-            BungeePerms.getInstance().getNetworkNotifier().reloadUser(u);
+            BungeePerms.getInstance().getNetworkNotifier().reloadUser(u, null);
         }
 
         //user groups check - backEnd
@@ -523,7 +524,7 @@ public class PermissionsManager
         backEnd.deleteUser(user);
 
         //send bukkit update infoif(useUUIDs)
-        BungeePerms.getInstance().getNetworkNotifier().deleteUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().deleteUser(user, null);
     }
 
     /**
@@ -543,7 +544,7 @@ public class PermissionsManager
         validateUsersGroups();
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().deleteGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().deleteGroup(group, null);
     }
 
     /**
@@ -560,7 +561,7 @@ public class PermissionsManager
         backEnd.saveUser(user, true);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
     /**
@@ -578,7 +579,7 @@ public class PermissionsManager
         backEnd.saveGroup(group, true);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     //database and permission operations
@@ -589,7 +590,7 @@ public class PermissionsManager
     {
         backEnd.format(backEnd.loadGroups(), backEnd.loadUsers(), permsversion);
         backEnd.load();
-        BungeePerms.getInstance().getNetworkNotifier().reloadAll();
+        BungeePerms.getInstance().getNetworkNotifier().reloadAll(null);
     }
 
     /**
@@ -601,7 +602,7 @@ public class PermissionsManager
     {
         int res = backEnd.cleanup(backEnd.loadGroups(), backEnd.loadUsers(), permsversion);
         backEnd.load();
-        BungeePerms.getInstance().getNetworkNotifier().reloadAll();
+        BungeePerms.getInstance().getNetworkNotifier().reloadAll(null);
         return res;
     }
 
@@ -624,7 +625,7 @@ public class PermissionsManager
         user.recalcPerms();
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
     /**
@@ -646,7 +647,7 @@ public class PermissionsManager
         user.recalcPerms();
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
     /**
@@ -667,7 +668,7 @@ public class PermissionsManager
         user.recalcPerms();
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
     /**
@@ -688,7 +689,7 @@ public class PermissionsManager
         user.recalcPerms();
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
     /**
@@ -717,7 +718,7 @@ public class PermissionsManager
         user.recalcPerms(server);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
     /**
@@ -746,7 +747,7 @@ public class PermissionsManager
         user.recalcPerms(server);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
     /**
@@ -783,7 +784,7 @@ public class PermissionsManager
         user.recalcPerms(server, world);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
     /**
@@ -820,7 +821,7 @@ public class PermissionsManager
         user.recalcPerms(server, world);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user);
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
     public void addGroupPerm(Group group, String perm)
@@ -842,7 +843,7 @@ public class PermissionsManager
         }
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     public void removeGroupPerm(Group group, String perm)
@@ -864,7 +865,7 @@ public class PermissionsManager
         }
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     public void addGroupPerServerPerm(Group group, String server, String perm)
@@ -894,7 +895,7 @@ public class PermissionsManager
         }
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     public void removeGroupPerServerPerm(Group group, String server, String perm)
@@ -924,7 +925,7 @@ public class PermissionsManager
         }
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     public void addGroupPerServerWorldPerm(Group group, String server, String world, String perm)
@@ -960,7 +961,7 @@ public class PermissionsManager
         }
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     public void removeGroupPerServerWorldPerm(Group group, String server, String world, String perm)
@@ -996,7 +997,7 @@ public class PermissionsManager
         }
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     public void addGroupInheritance(Group group, Group toadd)
@@ -1019,7 +1020,7 @@ public class PermissionsManager
         }
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     public void removeGroupInheritance(Group group, Group toremove)
@@ -1042,7 +1043,7 @@ public class PermissionsManager
         }
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     /**
@@ -1060,7 +1061,7 @@ public class PermissionsManager
         backEnd.saveGroupLadder(group);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     /**
@@ -1079,7 +1080,7 @@ public class PermissionsManager
         backEnd.saveGroupRank(group);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     /**
@@ -1098,7 +1099,7 @@ public class PermissionsManager
         backEnd.saveGroupWeight(group);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     /**
@@ -1116,7 +1117,7 @@ public class PermissionsManager
         backEnd.saveGroupDefault(group);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     /**
@@ -1136,7 +1137,7 @@ public class PermissionsManager
         backEnd.saveGroupDisplay(group, server, world);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     /**
@@ -1156,7 +1157,7 @@ public class PermissionsManager
         backEnd.saveGroupPrefix(group, server, world);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     /**
@@ -1176,7 +1177,7 @@ public class PermissionsManager
         backEnd.saveGroupSuffix(group, server, world);
 
         //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group);
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
     /**
