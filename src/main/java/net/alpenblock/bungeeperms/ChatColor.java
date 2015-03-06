@@ -38,6 +38,11 @@ public enum ChatColor
         return "&" + code;
     }
 
+    public String str()
+    {
+        return name();
+    }
+
     @Override
     public String toString()
     {

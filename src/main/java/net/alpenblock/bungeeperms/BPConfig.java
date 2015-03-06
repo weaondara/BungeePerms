@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
 import net.alpenblock.bungeeperms.io.BackEndType;
@@ -28,7 +29,8 @@ public class BPConfig
     private boolean notifyPromote;
     private boolean notifyDemote;
     private boolean tabComplete;
-    
+    private Locale locale;
+
     //tmp at runtime
     @Setter
     private boolean debug;
@@ -59,6 +61,7 @@ public class BPConfig
         notifyPromote = config.getBoolean("notify.promote", false);
         notifyDemote = config.getBoolean("notify.demote", false);
         tabComplete = config.getBoolean("tabcomplete", false);
+        locale = Locale.forLanguageTag(config.getString("locale", Statics.localeString(new Locale("en", "GB"))));
     }
 
     public void setUseUUIDs(boolean useUUIDs)

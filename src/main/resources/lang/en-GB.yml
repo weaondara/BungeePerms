@@ -1,0 +1,135 @@
+bungeeperms: '&6Welcome to BungeePerms, a BungeeCord permissions plugin'
+version: '&7Version &6{0}'
+author: '&7Author &6{0}'
+permissions-reloaded: '&7Permissions reloaded'
+debug:
+  enabled: '&7Debug mode enabled.'
+  disabled: '&7Debug mode disabled.'
+promote-message: '&3{0}&7 is now &6{1}&7!'
+demote-message: '&3{0}&7 is now &6{1}&7!'
+promote-message-to-user: '&7You were promoted to &6{0}&7!'
+demote-message-to-user: '&7You were demoted to &6{0}&7!'
+formatting: '&7Formatting permissions file/table ...'
+formatting-done: '&2Finished formatting.'
+cleaning: '&7Cleaning up permissions file/table ...'
+cleaning-done: '&2Finished cleaning. Deleted &6{0} users&2.'
+error:
+  invalid-bool-value: '&4A boolean value is required!'
+  invalid-int-value: '&4An integer value greater than 0 is required!'
+  user:
+    not-existing: '&4The player &3{0}&4 does not exist!'
+    already-in-group: '&4Player is already in group &6{0}&4!'
+    not-in-group: '&4Player is not in group &6{0}&4!'
+    no-groups: '&4The player &3{0}&4 doesn''t have a group!'
+    cannot-be-promoted: '&4The player &3{0}&4 can''t be promoted!'
+    cannot-be-demoted: '&4The player &3{0}&4 can''t be demoted!'
+    you-not-existing: '&4You do not exist!'
+    you-no-groups: '&4You don''t have a group!'
+    you-cannot-promote: '&4You can''t promote the player &3{0}&4!'
+    you-cannot-demote: '&4You can''t demote the player &3{0}&4!'
+  group:
+    not-existing: '&4The group &3{0}&4 does not exist!'
+    already-inherits: '&4The group &6{0}&7 already inherits from &6{1}&4!'
+    does-not-inherit: '&4The group &6{0}&4 does not inherit from group &6{1}&4!'
+user:
+  nu-users-found: '&7No players found!'
+  registered-users: '&7Following players are registered: '
+  registered-users-count: '&7There are &6{0}&7 players registered.'
+  permissions-list-header: '&7Permissions of the player &3{0}&7:'
+  permissions-list-header-uuid: '&7Permissions of the player &3{0}&7 (&3{1}&7):'
+  group-header: '&7Groups of the player &3{0}&7:'
+  about: '&7About &3{0}'
+  uuid: '&7UUID: &6{0}'
+  groups: '&7Groups: {0}'
+  permissions-count: '&7User permissions: &6{0}'
+  deleted: '&7User deleted'
+  added-perm: '&7Added permission &6{0}&7 to player &3{1}&7.'
+  added-perm-server: '&7Added permission &6{0}&7 to player &3{1}&7 on server &6{2}&7.'
+  added-perm-server-world: '&7Added permission &6{0}&7 to player &3{1}&7 on server
+    &6{2}&7 in world &6{3}&7.'
+  removed-perm: '&7Removed permission &6{0}&7 from player &3{1}&7.'
+  removed-perm-server: '&7Removed permission &6{0}&7 from player &3{1}&7 on server
+    &6{2}&7.'
+  removed-perm-server-world: '&7Removed permission &6{0}&7 from player &3{1}&7 on
+    server &6{2}&7 in world &6{3}&7.'
+  alreday-has-perm: '&7The player &6{0}&7 already has the permission &6{1}&7.'
+  alreday-has-perm-server: '&7The player &6{0}&7 already has the permission &6{1}&7
+    on server &6{2}&7.'
+  alreday-has-perm-server-world: '&7The player &6{0}&7 already has the permission
+    &6{1}&7 on server &6{2}&7 in world &6{3}&7.'
+  never-had-perm: '&7The player &6{0}&7 never had the permission &6{1}&7.'
+  never-had-perm-server: '&7The player &6{0}&7 never had the permission &6{1}&7 on
+    server &6{2}&7.'
+  never-had-perm-server-world: '&7The player &6{0}&7 never had the permission &6{1}&7
+    on server &6{2}&7 in world &6{3}&7.'
+  has-perm: '&7Player &3{0}&7 has the permission &6{1}&7: {2}'
+  has-perm-server: '&7Player &3{0}&7 has the permission &6{1}&7 on server &6{2}&7:
+    {3}'
+  has-perm-server-world: '&7Player &3{0}&7 has the permission &6{1}&7 on server &6{2}&7
+    in world &6{3}&7: {4}'
+  added-group: '&7Added group &6{0}&7 to player &3{1}&7.'
+  removed-group: '&7Removed group &6{0}&7 from player &3{1}&7.'
+  set-group: '&7Set group &6{0}&7 for player &3{1}&7.'
+  set-display: '&7Set display name for user &6{0}&7.'
+  set-prefix: '&7Set prefix for user &6{0}&7.'
+  set-suffix: '&7Set suffix for user &6{0}&7.'
+group:
+  no-groups-found: '&7No groups found!'
+  groups-list-header: '&7There are following groups: '
+  permissions-list-header: '&7Permissions of the group &6{0}&7:'
+  about: '&7About group &6{0}'
+  inheritances: '&7Inheritances: {0}'
+  permissions: '&7Group permissions: &6{0}'
+  all-permissions: '&7All permissions: &6{0}'
+  rank: '&7Rank: &6{0}'
+  weight: '&7Weight: &6{0}'
+  ladder: '&7Ladder: &6{0}'
+  default: '&7Default: {0}'
+  display: '&7Dislay name: &r{0}'
+  prefix: '&7Prefix: &r{0}'
+  suffix: '&7Suffix: &r{0}'
+  users-header: '&7Following players are in group &6{0}&7: '
+  users-header-count: '&7There are &6{0}&7 players in group &6{1}&7.'
+  created: '&7Group {0} created'
+  deleted: '&7Group {0} deleted'
+  deletion-in-progress: '&7Group deletion in progress ... this may take a while (backend
+    integrity check).'
+  added-perm: '&7Added permission &6{0}&7 to group &6{1}&7.'
+  added-perm-server: '&7Added permission &6{0}&7 to group &6{1}&7 on server &6{2}&7.'
+  added-perm-server-world: '&7Added permission &6{0}&7 to group &6{1}&7 on server
+    &6{2}&7 in world &6{3}&7.'
+  removed-perm: '&7Removed permission &6{0}&7 from group &6{1}&7.'
+  removed-perm-server: '&7Removed permission &6{0}&7 from group &6{1}&7 on server
+    &6{2}&7.'
+  removed-perm-server-world: '&7Removed permission &6{0}&7 from group &6{1}&7 on server
+    &6{2}&7 in world &6{3}&7.'
+  already-had-perm: '&7The group &6{0}&7 already has the permission &6{1}&7.'
+  already-had-perm-server: '&7The group &6{0}&7 already has the permission &6{1}&7
+    on server &6{2}&7.'
+  already-had-perm-server-world: '&7The group &6{0}&7 already has the permission &6{1}&7
+    on server &6{2}&7 in world &6{3}&7.'
+  never-had-perm: '&7The group &6{0}&7 never had the permission &6{1}&7.'
+  never-had-perm-server: '&7The group &6{0}&7 never had the permission &6{1}&7 on
+    server &6{2}&7.'
+  never-had-perm-server-world: '&7The group &6{0}&7 never had the permission &6{1}&7
+    on server &6{2}&7 in world &6{3}&7.'
+  has-perm: '&7Group &6{0}&7 has the permission &6{1}&7: {2}'
+  has-perm-server: '&7Group &6{0}&7 has the permission &6{1}&7 on server &6{2}&7:
+    {3}'
+  has-perm-server-world: '&7Group &6{0}&7 has the permission &6{1}&7 on server &6{2}&7
+    in world &6{3}&7: {4}'
+  added-inheritance: '&7Added inheritance &6{0}&7 to group &6{1}&7.'
+  removed-inheritance: '&7Removed inheritance &6{0}&7 from group &6{1}&7.'
+  set-rank: '&7Group rank set for group &6{0}&7.'
+  set-weight: '&7Group weight set for group &6{0}&7.'
+  set-ladder: '&7Group ladder set for group &6{0}&7.'
+  set-default: '&7Marked group &6{0}&7 as &6{1}'
+  set-display: '&7Set display name for group &6{0}&7.'
+  set-prefix: '&7Set prefix for group &6{0}&7.'
+  set-suffix: '&7Set suffix for group &6{0}&7.'
+general:
+  permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3})'
+  own: own
+  none: none
+  default: default
+  nondefault: non-default

@@ -10,18 +10,18 @@ import net.alpenblock.bungeeperms.platform.PluginMessageSender;
 @Getter
 public class BungeePerms
 {
-
+    
     public final static String CHANNEL = "bungeeperms";
-
+    
     @Getter
     private static BungeePerms instance;
     @Getter
     private static Logger logger;
-
+    
     private final PlatformPlugin plugin;
     private final BPConfig config;
     private final Debug debug;
-
+    
     private final PermissionsManager permissionsManager;
     private final CommandHandler commandHandler;
     private final PermissionsChecker permissionsChecker;
@@ -29,9 +29,9 @@ public class BungeePerms
     private final NetworkNotifier networkNotifier;
     private final EventListener eventListener;
     private final PermissionsResolver permissionsResolver;
-
+    
     private boolean enabled;
-
+    
     public BungeePerms(PlatformPlugin plugin, BPConfig config, PluginMessageSender pluginMessageSender, NetworkNotifier networkNotifier, EventListener eventListener)
     {
         //static
@@ -42,9 +42,10 @@ public class BungeePerms
         this.plugin = plugin;
         this.config = config;
         debug = new Debug(plugin, config.getConfig(), "BP");
-        
+
         //extract packed files
         FileExtractor.extractAll();
+        Lang.load(plugin.getPluginFolderPath() + "/lang/" + Statics.localeString(config.getLocale()) + ".yml"); //early load needed
 
         //adv
         permissionsManager = new PermissionsManager(plugin, config, debug);
@@ -55,12 +56,13 @@ public class BungeePerms
         this.eventListener = eventListener;
         permissionsResolver = new PermissionsResolver();
     }
-
+    
     public void load()
     {
+        Lang.load(plugin.getPluginFolderPath() + "/lang/" + Statics.localeString(config.getLocale()) + ".yml");
         permissionsResolver.setUseRegex(config.isUseRegexPerms());
     }
-
+    
     public void enable()
     {
         if (enabled)
@@ -68,12 +70,12 @@ public class BungeePerms
             return;
         }
         enabled = true;
-
+        
         logger.info("Activating BungeePerms ...");
         permissionsManager.enable();
         eventListener.enable();
     }
-
+    
     public void disable()
     {
         if (!enabled)
@@ -81,12 +83,12 @@ public class BungeePerms
             return;
         }
         enabled = false;
-
+        
         logger.info("Deactivating BungeePerms ...");
         eventListener.disable();
         permissionsManager.disable();
     }
-
+    
     public void reload()
     {
         disable();

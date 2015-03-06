@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import net.alpenblock.bungeeperms.Lang.MessageType;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -29,9 +30,9 @@ public class CommandHandler
 
         if (args.length == 0)
         {
-            sender.sendMessage(ChatColor.GOLD + "Welcome to BungeePerms, a BungeeCord permissions plugin");
-            sender.sendMessage(Color.Text + "Version " + ChatColor.GOLD + plugin.getVersion());
-            sender.sendMessage(Color.Text + "Author " + ChatColor.GOLD + plugin.getAuthor());
+            sender.sendMessage(Lang.translate(MessageType.BUNGEEPERMS));
+            sender.sendMessage(Lang.translate(MessageType.VERSION, plugin.getVersion()));
+            sender.sendMessage(Lang.translate(MessageType.AUTHOR, plugin.getAuthor()));
             return true;
         }
         else if (args.length > 0)
@@ -112,7 +113,7 @@ public class CommandHandler
         }
 
         BungeePerms.getInstance().reload();
-        sender.sendMessage(Color.Text + "Permissions reloaded");
+        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_RELOADED));
         return true;
     }
 
@@ -128,21 +129,27 @@ public class CommandHandler
             return true;
         }
 
-        if (args[1].equalsIgnoreCase("on"))
+        boolean val;
+        try
         {
-            config.setDebug(true);
-            sender.sendMessage(Color.Text + "Debug mode enabled.");
+            val = parseTrueFalse(args[1]);
+        }
+        catch (Exception e)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_BOOL_VALUE));
             return true;
         }
-        else if (args[1].equalsIgnoreCase("off"))
+
+        if (val)
         {
-            config.setDebug(false);
-            sender.sendMessage(Color.Text + "Debug mode disabled.");
+            config.setDebug(true);
+            sender.sendMessage(Lang.translate(MessageType.DEBUG_ENABLED));
             return true;
         }
         else
         {
-            sender.sendMessage(Color.Error + "'on' or 'off' is required!");
+            config.setDebug(false);
+            sender.sendMessage(Lang.translate(MessageType.DEBUG_DISABLED));
             return true;
         }
     }
@@ -154,25 +161,29 @@ public class CommandHandler
             return true;
         }
 
-        if (args.length == 1)
+        if (!Statics.matchArgs(sender, args, 1, 2))
         {
-            List<String> users = pm().getRegisteredUsers();
-            if (users.isEmpty())
-            {
-                sender.sendMessage(Color.Text + "No players found!");
-            }
-            else
-            {
-                String out = Color.Text + "Following players are registered: ";
-                for (int i = 0; i < users.size(); i++)
-                {
-                    out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : "");
-                }
-                sender.sendMessage(out);
-            }
             return true;
         }
-        else if (args.length == 2)
+
+        List<String> users = pm().getRegisteredUsers();
+        if (users.isEmpty())
+        {
+            sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+            return true;
+        }
+
+        if (args.length == 1)
+        {
+            String out = Lang.translate(MessageType.REGISTERED_USERS);
+            for (int i = 0; i < users.size(); i++) //todo: translate uuids and output 1 entity per line
+            {
+                out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : "");
+            }
+            sender.sendMessage(out);
+            return true;
+        }
+        else //args count == 2
         {
             //for counting
             if (!args[1].equalsIgnoreCase("-c"))
@@ -180,19 +191,7 @@ public class CommandHandler
                 return false;
             }
 
-            if (pm().getRegisteredUsers().isEmpty())
-            {
-                sender.sendMessage(Color.Text + "No players found!");
-            }
-            else
-            {
-                sender.sendMessage(Color.Text + "There are " + Color.Value + pm().getRegisteredUsers().size() + Color.Text + " players registered.");
-            }
-            return true;
-        }
-        else
-        {
-            Messages.sendTooManyArgsMessage(sender);
+            sender.sendMessage(Lang.translate(MessageType.REGISTERED_USERS_COUNT, pm().getRegisteredUsers().size()));
             return true;
         }
     }
@@ -280,20 +279,26 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
-        sender.sendMessage(Color.Text + "Permissions of the player " + Color.User + user.getName() + Color.Text + " (" + Color.User + user.getUUID() + Color.Text + "):");
+        if (config.isUseUUIDs())
+        {
+            sender.sendMessage(Lang.translate(MessageType.USER_PERMISSIONS_LIST_HEADER_UUID, user.getName(), user.getUUID()));
+        }
+        else
+        {
+            sender.sendMessage(Lang.translate(MessageType.USER_PERMISSIONS_LIST_HEADER, user.getName()));
+        }
         List<BPPermission> perms = user.getPermsWithOrigin(server, world);
         for (BPPermission perm : perms)
         {
-            sender.sendMessage(Color.Text + "- " + Color.Value + perm.getPermission() + Color.Text
-                    + " ("
-                    + Color.Value + (!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(player) ? "own" : perm.getOrigin()) + Color.Text
-                    + (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : "")
-                    + (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : "")
-                    + ")");
+            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
+                                              perm.getPermission(),
+                                              (!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(player) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
+                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
+                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : "")));
         }
         return true;
     }
@@ -314,11 +319,11 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
-        sender.sendMessage(Color.Text + "Groups of the player " + Color.User + user.getName() + Color.Text + ":");
+        sender.sendMessage(Lang.translate(MessageType.USER_GROUPS_HEADER, user.getName()));
         for (Group g : user.getGroups())
         {
             sender.sendMessage(Color.Text + "- " + Color.Value + g.getName());
@@ -342,23 +347,26 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
-        sender.sendMessage(Color.Text + "About " + Color.User + user.getName());
+        sender.sendMessage(Lang.translate(MessageType.USER_ABOUT, user.getName()));
 
-        sender.sendMessage(Color.Text + "UUID: " + Color.Value + user.getUUID());
+        sender.sendMessage(Lang.translate(MessageType.USER_UUID, user.getUUID()));
 
         String groups = "";
         for (int i = 0; i < user.getGroups().size(); i++)
         {
             groups += Color.Value + user.getGroups().get(i).getName() + Color.Text + " (" + Color.Value + user.getGroups().get(i).getPerms().size() + Color.Text + ")" + (i + 1 < user.getGroups().size() ? ", " : "");
         }
-        sender.sendMessage(Color.Text + "Groups: " + groups);
+        sender.sendMessage(Lang.translate(MessageType.USER_GROUPS, groups));
+
+        //user perms
+        sender.sendMessage(Lang.translate(MessageType.USER_PERMISSIONS, user.getOwnPermissionsCount()));
 
         //all group perms
-        sender.sendMessage(Color.Text + "Count of permissions: " + Color.Value + user.getPermissionsCount());
+        sender.sendMessage(Lang.translate(MessageType.USER_ALL_PERMISSIONS_COUNT, user.getPermissionsCount()));
         return true;
     }
 
@@ -378,13 +386,13 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
         pm().deleteUser(user);
 
-        sender.sendMessage(Color.Text + "User deleted");
+        sender.sendMessage(Lang.translate(MessageType.USER_DELETED));
         return true;
     }
 
@@ -407,7 +415,7 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
@@ -416,16 +424,16 @@ public class CommandHandler
             if (user.getExtraPerms().contains("-" + perm))
             {
                 pm().removeUserPerm(user, "-" + perm);
-                sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM, perm, user.getName()));
             }
             else if (!user.getExtraPerms().contains(perm))
             {
                 pm().addUserPerm(user, perm);
-                sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM, perm, user.getName()));
             }
             else
             {
-                sender.sendMessage(Color.Text + "The player " + Color.Value + user.getName() + Color.Text + " already has the permission " + Color.Value + perm + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.USER_ALREADY_HAS_PERM, user.getName(), perm));
             }
         }
         else
@@ -442,16 +450,16 @@ public class CommandHandler
                 if (srv.getPerms().contains("-" + perm))
                 {
                     pm().removeUserPerServerPerm(user, server, "-" + perm);
-                    sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER, perm, user.getName(), server));
                 }
                 else if (!srv.getPerms().contains(perm))
                 {
                     pm().addUserPerServerPerm(user, server, perm);
-                    sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER, perm, user.getName(), server));
                 }
                 else
                 {
-                    sender.sendMessage(Color.Text + "The player " + Color.Value + user.getName() + Color.Text + " alreday has the permission " + Color.Value + perm + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_ALREADY_HAS_PERM_SERVER, user.getName(), perm, server));
                 }
             }
             else
@@ -466,16 +474,16 @@ public class CommandHandler
                 if (w.getPerms().contains("-" + perm))
                 {
                     pm().removeUserPerServerWorldPerm(user, server, world, "-" + perm);
-                    sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
                 }
                 else if (!w.getPerms().contains(perm))
                 {
                     pm().addUserPerServerWorldPerm(user, server, world, perm);
-                    sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
                 }
                 else
                 {
-                    sender.sendMessage(Color.Text + "The player " + Color.Value + user.getName() + Color.Text + " alreday has the permission " + Color.Value + perm + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_ALREADY_HAS_PERM_SERVER_WORLD, user.getName(), perm, server, world));
                 }
             }
         }
@@ -501,7 +509,7 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
@@ -510,16 +518,16 @@ public class CommandHandler
             if (user.getExtraPerms().contains(perm))
             {
                 pm().removeUserPerm(user, perm);
-                sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));
             }
             else if (!user.getExtraPerms().contains("-" + perm))
             {
                 pm().addUserPerm(user, "-" + perm);
-                sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));
             }
             else
             {
-                sender.sendMessage(Color.Text + "The player " + Color.Value + user.getName() + Color.Text + " never had the permission " + Color.Value + perm + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.USER_NEVER_HAD_PERM, user.getName(), perm));
             }
         }
         else
@@ -536,16 +544,16 @@ public class CommandHandler
                 if (srv.getPerms().contains(perm))
                 {
                     pm().removeUserPerServerPerm(user, server, perm);
-                    sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER, perm, user.getName(), server));
                 }
                 else if (!srv.getPerms().contains("-" + perm))
                 {
                     pm().addUserPerServerPerm(user, server, "-" + perm);
-                    sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER, perm, user.getName(), server));
                 }
                 else
                 {
-                    sender.sendMessage(Color.Text + "The player " + Color.Value + user.getName() + Color.Text + " never had the permission " + Color.Value + perm + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_NEVER_HAD_PERM_SERVER, user.getName(), perm, server));
                 }
             }
             else
@@ -560,16 +568,16 @@ public class CommandHandler
                 if (w.getPerms().contains(perm))
                 {
                     pm().removeUserPerServerWorldPerm(user, server, world, perm);
-                    sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
                 }
                 else if (!w.getPerms().contains("-" + perm))
                 {
                     pm().addUserPerServerWorldPerm(user, server, world, "-" + perm);
-                    sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from player " + Color.User + user.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
                 }
                 else
                 {
-                    sender.sendMessage(Color.Text + "The player " + Color.Value + user.getName() + Color.Text + " never had the permission " + Color.Value + perm + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.USER_NEVER_HAD_PERM_SERVER_WORLD, user.getName(), perm, server, world));
                 }
             }
         }
@@ -589,31 +597,32 @@ public class CommandHandler
         }
 
         String player = Statics.getFullPlayerName(args[1]);
+        String perm = args[3].toLowerCase();
         String server = args.length > 4 ? args[4].toLowerCase() : null;
         String world = args.length > 5 ? args[5].toLowerCase() : null;
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
         if (server == null)
         {
-            boolean has = checker.hasPerm(player, args[3].toLowerCase());
-            sender.sendMessage(Color.Text + "Player " + Color.User + user.getName() + Color.Text + " has the permission " + Color.Value + args[3] + Color.Text + ": " + (has ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(has).toUpperCase());
+            boolean has = checker.hasPerm(player, perm.toLowerCase());
+            sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM, user.getName(), perm, formatBool(has)));
         }
         else
         {
             if (world == null)
             {
-                boolean has = checker.hasPermOnServer(user.getName(), args[3].toLowerCase(), server);
-                sender.sendMessage(Color.Text + "Player " + Color.User + user.getName() + Color.Text + " has the permission " + Color.Value + args[3] + Color.Text + " on server " + Color.Value + server + Color.Text + ": " + (has ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(has).toUpperCase());
+                boolean has = checker.hasPermOnServer(user.getName(), perm.toLowerCase(), server);
+                sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM_SERVER, user.getName(), perm, server, formatBool(has)));
             }
             else
             {
-                boolean has = checker.hasPermOnServerInWorld(user.getName(), args[3].toLowerCase(), server, world);
-                sender.sendMessage(Color.Text + "Player " + Color.User + user.getName() + Color.Text + " has the permission " + Color.Value + args[3] + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ": " + (has ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(has).toUpperCase());
+                boolean has = checker.hasPermOnServerInWorld(user.getName(), perm.toLowerCase(), server, world);
+                sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM_SERVER_WORLD, user.getName(), perm, server, world, formatBool(has)));
             }
         }
         return true;
@@ -636,14 +645,14 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.User + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
         User u = pm().getUser(player);
         if (u == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
@@ -652,13 +661,13 @@ public class CommandHandler
         {
             if (g.getName().equalsIgnoreCase(group.getName()))
             {
-                sender.sendMessage(Color.Error + "Player is already in group " + Color.Value + groupname + Color.Error + "!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_ALREADY_IN_GROUP, groupname));
                 return true;
             }
         }
 
         pm().addUserGroup(u, group);
-        sender.sendMessage(Color.Text + "Added group " + Color.Value + groupname + Color.Text + " to player " + Color.User + u.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP, groupname, u.getName()));
         return true;
     }
 
@@ -679,14 +688,14 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.User + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
         User u = pm().getUser(player);
         if (u == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
@@ -696,11 +705,11 @@ public class CommandHandler
             if (g.getName().equalsIgnoreCase(group.getName()))
             {
                 pm().removeUserGroup(u, group);
-                sender.sendMessage(Color.Text + "Removed group " + Color.Value + groupname + Color.Text + " from player " + Color.User + u.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP, groupname, u.getName()));
                 return true;
             }
         }
-        sender.sendMessage(Color.Error + "Player is not in group " + Color.Value + groupname + Color.Error + "!");
+        sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_IN_GROUP, groupname));
         return true;
     }
 
@@ -721,14 +730,14 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.User + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
         User u = pm().getUser(player);
         if (u == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
@@ -739,7 +748,7 @@ public class CommandHandler
         }
 
         pm().addUserGroup(u, group);
-        sender.sendMessage(Color.Text + "Set group " + Color.Value + groupname + Color.Text + " for player " + Color.User + u.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.USER_SET_GROUP, groupname, u.getName()));
         return true;
     }
 
@@ -762,11 +771,11 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The user " + Color.Value + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
         pm().setUserDisplay(user, display, server, world);
-        sender.sendMessage(Color.Text + "Set display name for user " + Color.Value + user.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.USER_SET_DISPLAY, user.getName()));
         return true;
     }
 
@@ -789,11 +798,11 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The user " + Color.Value + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
         pm().setUserPrefix(user, prefix, server, world);
-        sender.sendMessage(Color.Text + "Set prefix for user " + Color.Value + user.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.USER_SET_PREFIX, user.getName()));
         return true;
     }
 
@@ -816,11 +825,11 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The user " + Color.Value + player + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
         pm().setUserSuffix(user, suffix, server, world);
-        sender.sendMessage(Color.Text + "Set suffix for user " + Color.Value + user.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.USER_SET_SUFFIX, user.getName()));
         return true;
     }
 //end user commands
@@ -839,11 +848,11 @@ public class CommandHandler
 
         if (pm().getGroups().isEmpty())
         {
-            sender.sendMessage(Color.Text + "No groups found!");
+            sender.sendMessage(Lang.translate(MessageType.NO_GROUPS_FOUND));
         }
         else
         {
-            sender.sendMessage(Color.Text + "There are following groups:");
+            sender.sendMessage(Lang.translate(MessageType.GROUPS_LIST_HEADER));
             for (String l : pm().getLadders())
             {
                 for (Group g : pm().getLadderGroups(l))
@@ -955,20 +964,19 @@ public class CommandHandler
 
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
-        sender.sendMessage(Color.Text + "Permissions of the group " + Color.Value + group.getName() + Color.Text + ":");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_PERMISSIONS_LIST_HEADER, group.getName()));
         List<BPPermission> perms = group.getPermsWithOrigin(server, world);
         for (BPPermission perm : perms)
         {
-            sender.sendMessage(Color.Text + "- " + Color.Value + perm.getPermission() + Color.Text
-                    + " ("
-                    + Color.Value + (perm.getOrigin().equalsIgnoreCase(groupname) ? "own" : perm.getOrigin()) + Color.Text
-                    + (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : "")
-                    + (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : "")
-                    + ")");
+            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
+                                              perm.getPermission(),
+                                              (!perm.getOrigin().equalsIgnoreCase(groupname) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
+                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
+                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : "")));
         }
         return true;
     }
@@ -989,11 +997,11 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
-        sender.sendMessage(Color.Text + "Info to group " + Color.Value + group.getName() + Color.Text + ":");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_ABOUT, group.getName()));
 
         //inheritances
         String inheritances = "";
@@ -1003,36 +1011,36 @@ public class CommandHandler
         }
         if (inheritances.length() == 0)
         {
-            inheritances = Color.Text + "(none)";
+            inheritances = Color.Text + "(" + Lang.translate(MessageType.NONE) + ")";
         }
-        sender.sendMessage(Color.Text + "Inheritances: " + inheritances);
+        sender.sendMessage(Lang.translate(MessageType.GROUP_INHERITANCES, inheritances));
 
         //group perms
-        sender.sendMessage(Color.Text + "Group permissions: " + Color.Value + group.getPerms().size());
-
-        //group rank
-        sender.sendMessage(Color.Text + "Rank: " + Color.Value + group.getRank());
-
-        //group weight
-        sender.sendMessage(Color.Text + "Weight: " + Color.Value + group.getWeight());
-
-        //group ladder
-        sender.sendMessage(Color.Text + "Ladder: " + Color.Value + group.getLadder());
-
-        //default
-        sender.sendMessage(Color.Text + "Default: " + Color.Value + (group.isDefault() ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(group.isDefault()).toUpperCase());
+        sender.sendMessage(Lang.translate(MessageType.GROUP_PERMISSONS, group.getOwnPermissionsCount()));
 
         //all group perms
-        sender.sendMessage(Color.Text + "Count of permissions: " + Color.Value + group.getPermissionsCount());
+        sender.sendMessage(Lang.translate(MessageType.GROUP_ALL_PERMISSIONS, group.getPermissionsCount()));
+
+        //group rank
+        sender.sendMessage(Lang.translate(MessageType.GROUP_RANK, group.getRank()));
+
+        //group weight
+        sender.sendMessage(Lang.translate(MessageType.GROUP_WEIGHT, group.getWeight()));
+
+        //group ladder
+        sender.sendMessage(Lang.translate(MessageType.GROUP_LADDER, group.getLadder()));
+
+        //default
+        sender.sendMessage(Lang.translate(MessageType.GROUP_DEFAULT, formatBool(group.isDefault())));
 
         //display
-        sender.sendMessage(Color.Text + "Dislay name: " + ChatColor.RESET + (group.getDisplay().length() > 0 ? group.getDisplay() : Color.Text + "(none)"));
+        sender.sendMessage(Lang.translate(MessageType.GROUP_DISPLAY, (group.getDisplay().length() > 0 ? group.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //prefix
-        sender.sendMessage(Color.Text + "Prefix: " + ChatColor.RESET + (group.getPrefix().length() > 0 ? group.getPrefix() : Color.Text + "(none)"));
+        sender.sendMessage(Lang.translate(MessageType.GROUP_PREFIX, (group.getPrefix().length() > 0 ? group.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //suffix
-        sender.sendMessage(Color.Text + "Suffix: " + ChatColor.RESET + (group.getSuffix().length() > 0 ? group.getSuffix() : Color.Text + "(none)"));
+        sender.sendMessage(Lang.translate(MessageType.GROUP_SUFFIX, (group.getSuffix().length() > 0 ? group.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
 
@@ -1053,26 +1061,23 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " doesn't exists!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
         List<String> users = pm().getGroupUsers(group);
+        if (users.isEmpty())
+        {
+            sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+        }
 
         if (args.length == 3)
         {
-            if (users.isEmpty())
+            String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
+            for (int i = 0; i < users.size(); i++)
             {
-                sender.sendMessage(Color.Text + "No players found!");
+                out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : ""); //todo: uuid
             }
-            else
-            {
-                String out = Color.Text + "Following players are in group " + Color.Value + group.getName() + Color.Text + ": ";
-                for (int i = 0; i < users.size(); i++)
-                {
-                    out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : "");
-                }
-                sender.sendMessage(out);
-            }
+            sender.sendMessage(out);
             return true;
         }
         else if (args.length == 4)
@@ -1081,14 +1086,7 @@ public class CommandHandler
             {
                 return false;
             }
-            if (users.isEmpty())
-            {
-                sender.sendMessage(Color.Text + "No players found!");
-            }
-            else
-            {
-                sender.sendMessage(Color.Text + "There are " + Color.Value + users.size() + Color.Text + " players in group " + Color.Value + group.getName() + Color.Text + ".");
-            }
+            sender.sendMessage(Lang.translate(MessageType.GROUP_USERS_HEADER, users.size(), group.getName()));
             return true;
         }
         return true;
@@ -1109,12 +1107,12 @@ public class CommandHandler
         String groupname = args[1];
         if (pm().getGroup(groupname) != null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " already exists!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-        Group group = new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String, Server>(), 1500, 1500, "default", false, "", "", "");
+        Group group = new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String, Server>(), 1000, 1000, "default", false, "", "", "");
         pm().addGroup(group);
-        sender.sendMessage(Color.Text + "Group " + Color.Value + groupname + Color.Text + " created.");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_CREATED, groupname));
         return true;
     }
 
@@ -1132,16 +1130,15 @@ public class CommandHandler
 
         String groupname = args[1];
         Group group = pm().getGroup(groupname);
-        if (group != null)
+        if (group == null)
         {
-            sender.sendMessage(Color.Text + "Group deletion in progress ... this may take a while (backend integrity check).");
-            pm().deleteGroup(group);
-            sender.sendMessage(Color.Text + "Group " + Color.Value + group.getName() + Color.Text + " deleted.");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
+            return true;
         }
-        else
-        {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
-        }
+
+        sender.sendMessage(Lang.translate(MessageType.GROUP_DELETION_IN_PROGRESS));
+        pm().deleteGroup(group);
+        sender.sendMessage(Lang.translate(MessageType.GROUP_DELETED, group.getName()));
         return true;
     }
 
@@ -1164,7 +1161,7 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
@@ -1174,16 +1171,16 @@ public class CommandHandler
             if (group.getPerms().contains("-" + perm))
             {
                 pm().removeGroupPerm(group, "-" + perm);
-                sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to group " + Color.Value + group.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM, perm, group.getName()));
             }
             else if (!group.getPerms().contains(perm))
             {
                 pm().addGroupPerm(group, perm);
-                sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to group " + Color.Value + group.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM, perm, group.getName()));
             }
             else
             {
-                sender.sendMessage(Color.Text + "The group " + Color.Value + group.getName() + Color.Text + " already has the permission " + Color.Value + perm + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.GROUP_ALREADY_HAS_PERM, group.getName(), perm));
             }
         }
         else
@@ -1202,16 +1199,16 @@ public class CommandHandler
                 if (perserverperms.contains("-" + perm))
                 {
                     pm().removeGroupPerServerPerm(group, server, "-" + perm);
-                    sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to group " + Color.Value + group.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER, perm, group.getName(), server));
                 }
                 else if (!perserverperms.contains(perm))
                 {
                     pm().addGroupPerServerPerm(group, server, perm);
-                    sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to group " + Color.Value + group.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER, perm, group.getName(), server));
                 }
                 else
                 {
-                    sender.sendMessage(Color.Text + "The group " + Color.Value + group.getName() + Color.Text + " already has the permission " + Color.Value + perm + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ALREADY_HAS_PERM_SERVER, group.getName(), perm, server));
                 }
             }
 
@@ -1229,16 +1226,16 @@ public class CommandHandler
                 if (perserverworldperms.contains("-" + perm))
                 {
                     pm().removeGroupPerServerWorldPerm(group, server, world, "-" + perm);
-                    sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to group " + Color.Value + group.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
                 }
                 else if (!perserverworldperms.contains(perm))
                 {
                     pm().addGroupPerServerWorldPerm(group, server, world, perm);
-                    sender.sendMessage(Color.Text + "Added permission " + Color.Value + perm + Color.Text + " to group " + Color.Value + group.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
                 }
                 else
                 {
-                    sender.sendMessage(Color.Text + "The group " + Color.Value + group.getName() + Color.Text + " already has the permission " + Color.Value + perm + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ALREADY_HAS_PERM_SERVER_WORLD, group.getName(), perm, server, world));
                 }
             }
         }
@@ -1264,7 +1261,7 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
@@ -1274,16 +1271,16 @@ public class CommandHandler
             if (group.getPerms().contains(perm))
             {
                 pm().removeGroupPerm(group, perm);
-                sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from group " + Color.Value + group.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM, perm, group.getName()));
             }
             else if (!group.getPerms().contains("-" + perm))
             {
                 pm().addGroupPerm(group, "-" + perm);
-                sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from group " + Color.Value + group.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM, perm, group.getName()));
             }
             else
             {
-                sender.sendMessage(Color.Text + "The group " + Color.Value + group.getName() + Color.Text + " never had the permission " + Color.Value + perm + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.GROUP_NEVER_HAD_PERM, group.getName(), perm));
             }
         }
         else
@@ -1302,16 +1299,16 @@ public class CommandHandler
                 if (perserverperms.contains(perm))
                 {
                     pm().removeGroupPerServerPerm(group, server, perm);
-                    sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from group " + Color.Value + group.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER, perm, group.getName(), server));
                 }
                 else if (!perserverperms.contains("-" + perm))
                 {
                     pm().addGroupPerServerPerm(group, server, "-" + perm);
-                    sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from group " + Color.Value + group.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER, perm, group.getName(), server));
                 }
                 else
                 {
-                    sender.sendMessage(Color.Text + "The group " + Color.Value + group.getName() + Color.Text + " never had the permission " + Color.Value + perm + Color.Text + " on server " + Color.Value + server + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_NEVER_HAD_PERM_SERVER, group.getName(), perm, server));
                 }
             }
             else
@@ -1327,16 +1324,16 @@ public class CommandHandler
                 if (perserverworldperms.contains(perm))
                 {
                     pm().removeGroupPerServerWorldPerm(group, server, world, perm);
-                    sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from group " + Color.Value + group.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
                 }
                 else if (!perserverworldperms.contains("-" + perm))
                 {
                     pm().addGroupPerServerWorldPerm(group, server, world, "-" + perm);
-                    sender.sendMessage(Color.Text + "Removed permission " + Color.Value + perm + Color.Text + " from group " + Color.Value + group.getName() + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
                 }
                 else
                 {
-                    sender.sendMessage(Color.Text + "The group " + Color.Value + group.getName() + Color.Text + " never had the permission " + Color.Value + perm + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ".");
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_NEVER_HAD_PERM_SERVER_WORLD, group.getName(), perm, server, world));
                 }
             }
         }
@@ -1362,7 +1359,7 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
@@ -1370,7 +1367,7 @@ public class CommandHandler
         if (server == null)
         {
             boolean has = group.has(perm.toLowerCase());
-            sender.sendMessage(Color.Text + "Group " + Color.Value + group.getName() + Color.Text + " has the permission " + Color.Value + args[3] + Color.Text + ": " + (has ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(has).toUpperCase());
+            sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM, group.getName(), perm, formatBool(has)));
         }
         else
         {
@@ -1378,14 +1375,14 @@ public class CommandHandler
             if (world == null)
             {
                 boolean has = group.hasOnServer(perm.toLowerCase(), server);
-                sender.sendMessage(Color.Text + "Group " + Color.Value + group.getName() + Color.Text + " has the permission " + Color.Value + args[3] + Color.Text + " on server " + Color.Value + server + Color.Text + ": " + (has ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(has).toUpperCase());
+                sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER, group.getName(), perm, server, formatBool(has)));
             }
 
             //per server world perm
             else
             {
                 boolean has = group.hasOnServerInWorld(perm.toLowerCase(), server, world);
-                sender.sendMessage(Color.Text + "Group " + Color.Value + group.getName() + Color.Text + " has the permission " + Color.Value + args[3] + Color.Text + " on server " + Color.Value + server + Color.Text + " in world " + Color.Value + world + Color.Text + ": " + (has ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(has).toUpperCase());
+                sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER_WORLD, group.getName(), perm, server, world, formatBool(has)));
             }
         }
         return true;
@@ -1410,14 +1407,14 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
         Group toadd = pm().getGroup(addgroup);
         if (toadd == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + addgroup + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, addgroup));
             return true;
         }
 
@@ -1428,14 +1425,14 @@ public class CommandHandler
         {
             if (s.equalsIgnoreCase(toadd.getName()))
             {
-                sender.sendMessage(Color.Error + "The group already inherits from " + Color.Value + addgroup + Color.Error + "!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_INHERITS, groupname, addgroup));
                 return true;
             }
         }
 
         pm().addGroupInheritance(group, toadd);
 
-        sender.sendMessage(Color.Text + "Added inheritance " + Color.Value + addgroup + Color.Text + " to group " + Color.Value + group.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE, addgroup, groupname));
         return true;
     }
 
@@ -1457,14 +1454,14 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
         Group toremove = pm().getGroup(removegroup);
         if (toremove == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + removegroup + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, removegroup));
             return true;
         }
 
@@ -1475,11 +1472,11 @@ public class CommandHandler
             {
                 pm().removeGroupInheritance(group, toremove);
 
-                sender.sendMessage(Color.Text + "Removed inheritance " + Color.Value + removegroup + Color.Text + " from group " + Color.Value + group.getName() + Color.Text + ".");
+                sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE, removegroup, groupname));
                 return true;
             }
         }
-        sender.sendMessage(Color.Error + "The group " + Color.Value + group.getName() + Color.Error + " does not inherit from group " + Color.Value + removegroup + Color.Error + "!");
+        sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_INHERITS, groupname, removegroup));
         return true;
     }
 
@@ -1507,18 +1504,19 @@ public class CommandHandler
         }
         catch (Exception e)
         {
-            sender.sendMessage(Color.Error + "A whole number greater than 0 is required!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_INT_VALUE));
             return true;
         }
+
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
         pm().rankGroup(group, rank);
-        sender.sendMessage(Color.Text + "Group rank set for group " + Color.Value + group.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_SET_RANK, group.getName()));
         return true;
     }
 
@@ -1546,18 +1544,18 @@ public class CommandHandler
         }
         catch (Exception e)
         {
-            sender.sendMessage(Color.Error + "A whole number greater than 0 is required!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_INT_VALUE));
             return true;
         }
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
 
         pm().weightGroup(group, weight);
-        sender.sendMessage(Color.Text + "Group weight set for group " + Color.Value + group.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_SET_WEIGHT, group.getName()));
         return true;
     }
 
@@ -1578,11 +1576,11 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
         pm().ladderGroup(group, ladder);
-        sender.sendMessage(Color.Text + "Group ladder set for group " + Color.Value + group.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_SET_LADDER, group.getName()));
         return true;
     }
 
@@ -1606,18 +1604,18 @@ public class CommandHandler
         }
         catch (Exception e)
         {
-            sender.sendMessage(Color.Error + "A form of '" + Color.Value + "true" + Color.Error + "','" + Color.Value + "false" + Color.Error + "','" + Color.Value + "yes" + Color.Error + "' or '" + Color.Value + "no" + Color.Error + "' is required!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_BOOL_VALUE));
             return true;
         }
 
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
         pm().setGroupDefault(group, isdefault);
-        sender.sendMessage(Color.Text + "Marked group " + Color.Value + group.getName() + Color.Text + " as " + (isdefault ? "" : "non-") + "default.");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_SET_DEFAULT, group.getName(), isdefault ? Lang.translate(MessageType.DEFAULT) : Lang.translate(MessageType.NONDEFAULT)));
         return true;
     }
 
@@ -1640,11 +1638,11 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
         pm().setGroupDisplay(group, display, server, world);
-        sender.sendMessage(Color.Text + "Set display name for group " + Color.Value + group.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_SET_DISPLAY, group.getName()));
         return true;
     }
 
@@ -1667,11 +1665,11 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
         pm().setGroupPrefix(group, prefix, server, world);
-        sender.sendMessage(Color.Text + "Set prefix for group " + Color.Value + group.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_SET_PREFIX, group.getName()));
         return true;
     }
 
@@ -1694,11 +1692,11 @@ public class CommandHandler
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
-            sender.sendMessage(Color.Error + "The group " + Color.Value + groupname + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
         pm().setGroupSuffix(group, suffix, server, world);
-        sender.sendMessage(Color.Text + "Set suffix for group " + Color.Value + group.getName() + Color.Text + ".");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_SET_SUFFIX, group.getName()));
         return true;
     }
 //end group commands
@@ -1721,7 +1719,7 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + args[1] + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
@@ -1754,7 +1752,7 @@ public class CommandHandler
             playergroup = pm().getMainGroup(user);
             if (playergroup == null)
             {
-                sender.sendMessage(Color.Error + "The player " + Color.User + user.getName() + Color.Error + " doesn't have a group!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_NO_GROUPS, user.getName()));
                 return true;
             }
             nextgroup = pm().getNextGroup(playergroup);
@@ -1762,7 +1760,7 @@ public class CommandHandler
 
         if (nextgroup == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + user.getName() + Color.Error + " can't be promoted!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_CANNOT_BE_PROMOTED, user.getName()));
             return true;
         }
 
@@ -1778,18 +1776,18 @@ public class CommandHandler
             User issuer = pm().getUser(sender.getName());
             if (issuer == null)
             {
-                sender.sendMessage(Color.Error + "You do not exist!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_YOU_NOT_EXISTING));
                 return true;
             }
             Group issuergroup = pm().getMainGroup(issuer);
             if (issuergroup == null)
             {
-                sender.sendMessage(Color.Error + "You don't have a group!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_YOU_NO_GROUPS));
                 return true;
             }
             if (!(issuergroup.getRank() < nextgroup.getRank()))
             {
-                sender.sendMessage(Color.Error + "You can't promote the player " + Color.User + user.getName() + Color.Error + "!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_YOU_CANNOT_PROMOTE, user.getName()));
                 return true;
             }
         }
@@ -1801,7 +1799,7 @@ public class CommandHandler
             pm().removeUserGroup(user, playergroup);
         }
         pm().addUserGroup(user, nextgroup);
-        sender.sendMessage(Color.User + user.getName() + Color.Text + " is now " + Color.Value + nextgroup.getName() + Color.Text + "!");
+        sender.sendMessage(Lang.translate(MessageType.PROMOTE_MESSAGE, user.getName(), nextgroup.getName()));
 
         //promote msg to user
         if (config.isNotifyPromote())
@@ -1809,7 +1807,7 @@ public class CommandHandler
             Sender s = plugin.getPlayer(user.getName());
             if (s != null)
             {
-                s.sendMessage(Color.Text + "You were promoted to " + Color.Value + nextgroup.getName() + Color.Text + "!");
+                sender.sendMessage(Lang.translate(MessageType.PROMOTE_MESSAGE_TO_USER, nextgroup.getName()));
             }
         }
 
@@ -1834,7 +1832,7 @@ public class CommandHandler
         User user = pm().getUser(player);
         if (user == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + args[1] + Color.Error + " does not exist!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
 
@@ -1859,7 +1857,7 @@ public class CommandHandler
             playergroup = pm().getMainGroup(user);
             if (playergroup == null)
             {
-                sender.sendMessage(Color.Error + "The player " + Color.User + user.getName() + Color.Error + " doesn't have a group!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_NO_GROUPS, user.getName()));
                 return true;
             }
             previousgroup = pm().getPreviousGroup(playergroup);
@@ -1867,7 +1865,7 @@ public class CommandHandler
 
         if (previousgroup == null)
         {
-            sender.sendMessage(Color.Error + "The player " + Color.User + user.getName() + Color.Error + " can't be demoted!");
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_CANNOT_BE_DEMOTED, user.getName()));
             return true;
         }
 
@@ -1883,18 +1881,18 @@ public class CommandHandler
             User issuer = pm().getUser(sender.getName());
             if (issuer == null)
             {
-                sender.sendMessage(Color.Error + "You do not exist!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_YOU_NOT_EXISTING));
                 return true;
             }
             Group issuergroup = pm().getMainGroup(issuer);
             if (issuergroup == null)
             {
-                sender.sendMessage(Color.Error + "You don't have a group!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_YOU_NO_GROUPS));
                 return true;
             }
             if (!(issuergroup.getRank() < playergroup.getRank()))
             {
-                sender.sendMessage(Color.Error + "You can't demote the player " + Color.User + user.getName() + Color.Error + "!");
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_YOU_CANNOT_DEMOTE, user.getName()));
                 return true;
             }
         }
@@ -1906,7 +1904,7 @@ public class CommandHandler
             pm().removeUserGroup(user, playergroup);
         }
         pm().addUserGroup(user, previousgroup);
-        sender.sendMessage(Color.User + user.getName() + Color.Text + " is now " + Color.Value + previousgroup.getName() + Color.Text + "!");
+        sender.sendMessage(Lang.translate(MessageType.DEMOTE_MESSAGE, user.getName(), previousgroup.getName()));
 
         //demote msg to user
         if (config.isNotifyDemote())
@@ -1914,7 +1912,7 @@ public class CommandHandler
             Sender s = plugin.getPlayer(user.getName());
             if (s != null)
             {
-                s.sendMessage(Color.Text + "You were demoted to " + Color.Value + previousgroup.getName() + Color.Text + "!");
+                sender.sendMessage(Lang.translate(MessageType.DEMOTE_MESSAGE_TO_USER, previousgroup.getName()));
             }
         }
         return true;
@@ -1927,9 +1925,9 @@ public class CommandHandler
             return true;
         }
 
-        sender.sendMessage(Color.Text + "Formating permissions file/table ...");
+        sender.sendMessage(Lang.translate(MessageType.FORMATTING));
         pm().format();
-        sender.sendMessage(Color.Message + "Finished formating.");
+        sender.sendMessage(Lang.translate(MessageType.FORMATTING_DONE));
         return true;
     }
 
@@ -1940,8 +1938,10 @@ public class CommandHandler
             return true;
         }
 
+        sender.sendMessage(Lang.translate(MessageType.CLEANING));
         sender.sendMessage(Color.Text + "Cleaning up permissions file/table ...");
         int deleted = pm().cleanup();
+        sender.sendMessage(Lang.translate(MessageType.CLEANING_DONE, deleted));
         sender.sendMessage(Color.Message + "Finished cleaning. Deleted " + Color.Value + deleted + " users" + Color.Message + ".");
         return true;
     }
@@ -2409,5 +2409,10 @@ public class CommandHandler
             return false;
         }
         throw new IllegalArgumentException("truefalse does not represent a boolean value");
+    }
+
+    private String formatBool(boolean b)
+    {
+        return (b ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(b).toUpperCase();
     }
 }
