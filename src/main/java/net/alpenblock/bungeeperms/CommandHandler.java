@@ -367,6 +367,15 @@ public class CommandHandler
 
         //all group perms
         sender.sendMessage(Lang.translate(MessageType.USER_ALL_PERMISSIONS_COUNT, user.getPermissionsCount()));
+        
+        //display
+        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (user.getDisplay().length() > 0 ? user.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+
+        //prefix
+        sender.sendMessage(Lang.translate(MessageType.PREFIX, (user.getPrefix().length() > 0 ? user.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+
+        //suffix
+        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (user.getSuffix().length() > 0 ? user.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
 
@@ -1034,13 +1043,13 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.GROUP_DEFAULT, formatBool(group.isDefault())));
 
         //display
-        sender.sendMessage(Lang.translate(MessageType.GROUP_DISPLAY, (group.getDisplay().length() > 0 ? group.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (group.getDisplay().length() > 0 ? group.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //prefix
-        sender.sendMessage(Lang.translate(MessageType.GROUP_PREFIX, (group.getPrefix().length() > 0 ? group.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translate(MessageType.PREFIX, (group.getPrefix().length() > 0 ? group.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //suffix
-        sender.sendMessage(Lang.translate(MessageType.GROUP_SUFFIX, (group.getSuffix().length() > 0 ? group.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (group.getSuffix().length() > 0 ? group.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
 

@@ -114,9 +114,6 @@ public class Lang
         GROUP_WEIGHT("group.weight", Color.Text.alt() + "Weight: " + Color.Value.alt() + "{0}"),
         GROUP_LADDER("group.ladder", Color.Text.alt() + "Ladder: " + Color.Value.alt() + "{0}"),
         GROUP_DEFAULT("group.default", Color.Text.alt() + "Default: {0}"),
-        GROUP_DISPLAY("group.display", Color.Text.alt() + "Dislay name: " + ChatColor.RESET.alt() + "{0}"),
-        GROUP_PREFIX("group.prefix", Color.Text.alt() + "Prefix: " + ChatColor.RESET.alt() + "{0}"),
-        GROUP_SUFFIX("group.suffix", Color.Text.alt() + "Suffix: " + ChatColor.RESET.alt() + "{0}"),
         GROUP_USERS_HEADER("group.users-header", Color.Text.alt() + "Following players are in group " + Color.Value.alt() + "{0}" + Color.Text.alt() + ": "),
         GROUP_USERS_HEADER_COUNT("group.users-header-count", Color.Text.alt() + "There are " + Color.Value.alt() + "{0}" + Color.Text.alt() + " players in group " + Color.Value.alt() + "{1}" + Color.Text.alt() + "."),
         GROUP_CREATED("group.created", Color.Text.alt() + "Group {0} created"),
@@ -146,7 +143,11 @@ public class Lang
         GROUP_SET_DISPLAY("group.set-display", Color.Text.alt() + "Set display name for group " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
         GROUP_SET_PREFIX("group.set-prefix", Color.Text.alt() + "Set prefix for group " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
         GROUP_SET_SUFFIX("group.set-suffix", Color.Text.alt() + "Set suffix for group " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
-        //util & parts
+        //common
+        DISPLAY("common.display", Color.Text.alt() + "Dislay: " + ChatColor.RESET.alt() + "{0}"),
+        PREFIX("common.prefix", Color.Text.alt() + "Prefix: " + ChatColor.RESET.alt() + "{0}"),
+        SUFFIX("common.suffix", Color.Text.alt() + "Suffix: " + ChatColor.RESET.alt() + "{0}"),
+        //util & partss
         PERMISSIONS_LIST_ITEM("general.permissions-list-item", Color.Text.alt() + "- " + Color.Value.alt() + "{0}" + Color.Text.alt() + " (" + Color.Value.alt() + "{1}" + Color.Text.alt() + "{2}{3})"),
         OWN("general.own", "own"),
         NONE("general.none", "none"),
@@ -156,6 +157,7 @@ public class Lang
         EXTRACTING("log.extraction.extracting", "extracting {0}"),
         EXTRACTION_FAILED("log.extraction.failed", "could not extract file {0}: {1}"),
         EXTRACTION_DONE("log.extraction.done", "extracted {0}"),
+        //log
         PERMISSIONS_LOADING("log.permissions.loading", "loading permissions ..."),
         PERMISSIONS_LOADED("log.permissions.loaded", "permissions loaded"),
         NO_PERM_FILE("log.permissions.no-perm-file", "no permissions file found!!!"),
@@ -164,7 +166,6 @@ public class Lang
         ADDING_DEFAULT_GROUPS("log.permissions.adding-default-groups", "Adding default groups to {0}"),
         ADDING_DEFAULT_GROUPS_UUID("log.permissions.adding-default-groups-uuid", "Adding default groups to {0} ({1})"),
         INTRUSTION_DETECTED("log.intrusion-detected", Color.Error + "Possible intrusion detected. Sender is {0}");
-        
 
         private final String configKey;
         private final String defaultValue;
