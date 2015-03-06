@@ -125,7 +125,7 @@ public class BungeeEventListener implements Listener, EventListener
             server = pp.getServer() != null ? pp.getServer().getInfo().getName() : null;
             world = server != null ? playerWorlds.get(e.getSender().getName()) : null;
         }
-        e.setHasPermission(BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(s.getName(), e.getPermission(), server, world));
+        e.setHasPermission(BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BungeeSender(s), e.getPermission(), server, world));
     }
 
     @EventHandler

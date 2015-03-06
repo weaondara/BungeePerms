@@ -7,6 +7,7 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
+import net.alpenblock.bungeeperms.platform.bukkit.BukkitSender;
 import org.bukkit.entity.Player;
 
 class BungeePermsHandler implements IPermissionsHandler
@@ -79,7 +80,7 @@ class BungeePermsHandler implements IPermissionsHandler
     public boolean hasPermission(Player player, String node)
     {
         BukkitConfig config = (BukkitConfig) perms.getConfig();
-        return perms.getPermissionsChecker().hasPermOrConsoleOnServerInWorld(player.getName(), node, config.getServername(), player.getWorld().getName());
+        return perms.getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BukkitSender(player), node, config.getServername(), player.getWorld().getName());
     }
 
     @Override

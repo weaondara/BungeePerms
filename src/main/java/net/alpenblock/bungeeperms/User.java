@@ -60,8 +60,25 @@ public class User
 
     public boolean hasPerm(String perm)
     {
-        //ops have every permission so *
         Sender s = getSender();
+        return hasPerm(s, perm);
+    }
+
+    public boolean hasPermOnServer(String perm, String server)
+    {
+        Sender s = getSender();
+        return hasPermOnServer(s, perm, server);
+    }
+
+    public boolean hasPermOnServerInWorld(String perm, String server, String world)
+    {
+        Sender s = getSender();
+        return hasPermOnServerInWorld(s, perm, server, world);
+    }
+
+    public boolean hasPerm(Sender s, String perm)
+    {
+        //ops have every permission so *
         if (s != null && s.isOperator())
         {
             //debug mode
@@ -102,10 +119,9 @@ public class User
         return has;
     }
 
-    public boolean hasPermOnServer(String perm, String server)
+    public boolean hasPermOnServer(Sender s, String perm, String server)
     {
         //ops have every permission so *
-        Sender s = getSender();
         if (s != null && s.isOperator())
         {
             //debug mode
@@ -153,10 +169,9 @@ public class User
         return has;
     }
 
-    public boolean hasPermOnServerInWorld(String perm, String server, String world)
+    public boolean hasPermOnServerInWorld(Sender s, String perm, String server, String world)
     {
         //ops have every permission so *
-        Sender s = getSender();
         if (s != null && s.isOperator())
         {
             //debug mode

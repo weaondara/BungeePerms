@@ -65,7 +65,7 @@ public class Permissible extends PermissibleBase
     public boolean hasPermission(String permission)
     {
         boolean res = BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(
-                sender.getName(),
+                new BukkitSender(sender),
                 permission,
                 ((BukkitConfig)BungeePerms.getInstance().getConfig()).getServername(),
                 (sender instanceof Player ? ((Player) sender).getWorld().getName() : null));
