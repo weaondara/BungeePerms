@@ -151,9 +151,21 @@ public class Lang
         OWN("general.own", "own"),
         NONE("general.none", "none"),
         DEFAULT("general.default", "default"),
-        NONDEFAULT("general.nondefault", "non-default");
+        NONDEFAULT("general.nondefault", "non-default"),
+        //extraction
+        EXTRACTING("log.extraction.extracting", "extracting {0}"),
+        EXTRACTION_FAILED("log.extraction.failed", "could not extract file {0}: {1}"),
+        EXTRACTION_DONE("log.extraction.done", "extracted {0}"),
+        PERMISSIONS_LOADING("log.permissions.loading", "loading permissions ..."),
+        PERMISSIONS_LOADED("log.permissions.loaded", "permissions loaded"),
+        NO_PERM_FILE("log.permissions.no-perm-file", "no permissions file found!!!"),
+        LOGIN("log.login", "Login by {0}"),
+        LOGIN_UUID("log.login-uuid", "Login by {0} ({1})"),
+        ADDING_DEFAULT_GROUPS("log.permissions.adding-default-groups", "Adding default groups to {0}"),
+        ADDING_DEFAULT_GROUPS_UUID("log.permissions.adding-default-groups-uuid", "Adding default groups to {0} ({1})"),
+        INTRUSTION_DETECTED("log.intrusion-detected", Color.Error + "Possible intrusion detected. Sender is {0}");
         
-        
+
         private final String configKey;
         private final String defaultValue;
     }

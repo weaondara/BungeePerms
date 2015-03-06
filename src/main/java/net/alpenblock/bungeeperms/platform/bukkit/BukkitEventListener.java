@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
@@ -73,19 +74,15 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         if (config.isUseUUIDs())
         {
             pm().reloadUser(e.getPlayer().getUniqueId());
-            BungeePerms.getLogger().log(Level.INFO, "Login by {0} ({1})", new Object[]
-                                {
-                                    e.getPlayer().getName(), e.getPlayer().getUniqueId()
-            });
+            BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN_UUID, e.getPlayer().getName(), e.getPlayer().getUniqueId()));
         }
         else
         {
             pm().reloadUser(e.getPlayer().getName());
-            BungeePerms.getLogger().log(Level.INFO, "Login by {0}", new Object[]
-                                {
-                                    e.getPlayer().getName()
-            });
+            BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN, e.getPlayer().getName()));
         }
+        
+        //todo: add default groups
 
         //inject permissible
         Permissible permissible = new Permissible(e.getPlayer());

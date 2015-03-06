@@ -6,6 +6,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import net.alpenblock.bungeeperms.Lang.MessageType;
 
 public class FileExtractor
 {
@@ -34,7 +35,7 @@ public class FileExtractor
             return;
         }
 
-        BungeePerms.getLogger().info("extracting " + file);
+        BungeePerms.getLogger().info(Lang.translate(MessageType.EXTRACTING, file));
         f.getParentFile().mkdirs();
         try
         {
@@ -50,10 +51,10 @@ public class FileExtractor
         }
         catch (Exception e)
         {
-            BungeePerms.getLogger().info("could not extract file " + file + ": " + e.getMessage());
+            BungeePerms.getLogger().info(Lang.translate(MessageType.EXTRACTION_FAILED, file, e.getMessage()));
             e.printStackTrace();
             return;
         }
-        BungeePerms.getLogger().info("extracted " + file);
+        BungeePerms.getLogger().info(Lang.translate(MessageType.EXTRACTION_DONE, file));
     }
 }

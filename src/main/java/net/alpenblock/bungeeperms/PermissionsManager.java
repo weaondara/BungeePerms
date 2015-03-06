@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import net.alpenblock.bungeeperms.Lang.MessageType;
 import net.alpenblock.bungeeperms.io.BackEnd;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.MySQL2BackEnd;
@@ -96,7 +97,7 @@ public class PermissionsManager
      */
     public final void loadPerms()
     {
-        BungeePerms.getLogger().info("loading permissions ...");
+        BungeePerms.getLogger().info(Lang.translate(MessageType.PERMISSIONS_LOADING));
 
         //load database
         backEnd.load();
@@ -109,7 +110,7 @@ public class PermissionsManager
         //load permsversion
         permsversion = backEnd.loadVersion();
 
-        BungeePerms.getLogger().info("permissions loaded");
+        BungeePerms.getLogger().info(Lang.translate(MessageType.PERMISSIONS_LOADED));
     }
 
     /**

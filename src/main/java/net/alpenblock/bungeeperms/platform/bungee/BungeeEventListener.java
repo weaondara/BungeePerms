@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.Statics;
@@ -72,23 +73,27 @@ public class BungeeEventListener implements Listener, EventListener
         if (config.isUseUUIDs())
         {
             uuid = e.getConnection().getUniqueId();
-            BungeePerms.getLogger().log(Level.INFO, "Login by {0} ({1})", new Object[]
-                                {
-                                    playername, uuid
-            });
+            BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN_UUID, playername, uuid));
 
             //update uuid player db
             pm().getUUIDPlayerDB().update(uuid, playername);
         }
         else
         {
-            BungeePerms.getLogger().log(Level.INFO, Statics.format("Login by {0}", playername));
+            BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN, playername));
         }
 
         User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
         if (u == null)
         {
-            BungeePerms.getLogger().log(Level.INFO, Statics.format("Adding default groups to {0} ({1})", playername, uuid));
+            if(config.isUseUUIDs())
+            {
+                BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.ADDING_DEFAULT_GROUPS_UUID, playername, uuid));
+            }
+            else
+            {
+                BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.ADDING_DEFAULT_GROUPS, playername));
+            }
 
             List<Group> groups = pm().getDefaultGroups();
             u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), "", "", "");
@@ -153,7 +158,7 @@ public class BungeeEventListener implements Listener, EventListener
         if (!(e.getReceiver() instanceof ProxiedPlayer))
         {
             //lock out silly hackers
-            BungeePerms.getLogger().severe(Color.Error + "Possible intrusion detected. Sender is " + e.getSender());
+            BungeePerms.getLogger().severe(Lang.translate(Lang.MessageType.INTRUSTION_DETECTED, e.getSender()));
             e.setCancelled(true);
             return;
         }
