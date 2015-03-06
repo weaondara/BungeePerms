@@ -1,14 +1,17 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
+import java.util.ArrayList;
 import net.alpenblock.bungeeperms.BungeePerms;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
+import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.EventListener;
@@ -71,18 +74,41 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e)
     {
+        String playername = e.getPlayer().getName();
+        UUID uuid = null;
+        
         if (config.isUseUUIDs())
         {
-            pm().reloadUser(e.getPlayer().getUniqueId());
             BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN_UUID, e.getPlayer().getName(), e.getPlayer().getUniqueId()));
+            uuid = e.getPlayer().getUniqueId();
+            
+            //update uuid player db
+            pm().getUUIDPlayerDB().update(uuid, playername);
         }
         else
         {
-            pm().reloadUser(e.getPlayer().getName());
             BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN, e.getPlayer().getName()));
         }
         
-        //todo: add default groups
+        User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
+        if (u == null)
+        {
+            //create user and add default groups
+            if(config.isUseUUIDs())
+            {
+                BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.ADDING_DEFAULT_GROUPS_UUID, playername, uuid));
+            }
+            else
+            {
+                BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.ADDING_DEFAULT_GROUPS, playername));
+            }
+
+            List<Group> groups = pm().getDefaultGroups();
+            u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), "", "", "");
+            pm().addUserToCache(u);
+
+            pm().getBackEnd().saveUser(u, true);
+        }
 
         //inject permissible
         Permissible permissible = new Permissible(e.getPlayer());
