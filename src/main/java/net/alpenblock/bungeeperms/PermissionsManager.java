@@ -150,6 +150,9 @@ public class PermissionsManager
         enabled = false;
     }
 
+    /**
+     * Reloads the config and permissions.
+     */
     public void reload()
     {
         disable();
@@ -183,7 +186,7 @@ public class PermissionsManager
             }
             backEnd.saveGroupInheritances(group);
         }
-        
+
         //perms recalc and bukkit perms update
         for (Group g : groups)
         {
@@ -505,6 +508,12 @@ public class PermissionsManager
         return backEnd.getRegisteredUsers();
     }
 
+    /**
+     * Gets a list of all user which are in the given group
+     *
+     * @param group the group
+     * @return a list of all user which are in the given group
+     */
     public List<String> getGroupUsers(Group group)
     {
         return backEnd.getGroupUsers(group);
@@ -824,6 +833,12 @@ public class PermissionsManager
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
     }
 
+    /**
+     * Adds the permission to the group.
+     *
+     * @param group the group
+     * @param perm the permission to add
+     */
     public void addGroupPerm(Group group, String perm)
     {
         //cache
@@ -846,6 +861,12 @@ public class PermissionsManager
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
+    /**
+     * Removes the permission from the group.
+     *
+     * @param group the group
+     * @param perm the permission to remove
+     */
     public void removeGroupPerm(Group group, String perm)
     {
         //cache
@@ -868,6 +889,13 @@ public class PermissionsManager
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
+    /**
+     * Adds the permission to the group on the given server.
+     *
+     * @param group the group
+     * @param server the server
+     * @param perm the permission to add
+     */
     public void addGroupPerServerPerm(Group group, String server, String perm)
     {
         //cache
@@ -898,6 +926,13 @@ public class PermissionsManager
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
+    /**
+     * Removes the permission from the group on the given server.
+     *
+     * @param group the group
+     * @param server the server
+     * @param perm the permission to remove
+     */
     public void removeGroupPerServerPerm(Group group, String server, String perm)
     {
         //cache
@@ -928,6 +963,14 @@ public class PermissionsManager
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
+    /**
+     * Adds the permission to the group on the given server and world.
+     *
+     * @param group the group
+     * @param server the server
+     * @param world the world
+     * @param perm the permission to add
+     */
     public void addGroupPerServerWorldPerm(Group group, String server, String world, String perm)
     {
         //cache
@@ -964,6 +1007,14 @@ public class PermissionsManager
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
+    /**
+     * Removes the permission from the group on the given server and world.
+     *
+     * @param group the group
+     * @param server the server
+     * @param world the world
+     * @param perm the permission to remove
+     */
     public void removeGroupPerServerWorldPerm(Group group, String server, String world, String perm)
     {
         //cache
@@ -1000,6 +1051,12 @@ public class PermissionsManager
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
+    /**
+     * Adds the toadd group to the group as inheritance
+     *
+     * @param group the group which should inherit
+     * @param toadd the group which should be inherited
+     */
     public void addGroupInheritance(Group group, Group toadd)
     {
         //cache
@@ -1023,6 +1080,12 @@ public class PermissionsManager
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
     }
 
+    /**
+     * Removes the toremove group from the group as inheritance
+     *
+     * @param group the group which should no longer inherit
+     * @param toremove the group which should no longer be inherited
+     */
     public void removeGroupInheritance(Group group, Group toremove)
     {
         //cache
@@ -1215,6 +1278,11 @@ public class PermissionsManager
         backEnd.load();
     }
 
+    /**
+     * Converts the permissions database to use UUIDs for player identification.
+     *
+     * @param uuids a map of player names and their corresponding UUIDs
+     */
     public void migrateUseUUID(Map<String, UUID> uuids)
     {
         List<Group> groups = backEnd.loadGroups();
@@ -1239,6 +1307,11 @@ public class PermissionsManager
         backEnd.saveVersion(version, true);
     }
 
+    /**
+     * Converts the permissions database to use player names for player identification.
+     *
+     * @param playernames a map of UUIDs and their corresponding player names
+     */
     public void migrateUsePlayerNames(Map<UUID, String> playernames)
     {
         List<Group> groups = backEnd.loadGroups();
@@ -1263,6 +1336,11 @@ public class PermissionsManager
         backEnd.saveVersion(version, true);
     }
 
+    /**
+     * Converts the backend of the database holding the UUIDs and their corresponding player names to the new backend.
+     *
+     * @param type the new backend type
+     */
     public void migrateUUIDPlayerDB(UUIDPlayerDBType type)
     {
         Map<UUID, String> map = UUIDPlayerDB.getAll();
