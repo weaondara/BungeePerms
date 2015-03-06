@@ -15,6 +15,7 @@ import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PlatformType;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
+import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -69,6 +70,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
         //extra part
         bridge = new BridgeManager();
         bridge.load();
+        bungeeperms.getPermissionsResolver().registerProcessor(new GroupProcessor());
         bungeeperms.getPermissionsResolver().registerProcessor(new SuperPermsPreProcessor());
         bungeeperms.getPermissionsResolver().registerProcessor(new OpProcessor());
         bungeeperms.getPermissionsResolver().registerProcessor(new SuperPermsPostProcessor());

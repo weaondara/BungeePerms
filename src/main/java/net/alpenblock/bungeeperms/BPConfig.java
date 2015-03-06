@@ -14,6 +14,7 @@ public class BPConfig
     //perms
     private boolean useUUIDs;
     private boolean useRegexPerms;
+    private boolean groupPermission;
 
     //db
     private BackEndType backEndType;
@@ -44,6 +45,7 @@ public class BPConfig
         //perms
         useUUIDs = config.getBoolean("useUUIDs", false);
         useRegexPerms = config.getBoolean("useregexperms", false);
+        groupPermission = config.getBoolean("grouppermission", true);
 
         //db
         backEndType = config.getEnumValue("backendtype", BackEndType.YAML);

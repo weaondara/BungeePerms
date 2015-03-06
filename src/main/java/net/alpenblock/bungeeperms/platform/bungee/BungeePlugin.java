@@ -12,6 +12,7 @@ import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PlatformType;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
+import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -57,6 +58,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
 
         bungeeperms = new BungeePerms(this, config, pmsender, notifier, listener);
         bungeeperms.load();
+        bungeeperms.getPermissionsResolver().registerProcessor(new GroupProcessor());
     }
 
     @Override
