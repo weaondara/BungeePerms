@@ -54,13 +54,7 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch (Exception e)
-            {
-            }
+            Mysql.closeResultSet(res);
         }
 
         return groups;
@@ -86,13 +80,7 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch (Exception e)
-            {
-            }
+            Mysql.closeResultSet(res);
         }
 
         return groups;
@@ -116,13 +104,7 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch (Exception e)
-            {
-            }
+            Mysql.closeResultSet(res);
         }
 
         return mpe;
@@ -163,13 +145,7 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch (Exception e)
-            {
-            }
+            Mysql.closeResultSet(res);
         }
 
         return found;
@@ -265,13 +241,7 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch (Exception e)
-            {
-            }
+            Mysql.closeResultSet(res);
         }
 
         return groups;

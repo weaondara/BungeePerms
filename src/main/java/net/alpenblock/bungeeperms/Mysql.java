@@ -13,6 +13,17 @@ public class Mysql
 	private Connection connection;
 	private String configsection;
     
+    public static void closeResultSet(ResultSet res)
+    {
+        try
+        {
+            res.close();
+        }
+        catch (Exception e)
+        {
+        }
+    }
+    
 	public Mysql (Config c,Debug d,String configsection) 
 	{	
 		config = c;
@@ -118,11 +129,7 @@ public class Mysql
     	}
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch(Exception e){}
+            Mysql.closeResultSet(res);
         }
     	return tableexists;
     }
@@ -161,11 +168,7 @@ public class Mysql
     	}
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch(Exception e){}
+            Mysql.closeResultSet(res);
         }
         return success;
     }
@@ -198,11 +201,7 @@ public class Mysql
     	}
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch(Exception e){}
+            Mysql.closeResultSet(res);
         }
         return fsuccess;
     }

@@ -37,13 +37,7 @@ public class MysqlConfig
         }
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch (Exception e)
-            {
-            }
+            Mysql.closeResultSet(res);
         }
     }
 

@@ -70,13 +70,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         }
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch (Exception e)
-            {
-            }
+            Mysql.closeResultSet(res);
         }
 
         return ret;
@@ -103,13 +97,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         }
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch (Exception e)
-            {
-            }
+            Mysql.closeResultSet(res);
         }
 
         return ret;
@@ -146,13 +134,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         }
         finally
         {
-            try
-            {
-                res.close();
-            }
-            catch (Exception e)
-            {
-            }
+            Mysql.closeResultSet(res);
         }
 
         return ret;

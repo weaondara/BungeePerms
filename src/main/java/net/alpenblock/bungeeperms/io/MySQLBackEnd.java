@@ -548,13 +548,7 @@ public class MySQLBackEnd implements BackEnd
 
         permsconf.fromResult(res);
 
-        try
-        {
-            res.close();
-        }
-        catch (Exception ex)
-        {
-        }
+        Mysql.closeResultSet(res);
 
         //load group from database
         List<String> inheritances = permsconf.getListString("groups." + group.getName() + ".inheritances", new ArrayList<String>());
@@ -613,13 +607,7 @@ public class MySQLBackEnd implements BackEnd
 
         permsconf.fromResult(res);
 
-        try
-        {
-            res.close();
-        }
-        catch (Exception ex)
-        {
-        }
+        Mysql.closeResultSet(res);
 
         String uname = config.isUseUUIDs() ? user.getUUID().toString() : user.getName();
 
