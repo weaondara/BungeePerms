@@ -485,6 +485,38 @@ public class User
         return ret;
     }
 
+    public int getOwnPermissionsCount()
+    {
+        int count = extraPerms.size();
+
+        for (List<String> s : serverPerms.values())
+        {
+            count += s.size();
+        }
+
+        for (Map<String, List<String>> s : serverWorldPerms.values())
+        {
+            for (List<String> w : s.values())
+            {
+                count += w.size();
+            }
+        }
+
+        return count;
+    }
+
+    public int getPermissionsCount()
+    {
+        int count = getOwnPermissionsCount();
+
+        for (Group g : groups)
+        {
+            count += g.getOwnPermissionsCount();
+        }
+
+        return count;
+    }
+
     private Sender getSender()
     {
         return BungeePerms.getInstance().getConfig().isUseUUIDs()

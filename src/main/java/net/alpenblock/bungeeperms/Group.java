@@ -319,6 +319,39 @@ public class Group implements Comparable<Group>
         return ret;
     }
 
+    public int getOwnPermissionsCount()
+    {
+        int count = perms.size();
+
+        for (Server s : servers.values())
+        {
+            count += s.getPerms().size();
+            for (World w : s.getWorlds().values())
+            {
+                count += w.getPerms().size();
+            }
+        }
+
+        return count;
+    }
+
+    public int getPermissionsCount()
+    {
+        int count = getOwnPermissionsCount();
+
+        for (String group : inheritances)
+        {
+            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+            if (g == null)
+            {
+                continue;
+            }
+            count += g.getOwnPermissionsCount();
+        }
+
+        return count;
+    }
+
     @Override
     public int compareTo(Group g)
     {

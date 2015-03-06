@@ -346,7 +346,7 @@ public class CommandHandler
         sender.sendMessage(Color.Text + "Groups: " + groups);
 
         //all group perms
-        sender.sendMessage(Color.Text + "Effective permissions: " + Color.Value + user.getEffectivePerms().size());//TODO
+        sender.sendMessage(Color.Text + "Count of permissions: " + Color.Value + user.getPermissionsCount());
         return true;
     }
 
@@ -944,7 +944,7 @@ public class CommandHandler
         sender.sendMessage(Color.Text + "Default: " + Color.Value + (group.isDefault() ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(group.isDefault()).toUpperCase());
 
         //all group perms
-        sender.sendMessage(Color.Text + "Effective permissions: " + Color.Value + group.getEffectivePerms().size());
+        sender.sendMessage(Color.Text + "Count of permissions: " + Color.Value + group.getPermissionsCount());
 
         //display
         sender.sendMessage(Color.Text + "Dislay name: " + ChatColor.RESET + (group.getDisplay().length() > 0 ? group.getDisplay() : Color.Text + "(none)"));
