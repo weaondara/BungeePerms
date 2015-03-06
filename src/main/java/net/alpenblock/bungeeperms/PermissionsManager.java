@@ -391,6 +391,11 @@ public class PermissionsManager
      */
     public synchronized Group getGroup(String groupname)
     {
+        if (groupname == null)
+        {
+            return null;
+        }
+
         for (Group g : groups)
         {
             if (g.getName().equalsIgnoreCase(groupname))
@@ -409,6 +414,11 @@ public class PermissionsManager
      */
     public synchronized User getUser(String usernameoruuid)
     {
+        if (usernameoruuid == null)
+        {
+            return null;
+        }
+
         UUID uuid = Statics.parseUUID(usernameoruuid);
         if (config.isUseUUIDs())
         {
@@ -460,6 +470,11 @@ public class PermissionsManager
      */
     public synchronized User getUser(UUID uuid)
     {
+        if (uuid == null)
+        {
+            return null;
+        }
+
         for (User u : users)
         {
             if (u.getUUID().equals(uuid))
