@@ -42,7 +42,8 @@ public class BukkitSender implements Sender
         }
         else
         {
-            throw new UnsupportedOperationException("CommandSender derivative " + sender.getClass().getName() + " is unknown!");
+            return null;
+//            throw new UnsupportedOperationException("CommandSender derivative " + sender.getClass().getName() + " is unknown!");
         }
     }
 
