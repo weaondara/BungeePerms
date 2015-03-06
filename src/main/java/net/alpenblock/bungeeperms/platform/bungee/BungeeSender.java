@@ -3,6 +3,8 @@ package net.alpenblock.bungeeperms.platform.bungee;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -62,8 +64,8 @@ public class BungeeSender implements Sender
     @Override
     public String getWorld()
     {
-        //todo: impl
-        return null;
+        BungeeEventListener l = (BungeeEventListener) BungeePerms.getInstance().getEventListener();
+        return l.getPlayerWorlds().get(sender.getName());
     }
 
     @Override
