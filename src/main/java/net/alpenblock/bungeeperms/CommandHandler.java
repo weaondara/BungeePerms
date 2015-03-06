@@ -2264,15 +2264,15 @@ public class CommandHandler
         }
         if (checker.hasPermOrConsole(sender, "bungeeperms.user.display"))
         {
-            sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> display [displayname> [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the display name for the given user");
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> display [displayname [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the display name for the given user");
         }
         if (checker.hasPermOrConsole(sender, "bungeeperms.user.prefix"))
         {
-            sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> prefix [prefix> [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the prefix for the given user");
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> prefix [prefix [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the prefix for the given user");
         }
         if (checker.hasPermOrConsole(sender, "bungeeperms.user.suffix"))
         {
-            sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> suffix [suffix> [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the suffix for the given user");
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms user <username> suffix [suffix [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the suffix for the given user");
         }
         if (checker.hasPermOrConsole(sender, "bungeeperms.user.perms.add"))
         {
@@ -2352,15 +2352,15 @@ public class CommandHandler
         }
         if (checker.hasPermOrConsole(sender, "bungeeperms.group.display"))
         {
-            sender.sendMessage(ChatColor.GOLD + "/bungeeperms group <groupname> display [displayname> [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the display name for the given group");
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms group <groupname> display [displayname [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the display name for the given group");
         }
         if (checker.hasPermOrConsole(sender, "bungeeperms.group.prefix"))
         {
-            sender.sendMessage(ChatColor.GOLD + "/bungeeperms group <groupname> prefix [prefix> [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the prefix for the given group");
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms group <groupname> prefix [prefix [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the prefix for the given group");
         }
         if (checker.hasPermOrConsole(sender, "bungeeperms.group.suffix"))
         {
-            sender.sendMessage(ChatColor.GOLD + "/bungeeperms group <groupname> suffix [suffix> [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the suffix for the given group");
+            sender.sendMessage(ChatColor.GOLD + "/bungeeperms group <groupname> suffix [suffix [server [world]]]" + ChatColor.WHITE + " - " + ChatColor.GRAY + "Sets the suffix for the given group");
         }
         if (checker.hasPermOrConsole(sender, "bungeeperms.group.perms.add"))
         {
