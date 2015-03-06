@@ -286,7 +286,7 @@ public class Group implements Comparable<Group>
         for (Map.Entry<String, Server> srv : servers.entrySet())
         {
             //check for server
-            if (server != null && !srv.getKey().equalsIgnoreCase(server))
+            if (server == null || !srv.getKey().equalsIgnoreCase(server))
             {
                 continue;
             }
@@ -302,7 +302,7 @@ public class Group implements Comparable<Group>
             for (Map.Entry<String, World> w : srv.getValue().getWorlds().entrySet())
             {
                 //check for world
-                if (world != null && !w.getKey().equalsIgnoreCase(world))
+                if (world == null || !w.getKey().equalsIgnoreCase(world))
                 {
                     continue;
                 }
