@@ -57,7 +57,7 @@ public class MysqlPermEntity
             e.add(ve);
         }
 
-        //todo: close res?
+        //close res? -> no will be done
     }
 
     public List<ValueEntry> getData(String type)
