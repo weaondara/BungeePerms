@@ -80,7 +80,7 @@ public class BungeeNotifier implements NetworkNotifier
             }
             
             //no feedback loop
-            if(pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
+            if(origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
             {
                 return;
             }
@@ -109,7 +109,7 @@ public class BungeeNotifier implements NetworkNotifier
             }
             
             //no feedback loop
-            if(pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
+            if(origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
             {
                 return;
             }
@@ -137,7 +137,7 @@ public class BungeeNotifier implements NetworkNotifier
             }
             
             //no feedback loop
-            if(si.getName().equalsIgnoreCase(origin))
+            if(origin != null && si.getName().equalsIgnoreCase(origin))
             {
                 continue;
             }
