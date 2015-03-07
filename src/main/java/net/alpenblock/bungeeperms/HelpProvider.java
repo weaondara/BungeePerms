@@ -75,7 +75,7 @@ public class HelpProvider
 
     public static void sendHelpHeader(Sender sender, int page)
     {
-        sender.sendMessage(enc().append("                  ------ BungeePerms - Help - Page " + (page+1) + " -----").color(ChatColor.GOLD));
+        sender.sendMessage(enc().append("                  ------ BungeePerms - Help - Page " + (page + 1) + " -----").color(ChatColor.GOLD));
         sender.sendMessage(enc().append("Aliases: ").color(ChatColor.GRAY).append("/bp").color(ChatColor.GOLD));
     }
 
@@ -83,19 +83,26 @@ public class HelpProvider
     {
         sendHelpHeader(sender, page);
 
-        int index = 0;
+        int index = -1;
         for (HelpEntry he : helpentries)
         {
             if (he.getPermission() != null && !BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsole(sender, he.getPermission()))
             {
-                System.out.println("no perm" + he.getPermission());
                 continue;
             }
 
             index++;
-            if ((page + 1) * PAGE_SIZE >= index && index > page * PAGE_SIZE)
+            if (index < page * PAGE_SIZE)
+            {
+                continue;
+            }
+            else if (index < (page + 1) * PAGE_SIZE)
             {
                 sender.sendMessage(he.getMessage());
+            }
+            else
+            {
+                break;
             }
         }
     }
