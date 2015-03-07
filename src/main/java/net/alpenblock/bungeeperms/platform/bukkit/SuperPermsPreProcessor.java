@@ -33,7 +33,7 @@ public class SuperPermsPreProcessor implements PermissionsPreProcessor
             {
                 continue;
             }
-            System.out.println(p.getChildren());
+            
             for (Map.Entry<String, Boolean> e : p.getChildren().entrySet())
             {
                 if (e.getValue())
