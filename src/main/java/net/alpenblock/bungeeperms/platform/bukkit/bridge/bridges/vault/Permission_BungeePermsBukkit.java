@@ -102,44 +102,108 @@ public class Permission_BungeePermsBukkit extends Permission
     public boolean playerHas(String world, String player, String permission)
     {
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        return BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(player, permission, config.getServername(), world);
+        return BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(player, permission.toLowerCase(), config.getServername().toLowerCase(), world.toLowerCase());
     }
 
     @Override
     public boolean playerAdd(String world, String player, String permission)
     {
-        return false;
+        String server = ((BukkitConfig) BungeePerms.getInstance().getConfig()).getServername().toLowerCase();
+        User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
+        if (u == null)
+        {
+            return false;
+        }
+
+        if (world == null)
+        {
+            BungeePerms.getInstance().getPermissionsManager().addUserPerServerPerm(u, server, permission.toLowerCase());
+        }
+        else
+        {
+            BungeePerms.getInstance().getPermissionsManager().addUserPerServerWorldPerm(u, server, world.toLowerCase(), permission.toLowerCase());
+        }
+
+        return true;
     }
 
     @Override
     public boolean playerRemove(String world, String player, String permission)
     {
-        return false;
+        String server = ((BukkitConfig) BungeePerms.getInstance().getConfig()).getServername().toLowerCase();
+        User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
+        if (u == null)
+        {
+            return false;
+        }
+
+        if (world == null)
+        {
+            BungeePerms.getInstance().getPermissionsManager().removeUserPerServerPerm(u, server, permission.toLowerCase());
+        }
+        else
+        {
+            BungeePerms.getInstance().getPermissionsManager().removeUserPerServerWorldPerm(u, server, world.toLowerCase(), permission.toLowerCase());
+        }
+
+        return true;
     }
 
     @Override
     public boolean groupHas(String world, String group, String permission)
     {
+        String server = ((BukkitConfig) BungeePerms.getInstance().getConfig()).getServername().toLowerCase();
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
         {
-            throw new NullPointerException("group " + group + " doesn't exist");
+            return false;
         }
-        
-        BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        return g.hasOnServerInWorld(permission, config.getServername(), world);
+
+        return g.hasOnServerInWorld(permission.toLowerCase(), server, world.toLowerCase());
     }
 
     @Override
     public boolean groupAdd(String world, String group, String permission)
     {
-        return false;
+        String server = ((BukkitConfig) BungeePerms.getInstance().getConfig()).getServername().toLowerCase();
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+        {
+            return false;
+        }
+        
+        if (world == null)
+        {
+            BungeePerms.getInstance().getPermissionsManager().addGroupPerServerPerm(g, server, permission.toLowerCase());
+        }
+        else
+        {
+            BungeePerms.getInstance().getPermissionsManager().addGroupPerServerWorldPerm(g, server, world.toLowerCase(), permission.toLowerCase());
+        }
+        
+        return true;
     }
 
     @Override
     public boolean groupRemove(String world, String group, String permission)
     {
-        return false;
+        String server = ((BukkitConfig) BungeePerms.getInstance().getConfig()).getServername().toLowerCase();
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+        {
+            return false;
+        }
+        
+        if (world == null)
+        {
+            BungeePerms.getInstance().getPermissionsManager().removeGroupPerServerPerm(g, server, permission.toLowerCase());
+        }
+        else
+        {
+            BungeePerms.getInstance().getPermissionsManager().removeGroupPerServerWorldPerm(g, server, world.toLowerCase(), permission.toLowerCase());
+        }
+        
+        return true;
     }
 
     @Override
@@ -148,28 +212,64 @@ public class Permission_BungeePermsBukkit extends Permission
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
         {
-            throw new NullPointerException("player " + player + " doesn't exist");
+            return false;
         }
-        for (Group g : u.getGroups())
+        
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
         {
-            if (g.getName().equalsIgnoreCase(group))
-            {
-                return true;
-            }
+            return false;
         }
-        return false;
+        
+        return u.getGroups().contains(g);
     }
 
     @Override
     public boolean playerAddGroup(String world, String player, String group)
     {
-        return false;
+        User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
+        if (u == null)
+        {
+            return false;
+        }
+        
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+        {
+            return false;
+        }
+        
+        if(u.getGroups().contains(g))
+        {
+            return false;
+        }
+        
+        BungeePerms.getInstance().getPermissionsManager().addUserGroup(u, g);
+        return true;
     }
 
     @Override
     public boolean playerRemoveGroup(String world, String player, String group)
     {
-        return false;
+        User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
+        if (u == null)
+        {
+            return false;
+        }
+        
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+        {
+            return false;
+        }
+        
+        if(!u.getGroups().contains(g))
+        {
+            return false;
+        }
+        
+        BungeePerms.getInstance().getPermissionsManager().removeUserGroup(u, g);
+        return true;
     }
 
     @Override
@@ -178,15 +278,10 @@ public class Permission_BungeePermsBukkit extends Permission
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
         {
-            throw new NullPointerException("player " + player + " doesn't exist");
-        }
-        List<String> groups = new ArrayList<>();
-        for (Group g : u.getGroups())
-        {
-            groups.add(g.getName());
+            return new String[0];
         }
 
-        return groups.toArray(new String[groups.size()]);
+        return u.getGroupsString().toArray(new String[u.getGroupsString().size()]);
     }
 
     @Override
@@ -195,7 +290,7 @@ public class Permission_BungeePermsBukkit extends Permission
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
         {
-            throw new NullPointerException("player " + player + " doesn't exist");
+            return null;
         }
         Group g = BungeePerms.getInstance().getPermissionsManager().getMainGroup(u);
         return g != null ? g.getName() : null;

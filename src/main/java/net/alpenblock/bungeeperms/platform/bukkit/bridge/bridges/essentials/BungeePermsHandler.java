@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
-import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
-import net.alpenblock.bungeeperms.World;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitSender;
 import org.bukkit.entity.Player;
@@ -67,22 +65,21 @@ class BungeePermsHandler implements IPermissionsHandler
         {
             return false;
         }
-
-        for (Group g : u.getGroups())
+        
+        Group g = perms.getPermissionsManager().getGroup(group);
+        if (g == null)
         {
-            if (g.getName().equalsIgnoreCase(group))
-            {
-                return true;
-            }
+            return false;
         }
-        return false;
+
+        return u.getGroups().contains(g);
     }
 
     @Override
     public boolean hasPermission(Player player, String node)
     {
         BukkitConfig config = (BukkitConfig) perms.getConfig();
-        return perms.getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BukkitSender(player), node);
+        return perms.getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BukkitSender(player), node.toLowerCase());
     }
 
     @Override

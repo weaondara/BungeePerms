@@ -45,7 +45,7 @@ public class BungeePermsBukkitResolver extends DinnerPermsResolver
     public boolean hasPermission(String worldName, String name, String permission)
     {
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        return BungeePerms.getInstance().getPermissionsChecker().hasPermOnServerInWorld(name, permission, config.getServername(), worldName);
+        return BungeePerms.getInstance().getPermissionsChecker().hasPermOnServerInWorld(name, permission.toLowerCase(), config.getServername().toLowerCase(), worldName.toLowerCase());
     }
 
     @Override
@@ -54,11 +54,11 @@ public class BungeePermsBukkitResolver extends DinnerPermsResolver
         Permissible permissible = getPermissible(player);
         if (permissible == null)
         {
-            return BungeePerms.getInstance().getPermissionsChecker().hasPerm(player.getName(), permission);
+            return BungeePerms.getInstance().getPermissionsChecker().hasPerm(player.getName(), permission.toLowerCase());
         }
         else
         {
-            return permissible.hasPermission(permission);
+            return permissible.hasPermission(permission.toLowerCase());
         }
     }
 
@@ -103,6 +103,7 @@ public class BungeePermsBukkitResolver extends DinnerPermsResolver
     @Override
     public String getDetectionMessage()
     {
-        return "BungeePermsBukkit detected! Using BungeePermsBukkit for permissions.";
+        String pluginname = BungeePerms.getInstance().getPlugin().getPluginName();
+        return pluginname + " detected! Using " + pluginname + " for permissions.";
     }
 }
