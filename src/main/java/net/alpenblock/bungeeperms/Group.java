@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import net.alpenblock.bungeeperms.platform.Sender;
+import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 
 @Getter
 @Setter
@@ -350,6 +352,56 @@ public class Group implements Comparable<Group>
         }
 
         return count;
+    }
+
+    public String buildPrefix(String world)
+    {
+        String prefix = "";
+
+        //global
+        prefix += this.prefix + (this.prefix.isEmpty() ? "" : " ");
+
+        //server
+        BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
+        Server s = servers.get(config.getServername().toLowerCase());
+        if (s != null)
+        {
+            prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
+
+            //world
+            World w = s.getWorlds().get(world.toLowerCase());
+            if (w != null)
+            {
+                prefix += w.getPrefix() + (w.getPrefix().isEmpty() ? "" : " ");
+            }
+        }
+
+        return prefix.isEmpty() ? prefix : prefix.substring(0, prefix.length() - 1) + ChatColor.RESET;
+    }
+
+    public String buildSuffix(String world)
+    {
+        String suffix = "";
+
+        //global
+        suffix += this.suffix + (this.suffix.isEmpty() ? "" : " ");
+
+        //server
+        BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
+        Server s = servers.get(config.getServername().toLowerCase());
+        if (s != null)
+        {
+            suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");
+
+            //world
+            World w = s.getWorlds().get(world.toLowerCase());
+            if (w != null)
+            {
+                suffix += w.getSuffix() + (w.getSuffix().isEmpty() ? "" : " ");
+            }
+        }
+
+        return suffix.isEmpty() ? suffix : suffix.substring(0, prefix.length() - 1) + ChatColor.RESET;
     }
 
     @Override

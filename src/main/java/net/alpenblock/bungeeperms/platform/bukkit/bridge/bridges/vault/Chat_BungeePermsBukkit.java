@@ -5,6 +5,7 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin;
+import net.alpenblock.bungeeperms.platform.bukkit.BukkitSender;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
@@ -89,19 +90,8 @@ public class Chat_BungeePermsBukkit extends Chat
     @Override
     public String getPlayerPrefix(String world, String player)
     {
-        String prefix = "";
-
         User u = perms.getPermissionsManager().getUser(player);
-        if (u == null)
-        {
-            return "";
-        }
-        for (Group g : u.getGroups())
-        {
-            prefix += g.getPrefix() + (g.getPrefix().isEmpty() ? "" : " ");
-        }
-
-        return prefix;
+        return u == null ? "" : u.buildPrefix();
     }
 
     @Override
@@ -113,19 +103,8 @@ public class Chat_BungeePermsBukkit extends Chat
     @Override
     public String getPlayerSuffix(String world, String player)
     {
-        String suffix = "";
-
         User u = perms.getPermissionsManager().getUser(player);
-        if (u == null)
-        {
-            return "";
-        }
-        for (Group g : u.getGroups())
-        {
-            suffix += g.getSuffix() + (g.getSuffix().isEmpty() ? "" : " ");
-        }
-
-        return suffix;
+        return u == null ? "" : u.buildSuffix();
     }
 
     @Override
@@ -138,7 +117,7 @@ public class Chat_BungeePermsBukkit extends Chat
     public String getGroupPrefix(String world, String group)
     {
         Group g = perms.getPermissionsManager().getGroup(group);
-        return g == null ? "" : g.getPrefix();
+        return g == null ? "" : g.buildPrefix(world);
     }
 
     @Override
@@ -151,7 +130,7 @@ public class Chat_BungeePermsBukkit extends Chat
     public String getGroupSuffix(String world, String group)
     {
         Group g = perms.getPermissionsManager().getGroup(group);
-        return g == null ? "" : g.getSuffix();
+        return g == null ? "" : g.buildSuffix(world);
     }
 
     @Override

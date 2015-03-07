@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
+import net.alpenblock.bungeeperms.World;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitSender;
 import org.bukkit.entity.Player;
@@ -86,36 +88,24 @@ class BungeePermsHandler implements IPermissionsHandler
     @Override
     public String getPrefix(Player player)
     {
-        String prefix = "";
-
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
         {
             return "";
         }
-        for (Group g : u.getGroups())
-        {
-            prefix += g.getPrefix() + (g.getPrefix().isEmpty() ? "" : " ");
-        }
-
-        return prefix;
+        
+        return u.buildPrefix(new BukkitSender(player));
     }
 
     @Override
     public String getSuffix(Player player)
     {
-        String suffix = "";
-
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
         {
             return "";
         }
-        for (Group g : u.getGroups())
-        {
-            suffix += g.getSuffix() + (g.getSuffix().isEmpty() ? "" : " ");
-        }
-
-        return suffix;
+        
+        return u.buildSuffix(new BukkitSender(player));
     }
 }
