@@ -86,7 +86,7 @@ public class HelpProvider
         int index = 0;
         for (HelpEntry he : helpentries)
         {
-            if (!BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsole(sender, he.getPermission()))
+            if (he.getPermission() != null && !BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsole(sender, he.getPermission()))
             {
                 System.out.println("no perm" + he.getPermission());
                 continue;
