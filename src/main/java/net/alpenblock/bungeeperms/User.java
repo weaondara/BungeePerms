@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import net.alpenblock.bungeeperms.platform.Sender;
+import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 
 @Getter
 @Setter
@@ -80,7 +81,7 @@ public class User
     public boolean hasPerm(Sender s, String perm)
     {
         Preconditions.checkNotNull(perm, "perm may not be null");
-        
+
         //ops have every permission so *
         if (s != null && s.isOperator())
         {
@@ -126,7 +127,7 @@ public class User
     {
         Preconditions.checkNotNull(perm, "perm may not be null");
         Preconditions.checkNotNull(server, "server may not be null");
-        
+
         //ops have every permission so *
         if (s != null && s.isOperator())
         {
@@ -180,7 +181,7 @@ public class User
         Preconditions.checkNotNull(perm, "perm may not be null");
         Preconditions.checkNotNull(server, "server may not be null");
         Preconditions.checkNotNull(world, "world may not be null");
-        
+
         //ops have every permission so *
         if (s != null && s.isOperator())
         {
@@ -555,6 +556,106 @@ public class User
         }
 
         return count;
+    }
+
+    public String buildPrefix()
+    {
+        Sender sender = getSender();
+        return buildPrefix(sender);
+    }
+
+    public String buildSuffix()
+    {
+        Sender sender = getSender();
+        return buildSuffix(sender);
+    }
+
+    public String buildPrefix(Sender sender)
+    {
+        String prefix = "";
+
+        for (Group g : groups)
+        {
+            //global
+            prefix += g.getPrefix() + (g.getPrefix().isEmpty() ? "" : " ");
+
+            //server
+            Server s = g.getServers().get(sender != null ? sender.getServer() : null);
+            if (s != null)
+            {
+                prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
+
+                //world
+                World w = s.getWorlds().get(sender != null ? sender.getWorld() : null);
+                if (w != null)
+                {
+                    prefix += w.getPrefix() + (w.getPrefix().isEmpty() ? "" : " ");
+                }
+            }
+        }
+
+        //global
+        prefix += this.prefix + (this.prefix.isEmpty() ? "" : " ");
+
+        //server
+        Server s = servers.get(sender != null ? sender.getServer() : null);
+        if (s != null)
+        {
+            prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
+
+            //world
+            World w = s.getWorlds().get(sender != null ? sender.getWorld() : null);
+            if (w != null)
+            {
+                prefix += w.getPrefix() + (w.getPrefix().isEmpty() ? "" : " ");
+            }
+        }
+
+        return prefix.isEmpty() ? prefix : prefix.substring(0, prefix.length() - 1) + ChatColor.RESET;
+    }
+
+    public String buildSuffix(Sender sender)
+    {
+        String suffix = "";
+
+        for (Group g : groups)
+        {
+            //global
+            suffix += g.getSuffix() + (g.getSuffix().isEmpty() ? "" : " ");
+
+            //server
+            Server s = g.getServers().get(sender.getServer());
+            if (s != null)
+            {
+                suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");
+
+                //world
+                World w = s.getWorlds().get(sender.getWorld());
+                if (w != null)
+                {
+                    suffix += w.getSuffix() + (w.getSuffix().isEmpty() ? "" : " ");
+                }
+            }
+        }
+
+        //global
+        suffix += this.suffix + (this.suffix.isEmpty() ? "" : " ");
+
+        //server
+        Server s = servers.get(sender.getServer());
+        if (s != null)
+        {
+            suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");
+
+            //world
+            World w = s.getWorlds().get(sender.getWorld());
+            if (w != null)
+            {
+                suffix += w.getSuffix() + (w.getSuffix().isEmpty() ? "" : " ");
+            }
+        }
+
+        return suffix.isEmpty() ? suffix : suffix.substring(0, prefix.length() - 1) + ChatColor.RESET;
     }
 
     private Sender getSender()
