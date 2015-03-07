@@ -85,7 +85,7 @@ public class BungeeEventListener implements Listener, EventListener
         if (u == null)
         {
             //create user and add default groups
-            if(config.isUseUUIDs())
+            if (config.isUseUUIDs())
             {
                 BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.ADDING_DEFAULT_GROUPS_UUID, playername, uuid));
             }
