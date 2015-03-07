@@ -400,19 +400,19 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public synchronized void saveUserDisplay(User user, String server, String world)
     {
-        permsconf.setString("users." + user.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".display", user.getDisplay());
+        permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".display", user.getDisplay());
     }
 
     @Override
     public synchronized void saveUserPrefix(User user, String server, String world)
     {
-        permsconf.setString("users." + user.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".prefix", user.getPrefix());
+        permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".prefix", user.getPrefix());
     }
 
     @Override
     public synchronized void saveUserSuffix(User user, String server, String world)
     {
-        permsconf.setString("users." + user.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".suffix", user.getSuffix());
+        permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".suffix", user.getSuffix());
     }
 
     @Override

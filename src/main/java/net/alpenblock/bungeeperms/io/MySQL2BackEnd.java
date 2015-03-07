@@ -605,19 +605,22 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveUserDisplay(User user, String server, String world)
     {
-        adapter.saveData(user.getName(), EntityType.User, "display", mkList(new ValueEntry(user.getDisplay(), server, world)), server, world);
+        adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
+                         EntityType.User, "display", mkList(new ValueEntry(user.getDisplay(), server, world)), server, world);
     }
 
     @Override
     public synchronized void saveUserPrefix(User user, String server, String world)
     {
-        adapter.saveData(user.getName(), EntityType.User, "prefix", mkList(new ValueEntry(user.getPrefix(), server, world)), server, world);
+        adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(), 
+                         EntityType.User, "prefix", mkList(new ValueEntry(user.getPrefix(), server, world)), server, world);
     }
 
     @Override
     public synchronized void saveUserSuffix(User user, String server, String world)
     {
-        adapter.saveData(user.getName(), EntityType.User, "suffix", mkList(new ValueEntry(user.getSuffix(), server, world)), server, world);
+        adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
+                         EntityType.User, "suffix", mkList(new ValueEntry(user.getSuffix(), server, world)), server, world);
     }
 
     @Override
