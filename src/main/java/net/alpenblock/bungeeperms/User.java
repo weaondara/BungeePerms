@@ -60,6 +60,18 @@ public class User
         this.suffix = suffix;
     }
 
+    public Server getServer(String name)
+    {
+        Server s = servers.get(name.toLowerCase());
+        if (s == null)
+        {
+            s = new Server(name.toLowerCase(), new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            servers.put(name.toLowerCase(), s);
+        }
+
+        return s;
+    }
+
     public boolean hasPerm(String perm)
     {
         Sender s = getSender();
@@ -81,6 +93,8 @@ public class User
     public boolean hasPerm(Sender s, String perm)
     {
         Preconditions.checkNotNull(perm, "perm may not be null");
+        
+        perm = perm.toLowerCase();
 
         //ops have every permission so *
         if (s != null && s.isOperator())
@@ -127,6 +141,9 @@ public class User
     {
         Preconditions.checkNotNull(perm, "perm may not be null");
         Preconditions.checkNotNull(server, "server may not be null");
+        
+        perm = perm.toLowerCase();
+        server = server.toLowerCase();
 
         //ops have every permission so *
         if (s != null && s.isOperator())
@@ -181,6 +198,10 @@ public class User
         Preconditions.checkNotNull(perm, "perm may not be null");
         Preconditions.checkNotNull(server, "server may not be null");
         Preconditions.checkNotNull(world, "world may not be null");
+        
+        perm = perm.toLowerCase();
+        server = server.toLowerCase();
+        world = world.toLowerCase();
 
         //ops have every permission so *
         if (s != null && s.isOperator())
@@ -299,7 +320,7 @@ public class User
         ret.addAll(extraPerms);
 
         //per server perms
-        Server srv = servers.get(server.toLowerCase());
+        Server srv = getServer(server);
         if (srv != null)
         {
             List<String> perserverperms = srv.getPerms();
@@ -323,13 +344,13 @@ public class User
         ret.addAll(extraPerms);
 
         //per server perms
-        Server srv = servers.get(server.toLowerCase());
+        Server srv = getServer(server);
         if (srv != null)
         {
             List<String> perserverperms = srv.getPerms();
             ret.addAll(perserverperms);
 
-            World w = srv.getWorlds().get(world.toLowerCase());
+            World w = srv.getWorld(world.toLowerCase());
             if (w != null)
             {
                 List<String> serverworldperms = w.getPerms();
@@ -398,13 +419,13 @@ public class User
             }
         }
 
-        Map<String, Boolean> serverresults = serverCheckResults.get(server);
+        Map<String, Boolean> serverresults = serverCheckResults.get(server.toLowerCase());
         if (serverresults != null)
         {
             serverresults.clear();
         }
 
-        Map<String, Map<String, Boolean>> worldresults = serverWorldCheckResults.get(server);
+        Map<String, Map<String, Boolean>> worldresults = serverWorldCheckResults.get(server.toLowerCase());
         if (worldresults != null)
         {
             worldresults.clear();
@@ -416,10 +437,10 @@ public class User
         List<String> effperms = calcEffectivePerms(server, world);
         cachedPerms.put(server.toLowerCase() + ";" + world.toLowerCase(), effperms);
 
-        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server);
+        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server.toLowerCase());
         if (serverresults != null)
         {
-            Map<String, Boolean> worldresults = serverresults.get(world);
+            Map<String, Boolean> worldresults = serverresults.get(world.toLowerCase());
             if (worldresults != null)
             {
                 worldresults.clear();
@@ -580,13 +601,13 @@ public class User
             prefix += g.getPrefix() + (g.getPrefix().isEmpty() ? "" : " ");
 
             //server
-            Server s = g.getServers().get(sender != null ? sender.getServer() : null);
+            Server s = g.getServer(sender != null ? sender.getServer() : null);
             if (s != null)
             {
                 prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
 
                 //world
-                World w = s.getWorlds().get(sender != null ? sender.getWorld() : null);
+                World w = s.getWorld(sender != null ? sender.getWorld() : null);
                 if (w != null)
                 {
                     prefix += w.getPrefix() + (w.getPrefix().isEmpty() ? "" : " ");
@@ -598,13 +619,13 @@ public class User
         prefix += this.prefix + (this.prefix.isEmpty() ? "" : " ");
 
         //server
-        Server s = servers.get(sender != null ? sender.getServer() : null);
+        Server s = getServer(sender != null ? sender.getServer() : null);
         if (s != null)
         {
             prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
 
             //world
-            World w = s.getWorlds().get(sender != null ? sender.getWorld() : null);
+            World w = s.getWorld(sender != null ? sender.getWorld() : null);
             if (w != null)
             {
                 prefix += w.getPrefix() + (w.getPrefix().isEmpty() ? "" : " ");
@@ -624,13 +645,13 @@ public class User
             suffix += g.getSuffix() + (g.getSuffix().isEmpty() ? "" : " ");
 
             //server
-            Server s = g.getServers().get(sender.getServer());
+            Server s = g.getServer(sender.getServer());
             if (s != null)
             {
                 suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");
 
                 //world
-                World w = s.getWorlds().get(sender.getWorld());
+                World w = s.getWorld(sender.getWorld());
                 if (w != null)
                 {
                     suffix += w.getSuffix() + (w.getSuffix().isEmpty() ? "" : " ");
@@ -642,13 +663,13 @@ public class User
         suffix += this.suffix + (this.suffix.isEmpty() ? "" : " ");
 
         //server
-        Server s = servers.get(sender.getServer());
+        Server s = getServer(sender.getServer());
         if (s != null)
         {
             suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");
 
             //world
-            World w = s.getWorlds().get(sender.getWorld());
+            World w = s.getWorld(sender.getWorld());
             if (w != null)
             {
                 suffix += w.getSuffix() + (w.getSuffix().isEmpty() ? "" : " ");

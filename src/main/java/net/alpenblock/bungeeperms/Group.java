@@ -50,6 +50,18 @@ public class Group implements Comparable<Group>
         cachedPerms = new HashMap<>();
     }
 
+    public Server getServer(String name)
+    {
+        Server s = servers.get(name.toLowerCase());
+        if (s == null)
+        {
+            s = new Server(name.toLowerCase(), new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            servers.put(name.toLowerCase(), s);
+        }
+
+        return s;
+    }
+
     public boolean isDefault()
     {
         return isdefault;
@@ -179,7 +191,7 @@ public class Group implements Comparable<Group>
     {
         List<String> perms = getEffectivePerms();
 
-        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm);
+        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm.toLowerCase());
 
         return has != null && has;
     }
@@ -188,7 +200,7 @@ public class Group implements Comparable<Group>
     {
         List<String> perms = getEffectivePerms(server);
 
-        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm);
+        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm.toLowerCase());
 
         return has != null && has;
     }
@@ -197,7 +209,7 @@ public class Group implements Comparable<Group>
     {
         List<String> perms = getEffectivePerms(server, world);
 
-        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm);
+        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm.toLowerCase());
 
         return has != null && has;
     }
@@ -363,13 +375,13 @@ public class Group implements Comparable<Group>
 
         //server
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        Server s = servers.get(config.getServername().toLowerCase());
+        Server s = getServer(config.getServername());
         if (s != null)
         {
             prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
 
             //world
-            World w = s.getWorlds().get(world.toLowerCase());
+            World w = s.getWorld(world);
             if (w != null)
             {
                 prefix += w.getPrefix() + (w.getPrefix().isEmpty() ? "" : " ");
@@ -388,13 +400,13 @@ public class Group implements Comparable<Group>
 
         //server
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        Server s = servers.get(config.getServername().toLowerCase());
+        Server s = getServer(config.getServername());
         if (s != null)
         {
             suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");
 
             //world
-            World w = s.getWorlds().get(world.toLowerCase());
+            World w = s.getWorld(world);
             if (w != null)
             {
                 suffix += w.getSuffix() + (w.getSuffix().isEmpty() ? "" : " ");
