@@ -10,6 +10,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.bukkit.bridge.BridgeManager;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -38,7 +39,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     private PluginMessageSender pmsender;
 
     private BungeePerms bungeeperms;
-    
+
     private final PlatformType platformType = PlatformType.Bukkit;
 
     //platform extra things
@@ -116,7 +117,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
                 l.add(p.getName());
             }
         }
-        
+
         return l;
     }
 
@@ -242,5 +243,25 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
         }
 
         return senders;
+    }
+
+    @Override
+    public boolean isChatApiPresent()
+    {
+        try
+        {
+            Class.forName("net.md_5.bungee.api.chat.BaseComponent");
+            return true;
+        }
+        catch (Throwable t)
+        {
+            return false;
+        }
+    }
+
+    @Override
+    public MessageEncoder newMessageEncoder()
+    {
+        return new BukkitMessageEncoder("");
     }
 }

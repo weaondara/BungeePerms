@@ -7,6 +7,8 @@ public interface Sender
 
     public void sendMessage(String message);
 
+    public void sendMessage(MessageEncoder encoder);
+
     public String getName();
 
     public UUID getUUID();

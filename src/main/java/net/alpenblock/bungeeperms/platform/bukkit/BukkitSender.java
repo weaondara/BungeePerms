@@ -4,7 +4,9 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -15,12 +17,28 @@ import org.bukkit.entity.Player;
 public class BukkitSender implements Sender
 {
 
-    private CommandSender sender;
+    private final CommandSender sender;
 
     @Override
     public void sendMessage(String message)
     {
         sender.sendMessage(message);
+    }
+
+    @Override
+    public void sendMessage(MessageEncoder encoder)
+    {
+        BukkitMessageEncoder e = (BukkitMessageEncoder) encoder;
+        if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
+        {
+            BaseComponent[] converted = BukkitMessageEncoder.convert(e.create());
+//            sender.sendMessage(converted); //todo: ... make this work
+            sender.sendMessage(e.toString());
+        }
+        else
+        {
+            sender.sendMessage(e.toString());
+        }
     }
 
     @Override
@@ -91,4 +109,5 @@ public class BukkitSender implements Sender
     {
         return isPlayer() && ((Player) sender).isOp();
     }
+
 }

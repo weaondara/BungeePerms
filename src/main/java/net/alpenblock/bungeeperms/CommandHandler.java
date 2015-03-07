@@ -95,13 +95,39 @@ public class CommandHandler
 
     private boolean handleHelp(Sender sender, String[] args)
     {
-        //todo: better help output with pages
-
-        if (checker.hasOrConsole(sender, "bungeeperms.help", true))
+        if (!checker.hasOrConsole(sender, "bungeeperms.help", true))
         {
-            showHelp(sender);
+//            showHelp(sender);
             return true;
         }
+
+        if (!Statics.matchArgs(sender, args, 1, 2))
+        {
+            return true;
+        }
+
+        int page = 1;
+        if (args.length == 2)
+        {
+            try
+            {
+                page = Integer.parseInt(args[1]);
+                if (page < 1)
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception e)
+            {
+                sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_INT_VALUE));
+                return true;
+            }
+        }
+
+        page--;
+
+        HelpProvider.sendHelpPage(sender, page);
+
         return true;
     }
 

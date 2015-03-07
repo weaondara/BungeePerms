@@ -29,4 +29,8 @@ public interface PlatformPlugin
     public Logger getLogger();
 
     public PlatformType getPlatformType();
+    
+    public boolean isChatApiPresent();
+    
+    public MessageEncoder newMessageEncoder();
 }
