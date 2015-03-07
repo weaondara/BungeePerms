@@ -824,7 +824,18 @@ public class PermissionsManager
     public void setUserDisplay(User user, String display, String server, String world)
     {
         //cache
-        user.setDisplay(display); //todo:fix per server woprld
+        if (server == null)
+        {
+            user.setDisplay(display);
+        }
+        else if (world == null)
+        {
+            user.getServer(server).setDisplay(display);
+        }
+        else
+        {
+            user.getServer(server).getWorld(world).setDisplay(display);
+        }
 
         //database
         backEnd.saveUserDisplay(user, server, world);
@@ -844,7 +855,18 @@ public class PermissionsManager
     public void setUserPrefix(User user, String prefix, String server, String world)
     {
         //cache
-        user.setPrefix(prefix);//todo:fix per server woprld
+        if (server == null)
+        {
+            user.setPrefix(prefix);
+        }
+        else if (world == null)
+        {
+            user.getServer(server).setPrefix(prefix);
+        }
+        else
+        {
+            user.getServer(server).getWorld(world).setPrefix(prefix);
+        }
 
         //database
         backEnd.saveUserPrefix(user, server, world);
@@ -864,7 +886,18 @@ public class PermissionsManager
     public void setUserSuffix(User user, String suffix, String server, String world)
     {
         //cache
-        user.setSuffix(suffix);//todo:fix per server woprld
+        if (server == null)
+        {
+            user.setSuffix(suffix);
+        }
+        else if (world == null)
+        {
+            user.getServer(server).setSuffix(suffix);
+        }
+        else
+        {
+            user.getServer(server).getWorld(world).setSuffix(suffix);
+        }
 
         //database
         backEnd.saveUserSuffix(user, server, world);
@@ -1197,7 +1230,18 @@ public class PermissionsManager
     public void setGroupDisplay(Group group, String display, String server, String world)
     {
         //cache
-        group.setDisplay(display);//todo : fix perserver world
+        if (server == null)
+        {
+            group.setDisplay(display);
+        }
+        else if (world == null)
+        {
+            group.getServer(server).setDisplay(display);
+        }
+        else
+        {
+            group.getServer(server).getWorld(world).setDisplay(display);
+        }
 
         //database
         backEnd.saveGroupDisplay(group, server, world);
@@ -1217,7 +1261,18 @@ public class PermissionsManager
     public void setGroupPrefix(Group group, String prefix, String server, String world)
     {
         //cache
-        group.setPrefix(prefix);//todo : fix perserver world
+        if (server == null)
+        {
+            group.setPrefix(prefix);
+        }
+        else if (world == null)
+        {
+            group.getServer(server).setPrefix(prefix);
+        }
+        else
+        {
+            group.getServer(server).getWorld(world).setPrefix(prefix);
+        }
 
         //database
         backEnd.saveGroupPrefix(group, server, world);
@@ -1237,7 +1292,18 @@ public class PermissionsManager
     public void setGroupSuffix(Group group, String suffix, String server, String world)
     {
         //cache
-        group.setSuffix(suffix);//todo : fix perserver world
+        if (server == null)
+        {
+            group.setSuffix(suffix);
+        }
+        else if (world == null)
+        {
+            group.getServer(server).setSuffix(suffix);
+        }
+        else
+        {
+            group.getServer(server).getWorld(world).setSuffix(suffix);
+        }
 
         //database
         backEnd.saveGroupSuffix(group, server, world);
