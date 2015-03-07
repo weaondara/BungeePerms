@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +79,8 @@ public class User
 
     public boolean hasPerm(Sender s, String perm)
     {
+        Preconditions.checkNotNull(perm, "perm may not be null");
+        
         //ops have every permission so *
         if (s != null && s.isOperator())
         {
@@ -121,6 +124,9 @@ public class User
 
     public boolean hasPermOnServer(Sender s, String perm, String server)
     {
+        Preconditions.checkNotNull(perm, "perm may not be null");
+        Preconditions.checkNotNull(server, "server may not be null");
+        
         //ops have every permission so *
         if (s != null && s.isOperator())
         {
@@ -171,6 +177,10 @@ public class User
 
     public boolean hasPermOnServerInWorld(Sender s, String perm, String server, String world)
     {
+        Preconditions.checkNotNull(perm, "perm may not be null");
+        Preconditions.checkNotNull(server, "server may not be null");
+        Preconditions.checkNotNull(world, "world may not be null");
+        
         //ops have every permission so *
         if (s != null && s.isOperator())
         {
