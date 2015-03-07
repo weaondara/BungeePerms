@@ -786,7 +786,6 @@ public class PermissionsManager
     public void addUserPerServerWorldPerm(User user, String server, String world, String perm)
     {
         //cache
-        //cache
         Server srv = user.getServers().get(server);
         if (srv == null)
         {
