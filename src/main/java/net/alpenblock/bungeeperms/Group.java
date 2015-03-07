@@ -52,6 +52,10 @@ public class Group implements Comparable<Group>
 
     public Server getServer(String name)
     {
+        if(name == null)
+        {
+            return null;
+        }
         Server s = servers.get(name.toLowerCase());
         if (s == null)
         {
@@ -174,12 +178,9 @@ public class Group implements Comparable<Group>
             List<String> perserverperms = srv.getPerms();
             ret.addAll(perserverperms);
 
-            World w = srv.getWorlds().get(world.toLowerCase());
-            if (w != null)
-            {
-                List<String> serverworldperms = w.getPerms();
-                ret.addAll(serverworldperms);
-            }
+            World w = srv.getWorld(world);
+            List<String> serverworldperms = w.getPerms();
+            ret.addAll(serverworldperms);
         }
 
         ret = BungeePerms.getInstance().getPermissionsResolver().simplify(ret);

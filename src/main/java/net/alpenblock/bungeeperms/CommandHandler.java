@@ -488,12 +488,7 @@ public class CommandHandler
         }
         else
         {
-            Server srv = user.getServers().get(server);
-            if (srv == null)
-            {
-                srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
-                user.getServers().put(server, srv);
-            }
+            Server srv = user.getServer(server);
 
             if (world == null)
             {
@@ -514,12 +509,7 @@ public class CommandHandler
             }
             else
             {
-                World w = srv.getWorlds().get(world);
-                if (w == null)
-                {
-                    w = new World(world, new ArrayList<String>(), "", "", "");
-                    srv.getWorlds().put(world, w);
-                }
+                World w = srv.getWorld(world);
 
                 if (w.getPerms().contains("-" + perm))
                 {
@@ -582,12 +572,7 @@ public class CommandHandler
         }
         else
         {
-            Server srv = user.getServers().get(server);
-            if (srv == null)
-            {
-                srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
-                user.getServers().put(server, srv);
-            }
+            Server srv = user.getServer(server);
 
             if (world == null)
             {
@@ -608,12 +593,7 @@ public class CommandHandler
             }
             else
             {
-                World w = srv.getWorlds().get(world);
-                if (w == null)
-                {
-                    w = new World(world, new ArrayList<String>(), "", "", "");
-                    srv.getWorlds().put(world, w);
-                }
+                World w = srv.getWorld(world);
 
                 if (w.getPerms().contains(perm))
                 {
@@ -1250,12 +1230,7 @@ public class CommandHandler
         }
         else
         {
-            Server srv = group.getServers().get(server);
-            if (srv == null)
-            {
-                srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
-                group.getServers().put(server, srv);
-            }
+            Server srv = group.getServer(server);
 
             //per server perm
             if (world == null)
@@ -1280,12 +1255,7 @@ public class CommandHandler
             //per server world perms
             else
             {
-                World w = srv.getWorlds().get(world);
-                if (w == null)
-                {
-                    w = new World(world, new ArrayList<String>(), "", "", "");
-                    srv.getWorlds().put(world, w);
-                }
+                World w = srv.getWorld(world);
 
                 List<String> perserverworldperms = w.getPerms();
                 if (perserverworldperms.contains("-" + perm))
@@ -1350,12 +1320,7 @@ public class CommandHandler
         }
         else
         {
-            Server srv = group.getServers().get(server);
-            if (srv == null)
-            {
-                srv = new Server(server, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
-                group.getServers().put(server, srv);
-            }
+            Server srv = group.getServer(server);
 
             //per server perm
             if (world == null)
@@ -1378,12 +1343,7 @@ public class CommandHandler
             }
             else
             {
-                World w = srv.getWorlds().get(world);
-                if (w == null)
-                {
-                    w = new World(world, new ArrayList<String>(), "", "", "");
-                    srv.getWorlds().put(world, w);
-                }
+                World w = srv.getWorld(world);
 
                 List<String> perserverworldperms = w.getPerms();
                 if (perserverworldperms.contains(perm))

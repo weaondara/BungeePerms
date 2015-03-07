@@ -26,6 +26,10 @@ public class Server
 
     public World getWorld(String name)
     {
+        if(name == null)
+        {
+            return null;
+        }
         World w = worlds.get(name.toLowerCase());
         if (w == null)
         {

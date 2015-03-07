@@ -591,7 +591,7 @@ public class MySQL2BackEnd implements BackEnd
     {
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
                          EntityType.User, "permissions",
-                         mkValueList(user.getServers().get(server).getPerms(), server, null), server, null);
+                         mkValueList(user.getServer(server).getPerms(), server, null), server, null);
     }
 
     @Override
@@ -599,7 +599,7 @@ public class MySQL2BackEnd implements BackEnd
     {
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
                          EntityType.User, "permissions",
-                         mkValueList(user.getServers().get(server).getWorlds().get(world).getPerms(), server, world), server, world);
+                         mkValueList(user.getServer(server).getWorld(world).getPerms(), server, world), server, world);
     }
 
     @Override
@@ -632,13 +632,13 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveGroupPerServerPerms(Group group, String server)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServers().get(server).getPerms(), server, null), server, null);
+        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServer(server).getPerms(), server, null), server, null);
     }
 
     @Override
     public synchronized void saveGroupPerServerWorldPerms(Group group, String server, String world)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServers().get(server).getWorlds().get(world).getPerms(), server, world), server, world);
+        adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServer(server).getWorld(world).getPerms(), server, world), server, world);
     }
 
     @Override

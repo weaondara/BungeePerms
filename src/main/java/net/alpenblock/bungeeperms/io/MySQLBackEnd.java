@@ -390,13 +390,13 @@ public class MySQLBackEnd implements BackEnd
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server)
     {
-        permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".permissions", user.getServers().get(server).getPerms());
+        permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".permissions", user.getServer(server).getPerms());
     }
 
     @Override
     public synchronized void saveUserPerServerWorldPerms(User user, String server, String world)
     {
-        permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds." + world + ".permissions", user.getServers().get(server).getWorlds().get(world).getPerms());
+        permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds." + world + ".permissions", user.getServer(server).getWorld(world).getPerms());
     }
 
     @Override
@@ -426,13 +426,13 @@ public class MySQLBackEnd implements BackEnd
     @Override
     public synchronized void saveGroupPerServerPerms(Group group, String server)
     {
-        permsconf.setListString("groups." + group.getName() + ".servers." + server + ".permissions", group.getServers().get(server).getPerms());
+        permsconf.setListString("groups." + group.getName() + ".servers." + server + ".permissions", group.getServer(server).getPerms());
     }
 
     @Override
     public synchronized void saveGroupPerServerWorldPerms(Group group, String server, String world)
     {
-        permsconf.setListString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".permissions", group.getServers().get(server).getWorlds().get(world).getPerms());
+        permsconf.setListString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".permissions", group.getServer(server).getWorld(world).getPerms());
     }
 
     @Override

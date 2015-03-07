@@ -62,6 +62,10 @@ public class User
 
     public Server getServer(String name)
     {
+        if(name == null)
+        {
+            return null;
+        }
         Server s = servers.get(name.toLowerCase());
         if (s == null)
         {
