@@ -5,6 +5,7 @@ import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
+import static net.alpenblock.bungeeperms.platform.bungee.BungeeMessageEncoder.convert;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class BukkitMessageEncoder extends MessageEncoder
@@ -86,7 +87,7 @@ public class BukkitMessageEncoder extends MessageEncoder
             cache = null;
             builder = builder.color(net.md_5.bungee.api.ChatColor.valueOf(color.name()));
         }
-        
+
         current = color + current;
 
         return this;
@@ -103,6 +104,11 @@ public class BukkitMessageEncoder extends MessageEncoder
         else
         {
             color(ChatColor.BOLD);
+            if (bold)
+            {
+                color(ChatColor.BOLD);
+            }
+            current = current.replaceAll("" + ChatColor.BOLD, "");
         }
 
         return this;
@@ -119,6 +125,11 @@ public class BukkitMessageEncoder extends MessageEncoder
         else
         {
             color(ChatColor.ITALIC);
+            if (italic)
+            {
+                color(ChatColor.ITALIC);
+            }
+            current = current.replaceAll("" + ChatColor.ITALIC, "");
         }
 
         return this;
@@ -134,7 +145,11 @@ public class BukkitMessageEncoder extends MessageEncoder
         }
         else
         {
-            color(ChatColor.UNDERLINE);
+            if (underlined)
+            {
+                color(ChatColor.UNDERLINE);
+            }
+            current = current.replaceAll("" + ChatColor.UNDERLINE, "");
         }
 
         return this;
@@ -150,7 +165,11 @@ public class BukkitMessageEncoder extends MessageEncoder
         }
         else
         {
-            color(ChatColor.STRIKETHROUGH);
+            if (strikethrough)
+            {
+                color(ChatColor.STRIKETHROUGH);
+            }
+            current = current.replaceAll("" + ChatColor.STRIKETHROUGH, "");
         }
 
         return this;
@@ -166,7 +185,11 @@ public class BukkitMessageEncoder extends MessageEncoder
         }
         else
         {
-            color(ChatColor.MAGIC);
+            if (obfuscated)
+            {
+                color(ChatColor.MAGIC);
+            }
+            current = current.replaceAll("" + ChatColor.MAGIC, "");
         }
 
         return this;
@@ -177,9 +200,16 @@ public class BukkitMessageEncoder extends MessageEncoder
     {
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
-            cache = null;
-            net.md_5.bungee.api.chat.ClickEvent.Action action = net.md_5.bungee.api.chat.ClickEvent.Action.valueOf(clickEvent.getAction().name());
-            builder = builder.event(new net.md_5.bungee.api.chat.ClickEvent(action, clickEvent.getValue()));
+            if (clickEvent == null)
+            {
+                builder = builder.event((net.md_5.bungee.api.chat.ClickEvent) null);
+            }
+            else
+            {
+                cache = null;
+                net.md_5.bungee.api.chat.ClickEvent.Action action = net.md_5.bungee.api.chat.ClickEvent.Action.valueOf(clickEvent.getAction().name());
+                builder = builder.event(new net.md_5.bungee.api.chat.ClickEvent(action, clickEvent.getValue()));
+            }
         }
 
         return this;
@@ -190,9 +220,16 @@ public class BukkitMessageEncoder extends MessageEncoder
     {
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
-            cache = null;
-            net.md_5.bungee.api.chat.HoverEvent.Action action = net.md_5.bungee.api.chat.HoverEvent.Action.valueOf(hoverEvent.getAction().name());
-            builder = builder.event(new net.md_5.bungee.api.chat.HoverEvent(action, convert(hoverEvent.getValue().create())));
+            if (hoverEvent == null)
+            {
+                builder = builder.event((net.md_5.bungee.api.chat.HoverEvent) null);
+            }
+            else
+            {
+                cache = null;
+                net.md_5.bungee.api.chat.HoverEvent.Action action = net.md_5.bungee.api.chat.HoverEvent.Action.valueOf(hoverEvent.getAction().name());
+                builder = builder.event(new net.md_5.bungee.api.chat.HoverEvent(action, convert(hoverEvent.getValue().create())));
+            }
         }
 
         return this;
