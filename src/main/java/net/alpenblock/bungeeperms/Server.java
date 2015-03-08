@@ -30,11 +30,11 @@ public class Server
         {
             return null;
         }
-        World w = worlds.get(name.toLowerCase());
+        World w = worlds.get(Statics.toLower(name));
         if (w == null)
         {
-            w = new World(name.toLowerCase(), new ArrayList<String>(), "", "", "");
-            worlds.put(name.toLowerCase(), w);
+            w = new World(Statics.toLower(name), new ArrayList<String>(), "", "", "");
+            worlds.put(Statics.toLower(name), w);
         }
 
         return w;

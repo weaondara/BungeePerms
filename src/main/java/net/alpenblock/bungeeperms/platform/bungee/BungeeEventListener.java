@@ -130,7 +130,7 @@ public class BungeeEventListener implements Listener, EventListener
         {
             for (ProxiedPlayer pp : BungeeCord.getInstance().getPlayers())
             {
-                if (pp.getName().toLowerCase().startsWith(e.getCursor().toLowerCase()))
+                if (Statics.toLower(pp.getName()).startsWith(Statics.toLower(e.getCursor())))
                 {
                     e.getSuggestions().add(pp.getName());
                 }

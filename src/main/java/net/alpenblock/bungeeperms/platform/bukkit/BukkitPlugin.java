@@ -10,6 +10,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.bukkit.bridge.BridgeManager;
 import net.alpenblock.bungeeperms.platform.Sender;
@@ -112,7 +113,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
 
         for (Player p : Bukkit.getOnlinePlayers())
         {
-            if (p.getName().toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
+            if (Statics.toLower(p.getName()).startsWith(Statics.toLower(args[args.length - 1])))
             {
                 l.add(p.getName());
             }

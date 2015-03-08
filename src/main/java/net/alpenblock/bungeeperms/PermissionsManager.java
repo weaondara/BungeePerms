@@ -683,7 +683,7 @@ public class PermissionsManager
     public void addUserPerm(User user, String perm)
     {
         //cache
-        user.getExtraPerms().add(perm.toLowerCase());
+        user.getExtraPerms().add(Statics.toLower(perm));
 
         //database
         backEnd.saveUserPerms(user);
@@ -704,7 +704,7 @@ public class PermissionsManager
     public void removeUserPerm(User user, String perm)
     {
         //cache
-        user.getExtraPerms().remove(perm.toLowerCase());
+        user.getExtraPerms().remove(Statics.toLower(perm));
 
         //database
         backEnd.saveUserPerms(user);
@@ -727,13 +727,13 @@ public class PermissionsManager
     {
         //cache
         Server srv = user.getServer(server);
-        srv.getPerms().add(perm.toLowerCase());
+        srv.getPerms().add(Statics.toLower(perm));
 
         //database
-        backEnd.saveUserPerServerPerms(user, server.toLowerCase());
+        backEnd.saveUserPerServerPerms(user, Statics.toLower(server));
 
         //recalc perms
-        user.recalcPerms(server.toLowerCase());
+        user.recalcPerms(Statics.toLower(server));
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
@@ -750,10 +750,10 @@ public class PermissionsManager
     {
         //cache
         Server srv = user.getServer(server);
-        srv.getPerms().remove(perm.toLowerCase());
+        srv.getPerms().remove(Statics.toLower(perm));
 
         //database
-        backEnd.saveUserPerServerPerms(user, server);
+        backEnd.saveUserPerServerPerms(user, Statics.toLower(server));
 
         //recalc perms
         user.recalcPerms(server);
@@ -775,10 +775,10 @@ public class PermissionsManager
         //cache
         Server srv = user.getServer(server);
         World w = srv.getWorld(world);
-        w.getPerms().add(perm.toLowerCase());
+        w.getPerms().add(Statics.toLower(perm));
 
         //database
-        backEnd.saveUserPerServerWorldPerms(user, server, world);
+        backEnd.saveUserPerServerWorldPerms(user, Statics.toLower(server), Statics.toLower(world));
 
         //recalc perms
         user.recalcPerms(server, world);
@@ -800,10 +800,10 @@ public class PermissionsManager
         //cache
         Server srv = user.getServer(server);
         World w = srv.getWorld(world);
-        w.getPerms().remove(perm.toLowerCase());
+        w.getPerms().remove(Statics.toLower(perm));
 
         //database
-        backEnd.saveUserPerServerWorldPerms(user, server, world);
+        backEnd.saveUserPerServerWorldPerms(user, Statics.toLower(server), Statics.toLower(world));
 
         //recalc perms
         user.recalcPerms(server, world);
@@ -837,7 +837,7 @@ public class PermissionsManager
         }
 
         //database
-        backEnd.saveUserDisplay(user, server, world);
+        backEnd.saveUserDisplay(user, Statics.toLower(server), Statics.toLower(world));
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
@@ -868,7 +868,7 @@ public class PermissionsManager
         }
 
         //database
-        backEnd.saveUserPrefix(user, server, world);
+        backEnd.saveUserPrefix(user, Statics.toLower(server), Statics.toLower(world));
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
@@ -899,7 +899,7 @@ public class PermissionsManager
         }
 
         //database
-        backEnd.saveUserSuffix(user, server, world);
+        backEnd.saveUserSuffix(user, Statics.toLower(server), Statics.toLower(world));
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
@@ -914,7 +914,7 @@ public class PermissionsManager
     public void addGroupPerm(Group group, String perm)
     {
         //cache
-        group.getPerms().add(perm.toLowerCase());
+        group.getPerms().add(Statics.toLower(perm));
 
         //database
         backEnd.saveGroupPerms(group);
@@ -942,7 +942,7 @@ public class PermissionsManager
     public void removeGroupPerm(Group group, String perm)
     {
         //cache
-        group.getPerms().remove(perm.toLowerCase());
+        group.getPerms().remove(Statics.toLower(perm));
 
         //database
         backEnd.saveGroupPerms(group);
@@ -972,10 +972,10 @@ public class PermissionsManager
     {
         //cache
         Server srv = group.getServer(server);
-        srv.getPerms().add(perm.toLowerCase());
+        srv.getPerms().add(Statics.toLower(perm));
 
         //database
-        backEnd.saveGroupPerServerPerms(group, server);
+        backEnd.saveGroupPerServerPerms(group, Statics.toLower(server));
 
         //recalc perms
         for (Group g : groups)
@@ -1003,10 +1003,10 @@ public class PermissionsManager
         //cache
         Server srv = group.getServer(server);
 
-        srv.getPerms().remove(perm.toLowerCase());
+        srv.getPerms().remove(Statics.toLower(perm));
 
         //database
-        backEnd.saveGroupPerServerPerms(group, server);
+        backEnd.saveGroupPerServerPerms(group, Statics.toLower(server));
 
         //recalc perms
         for (Group g : groups)
@@ -1035,10 +1035,10 @@ public class PermissionsManager
         //cache
         Server srv = group.getServer(server);
         World w = srv.getWorld(world);
-        w.getPerms().add(perm.toLowerCase());
+        w.getPerms().add(Statics.toLower(perm));
 
         //database
-        backEnd.saveGroupPerServerWorldPerms(group, server, world);
+        backEnd.saveGroupPerServerWorldPerms(group, Statics.toLower(server), Statics.toLower(world));
 
         //recalc perms
         for (Group g : groups)
@@ -1067,10 +1067,10 @@ public class PermissionsManager
         //cache
         Server srv = group.getServer(server);
         World w = srv.getWorld(world);
-        w.getPerms().remove(perm.toLowerCase());
+        w.getPerms().remove(Statics.toLower(perm));
 
         //database
-        backEnd.saveGroupPerServerWorldPerms(group, server, world);
+        backEnd.saveGroupPerServerWorldPerms(group, Statics.toLower(server), Statics.toLower(world));
 
         //recalc perms
         for (Group g : groups)

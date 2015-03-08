@@ -1,6 +1,5 @@
 package net.alpenblock.bungeeperms;
 
-import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import net.alpenblock.bungeeperms.platform.Sender;
-import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 
 @Getter
 @Setter
@@ -62,15 +60,16 @@ public class User
 
     public Server getServer(String name)
     {
-        if(name == null)
+        name = Statics.toLower(name);
+        if (name == null)
         {
             return null;
         }
-        Server s = servers.get(name.toLowerCase());
+        Server s = servers.get(name);
         if (s == null)
         {
-            s = new Server(name.toLowerCase(), new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
-            servers.put(name.toLowerCase(), s);
+            s = new Server(name, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            servers.put(name, s);
         }
 
         return s;
@@ -96,9 +95,7 @@ public class User
 
     public boolean hasPerm(Sender s, String perm)
     {
-        Preconditions.checkNotNull(perm, "perm may not be null");
-        
-        perm = perm.toLowerCase();
+        perm = Statics.toLower(perm);
 
         //ops have every permission so *
         if (s != null && s.isOperator())
@@ -109,7 +106,7 @@ public class User
         }
 
         //check cached perms
-        Boolean cached = checkResults.get(perm.toLowerCase());
+        Boolean cached = checkResults.get(perm);
         if (cached != null)
         {
             //debug mode
@@ -133,7 +130,7 @@ public class User
         has = has != null && has;
 
         //cache
-        checkResults.put(perm.toLowerCase(), has);
+        checkResults.put(perm, has);
 
         //debug mode
         debug(perm, has);
@@ -143,11 +140,8 @@ public class User
 
     public boolean hasPermOnServer(Sender s, String perm, String server)
     {
-        Preconditions.checkNotNull(perm, "perm may not be null");
-        Preconditions.checkNotNull(server, "server may not be null");
-        
-        perm = perm.toLowerCase();
-        server = server.toLowerCase();
+        perm = Statics.toLower(perm);
+        server = Statics.toLower(server);
 
         //ops have every permission so *
         if (s != null && s.isOperator())
@@ -165,7 +159,7 @@ public class User
             serverCheckResults.put(server, serverresults);
         }
 
-        Boolean cached = serverresults.get(perm.toLowerCase());
+        Boolean cached = serverresults.get(perm);
         if (cached != null)
         {
             //debug mode
@@ -189,7 +183,7 @@ public class User
         has = has != null && has;
 
         //cache
-        serverresults.put(perm.toLowerCase(), has);
+        serverresults.put(perm, has);
 
         //debug mode
         debug(perm, has);
@@ -199,13 +193,9 @@ public class User
 
     public boolean hasPermOnServerInWorld(Sender s, String perm, String server, String world)
     {
-        Preconditions.checkNotNull(perm, "perm may not be null");
-        Preconditions.checkNotNull(server, "server may not be null");
-        Preconditions.checkNotNull(world, "world may not be null");
-        
-        perm = perm.toLowerCase();
-        server = server.toLowerCase();
-        world = world.toLowerCase();
+        perm = Statics.toLower(perm);
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
 
         //ops have every permission so *
         if (s != null && s.isOperator())
@@ -230,7 +220,7 @@ public class User
             serverresults.put(world, worldresults);
         }
 
-        Boolean cached = worldresults.get(perm.toLowerCase());
+        Boolean cached = worldresults.get(perm);
         if (cached != null)
         {
             //debug mode
@@ -254,7 +244,7 @@ public class User
         has = has != null && has;
 
         //cache
-        worldresults.put(perm.toLowerCase(), has);
+        worldresults.put(perm, has);
 
         //debug mode
         debug(perm, has);
@@ -276,11 +266,13 @@ public class User
 
     public List<String> getEffectivePerms(String server)
     {
-        List<String> effperms = cachedPerms.get(server.toLowerCase());
+        server = Statics.toLower(server);
+
+        List<String> effperms = cachedPerms.get(Statics.toLower(server));
         if (effperms == null)
         {
             effperms = calcEffectivePerms(server);
-            cachedPerms.put(server.toLowerCase(), effperms);
+            cachedPerms.put(server, effperms);
         }
 
         return new ArrayList<>(effperms);
@@ -288,11 +280,14 @@ public class User
 
     public List<String> getEffectivePerms(String server, String world)
     {
-        List<String> effperms = cachedPerms.get(server.toLowerCase() + ";" + world.toLowerCase());
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+
+        List<String> effperms = cachedPerms.get(server + ";" + world);
         if (effperms == null)
         {
             effperms = calcEffectivePerms(server, world);
-            cachedPerms.put(server.toLowerCase() + ";" + world.toLowerCase(), effperms);
+            cachedPerms.put(server + ";" + world, effperms);
         }
 
         return new ArrayList<>(effperms);
@@ -354,7 +349,7 @@ public class User
             List<String> perserverperms = srv.getPerms();
             ret.addAll(perserverperms);
 
-            World w = srv.getWorld(world.toLowerCase());
+            World w = srv.getWorld(world);
             if (w != null)
             {
                 List<String> serverworldperms = w.getPerms();
@@ -384,7 +379,7 @@ public class User
                 else
                 {
                     List<String> effperms = calcEffectivePerms(server);
-                    cachedPerms.put(server.toLowerCase(), effperms);
+                    cachedPerms.put(Statics.toLower(server), effperms);
                 }
             }
             else if (l.size() == 2)
@@ -402,34 +397,36 @@ public class User
 
     public void recalcPerms(String server)
     {
+        server = Statics.toLower(server);
+
         for (Map.Entry<String, List<String>> e : cachedPerms.entrySet())
         {
             String where = e.getKey();
             List<String> l = Statics.toList(where, ";");
-            String lserver = l.get(0);
+            String lserver = Statics.toLower(l.get(0));
 
             if (lserver.equalsIgnoreCase(server))
             {
                 if (l.size() == 1)
                 {
                     List<String> effperms = calcEffectivePerms(lserver);
-                    cachedPerms.put(lserver.toLowerCase(), effperms);
+                    cachedPerms.put(lserver, effperms);
                 }
                 else if (l.size() == 2)
                 {
-                    String world = l.get(1);
-                    recalcPerms(server, world);
+                    String world = Statics.toLower(l.get(1));
+                    recalcPerms(lserver, world);
                 }
             }
         }
 
-        Map<String, Boolean> serverresults = serverCheckResults.get(server.toLowerCase());
+        Map<String, Boolean> serverresults = serverCheckResults.get(server);
         if (serverresults != null)
         {
             serverresults.clear();
         }
 
-        Map<String, Map<String, Boolean>> worldresults = serverWorldCheckResults.get(server.toLowerCase());
+        Map<String, Map<String, Boolean>> worldresults = serverWorldCheckResults.get(server);
         if (worldresults != null)
         {
             worldresults.clear();
@@ -438,13 +435,16 @@ public class User
 
     public void recalcPerms(String server, String world)
     {
-        List<String> effperms = calcEffectivePerms(server, world);
-        cachedPerms.put(server.toLowerCase() + ";" + world.toLowerCase(), effperms);
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
 
-        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server.toLowerCase());
+        List<String> effperms = calcEffectivePerms(server, world);
+        cachedPerms.put(server + ";" + world, effperms);
+
+        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server);
         if (serverresults != null)
         {
-            Map<String, Boolean> worldresults = serverresults.get(world.toLowerCase());
+            Map<String, Boolean> worldresults = serverresults.get(world);
             if (worldresults != null)
             {
                 worldresults.clear();

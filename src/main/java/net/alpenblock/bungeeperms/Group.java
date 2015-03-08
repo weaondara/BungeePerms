@@ -52,15 +52,16 @@ public class Group implements Comparable<Group>
 
     public Server getServer(String name)
     {
-        if(name == null)
+        name = Statics.toLower(name);
+        if (name == null)
         {
             return null;
         }
-        Server s = servers.get(name.toLowerCase());
+        Server s = servers.get(name);
         if (s == null)
         {
-            s = new Server(name.toLowerCase(), new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
-            servers.put(name.toLowerCase(), s);
+            s = new Server(name, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            servers.put(name, s);
         }
 
         return s;
@@ -90,11 +91,13 @@ public class Group implements Comparable<Group>
 
     public List<String> getEffectivePerms(String server)
     {
-        List<String> effperms = cachedPerms.get(server.toLowerCase());
+        server = Statics.toLower(server);
+
+        List<String> effperms = cachedPerms.get(server);
         if (effperms == null)
         {
             effperms = calcEffectivePerms(server);
-            cachedPerms.put(server.toLowerCase(), effperms);
+            cachedPerms.put(server, effperms);
         }
 
         return new ArrayList<>(effperms);
@@ -102,11 +105,14 @@ public class Group implements Comparable<Group>
 
     public List<String> getEffectivePerms(String server, String world)
     {
-        List<String> effperms = cachedPerms.get(server.toLowerCase() + ";" + world.toLowerCase());
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+
+        List<String> effperms = cachedPerms.get(server + ";" + world);
         if (effperms == null)
         {
             effperms = calcEffectivePerms(server, world);
-            cachedPerms.put(server.toLowerCase() + ";" + world.toLowerCase(), effperms);
+            cachedPerms.put(server + ";" + world, effperms);
         }
 
         return new ArrayList<>(effperms);
@@ -132,6 +138,8 @@ public class Group implements Comparable<Group>
 
     public List<String> calcEffectivePerms(String server)
     {
+        server = Statics.toLower(server);
+
         List<String> ret = new ArrayList<>();
         for (Group g : BungeePerms.getInstance().getPermissionsManager().getGroups())
         {
@@ -145,7 +153,7 @@ public class Group implements Comparable<Group>
         ret.addAll(perms);
 
         //per server perms
-        Server srv = servers.get(server.toLowerCase());
+        Server srv = servers.get(server);
         if (srv != null)
         {
             List<String> perserverperms = srv.getPerms();
@@ -159,6 +167,9 @@ public class Group implements Comparable<Group>
 
     public List<String> calcEffectivePerms(String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+
         List<String> ret = new ArrayList<>();
         for (Group g : BungeePerms.getInstance().getPermissionsManager().getGroups())
         {
@@ -172,7 +183,7 @@ public class Group implements Comparable<Group>
         ret.addAll(perms);
 
         //per server perms
-        Server srv = servers.get(server.toLowerCase());
+        Server srv = servers.get(server);
         if (srv != null)
         {
             List<String> perserverperms = srv.getPerms();
@@ -190,27 +201,36 @@ public class Group implements Comparable<Group>
 
     public boolean has(String perm)
     {
+        perm = Statics.toLower(perm);
+
         List<String> perms = getEffectivePerms();
 
-        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm.toLowerCase());
+        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, Statics.toLower(perm));
 
         return has != null && has;
     }
 
     public boolean hasOnServer(String perm, String server)
     {
+        perm = Statics.toLower(perm);
+        server = Statics.toLower(server);
+
         List<String> perms = getEffectivePerms(server);
 
-        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm.toLowerCase());
+        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm);
 
         return has != null && has;
     }
 
     public boolean hasOnServerInWorld(String perm, String server, String world)
     {
+        perm = Statics.toLower(perm);
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+
         List<String> perms = getEffectivePerms(server, world);
 
-        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm.toLowerCase());
+        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm);
 
         return has != null && has;
     }
@@ -221,7 +241,7 @@ public class Group implements Comparable<Group>
         {
             String where = e.getKey();
             List<String> l = Statics.toList(where, ";");
-            String server = l.get(0);
+            String server = Statics.toLower(l.get(0));
 
             if (l.size() == 1)
             {
@@ -232,13 +252,12 @@ public class Group implements Comparable<Group>
                 else
                 {
                     List<String> effperms = calcEffectivePerms(server);
-                    cachedPerms.put(server.toLowerCase(), effperms);
+                    cachedPerms.put(server, effperms);
                 }
             }
             else if (l.size() == 2)
             {
-                String world = l.get(1);
-
+                String world = Statics.toLower(l.get(1));
                 recalcPerms(server, world);
             }
         }
@@ -250,19 +269,19 @@ public class Group implements Comparable<Group>
         {
             String where = e.getKey();
             List<String> l = Statics.toList(where, ";");
-            String lserver = l.get(0);
+            String lserver = Statics.toLower(l.get(0));
 
             if (lserver.equalsIgnoreCase(server))
             {
                 if (l.size() == 1)
                 {
                     List<String> effperms = calcEffectivePerms(lserver);
-                    cachedPerms.put(lserver.toLowerCase(), effperms);
+                    cachedPerms.put(lserver, effperms);
                 }
                 else if (l.size() == 2)
                 {
-                    String world = l.get(1);
-                    recalcPerms(server, world);
+                    String world = Statics.toLower(l.get(1));
+                    recalcPerms(lserver, world);
                 }
             }
         }
@@ -270,8 +289,11 @@ public class Group implements Comparable<Group>
 
     public void recalcPerms(String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+
         List<String> effperms = calcEffectivePerms(server, world);
-        cachedPerms.put(server.toLowerCase() + ";" + world.toLowerCase(), effperms);
+        cachedPerms.put(server + ";" + world, effperms);
     }
 
     public List<BPPermission> getPermsWithOrigin(String server, String world)
@@ -367,7 +389,7 @@ public class Group implements Comparable<Group>
         return count;
     }
 
-    public String buildPrefix(String world)
+    public String buildPrefix(String server, String world)
     {
         String prefix = "";
 
@@ -375,8 +397,7 @@ public class Group implements Comparable<Group>
         prefix += this.prefix + (this.prefix.isEmpty() ? "" : " ");
 
         //server
-        BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        Server s = getServer(config.getServername());
+        Server s = getServer(server);
         if (s != null)
         {
             prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
@@ -392,7 +413,7 @@ public class Group implements Comparable<Group>
         return prefix.isEmpty() ? prefix : prefix.substring(0, prefix.length() - 1) + ChatColor.RESET;
     }
 
-    public String buildSuffix(String world)
+    public String buildSuffix(String server, String world)
     {
         String suffix = "";
 
@@ -400,8 +421,7 @@ public class Group implements Comparable<Group>
         suffix += this.suffix + (this.suffix.isEmpty() ? "" : " ");
 
         //server
-        BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        Server s = getServer(config.getServername());
+        Server s = getServer(server);
         if (s != null)
         {
             suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");

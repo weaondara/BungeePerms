@@ -12,6 +12,7 @@ import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Mysql;
 import net.alpenblock.bungeeperms.Server;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
 import net.alpenblock.bungeeperms.io.mysql2.EntityType;
@@ -55,8 +56,6 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public void load()
     {
-        //load from table
-        //permsconf.load();
     }
 
     @Override
@@ -123,16 +122,16 @@ public class MySQL2BackEnd implements BackEnd
             //check for servers 
             if (e.getServer() != null)
             {
-                if (!foundservers.contains(e.getServer().toLowerCase()))
+                if (!foundservers.contains(Statics.toLower(e.getServer())))
                 {
-                    foundservers.add(e.getServer().toLowerCase());
+                    foundservers.add(Statics.toLower(e.getServer()));
                 }
             }
 
             //is global perm
             else
             {
-                globalperms.add(e.getValue());
+                globalperms.add(Statics.toLower(e.getValue()));
             }
         }
 
@@ -149,16 +148,16 @@ public class MySQL2BackEnd implements BackEnd
                     //check for worlds 
                     if (e.getWorld() != null)
                     {
-                        if (!foundworlds.contains(e.getWorld().toLowerCase()))
+                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
                         {
-                            foundworlds.add(e.getWorld().toLowerCase());
+                            foundworlds.add(Statics.toLower(e.getWorld()));
                         }
                     }
 
                     //is server perm
                     else
                     {
-                        serverperms.add(e.getValue());
+                        serverperms.add(Statics.toLower(e.getValue()));
                     }
                 }
             }
@@ -172,16 +171,16 @@ public class MySQL2BackEnd implements BackEnd
                 {
                     if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
                     {
-                        worldperms.add(e.getValue());
+                        worldperms.add(Statics.toLower(e.getValue()));
                     }
                 }
 
-                World w = new World(world.toLowerCase(), worldperms, "", "", "");
-                worlds.put(world.toLowerCase(), w);
+                World w = new World(Statics.toLower(world), worldperms, "", "", "");
+                worlds.put(Statics.toLower(world), w);
             }
 
-            Server s = new Server(server, serverperms, worlds, "", "", "");
-            servers.put(server.toLowerCase(), s);
+            Server s = new Server(Statics.toLower(server), serverperms, worlds, "", "", "");
+            servers.put(Statics.toLower(server), s);
         }
 
         // display props for servers and worlds
@@ -248,16 +247,16 @@ public class MySQL2BackEnd implements BackEnd
             //check for servers 
             if (e.getServer() != null)
             {
-                if (!foundservers.contains(e.getServer().toLowerCase()))
+                if (!foundservers.contains(Statics.toLower(e.getServer())))
                 {
-                    foundservers.add(e.getServer().toLowerCase());
+                    foundservers.add(Statics.toLower(e.getServer()));
                 }
             }
 
             //is global perm
             else
             {
-                globalperms.add(e.getValue());
+                globalperms.add(Statics.toLower(e.getValue()));
             }
         }
 
@@ -274,16 +273,16 @@ public class MySQL2BackEnd implements BackEnd
                     //check for worlds 
                     if (e.getWorld() != null)
                     {
-                        if (!foundworlds.contains(e.getWorld().toLowerCase()))
+                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
                         {
-                            foundworlds.add(e.getWorld().toLowerCase());
+                            foundworlds.add(Statics.toLower(e.getWorld()));
                         }
                     }
 
                     //is server perm
                     else
                     {
-                        serverperms.add(e.getValue());
+                        serverperms.add(Statics.toLower(e.getValue()));
                     }
                 }
             }
@@ -297,16 +296,16 @@ public class MySQL2BackEnd implements BackEnd
                 {
                     if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
                     {
-                        worldperms.add(e.getValue());
+                        worldperms.add(Statics.toLower(e.getValue()));
                     }
                 }
 
-                World w = new World(world.toLowerCase(), worldperms, "", "", "");
-                worlds.put(world.toLowerCase(), w);
+                World w = new World(Statics.toLower(world), worldperms, "", "", "");
+                worlds.put(Statics.toLower(world), w);
             }
 
-            Server s = new Server(server, serverperms, worlds, "", "", "");
-            servers.put(server.toLowerCase(), s);
+            Server s = new Server(Statics.toLower(server), serverperms, worlds, "", "", "");
+            servers.put(Statics.toLower(server), s);
         }
 
         // display props for servers and worlds
@@ -374,16 +373,16 @@ public class MySQL2BackEnd implements BackEnd
             //check for servers 
             if (e.getServer() != null)
             {
-                if (!foundservers.contains(e.getServer().toLowerCase()))
+                if (!foundservers.contains(Statics.toLower(e.getServer())))
                 {
-                    foundservers.add(e.getServer().toLowerCase());
+                    foundservers.add(Statics.toLower(e.getServer()));
                 }
             }
 
             //is global perm
             else
             {
-                globalperms.add(e.getValue());
+                globalperms.add(Statics.toLower(e.getValue()));
             }
         }
 
@@ -400,16 +399,16 @@ public class MySQL2BackEnd implements BackEnd
                     //check for worlds 
                     if (e.getWorld() != null)
                     {
-                        if (!foundworlds.contains(e.getWorld().toLowerCase()))
+                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
                         {
-                            foundworlds.add(e.getWorld().toLowerCase());
+                            foundworlds.add(Statics.toLower(e.getWorld()));
                         }
                     }
 
                     //is server perm
                     else
                     {
-                        serverperms.add(e.getValue());
+                        serverperms.add(Statics.toLower(e.getValue()));
                     }
                 }
             }
@@ -423,16 +422,16 @@ public class MySQL2BackEnd implements BackEnd
                 {
                     if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
                     {
-                        worldperms.add(e.getValue());
+                        worldperms.add(Statics.toLower(e.getValue()));
                     }
                 }
 
-                World w = new World(world.toLowerCase(), worldperms, "", "", "");
-                worlds.put(world.toLowerCase(), w);
+                World w = new World(Statics.toLower(world), worldperms, "", "", "");
+                worlds.put(Statics.toLower(world), w);
             }
 
-            Server s = new Server(server, serverperms, worlds, "", "", "");
-            servers.put(server.toLowerCase(), s);
+            Server s = new Server(Statics.toLower(server), serverperms, worlds, "", "", "");
+            servers.put(Statics.toLower(server), s);
         }
 
         // display props for servers and worlds
@@ -589,6 +588,8 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server)
     {
+        server = Statics.toLower(server);
+
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
                          EntityType.User, "permissions",
                          mkValueList(user.getServer(server).getPerms(), server, null), server, null);
@@ -597,6 +598,9 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveUserPerServerWorldPerms(User user, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
                          EntityType.User, "permissions",
                          mkValueList(user.getServer(server).getWorld(world).getPerms(), server, world), server, world);
@@ -605,6 +609,9 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveUserDisplay(User user, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
                          EntityType.User, "display", mkList(new ValueEntry(user.getDisplay(), server, world)), server, world);
     }
@@ -612,13 +619,19 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveUserPrefix(User user, String server, String world)
     {
-        adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(), 
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
+        adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
                          EntityType.User, "prefix", mkList(new ValueEntry(user.getPrefix(), server, world)), server, world);
     }
 
     @Override
     public synchronized void saveUserSuffix(User user, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
                          EntityType.User, "suffix", mkList(new ValueEntry(user.getSuffix(), server, world)), server, world);
     }
@@ -632,12 +645,17 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveGroupPerServerPerms(Group group, String server)
     {
+        server = Statics.toLower(server);
+
         adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServer(server).getPerms(), server, null), server, null);
     }
 
     @Override
     public synchronized void saveGroupPerServerWorldPerms(Group group, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServer(server).getWorld(world).getPerms(), server, world), server, world);
     }
 
@@ -674,18 +692,27 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveGroupDisplay(Group group, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         adapter.saveData(group.getName(), EntityType.Group, "display", mkList(new ValueEntry(group.getDisplay(), server, world)), server, world);
     }
 
     @Override
     public synchronized void saveGroupPrefix(Group group, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         adapter.saveData(group.getName(), EntityType.Group, "prefix", mkList(new ValueEntry(group.getPrefix(), server, world)), server, world);
     }
 
     @Override
     public synchronized void saveGroupSuffix(Group group, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         adapter.saveData(group.getName(), EntityType.Group, "suffix", mkList(new ValueEntry(group.getSuffix(), server, world)), server, world);
     }
 
@@ -888,16 +915,16 @@ public class MySQL2BackEnd implements BackEnd
             //check for servers 
             if (e.getServer() != null)
             {
-                if (!foundservers.contains(e.getServer().toLowerCase()))
+                if (!foundservers.contains(Statics.toLower(e.getServer())))
                 {
-                    foundservers.add(e.getServer().toLowerCase());
+                    foundservers.add(Statics.toLower(e.getServer()));
                 }
             }
 
             //is global perm
             else
             {
-                globalperms.add(e.getValue());
+                globalperms.add(Statics.toLower(e.getValue()));
             }
         }
 
@@ -914,16 +941,16 @@ public class MySQL2BackEnd implements BackEnd
                     //check for worlds 
                     if (e.getWorld() != null)
                     {
-                        if (!foundworlds.contains(e.getWorld().toLowerCase()))
+                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
                         {
-                            foundworlds.add(e.getWorld().toLowerCase());
+                            foundworlds.add(Statics.toLower(e.getWorld()));
                         }
                     }
 
                     //is server perm
                     else
                     {
-                        serverperms.add(e.getValue());
+                        serverperms.add(Statics.toLower(e.getValue()));
                     }
                 }
             }
@@ -937,16 +964,16 @@ public class MySQL2BackEnd implements BackEnd
                 {
                     if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
                     {
-                        worldperms.add(e.getValue());
+                        worldperms.add(Statics.toLower(e.getValue()));
                     }
                 }
 
-                World w = new World(world.toLowerCase(), worldperms, null, null, null);
-                worlds.put(world.toLowerCase(), w);
+                World w = new World(Statics.toLower(world), worldperms, null, null, null);
+                worlds.put(Statics.toLower(world), w);
             }
 
-            Server s = new Server(server, serverperms, worlds, null, null, null);
-            servers.put(server.toLowerCase(), s);
+            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
+            servers.put(Statics.toLower(server), s);
         }
 
         // display props for servers and worlds
@@ -1017,16 +1044,16 @@ public class MySQL2BackEnd implements BackEnd
             //check for servers 
             if (e.getServer() != null)
             {
-                if (!foundservers.contains(e.getServer().toLowerCase()))
+                if (!foundservers.contains(Statics.toLower(e.getServer())))
                 {
-                    foundservers.add(e.getServer().toLowerCase());
+                    foundservers.add(Statics.toLower(e.getServer()));
                 }
             }
 
             //is global perm
             else
             {
-                globalperms.add(e.getValue());
+                globalperms.add(Statics.toLower(e.getValue()));
             }
         }
 
@@ -1043,16 +1070,16 @@ public class MySQL2BackEnd implements BackEnd
                     //check for worlds 
                     if (e.getWorld() != null)
                     {
-                        if (!foundworlds.contains(e.getWorld().toLowerCase()))
+                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
                         {
-                            foundworlds.add(e.getWorld().toLowerCase());
+                            foundworlds.add(Statics.toLower(e.getWorld()));
                         }
                     }
 
                     //is server perm
                     else
                     {
-                        serverperms.add(e.getValue());
+                        serverperms.add(Statics.toLower(e.getValue()));
                     }
                 }
             }
@@ -1070,12 +1097,12 @@ public class MySQL2BackEnd implements BackEnd
                     }
                 }
 
-                World w = new World(world.toLowerCase(), worldperms, null, null, null);
-                worlds.put(world.toLowerCase(), w);
+                World w = new World(Statics.toLower(world), worldperms, null, null, null);
+                worlds.put(Statics.toLower(world), w);
             }
 
-            Server s = new Server(server, serverperms, worlds, null, null, null);
-            servers.put(server.toLowerCase(), s);
+            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
+            servers.put(Statics.toLower(server), s);
         }
 
         // display props for servers and worlds

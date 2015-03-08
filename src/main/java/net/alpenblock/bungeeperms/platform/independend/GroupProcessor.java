@@ -6,6 +6,7 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.PermissionsPreProcessor;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.Sender;
 
@@ -31,7 +32,7 @@ public class GroupProcessor implements PermissionsPreProcessor
 
             for (Group g : u.getGroups())
             {
-                perms.add(0, "group." + g.getName().toLowerCase());
+                perms.add(0, "group." + Statics.toLower(g.getName()));
             }
         }
 

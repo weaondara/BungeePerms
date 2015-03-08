@@ -149,7 +149,8 @@ public class Chat_BungeePermsBukkit extends Chat
     public String getGroupPrefix(String world, String group)
     {
         Group g = perms.getPermissionsManager().getGroup(group);
-        return g == null ? "" : g.buildPrefix(world);
+        BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
+        return g == null ? "" : g.buildPrefix(config.getServername(), world);
     }
 
     @Override
@@ -177,7 +178,8 @@ public class Chat_BungeePermsBukkit extends Chat
     public String getGroupSuffix(String world, String group)
     {
         Group g = perms.getPermissionsManager().getGroup(group);
-        return g == null ? "" : g.buildSuffix(world);
+        BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
+        return g == null ? "" : g.buildSuffix(config.getServername(), world);
     }
 
     @Override

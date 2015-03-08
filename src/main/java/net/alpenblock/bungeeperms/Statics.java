@@ -227,6 +227,11 @@ public class Statics
         return locale.getLanguage() + (locale.getCountry().isEmpty() ? "" : "-" + locale.getCountry());
     }
 
+    public static String toLower(String s)
+    {
+        return s == null ? null : s.toLowerCase();
+    }
+
     @SneakyThrows
     public static void unregisterListener(Listener l)
     {

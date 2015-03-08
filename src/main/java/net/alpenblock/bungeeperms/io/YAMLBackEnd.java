@@ -13,6 +13,7 @@ import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.Server;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.World;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -112,11 +113,11 @@ public class YAMLBackEnd implements BackEnd
                 String wprefix = permsconf.getString("groups." + group + ".servers." + server + ".worlds." + world + ".prefix", "");
                 String wsuffix = permsconf.getString("groups." + group + ".servers." + server + ".worlds." + world + ".suffix", "");
 
-                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
-                worlds.put(world, w);
+                World w = new World(Statics.toLower(world), worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(Statics.toLower(world), w);
             }
 
-            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
+            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         Group g = new Group(group, inheritances, permissions, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
@@ -166,11 +167,11 @@ public class YAMLBackEnd implements BackEnd
                 String wprefix = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".prefix", "");
                 String wsuffix = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".suffix", "");
 
-                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
-                worlds.put(world, w);
+                World w = new World(Statics.toLower(world), worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(Statics.toLower(world), w);
             }
 
-            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
+            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         UUID uuid = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(user);
@@ -221,11 +222,11 @@ public class YAMLBackEnd implements BackEnd
                 String wprefix = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".prefix", "");
                 String wsuffix = permsconf.getString("users." + user + ".servers." + server + ".worlds." + world + ".suffix", "");
 
-                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
-                worlds.put(world, w);
+                World w = new World(Statics.toLower(world), worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(Statics.toLower(world), w);
             }
 
-            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
+            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         String username = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
@@ -388,30 +389,44 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server)
     {
+        server = Statics.toLower(server);
+
         permsconf.setListStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".permissions", user.getServer(server).getPerms());
     }
 
     @Override
     public synchronized void saveUserPerServerWorldPerms(User user, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         permsconf.setListStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds." + world + ".permissions", user.getServer(server).getWorld(world).getPerms());
     }
 
     @Override
     public synchronized void saveUserDisplay(User user, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".display", user.getDisplay());
     }
 
     @Override
     public synchronized void saveUserPrefix(User user, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".prefix", user.getPrefix());
     }
 
     @Override
     public synchronized void saveUserSuffix(User user, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".suffix", user.getSuffix());
     }
 
@@ -424,12 +439,17 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public synchronized void saveGroupPerServerPerms(Group group, String server)
     {
+        server = Statics.toLower(server);
+
         permsconf.setListStringAndSave("groups." + group.getName() + ".servers." + server + ".permissions", group.getServer(server).getPerms());
     }
 
     @Override
     public synchronized void saveGroupPerServerWorldPerms(Group group, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         permsconf.setListStringAndSave("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".permissions", group.getServer(server).getWorld(world).getPerms());
     }
 
@@ -466,18 +486,27 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public synchronized void saveGroupDisplay(Group group, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         permsconf.setStringAndSave("groups." + group.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".display", group.getDisplay());
     }
 
     @Override
     public synchronized void saveGroupPrefix(Group group, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         permsconf.setStringAndSave("groups." + group.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".prefix", group.getPrefix());
     }
 
     @Override
     public synchronized void saveGroupSuffix(Group group, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+        
         permsconf.setStringAndSave("groups." + group.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".suffix", group.getSuffix());
     }
 
@@ -574,11 +603,11 @@ public class YAMLBackEnd implements BackEnd
                 String wprefix = permsconf.getString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".prefix", "");
                 String wsuffix = permsconf.getString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".suffix", "");
 
-                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
-                worlds.put(world, w);
+                World w = new World(Statics.toLower(world), worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(Statics.toLower(world), w);
             }
 
-            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
+            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         group.setInheritances(inheritances);
@@ -635,11 +664,11 @@ public class YAMLBackEnd implements BackEnd
                 String wprefix = permsconf.getString("users." + uname + ".servers." + server + ".worlds." + world + ".prefix", "");
                 String wsuffix = permsconf.getString("users." + uname + ".servers." + server + ".worlds." + world + ".suffix", "");
 
-                World w = new World(world, worldperms, wdisplay, wprefix, wsuffix);
-                worlds.put(world, w);
+                World w = new World(Statics.toLower(world), worldperms, wdisplay, wprefix, wsuffix);
+                worlds.put(Statics.toLower(world), w);
             }
 
-            servers.put(server, new Server(server, serverperms, worlds, sdisplay, sprefix, ssuffix));
+            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         user.setGroups(lgroups);

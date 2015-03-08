@@ -5,6 +5,7 @@ import com.sk89q.wepif.DinnerPermsResolver;
 import com.sk89q.wepif.PermissionsResolver;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.PermissionsManager;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 import org.bukkit.OfflinePlayer;
@@ -45,7 +46,7 @@ public class BungeePermsBukkitResolver extends DinnerPermsResolver
     public boolean hasPermission(String worldName, String name, String permission)
     {
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        return BungeePerms.getInstance().getPermissionsChecker().hasPermOnServerInWorld(name, permission.toLowerCase(), config.getServername().toLowerCase(), worldName.toLowerCase());
+        return BungeePerms.getInstance().getPermissionsChecker().hasPermOnServerInWorld(name, Statics.toLower(permission), Statics.toLower(config.getServername()), Statics.toLower(worldName));
     }
 
     @Override
@@ -54,11 +55,11 @@ public class BungeePermsBukkitResolver extends DinnerPermsResolver
         Permissible permissible = getPermissible(player);
         if (permissible == null)
         {
-            return BungeePerms.getInstance().getPermissionsChecker().hasPerm(player.getName(), permission.toLowerCase());
+            return BungeePerms.getInstance().getPermissionsChecker().hasPerm(player.getName(), Statics.toLower(permission));
         }
         else
         {
-            return permissible.hasPermission(permission.toLowerCase());
+            return permissible.hasPermission(Statics.toLower(permission));
         }
     }
 
