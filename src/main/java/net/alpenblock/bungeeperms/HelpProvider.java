@@ -5,6 +5,8 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
+import net.alpenblock.bungeeperms.platform.MessageEncoder.ClickEvent;
+import net.alpenblock.bungeeperms.platform.MessageEncoder.HoverEvent;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.Sender;
 
@@ -16,51 +18,89 @@ public class HelpProvider
 
     static
     {
-        helpentries.add(new HelpEntry(null, enc().append("/bp").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Welcomes you to BungeePerms").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.help", enc().append("/bp help [page]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Shows this help").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.reload", enc().append("/bp reload").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Reloads the plugin").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.debug", enc().append("/bp debug <true|false>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("En-/Disables the debug mode").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.users", enc().append("/bp users [-c]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Lists the users [or shows the amount]").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.info", enc().append("/bp user <user> info").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Shows information about the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.delete", enc().append("/bp user <user> delete").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Deletes the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.display", enc().append("/bp user <user> display [displayname [server [world]]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Sets the display name for the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.prefix", enc().append("/bp user <user> prefix [prefix [server [world]]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Sets the prefix name for the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.suffix", enc().append("/bp user <user> suffix [suffix [server [world]]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Sets the suffix for the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.perms.add", enc().append("/bp user <user> addperm <perm> [server [world]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Adds a permission to the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.perms.remove", enc().append("/bp user <user> removeperm <perm> [server [world]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Removes a permission from a the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.perms.has", enc().append("/bp user <user> has <perm> [server [world]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Checks if the user has the permission").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.perms.list", enc().append("/bp user <user> list").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Lists the permissions of the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.group.add", enc().append("/bp user <user> addgroup <group>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Add the group to the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.group.remove", enc().append("/bp user <user> removegroup <group>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Removes the group from the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.group.set", enc().append("/bp user <user> setgroup <group>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Removes the old group in the group's ladder and adds the group to the user").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.user.groups", enc().append("/bp user <user> groups").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Lists the groups the user is in").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.groups", enc().append("/bp groups").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Lists the groups").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.info", enc().append("/bp group <group> info").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Shows information about the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.users", enc().append("/bp group <group> users [-c]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Lists the users of the group [or shows the amount]").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.create", enc().append("/bp group <group> create").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Create a new group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.delete", enc().append("/bp group <group> delete").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Deletes the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.inheritances.add", enc().append("/bp group <group> addinherit <addgroup>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Adds the addgroup to the group as inheritance").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.inheritances.remove", enc().append("/bp group <group> removeinherit <removegroup>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Removes the removegroup from the group as inheritance").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.rank", enc().append("/bp group <group> rank <new rank>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Sets the rank for the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.weight", enc().append("/bp group <group> weight <new weight>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Sets the weight for the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.ladder", enc().append("/bp group <group> ladder <new ladder>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Sets the ladder for the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.default", enc().append("/bp group <group> default <true|false>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Determines whether the group is a default group or not").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.display", enc().append("/bp group <group> display [displayname [server [world]]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Sets the display name for the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.prefix", enc().append("/bp group <group> prefix [prefix [server [world]]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Sets the prefix for the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.suffix", enc().append("/bp group <group> suffix [suffix [server [world]]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Sets the suffix for the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.perms.add", enc().append("/bp group <group> addperm <perm> [server [world]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Adds a permission to the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.perms.remove", enc().append("/bp group <group> removeperm <perm> [server [world]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Removes a permission from the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.perms.has", enc().append("/bp group <group> has <perm> [server [world]]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Checks if the group has the permission").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.group.perms.list", enc().append("/bp group <group> list").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Lists the permissions of the group").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.promote", enc().append("/bp promote <user> [ladder]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Promotes the user to the next rank").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.demote", enc().append("/bp demote <user> [ladder]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Demotes the user to the previous rank").color(ChatColor.GRAY)));
-        helpentries.add(new HelpEntry("bungeeperms.format", enc().append("/bp format").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Reformates the permission.yml or mysql table - ").color(ChatColor.GRAY).append("BE CAREFUL").color(ChatColor.RED)));
-        helpentries.add(new HelpEntry("bungeeperms.cleanup", enc().append("/bp cleanup").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Cleans up the permission.yml or mysql table - ").color(ChatColor.GRAY).append("!BE VERY CAREFUL! - removes a lot of players from the permissions db if configured").color(ChatColor.RED)));
-        helpentries.add(new HelpEntry("bungeeperms.migrate", enc().append("/bp migrate <backend [yaml|mysql|mysql2]>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Migrates the backend or shows status - ").color(ChatColor.GRAY).append("!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)").color(ChatColor.RED)));
-        helpentries.add(new HelpEntry("bungeeperms.migrate", enc().append("/bp migrate <useuuid [true|false]>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Migrates backends to (not) use UUIDs or shows status - ").color(ChatColor.GRAY).append("!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)").color(ChatColor.RED)));
-        helpentries.add(new HelpEntry("bungeeperms.migrate", enc().append("/bp migrate <uuidplayerdb [None|YAML|MySQL]>").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Migrates UUID-player-databases or shows status - ").color(ChatColor.GRAY).append("!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)").color(ChatColor.RED)));
-        helpentries.add(new HelpEntry("bungeeperms.uuid", enc().append("/bp uuid <player|uuid> [-rm]").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Gets the UUID of a player from database (-r: reverse; -m: ask mojang)").color(ChatColor.GRAY)));
-// template        helpentries.add(new HelpEntry(null, enc().append("/bp help").color(ChatColor.GOLD).append(" - ").color(ChatColor.WHITE).append("Shows").color(ChatColor.GRAY)));
+        helpentries.add(new HelpEntry(null,/*                                   */ makeClickCommand("/bp", "Welcomes you to BungeePerms")));
+        helpentries.add(new HelpEntry("bungeeperms.help",/*                     */ makeSuggestCommand("/bp help [page]", "Shows this help")));
+        helpentries.add(new HelpEntry("bungeeperms.reload",/*                   */ makeClickCommand("/bp reload", "Reloads the plugin")));
+        helpentries.add(new HelpEntry("bungeeperms.debug",/*                    */ makeSuggestCommand("/bp debug <true|false>", "En-/Disables the debug mode")));
+        helpentries.add(new HelpEntry("bungeeperms.users",/*                    */ makeSuggestCommand("/bp users [-c]", "Lists the users [or shows the amount]")));
+        helpentries.add(new HelpEntry("bungeeperms.user.info",/*                */ makeSuggestCommand("/bp user <user> info", "Shows information about the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.delete",/*              */ makeSuggestCommand("/bp user <user> delete", "Deletes the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.display",/*             */ makeSuggestCommand("/bp user <user> display [displayname [server [world]]]", "Sets the display name for the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.prefix",/*              */ makeSuggestCommand("/bp user <user> prefix [prefix [server [world]]]", "Sets the prefix name for the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.suffix",/*              */ makeSuggestCommand("/bp user <user> suffix [suffix [server [world]]]", "Sets the suffix for the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.perms.add",/*           */ makeSuggestCommand("/bp user <user> addperm <perm> [server [world]]", "Adds a permission to the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.perms.remove",/*        */ makeSuggestCommand("/bp user <user> removeperm <perm> [server [world]]", "Removes a permission from a the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.perms.has",/*           */ makeSuggestCommand("/bp user <user> has <perm> [server [world]]", "Checks if the user has the permission")));
+        helpentries.add(new HelpEntry("bungeeperms.user.perms.list",/*          */ makeSuggestCommand("/bp user <user> list", "Lists the permissions of the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.group.add",/*           */ makeSuggestCommand("/bp user <user> addgroup <group>", "Add the group to the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.group.remove",/*        */ makeSuggestCommand("/bp user <user> removegroup <group>", "Removes the group from the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.group.set",/*           */ makeSuggestCommand("/bp user <user> setgroup <group>", "Removes the old group in the group's ladder and adds the group to the user")));
+        helpentries.add(new HelpEntry("bungeeperms.user.groups",/*              */ makeSuggestCommand("/bp user <user> groups", "Lists the groups the user is in")));
+        helpentries.add(new HelpEntry("bungeeperms.groups",/*                   */ makeClickCommand("/bp groups", "Lists the groups")));
+        helpentries.add(new HelpEntry("bungeeperms.group.info",/*               */ makeSuggestCommand("/bp group <group> info", "Shows information about the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.users",/*              */ makeSuggestCommand("/bp group <group> users [-c]", "Lists the users of the group [or shows the amount]")));
+        helpentries.add(new HelpEntry("bungeeperms.group.create",/*             */ makeSuggestCommand("/bp group <group> create", "Create a new group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.delete",/*             */ makeSuggestCommand("/bp group <group> delete", "Deletes the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.inheritances.add",/*   */ makeSuggestCommand("/bp group <group> addinherit <addgroup>", "Adds the addgroup to the group as inheritance")));
+        helpentries.add(new HelpEntry("bungeeperms.group.inheritances.remove",/**/ makeSuggestCommand("/bp group <group> removeinherit <removegroup>", "Removes the removegroup from the group as inheritance")));
+        helpentries.add(new HelpEntry("bungeeperms.group.rank",/*               */ makeSuggestCommand("/bp group <group> rank <new rank>", "Sets the rank for the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.weight",/*             */ makeSuggestCommand("/bp group <group> weight <new weight>", "Sets the weight for the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.ladder",/*             */ makeSuggestCommand("/bp group <group> ladder <new ladder>", "Sets the ladder for the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.default",/*            */ makeSuggestCommand("/bp group <group> default <true|false>", "Determines whether the group is a default group or not")));
+        helpentries.add(new HelpEntry("bungeeperms.group.display",/*            */ makeSuggestCommand("/bp group <group> display [displayname [server [world]]]", "Sets the display name for the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.prefix",/*             */ makeSuggestCommand("/bp group <group> prefix [prefix [server [world]]]", "Sets the prefix for the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.suffix",/*             */ makeSuggestCommand("/bp group <group> suffix [suffix [server [world]]]", "Sets the suffix for the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.perms.add",/*          */ makeSuggestCommand("/bp group <group> addperm <perm> [server [world]]", "Adds a permission to the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.perms.remove",/*       */ makeSuggestCommand("/bp group <group> removeperm <perm> [server [world]]", "Removes a permission from the group")));
+        helpentries.add(new HelpEntry("bungeeperms.group.perms.has",/*          */ makeSuggestCommand("/bp group <group> has <perm> [server [world]]", "Checks if the group has the permission")));
+        helpentries.add(new HelpEntry("bungeeperms.group.perms.list",/*         */ makeSuggestCommand("/bp group <group> list", "Lists the permissions of the group")));
+        helpentries.add(new HelpEntry("bungeeperms.promote",/*                  */ makeSuggestCommand("/bp promote <user> [ladder]", "Promotes the user to the next rank")));
+        helpentries.add(new HelpEntry("bungeeperms.demote",/*                   */ makeSuggestCommand("/bp demote <user> [ladder]", "Demotes the user to the previous rank")));
+        helpentries.add(new HelpEntry("bungeeperms.format",/*                   */ makeClickCommand("/bp format", "Reformates the permission.yml or mysql table - ").append("BE CAREFUL").color(ChatColor.RED)));
+        helpentries.add(new HelpEntry("bungeeperms.cleanup",/*                  */ makeClickCommand("/bp cleanup", "Cleans up the permission.yml or mysql table - ").append("!BE VERY CAREFUL! - removes a lot of players from the permissions db if configured").color(ChatColor.RED)));
+        helpentries.add(new HelpEntry("bungeeperms.migrate",/*                  */ makeSuggestCommand("/bp migrate <backend [yaml|mysql|mysql2]>", "Migrates the backend or shows status - ").append("!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)").color(ChatColor.RED)));
+        helpentries.add(new HelpEntry("bungeeperms.migrate",/*                  */ makeSuggestCommand("/bp migrate <useuuid [true|false]>", "Migrates backends to (not) use UUIDs or shows status - ").append("!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)").color(ChatColor.RED)));
+        helpentries.add(new HelpEntry("bungeeperms.migrate",/*                  */ makeSuggestCommand("/bp migrate <uuidplayerdb [None|YAML|MySQL]>", "Migrates UUID-player-databases or shows status - ").append("!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)").color(ChatColor.RED)));
+        helpentries.add(new HelpEntry("bungeeperms.uuid",/*                     */ makeSuggestCommand("/bp uuid <player|uuid> [-rm]", "Gets the UUID of a player from database (-r: reverse; -m: ask mojang)")));
+// template        helpentries.add(new HelpEntry(null, makeClickCommand("/bp help", "Shows").color(ChatColor.GRAY)));
+    }
+
+    private static MessageEncoder makeClickCommand(String cmd, String help)
+    {
+        return enc()
+                //cmd
+                .append(cmd)
+                .color(ChatColor.GOLD)
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, cmd))
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, enc().append("Click to execute")))
+                //reset
+                .append("")
+                .reset()
+                //seperator
+                .append(" - ")
+                .color(ChatColor.WHITE)
+                //help
+                .append(help)
+                .color(ChatColor.GRAY);
+    }
+
+    private static MessageEncoder makeSuggestCommand(String cmd, String help)
+    {
+        return enc()
+                //cmd
+                .append(cmd)
+                .color(ChatColor.GOLD)
+                .event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmd))
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, enc().append("Click to suggest")))
+                //reset
+                .append("")
+                .reset()
+                //seperator
+                .append(" - ")
+                .color(ChatColor.WHITE)
+                //help
+                .append(help)
+                .color(ChatColor.GRAY);
     }
 
     private static PlatformPlugin plugin()
@@ -76,7 +116,9 @@ public class HelpProvider
     public static void sendHelpHeader(Sender sender, int page)
     {
         sender.sendMessage(enc().append("                  ------ BungeePerms - Help - Page " + (page + 1) + " -----").color(ChatColor.GOLD));
-        sender.sendMessage(enc().append("Aliases: ").color(ChatColor.GRAY).append("/bp").color(ChatColor.GOLD));
+        sender.sendMessage(enc().append("Aliases: ").color(ChatColor.GRAY).append("/bp").color(ChatColor.GOLD)
+                .append("       ").color(ChatColor.GRAY).append("<required>").color(ChatColor.GOLD)
+                .append("       ").color(ChatColor.GRAY).append("[optional]").color(ChatColor.GOLD));
     }
 
     public static void sendHelpPage(Sender sender, int page)
