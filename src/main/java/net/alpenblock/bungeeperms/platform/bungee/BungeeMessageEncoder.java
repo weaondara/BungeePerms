@@ -194,7 +194,7 @@ public class BungeeMessageEncoder extends MessageEncoder
         {
             cache = null;
             net.md_5.bungee.api.chat.HoverEvent.Action action = net.md_5.bungee.api.chat.HoverEvent.Action.valueOf(hoverEvent.getAction().name());
-            builder = builder.event(new net.md_5.bungee.api.chat.HoverEvent(action, convert(hoverEvent.getValue())));
+            builder = builder.event(new net.md_5.bungee.api.chat.HoverEvent(action, convert(hoverEvent.getValue().create())));
         }
 
         return this;

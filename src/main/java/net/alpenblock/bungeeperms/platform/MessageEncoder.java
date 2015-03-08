@@ -67,7 +67,7 @@ public abstract class MessageEncoder
     {
 
         private final Action action;
-        private final BaseComponent[] value;
+        private final MessageEncoder value;
 
         public enum Action
         {
