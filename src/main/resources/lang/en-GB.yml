@@ -148,4 +148,50 @@ log:
     adding-default-groups-uuid: Adding default groups to {0} ({1})
   login: Login by {0}
   login-uuid: Login by {0} ({1})
-  intrusion-detected: §4Possible intrusion detected. Sender is {0}
+  intrusion-detected: '&4Possible intrusion detected. Sender is {0}'
+help:
+  welcome: Welcomes you to BungeePerms
+  help: Shows this help
+  reload: Reloads the plugin
+  debug: En-/Disables the debug mode
+  users: Lists the users [or shows the amount]
+  user:
+    info: Shows information about the user
+    delete: Deletes the user
+    display: Sets the display name for the user
+    prefiy: Sets the prefix name for the user
+    suffix: Sets the suffix for the user
+    add-perm: Adds a permission to the user
+    remove-perm: Removes a permission from a the user
+    has: Checks if the user has the permission
+    list: Lists the permissions of the user
+    set-group: Removes the old group in the group's ladder and adds the group to the user
+    groups: Lists the groups the user is in
+  groups: Lists the groups
+  group:
+    info: Shows information about the group
+    users: Lists the users of the group [or shows the amount]
+    create: Create a new group
+    delete: Deletes the group
+    add-inherit: Adds the addgroup to the group as inheritance
+    remive-inherit: Removes the removegroup from the group as inheritance
+    rank: Sets the rank for the group
+    weight: Sets the weight for the group
+    ladder: Sets the ladder for the group
+    default: Determines whether the group is a default group or not
+    display: Sets the display name for the group
+    prefix: Sets the prefix for the group
+    suffix: Sets the suffix for the group
+    add-perm: Adds a permission to the group
+    remove-perm: Removes a permission from the group
+    has: Checks if the group has the permission
+    list: Lists the permissions of the group
+  promote: Promotes the user to the next rank
+  demote: Demotes the user to the previous rank
+  format: Reformates the permission.yml or mysql table - &cBE CAREFUL
+  cleanup: Cleans up the permission.yml or mysql table - &c!BE VERY CAREFUL! - removes a lot of players from the permissions db if configured
+  migrate:
+    backend: Migrates the backend or shows status - &c!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)
+    use-uuid: Migrates backends to (not) use UUIDs or shows status - &c!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)
+    uuid-player-db: Migrates UUID-player-databases or shows status - &c!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)
+  uuid: 'Gets the UUID of a player from database (-r: reverse; -m: ask mojang)'
