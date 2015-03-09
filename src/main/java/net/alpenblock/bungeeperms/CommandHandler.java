@@ -2028,7 +2028,7 @@ public class CommandHandler
             }
 
             //disallow mysql backend
-            if (pm().getBackEnd().getType() == BackEndType.MySQL)
+            if (type == BackEndType.MySQL)
             {
                 sender.sendMessage(ChatColor.RED + "The MySQL backend is deprecated! Please use MySQL2.");
                 return true;
