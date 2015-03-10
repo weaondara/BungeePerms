@@ -231,6 +231,11 @@ public class Statics
     {
         return s == null ? null : s.toLowerCase();
     }
+    
+    public static boolean isBungeeConsole(Object o)
+    {
+        return o.getClass().getName().equals("net.md_5.bungee.command.ConsoleCommandSender");
+    }
 
     @SneakyThrows
     public static void unregisterListener(Listener l)

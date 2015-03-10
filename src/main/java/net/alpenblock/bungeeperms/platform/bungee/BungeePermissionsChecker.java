@@ -3,11 +3,11 @@ package net.alpenblock.bungeeperms.platform.bungee;
 import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.PermissionsChecker;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.command.ConsoleCommandSender;
 
 @AllArgsConstructor
 public class BungeePermissionsChecker extends PermissionsChecker
@@ -44,7 +44,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
         {
             return (config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName())).hasPerm(permission);
         }
-        else if (sender instanceof ConsoleCommandSender)
+        else if (Statics.isBungeeConsole(sender))
         {
             return true;
         }
@@ -90,7 +90,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
             }
             return user.hasPermOnServer(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName());
         }
-        else if (sender instanceof ConsoleCommandSender)
+        else if (Statics.isBungeeConsole(sender))
         {
             return true;
         }
@@ -154,7 +154,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
 
             return user.hasPermOnServerInWorld(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), world);
         }
-        else if (sender instanceof ConsoleCommandSender)
+        else if (Statics.isBungeeConsole(sender))
         {
             return true;
         }
@@ -198,7 +198,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
      */
     public boolean hasOrConsole(CommandSender sender, String perm, boolean msg)
     {
-        boolean isperm = (hasPerm(sender, perm) | (sender instanceof ConsoleCommandSender));
+        boolean isperm = (hasPerm(sender, perm) | (Statics.isBungeeConsole(sender)));
         if (!isperm && msg)
         {
             sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
@@ -242,7 +242,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
      */
     public boolean hasOrConsoleOnServer(CommandSender sender, String perm, boolean msg)
     {
-        boolean isperm = (hasPermOnServer(sender, perm) | (sender instanceof ConsoleCommandSender));
+        boolean isperm = (hasPermOnServer(sender, perm) | (Statics.isBungeeConsole(sender)));
         if (!isperm && msg)
         {
             sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
@@ -286,7 +286,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
      */
     public boolean hasOrConsoleOnServerInWorld(CommandSender sender, String perm, boolean msg)
     {
-        boolean isperm = (hasPermOnServerInWorld(sender, perm) | (sender instanceof ConsoleCommandSender));
+        boolean isperm = (hasPermOnServerInWorld(sender, perm) | (Statics.isBungeeConsole(sender)));
         if (!isperm && msg)
         {
             sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);

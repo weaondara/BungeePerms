@@ -4,12 +4,12 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.command.ConsoleCommandSender;
 
 @Getter
 @AllArgsConstructor
@@ -49,7 +49,7 @@ public class BungeeSender implements Sender
     @Override
     public UUID getUUID()
     {
-        if (sender instanceof ConsoleCommandSender)
+        if (Statics.isBungeeConsole(sender))
         {
             return UUID.fromString("00000000-0000-0000-0000-000000000000");
         }
@@ -88,7 +88,7 @@ public class BungeeSender implements Sender
     @Override
     public boolean isConsole()
     {
-        return sender instanceof ConsoleCommandSender;
+        return Statics.isBungeeConsole(sender);
     }
 
     @Override
