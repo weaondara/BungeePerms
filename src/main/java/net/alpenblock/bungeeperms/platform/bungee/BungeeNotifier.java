@@ -6,7 +6,7 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.NetworkNotifier;
-import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -81,7 +81,7 @@ public class BungeeNotifier implements NetworkNotifier
             return;
         }
 
-        ProxiedPlayer pp = BungeeCord.getInstance().getPlayer(player);
+        ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(player);
         if (pp != null && pp.getServer() != null)
         {
             //ignore servers not in config and netork type is server dependend
@@ -110,7 +110,7 @@ public class BungeeNotifier implements NetworkNotifier
             return;
         }
 
-        ProxiedPlayer pp = BungeeCord.getInstance().getPlayer(player);
+        ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(player);
         if (pp != null && pp.getServer() != null)
         {
             //ignore servers not in config and netork type is server dependend
@@ -139,7 +139,7 @@ public class BungeeNotifier implements NetworkNotifier
             return;
         }
 
-        for (ServerInfo si : BungeeCord.getInstance().config.getServers().values())
+        for (ServerInfo si : ProxyServer.getInstance().getConfig().getServers().values())
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend

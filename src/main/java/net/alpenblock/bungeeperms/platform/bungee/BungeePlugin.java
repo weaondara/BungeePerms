@@ -14,8 +14,8 @@ import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PlatformType;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
 import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -65,7 +65,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     @Override
     public void onEnable()
     {
-        BungeeCord.getInstance().registerChannel(BungeePerms.CHANNEL);
+        ProxyServer.getInstance().registerChannel(BungeePerms.CHANNEL);
         bungeeperms.enable();
     }
 
@@ -73,7 +73,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     public void onDisable()
     {
         bungeeperms.disable();
-        BungeeCord.getInstance().unregisterChannel(BungeePerms.CHANNEL);
+        ProxyServer.getInstance().unregisterChannel(BungeePerms.CHANNEL);
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
@@ -83,14 +83,14 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
 
     private void loadcmds()
     {
-        BungeeCord.getInstance().getPluginManager().registerCommand(this,
+        ProxyServer.getInstance().getPluginManager().registerCommand(this,
                                                                     new Command("bungeeperms", null, "bp")
                                                                     {
                                                                         @Override
                                                                         public void execute(final CommandSender sender, final String[] args)
                                                                         {
                                                                             final Command cmd = this;
-                                                                            BungeeCord.getInstance().getScheduler().runAsync(instance, new Runnable()
+                                                                            ProxyServer.getInstance().getScheduler().runAsync(instance, new Runnable()
                                                                                                                              {
                                                                                                                                  @Override
                                                                                                                                  public void run()
@@ -139,7 +139,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     @Override
     public Sender getPlayer(String name)
     {
-        CommandSender sender = BungeeCord.getInstance().getPlayer(name);
+        CommandSender sender = ProxyServer.getInstance().getPlayer(name);
 
         Sender s = null;
 
@@ -154,7 +154,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     @Override
     public Sender getPlayer(UUID uuid)
     {
-        CommandSender sender = BungeeCord.getInstance().getPlayer(uuid);
+        CommandSender sender = ProxyServer.getInstance().getPlayer(uuid);
 
         Sender s = null;
 
@@ -169,7 +169,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     @Override
     public Sender getConsole()
     {
-        return new BungeeSender(BungeeCord.getInstance().getConsole());
+        return new BungeeSender(ProxyServer.getInstance().getConsole());
     }
 
     @Override
@@ -177,7 +177,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     {
         List<Sender> senders = new ArrayList<>();
 
-        for (ProxiedPlayer pp : BungeeCord.getInstance().getPlayers())
+        for (ProxiedPlayer pp : ProxyServer.getInstance().getPlayers())
         {
             senders.add(new BungeeSender(pp));
         }

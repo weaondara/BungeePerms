@@ -14,9 +14,8 @@ import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.EventListener;
-import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PermissionCheckEvent;
@@ -49,7 +48,7 @@ public class BungeeEventListener implements Listener, EventListener
             return;
         }
         enabled = true;
-        BungeeCord.getInstance().getPluginManager().registerListener(BungeePlugin.getInstance(), this);
+        ProxyServer.getInstance().getPluginManager().registerListener(BungeePlugin.getInstance(), this);
     }
 
     @Override
@@ -60,7 +59,7 @@ public class BungeeEventListener implements Listener, EventListener
             return;
         }
         enabled = false;
-        BungeeCord.getInstance().getPluginManager().unregisterListener(this);
+        ProxyServer.getInstance().getPluginManager().unregisterListener(this);
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
@@ -128,7 +127,7 @@ public class BungeeEventListener implements Listener, EventListener
         }
         if (e.getSuggestions().isEmpty())
         {
-            for (ProxiedPlayer pp : BungeeCord.getInstance().getPlayers())
+            for (ProxiedPlayer pp : ProxyServer.getInstance().getPlayers())
             {
                 if (Statics.toLower(pp.getName()).startsWith(Statics.toLower(e.getCursor())))
                 {
@@ -154,7 +153,7 @@ public class BungeeEventListener implements Listener, EventListener
             return;
         }
 
-        ServerConnection scon = (ServerConnection) e.getSender();
+        net.md_5.bungee.api.connection.Server scon = (net.md_5.bungee.api.connection.Server) e.getSender();
 
         //check network type // ignore if standalone or not registered server
         if (config.getNetworkType() == NetworkType.Standalone
