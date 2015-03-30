@@ -169,7 +169,7 @@ public class BungeeEventListener implements Listener, EventListener
         String cmd = data.get(0);
         String userorgroup = data.size() > 1 ? data.get(1) : null;
 
-        if (cmd.equalsIgnoreCase("updateplayerworld"))
+        if (cmd.equalsIgnoreCase("playerworldupdate"))
         {
             String player = data.get(1);
             String world = data.get(2);
