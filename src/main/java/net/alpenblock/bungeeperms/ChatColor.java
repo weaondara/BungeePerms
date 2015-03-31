@@ -31,6 +31,11 @@ public enum ChatColor
 
     public static final char COLOR_CHAR = '\u00A7';
 
+    static String strip(String text)
+    {
+        return text.replaceAll("§.", "");
+    }
+
     private final char code;
 
     public String alt()

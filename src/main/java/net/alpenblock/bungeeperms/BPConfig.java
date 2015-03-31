@@ -30,6 +30,10 @@ public class BPConfig
     private boolean notifyDemote;
     private boolean tabComplete;
     private Locale locale;
+    private boolean terminatePrefixReset;
+    private boolean terminateSuffixReset;
+    private boolean terminatePrefixSpace;
+    private boolean terminateSuffixSpace;
 
     //tmp at runtime
     @Setter
@@ -62,6 +66,10 @@ public class BPConfig
         notifyDemote = config.getBoolean("notify.demote", false);
         tabComplete = config.getBoolean("tabcomplete", false);
         locale = Locale.forLanguageTag(config.getString("locale", Statics.localeString(new Locale("en", "GB"))));
+        terminatePrefixReset = config.getBoolean("terminate.prefix.reset", true);
+        terminateSuffixReset = config.getBoolean("terminate.suffix.reset", true);
+        terminatePrefixSpace = config.getBoolean("terminate.prefix.space", true);
+        terminateSuffixSpace = config.getBoolean("terminate.suffix.space", true);
     }
 
     public void setUseUUIDs(boolean useUUIDs)

@@ -599,88 +599,154 @@ public class User
     {
         String prefix = "";
 
+        List<String> prefixes = new ArrayList<>();
+
         for (Group g : groups)
         {
             //global
-            prefix += g.getPrefix() + (g.getPrefix().isEmpty() ? "" : " ");
+            if (!g.getPrefix().isEmpty())
+            {
+                prefixes.add(g.getPrefix());
+            }
 
             //server
             Server s = g.getServer(sender != null ? sender.getServer() : null);
             if (s != null)
             {
-                prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
+                if (!s.getPrefix().isEmpty())
+                {
+                    prefixes.add(s.getPrefix());
+                }
 
                 //world
                 World w = s.getWorld(sender != null ? sender.getWorld() : null);
                 if (w != null)
                 {
-                    prefix += w.getPrefix() + (w.getPrefix().isEmpty() ? "" : " ");
+                    if (!w.getPrefix().isEmpty())
+                    {
+                        prefixes.add(w.getPrefix());
+                    }
                 }
             }
         }
 
         //global
-        prefix += this.prefix + (this.prefix.isEmpty() ? "" : " ");
+        if (!this.prefix.isEmpty())
+        {
+            prefixes.add(this.prefix);
+        }
 
         //server
         Server s = getServer(sender != null ? sender.getServer() : null);
         if (s != null)
         {
-            prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
+            if (!s.getPrefix().isEmpty())
+            {
+                prefixes.add(s.getPrefix());
+            }
 
             //world
             World w = s.getWorld(sender != null ? sender.getWorld() : null);
             if (w != null)
             {
-                prefix += w.getPrefix() + (w.getPrefix().isEmpty() ? "" : " ");
+                if (!w.getPrefix().isEmpty())
+                {
+                    prefixes.add(w.getPrefix());
+                }
             }
         }
 
-        return prefix.isEmpty() ? prefix : prefix.substring(0, prefix.length() - 1) + ChatColor.RESET;
+        for (String p : prefixes)
+        {
+            if (!ChatColor.strip(p.replaceAll("&", "§")).isEmpty()
+                    && !prefix.isEmpty()
+                    && !ChatColor.strip(prefix.replaceAll("&", "§")).endsWith(" "))
+            {
+                prefix += " ";
+            }
+            prefix += p;
+        }
+
+        return prefix
+                + (BungeePerms.getInstance().getConfig().isTerminatePrefixSpace() ? " " : "")
+                + (BungeePerms.getInstance().getConfig().isTerminatePrefixReset() ? ChatColor.RESET : "");
     }
 
     public String buildSuffix(Sender sender)
     {
         String suffix = "";
+        
+        List<String> suffixes = new ArrayList<>();
 
         for (Group g : groups)
         {
             //global
-            suffix += g.getSuffix() + (g.getSuffix().isEmpty() ? "" : " ");
+            if (!g.getSuffix().isEmpty())
+            {
+                suffixes.add(g.getSuffix());
+            }
 
             //server
-            Server s = g.getServer(sender.getServer());
+            Server s = g.getServer(sender != null ? sender.getServer() : null);
             if (s != null)
             {
-                suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");
+                if (!s.getSuffix().isEmpty())
+                {
+                    suffixes.add(s.getSuffix());
+                }
 
                 //world
-                World w = s.getWorld(sender.getWorld());
+                World w = s.getWorld(sender != null ? sender.getWorld() : null);
                 if (w != null)
                 {
-                    suffix += w.getSuffix() + (w.getSuffix().isEmpty() ? "" : " ");
+                    if (!w.getSuffix().isEmpty())
+                    {
+                        suffixes.add(w.getSuffix());
+                    }
                 }
             }
         }
 
         //global
-        suffix += this.suffix + (this.suffix.isEmpty() ? "" : " ");
+        if (!this.suffix.isEmpty())
+        {
+            suffixes.add(this.suffix);
+        }
 
         //server
-        Server s = getServer(sender.getServer());
+        Server s = getServer(sender != null ? sender.getServer() : null);
         if (s != null)
         {
-            suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");
+            if (!s.getSuffix().isEmpty())
+            {
+                suffixes.add(s.getSuffix());
+            }
 
             //world
-            World w = s.getWorld(sender.getWorld());
+            World w = s.getWorld(sender != null ? sender.getWorld() : null);
             if (w != null)
             {
-                suffix += w.getSuffix() + (w.getSuffix().isEmpty() ? "" : " ");
+                if (!w.getSuffix().isEmpty())
+                {
+                    suffixes.add(w.getSuffix());
+                }
             }
         }
 
-        return suffix.isEmpty() ? suffix : suffix.substring(0, prefix.length() - 1) + ChatColor.RESET;
+        for (String suf : suffixes)
+        {
+            if (!ChatColor.strip(suf.replaceAll("&", "§")).isEmpty()
+                    && !suffix.isEmpty()
+                    && !ChatColor.strip(suffix.replaceAll("&", "§")).endsWith(" "))
+            {
+                suffix += " ";
+            }
+            suffix += suf;
+        }
+
+        return suffix
+                + (BungeePerms.getInstance().getConfig().isTerminateSuffixSpace() ? " " : "")
+                + (BungeePerms.getInstance().getConfig().isTerminateSuffixReset() ? ChatColor.RESET : "");
     }
 
     private Sender getSender()
