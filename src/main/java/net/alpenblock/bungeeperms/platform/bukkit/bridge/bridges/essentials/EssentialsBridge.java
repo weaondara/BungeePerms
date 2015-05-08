@@ -80,7 +80,7 @@ public class EssentialsBridge implements Bridge
 
     public void inject(Plugin plugin)
     {
-        BungeePerms.getLogger().info("Injection of BungeepermsBukkit into Essentials");
+        BungeePerms.getLogger().info("Injection of Bungeeperms into Essentials");
         try
         {
             Essentials ess = (Essentials) plugin;
@@ -119,7 +119,7 @@ public class EssentialsBridge implements Bridge
 
     public void uninject(Plugin plugin)
     {
-        BungeePerms.getLogger().info("Uninjection of BungeepermsBukkit into Essentials");
+        BungeePerms.getLogger().info("Uninjection of Bungeeperms into Essentials");
 
         try
         {

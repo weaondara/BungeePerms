@@ -69,7 +69,7 @@ public class VaultBridge implements Bridge
 
     public void inject(Plugin plugin)
     {
-        BungeePerms.getLogger().info("Injection of BungeepermsBukkit into Vault");
+        BungeePerms.getLogger().info("Injection of Bungeeperms into Vault");
         try
         {
             Vault v = (Vault) plugin;
@@ -112,7 +112,7 @@ public class VaultBridge implements Bridge
 
     public void uninject(Plugin plugin)
     {
-        BungeePerms.getLogger().info("Uninjection of BungeepermsBukkit into Vault");
+        BungeePerms.getLogger().info("Uninjection of Bungeeperms into Vault");
 
         try
         {
