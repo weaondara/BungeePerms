@@ -21,23 +21,24 @@ import org.bukkit.plugin.Plugin;
 public class Permission_BungeePermsBukkit extends Permission
 {
 
-    private final String name = "BungeePermsBukkit";
+    private final String name = "BungeePerms";
 
-    protected Plugin plugin = null;
-    protected Plugin perms = null;
+    private Plugin plugin = null;
+    private BungeePerms perms;
 
     public Permission_BungeePermsBukkit(Plugin plugin)
     {
         super();
         this.plugin = plugin;
-        Bukkit.getServer().getPluginManager().registerEvents(new PermissionServerListener(this), BukkitPlugin.getInstance());
+        Bukkit.getServer().getPluginManager().registerEvents(new PermissionServerListener(), BukkitPlugin.getInstance());
 
         // Load Plugin in case it was loaded before
         if (perms == null)
         {
-            perms = plugin.getServer().getPluginManager().getPlugin("BungeePermsBukkit");
-            if (perms != null && perms.isEnabled())
+            Plugin p = plugin.getServer().getPluginManager().getPlugin("BungeePerms");
+            if (p != null)
             {
+                this.perms = BungeePerms.getInstance();
                 log.info(String.format("[%s][Permission] %s hooked.", plugin.getDescription().getName(), name));
             }
         }
@@ -46,23 +47,16 @@ public class Permission_BungeePermsBukkit extends Permission
     public class PermissionServerListener implements Listener
     {
 
-        Permission_BungeePermsBukkit permission = null;
-
-        public PermissionServerListener(Permission_BungeePermsBukkit permission)
-        {
-            this.permission = permission;
-        }
-
         @EventHandler(priority = EventPriority.MONITOR)
         public void onPluginEnable(PluginEnableEvent event)
         {
-            if (permission.perms == null)
+            if (perms == null)
             {
-                Plugin perms = event.getPlugin();
-                if (perms.getDescription().getName().equals("BungeePermsBukkit"))
+                Plugin p = event.getPlugin();
+                if (p.getDescription().getName().equals("BungeePerms"))
                 {
-                    permission.perms = BukkitPlugin.getInstance();
-                    log.info(String.format("[%s][Permission] %s hooked.", plugin.getDescription().getName(), permission.name));
+                    perms = BungeePerms.getInstance();
+                    log.info(String.format("[%s][Permission] %s hooked.", plugin.getDescription().getName(), name));
                 }
             }
         }
@@ -70,12 +64,12 @@ public class Permission_BungeePermsBukkit extends Permission
         @EventHandler(priority = EventPriority.MONITOR)
         public void onPluginDisable(PluginDisableEvent event)
         {
-            if (permission.perms != null)
+            if (perms != null)
             {
-                if (event.getPlugin().getDescription().getName().equals("BungeePermsBukkit"))
+                if (event.getPlugin().getDescription().getName().equals("BungeePerms"))
                 {
-                    permission.perms = null;
-                    log.info(String.format("[%s][Permission] %s un-hooked.", plugin.getDescription().getName(), permission.name));
+                    perms = null;
+                    log.info(String.format("[%s][Permission] %s un-hooked.", plugin.getDescription().getName(), name));
                 }
             }
         }

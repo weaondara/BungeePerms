@@ -30,21 +30,21 @@ public class Chat_BungeePermsBukkit extends Chat
     {
         super(perms);
         this.plugin = plugin;
-        Bukkit.getServer().getPluginManager().registerEvents(new PermissionServerListener(), BukkitPlugin.getInstance());
+        Bukkit.getServer().getPluginManager().registerEvents(new ChatServerListener(), BukkitPlugin.getInstance());
 
         // Load Plugin in case it was loaded before
         if (this.perms == null)
         {
-            Plugin p = plugin.getServer().getPluginManager().getPlugin("BungeePermsBukkit");
+            Plugin p = plugin.getServer().getPluginManager().getPlugin("BungeePerms");
             if (p != null)
             {
-                this.perms = (BungeePerms) p;
+                this.perms = BungeePerms.getInstance();
                 log.info(String.format("[%s][Chat] %s hooked.", plugin.getDescription().getName(), name));
             }
         }
     }
 
-    public class PermissionServerListener implements Listener
+    public class ChatServerListener implements Listener
     {
 
         @EventHandler(priority = EventPriority.MONITOR)
@@ -52,10 +52,10 @@ public class Chat_BungeePermsBukkit extends Chat
         {
             if (perms == null)
             {
-                Plugin permPlugin = event.getPlugin();
-                if (permPlugin.getDescription().getName().equals("BungeePermsBukkit"))
+                Plugin p = event.getPlugin();
+                if (p.getDescription().getName().equals("BungeePerms"))
                 {
-                    perms = (BungeePerms) permPlugin;
+                    perms = BungeePerms.getInstance();
                     log.info(String.format("[%s][Chat] %s hooked.", plugin.getDescription().getName(), name));
                 }
             }
@@ -68,7 +68,7 @@ public class Chat_BungeePermsBukkit extends Chat
             if (perms != null)
             {
                 Plugin permPlugin = event.getPlugin();
-                if (permPlugin.getDescription().getName().equals("BungeePermsBukkit"))
+                if (permPlugin.getDescription().getName().equals("BungeePerms"))
                 {
                     perms = null;
                     log.info(String.format("[%s][Chat] %s unhooked.", plugin.getDescription().getName(), name));
