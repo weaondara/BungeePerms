@@ -18,7 +18,7 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 
-public class Chat_BungeePermsBukkit extends Chat
+public class Chat_BungeePerms extends Chat
 {
 
     private static final Logger log = Logger.getLogger("Minecraft");
@@ -26,7 +26,7 @@ public class Chat_BungeePermsBukkit extends Chat
     private Plugin plugin;
     private BungeePerms perms;
 
-    public Chat_BungeePermsBukkit(Plugin plugin, Permission perms)
+    public Chat_BungeePerms(Plugin plugin, Permission perms)
     {
         super(perms);
         this.plugin = plugin;

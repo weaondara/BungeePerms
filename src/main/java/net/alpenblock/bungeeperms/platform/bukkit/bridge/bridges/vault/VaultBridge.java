@@ -82,7 +82,7 @@ public class VaultBridge implements Bridge
             //inject BungeePerms permissions
             Method m = v.getClass().getDeclaredMethod("hookPermission", String.class, Class.class, ServicePriority.class, String[].class);
             m.setAccessible(true);
-            m.invoke(v, "BungeePerms", Permission_BungeePermsBukkit.class, ServicePriority.Normal, new String[]
+            m.invoke(v, "BungeePerms", Permission_BungeePerms.class, ServicePriority.Normal, new String[]
              {
                  "net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin"
             });
@@ -94,7 +94,7 @@ public class VaultBridge implements Bridge
             //inject BungeePerms chat
             m = v.getClass().getDeclaredMethod("hookChat", String.class, Class.class, ServicePriority.class, String[].class);
             m.setAccessible(true);
-            m.invoke(v, "BungeePerms", Chat_BungeePermsBukkit.class, ServicePriority.Normal, new String[]
+            m.invoke(v, "BungeePerms", Chat_BungeePerms.class, ServicePriority.Normal, new String[]
              {
                  "net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin"
             });

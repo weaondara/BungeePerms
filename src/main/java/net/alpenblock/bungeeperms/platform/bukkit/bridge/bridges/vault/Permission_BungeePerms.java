@@ -18,7 +18,7 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 
-public class Permission_BungeePermsBukkit extends Permission
+public class Permission_BungeePerms extends Permission
 {
 
     private final String name = "BungeePerms";
@@ -26,7 +26,7 @@ public class Permission_BungeePermsBukkit extends Permission
     private Plugin plugin = null;
     private BungeePerms perms;
 
-    public Permission_BungeePermsBukkit(Plugin plugin)
+    public Permission_BungeePerms(Plugin plugin)
     {
         super();
         this.plugin = plugin;
