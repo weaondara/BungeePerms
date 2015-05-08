@@ -61,7 +61,7 @@ public class WorldEditBridge implements Bridge
 
     public void inject(Plugin plugin)
     {
-        BungeePerms.getLogger().info("Injection of BungeepermsBukkit into WorldEdit");
+        BungeePerms.getLogger().info("Injection of Bungeeperms into WorldEdit");
         try
         {
             WorldEditPlugin we = (WorldEditPlugin) plugin;
@@ -74,7 +74,7 @@ public class WorldEditBridge implements Bridge
             //inject BungeePerms
             Field f = we.getPermissionsResolver().getClass().getDeclaredField("enabledResolvers");
             f.setAccessible(true);
-            ((List) f.get(we.getPermissionsResolver())).add(BungeePermsBukkitResolver.class);
+            ((List) f.get(we.getPermissionsResolver())).add(BungeePermsResolver.class);
 
             we.getPermissionsResolver().findResolver();
         }
@@ -85,7 +85,7 @@ public class WorldEditBridge implements Bridge
 
     public void uninject(Plugin plugin)
     {
-        BungeePerms.getLogger().info("Uninjection of BungeepermsBukkit into WorldEdit");
+        BungeePerms.getLogger().info("Uninjection of Bungeeperms into WorldEdit");
         try
         {
             WorldEditPlugin we = (WorldEditPlugin) plugin;
@@ -93,7 +93,7 @@ public class WorldEditBridge implements Bridge
             //inject BungeePerms
             Field f = we.getPermissionsResolver().getClass().getDeclaredField("enabledResolvers");
             f.setAccessible(true);
-            ((List) f.get(we.getPermissionsResolver())).remove(BungeePermsBukkitResolver.class);
+            ((List) f.get(we.getPermissionsResolver())).remove(BungeePermsResolver.class);
 
             we.getPermissionsResolver().findResolver();
         }
