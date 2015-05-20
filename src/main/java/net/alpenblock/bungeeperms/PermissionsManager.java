@@ -62,6 +62,7 @@ public class PermissionsManager
      */
     public final void loadConfig()
     {
+        config.load();
         BackEndType bet = config.getBackEndType();
         if (bet == BackEndType.YAML)
         {
