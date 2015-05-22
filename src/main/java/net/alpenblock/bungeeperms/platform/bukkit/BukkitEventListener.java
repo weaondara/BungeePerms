@@ -150,6 +150,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
     public void onPluginMessageReceived(String channel, Player player, byte[] bytes)
     {
         String msg = new String(bytes);
+        BungeePerms.getLogger().info("msg=" + msg);
         List<String> data = Statics.toList(msg, ";");
 
         BungeePerms.getInstance().getDebug().log("msg=" + msg);
@@ -193,7 +194,15 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         }
         else if (cmd.equalsIgnoreCase("reloadall"))
         {
-            BungeePerms.getInstance().reload();
+            Runnable r = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    BungeePerms.getInstance().reload(false);
+                }
+            };
+            Bukkit.getScheduler().runTaskLater(BukkitPlugin.getInstance(), r, 1);
         }
     }
 

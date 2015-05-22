@@ -253,4 +253,16 @@ public class Statics
             }
         }
     }
+
+    public static boolean listContains(List<String> list, String element)
+    {
+        for (String l : list)
+        {
+            if (l.equalsIgnoreCase(element))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

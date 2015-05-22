@@ -4,6 +4,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.NetworkNotifier;
 import net.md_5.bungee.api.ProxyServer;
@@ -86,7 +87,7 @@ public class BungeeNotifier implements NetworkNotifier
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                    && !config.getNetworkServers().contains(pp.getServer().getInfo().getName()))
+                    && !Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
             {
                 return;
             }
@@ -115,7 +116,7 @@ public class BungeeNotifier implements NetworkNotifier
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                    && !config.getNetworkServers().contains(pp.getServer().getInfo().getName()))
+                    && !Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
             {
                 return;
             }
@@ -143,7 +144,7 @@ public class BungeeNotifier implements NetworkNotifier
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                    && !config.getNetworkServers().contains(si.getName()))
+                    && !Statics.listContains(config.getNetworkServers(), si.getName()))
             {
                 return;
             }

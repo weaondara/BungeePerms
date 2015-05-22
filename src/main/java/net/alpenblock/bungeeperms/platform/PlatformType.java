@@ -8,8 +8,9 @@ import lombok.Getter;
 public enum PlatformType
 {
 
-    Bukkit("bukkit.conf.yml"),
-    BungeeCord("bungee.conf.yml");
+    Bukkit("bukkit.conf.yml", false),
+    BungeeCord("bungee.conf.yml", true);
 
     private final String defaultConfigPath;
+    private final boolean proxy;
 }

@@ -138,7 +138,7 @@ public class CommandHandler
             return true;
         }
 
-        BungeePerms.getInstance().reload();
+        BungeePerms.getInstance().reload(true);
         sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_RELOADED));
         return true;
     }

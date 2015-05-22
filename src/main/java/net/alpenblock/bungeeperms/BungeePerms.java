@@ -89,12 +89,15 @@ public class BungeePerms
         permissionsManager.disable();
     }
     
-    public void reload()
+    public void reload(boolean notifynetwork)
     {
         disable();
         load();
         permissionsManager.reload();
-        networkNotifier.reloadAll(null);
+        if(notifynetwork)
+        {
+            networkNotifier.reloadAll("");
+        }
         enable();
     }
 }

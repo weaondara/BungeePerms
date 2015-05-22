@@ -14,6 +14,7 @@ import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.EventListener;
+import net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -159,11 +160,13 @@ public class BungeeEventListener implements Listener, EventListener
         if (config.getNetworkType() == NetworkType.Standalone
                 || (config.getNetworkType() == NetworkType.ServerDependend && !config.getNetworkServers().contains(scon.getInfo().getName())))
         {
+            //todo add misconfiguration message
             return;
         }
 
         //process message
         String msg = new String(e.getData());
+        BungeePerms.getLogger().info("msg=" + msg);
         List<String> data = Statics.toList(msg, ";");
 
         String cmd = data.get(0);
@@ -171,10 +174,9 @@ public class BungeeEventListener implements Listener, EventListener
 
         if (cmd.equalsIgnoreCase("playerworldupdate"))
         {
-            String player = data.get(1);
             String world = data.get(2);
 
-            playerWorlds.put(player, world);
+            playerWorlds.put(userorgroup, world);
         }
         else if (cmd.equalsIgnoreCase("deleteuser"))
         {
@@ -240,11 +242,18 @@ public class BungeeEventListener implements Listener, EventListener
         }
         else if (cmd.equalsIgnoreCase("reloadall"))
         {
-            BungeePerms.getInstance().reload();
+            Runnable r = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    BungeePerms.getInstance().reload(false);
+                }
+            };
+            ProxyServer.getInstance().getScheduler().runAsync(BungeePlugin.getInstance(), r);
 
-            //this would be bad
-//            //forward plugin message to network
-//            BungeePerms.getInstance().getNetworkNotifier().reloadAll(scon.getInfo().getName());
+            //forward plugin message to network except to server which issued the reload
+            BungeePerms.getInstance().getNetworkNotifier().reloadAll(scon.getInfo().getName());
         }
 
         e.setCancelled(true);
