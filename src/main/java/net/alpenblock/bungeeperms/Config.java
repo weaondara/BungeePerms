@@ -84,7 +84,6 @@ public class Config
 
     public String getString(String key, String def)
     {
-
         if (fconfig.contains(key))
         {
             return fconfig.getString(key);
@@ -99,7 +98,6 @@ public class Config
 
     public int getInt(String key, int def)
     {
-
         if (fconfig.contains(key))
         {
             return fconfig.getInt(key);
@@ -110,12 +108,24 @@ public class Config
             save();
             return def;
         }
+    }
 
+    public long getLong(String key, long def)
+    {
+        if (fconfig.contains(key))
+        {
+            return fconfig.getInt(key);
+        }
+        else
+        {
+            fconfig.set(key, def);
+            save();
+            return def;
+        }
     }
 
     public boolean getBoolean(String key, boolean def)
     {
-
         if (fconfig.contains(key))
         {
             return fconfig.getBoolean(key);
@@ -126,7 +136,6 @@ public class Config
             save();
             return def;
         }
-
     }
 
     public <T extends Enum> T getEnumValue(String key, T def)
@@ -155,7 +164,6 @@ public class Config
 
     public List<String> getListString(String key, List<String> def)
     {
-
         if (fconfig.contains(key))
         {
             return fconfig.getStringList(key);
@@ -166,7 +174,6 @@ public class Config
             save();
             return def;
         }
-
     }
 
     public double getDouble(String key, double def)
@@ -200,6 +207,17 @@ public class Config
     }
 
     public void setIntAndSave(String key, int val)
+    {
+        fconfig.set(key, val);
+        save();
+    }
+    
+    public void setLong(String key, long val)
+    {
+        fconfig.set(key, val);
+    }
+
+    public void setLongAndSave(String key, long val)
     {
         fconfig.set(key, val);
         save();
