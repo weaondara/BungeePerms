@@ -90,6 +90,7 @@ public class BungeePerms
         
         logger.info("Deactivating BungeePerms ...");
         plugin.cancelTask(cleanupTaskId);
+        cleanupTaskId = -1;
         eventListener.disable();
         permissionsManager.disable();
     }
