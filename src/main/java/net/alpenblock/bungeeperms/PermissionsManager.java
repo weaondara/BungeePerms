@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.Getter;
 import lombok.Setter;
 import net.alpenblock.bungeeperms.Lang.MessageType;
@@ -43,6 +45,9 @@ public class PermissionsManager
     private List<Group> groups;
     private List<User> users;
     private int permsversion;
+    
+    private final ReadWriteLock grouplock = new ReentrantReadWriteLock();
+    private final ReadWriteLock userlock = new ReentrantReadWriteLock();
 
     public PermissionsManager(PlatformPlugin p, BPConfig conf, Debug d)
     {
@@ -103,9 +108,13 @@ public class PermissionsManager
         backEnd.load();
 
         //load all groups
+        grouplock.writeLock().lock();
         groups = backEnd.loadGroups();
+        grouplock.writeLock().unlock();
 
+        userlock.writeLock().lock();
         users = new ConcurrentList<>();
+        userlock.writeLock().unlock();
 
         //load permsversion
         permsversion = backEnd.loadVersion();
@@ -148,6 +157,9 @@ public class PermissionsManager
         {
             return;
         }
+        userlock.writeLock().lock();
+        users.clear();
+        userlock.writeLock().unlock();
         enabled = false;
     }
 
@@ -173,9 +185,9 @@ public class PermissionsManager
     public synchronized void validateUsersGroups()
     {
         //group check - remove inheritances
-        for (int i = 0; i < groups.size(); i++)
+        grouplock.readLock().lock();
+        for (Group group : groups)
         {
-            Group group = groups.get(i);
             List<String> inheritances = group.getInheritances();
             for (int j = 0; j < inheritances.size(); j++)
             {
@@ -189,6 +201,7 @@ public class PermissionsManager
         }
 
         //perms recalc and bukkit perms update
+        //do this in 2 seperate loops to keep validation clean
         for (Group g : groups)
         {
             g.recalcPerms();
@@ -196,11 +209,12 @@ public class PermissionsManager
             //send bukkit update info
             BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g, null);
         }
+        grouplock.readLock().unlock();
 
         //user check
-        for (int i = 0; i < users.size(); i++)
+        userlock.readLock().lock();
+        for (User u : users)
         {
-            User u = users.get(i);
             for (int j = 0; j < u.getGroups().size(); j++)
             {
                 if (getGroup(u.getGroups().get(j).getName()) == null)
@@ -213,6 +227,7 @@ public class PermissionsManager
         }
 
         //perms recalc and bukkit perms update
+        //do this in 2 seperate loops to keep validation clean
         for (User u : users)
         {
             u.recalcPerms();
@@ -220,12 +235,12 @@ public class PermissionsManager
             //send bukkit update info
             BungeePerms.getInstance().getNetworkNotifier().reloadUser(u, null);
         }
+        userlock.readLock().unlock();
 
         //user groups check - backEnd
         List<User> backendusers = backEnd.loadUsers();
-        for (int i = 0; i < backendusers.size(); i++)
+        for (User u : backendusers)
         {
-            User u = backendusers.get(i);
             for (int j = 0; j < u.getGroups().size(); j++)
             {
                 if (getGroup(u.getGroups().get(j).getName()) == null)
@@ -332,6 +347,7 @@ public class PermissionsManager
     {
         List<Group> ret = new ArrayList<>();
 
+        grouplock.readLock().lock();
         for (Group g : groups)
         {
             if (g.getLadder().equalsIgnoreCase(ladder))
@@ -339,6 +355,7 @@ public class PermissionsManager
                 ret.add(g);
             }
         }
+        grouplock.readLock().unlock();
 
         Collections.sort(ret);
 
@@ -354,13 +371,15 @@ public class PermissionsManager
     {
         List<String> ret = new ArrayList<>();
 
+        grouplock.readLock().lock();
         for (Group g : groups)
         {
-            if (!ret.contains(g.getLadder()))
+            if (!Statics.listContains(ret, g.getLadder()))
             {
                 ret.add(g.getLadder());
             }
         }
+        grouplock.readLock().unlock();
 
         return ret;
     }
@@ -373,6 +392,7 @@ public class PermissionsManager
     public synchronized List<Group> getDefaultGroups()
     {
         List<Group> ret = new ArrayList<>();
+        grouplock.readLock().lock();
         for (Group g : groups)
         {
             if (g.isDefault())
@@ -380,6 +400,7 @@ public class PermissionsManager
                 ret.add(g);
             }
         }
+        grouplock.readLock().unlock();
         return ret;
     }
 
@@ -396,13 +417,16 @@ public class PermissionsManager
             return null;
         }
 
+        grouplock.readLock().lock();
         for (Group g : groups)
         {
             if (g.getName().equalsIgnoreCase(groupname))
             {
+                grouplock.readLock().unlock();
                 return g;
             }
         }
+        grouplock.readLock().unlock();
         return null;
     }
 
@@ -420,21 +444,21 @@ public class PermissionsManager
         }
 
         UUID uuid = Statics.parseUUID(usernameoruuid);
-        if (config.isUseUUIDs())
+        if (config.isUseUUIDs() && uuid != null)
         {
-            if (uuid != null)
-            {
-                return getUser(uuid);
-            }
+            return getUser(uuid);
         }
 
+        userlock.readLock().lock();
         for (User u : users)
         {
             if (u.getName().equalsIgnoreCase(usernameoruuid))
             {
+                userlock.readLock().unlock();
                 return u;
             }
         }
+        userlock.readLock().unlock();
 
         //load user from database
         User u = null;
@@ -455,7 +479,9 @@ public class PermissionsManager
         }
         if (u != null)
         {
+            userlock.writeLock().lock();
             users.add(u);
+            userlock.writeLock().unlock();
             return u;
         }
 
@@ -475,19 +501,24 @@ public class PermissionsManager
             return null;
         }
 
+        userlock.readLock().lock();
         for (User u : users)
         {
             if (u.getUUID().equals(uuid))
             {
+                userlock.readLock().unlock();
                 return u;
             }
         }
+        userlock.readLock().unlock();
 
         //load user from database
         User u = backEnd.loadUser(uuid);
         if (u != null)
         {
+            userlock.writeLock().lock();
             users.add(u);
+            userlock.writeLock().unlock();
             return u;
         }
 
@@ -501,7 +532,10 @@ public class PermissionsManager
      */
     public List<Group> getGroups()
     {
-        return Collections.unmodifiableList(groups);
+        grouplock.readLock().lock();
+        List<Group> l = Collections.unmodifiableList(groups);
+        grouplock.readLock().unlock();
+        return l;
     }
 
     /**
@@ -511,7 +545,10 @@ public class PermissionsManager
      */
     public List<User> getUsers()
     {
-        return Collections.unmodifiableList(users);
+        userlock.readLock().lock();
+        List<User> l = Collections.unmodifiableList(users);
+        userlock.readLock().unlock();
+        return l;
     }
 
     /**
@@ -543,7 +580,9 @@ public class PermissionsManager
     public synchronized void deleteUser(User user)
     {
         //cache
+        userlock.writeLock().lock();
         users.remove(user);
+        userlock.writeLock().unlock();
 
         //database
         backEnd.deleteUser(user);
@@ -560,7 +599,9 @@ public class PermissionsManager
     public synchronized void deleteGroup(Group group)
     {
         //cache
+        grouplock.writeLock().lock();
         groups.remove(group);
+        grouplock.writeLock().unlock();
 
         //database
         backEnd.deleteGroup(group);
@@ -580,7 +621,9 @@ public class PermissionsManager
     public synchronized void addUser(User user)
     {
         //cache
+        userlock.writeLock().lock();
         users.add(user);
+        userlock.writeLock().unlock();
 
         //database
         backEnd.saveUser(user, true);
@@ -597,8 +640,10 @@ public class PermissionsManager
     public synchronized void addGroup(Group group)
     {
         //cache
+        grouplock.writeLock().lock();
         groups.add(group);
         Collections.sort(groups);
+        grouplock.writeLock().unlock();
 
         //database
         backEnd.saveGroup(group, true);
@@ -1472,16 +1517,22 @@ public class PermissionsManager
             debug.log("Group " + group + " not found!!!");
             return;
         }
+        grouplock.writeLock().lock();
         backEnd.reloadGroup(g);
         Collections.sort(groups);
+        grouplock.readLock().lock();
+        grouplock.writeLock().unlock();
         for (Group gr : groups)
         {
             gr.recalcPerms();
         }
+        grouplock.readLock().unlock();
+        userlock.readLock().lock();
         for (User u : users)
         {
             u.recalcPerms();
         }
+        userlock.readLock().unlock();
     }
 
     public void reloadUsers()
@@ -1495,38 +1546,52 @@ public class PermissionsManager
 
     public void reloadGroups()
     {
+        grouplock.writeLock().lock();
         for (Group g : groups)
         {
             backEnd.reloadGroup(g);
         }
         Collections.sort(groups);
+        grouplock.readLock().lock();
+        grouplock.writeLock().unlock();
         for (Group g : groups)
         {
             g.recalcPerms();
         }
+        grouplock.readLock().unlock();
+        userlock.readLock().lock();
         for (User u : users)
         {
             u.recalcPerms();
         }
+        userlock.readLock().unlock();
     }
 
     public void addUserToCache(User u)
     {
+        userlock.writeLock().lock();
         users.add(u);
+        userlock.writeLock().unlock();
     }
 
     public void removeUserFromCache(User u)
     {
+        userlock.writeLock().lock();
         users.remove(u);
+        userlock.writeLock().unlock();
     }
 
     public void addGroupToCache(Group g)
     {
+        grouplock.writeLock().lock();
         groups.add(g);
+        grouplock.writeLock().unlock();
     }
 
     public void removeGroupFromCache(Group g)
     {
+        grouplock.writeLock().lock();
         groups.remove(g);
+        grouplock.writeLock().unlock();
     }
 }
