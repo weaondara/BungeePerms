@@ -40,8 +40,8 @@ public class BPConfig
     private boolean debug;
     
     //cleanup
-    private long cleanupInterval;
-    private long cleanupThreshold;
+    private int cleanupInterval;
+    private int cleanupThreshold;
 
     public BPConfig(Config config)
     {
@@ -76,8 +76,8 @@ public class BPConfig
         terminateSuffixSpace = config.getBoolean("terminate.suffix.space", true);
         
         //cleanup
-        cleanupInterval = config.getLong("cleanup.interval", 30 * 60 * 1000);
-        cleanupThreshold = config.getLong("cleanup.threshold", 10 * 60 * 1000);
+        cleanupInterval = config.getInt("cleanup.interval", 30 * 60);
+        cleanupThreshold = config.getInt("cleanup.threshold", 10 * 60);
     }
 
     public void setUseUUIDs(boolean useUUIDs)
