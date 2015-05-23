@@ -434,7 +434,7 @@ public class Group implements Comparable<Group>
             }
         }
 
-        return suffix.isEmpty() ? suffix : suffix.substring(0, prefix.length() - 1) + ChatColor.RESET;
+        return suffix.isEmpty() ? suffix : suffix.substring(0, suffix.length() - 1) + ChatColor.RESET;
     }
 
     @Override
