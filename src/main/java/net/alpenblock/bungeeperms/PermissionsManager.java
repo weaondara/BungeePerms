@@ -479,9 +479,7 @@ public class PermissionsManager
         }
         if (u != null)
         {
-            userlock.writeLock().lock();
-            users.add(u);
-            userlock.writeLock().unlock();
+            addUserToCache(u);
             return u;
         }
 
@@ -516,9 +514,7 @@ public class PermissionsManager
         User u = backEnd.loadUser(uuid);
         if (u != null)
         {
-            userlock.writeLock().lock();
-            users.add(u);
-            userlock.writeLock().unlock();
+            addUserToCache(u);
             return u;
         }
 
@@ -580,9 +576,7 @@ public class PermissionsManager
     public synchronized void deleteUser(User user)
     {
         //cache
-        userlock.writeLock().lock();
-        users.remove(user);
-        userlock.writeLock().unlock();
+        removeUserFromCache(user);
 
         //database
         backEnd.deleteUser(user);
@@ -599,9 +593,7 @@ public class PermissionsManager
     public synchronized void deleteGroup(Group group)
     {
         //cache
-        grouplock.writeLock().lock();
-        groups.remove(group);
-        grouplock.writeLock().unlock();
+        removeGroupFromCache(group);
 
         //database
         backEnd.deleteGroup(group);
@@ -621,9 +613,7 @@ public class PermissionsManager
     public synchronized void addUser(User user)
     {
         //cache
-        userlock.writeLock().lock();
-        users.add(user);
-        userlock.writeLock().unlock();
+        addUserToCache(user);
 
         //database
         backEnd.saveUser(user, true);
