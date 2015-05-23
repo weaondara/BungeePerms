@@ -33,4 +33,8 @@ public interface PlatformPlugin
     public boolean isChatApiPresent();
     
     public MessageEncoder newMessageEncoder();
+    
+    public int registerRepeatingTask(Runnable r, long delay, long interval);
+    
+    public void cancelTask(int id);
 }

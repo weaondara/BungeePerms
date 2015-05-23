@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
@@ -203,5 +204,17 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     public MessageEncoder newMessageEncoder()
     {
         return new BungeeMessageEncoder("");
+    }
+
+    @Override
+    public int registerRepeatingTask(Runnable r, long delay, long interval)
+    {
+        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, interval, TimeUnit.MILLISECONDS).getId();
+    }
+
+    @Override
+    public void cancelTask(int id)
+    {
+        ProxyServer.getInstance().getScheduler().cancel(id);
     }
 }

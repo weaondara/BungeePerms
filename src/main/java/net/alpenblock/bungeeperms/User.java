@@ -39,6 +39,8 @@ public class User
     private String display;
     private String prefix;
     private String suffix;
+    
+    private long lastAccess;
 
     public User(String name, UUID UUID, List<Group> groups, List<String> extraPerms, Map<String, Server> servers, String display, String prefix, String suffix)
     {
@@ -56,10 +58,14 @@ public class User
         this.display = display;
         this.prefix = prefix;
         this.suffix = suffix;
+        
+        access();
     }
 
     public Server getServer(String name)
     {
+        access();
+        
         name = Statics.toLower(name);
         if (name == null)
         {
@@ -77,24 +83,32 @@ public class User
 
     public boolean hasPerm(String perm)
     {
+        access();
+        
         Sender s = getSender();
         return hasPerm(s, perm);
     }
 
     public boolean hasPermOnServer(String perm, String server)
     {
+        access();
+        
         Sender s = getSender();
         return hasPermOnServer(s, perm, server);
     }
 
     public boolean hasPermOnServerInWorld(String perm, String server, String world)
     {
+        access();
+        
         Sender s = getSender();
         return hasPermOnServerInWorld(s, perm, server, world);
     }
 
     public boolean hasPerm(Sender s, String perm)
     {
+        access();
+        
         perm = Statics.toLower(perm);
 
         //ops have every permission so *
@@ -140,6 +154,8 @@ public class User
 
     public boolean hasPermOnServer(Sender s, String perm, String server)
     {
+        access();
+        
         perm = Statics.toLower(perm);
         server = Statics.toLower(server);
 
@@ -193,6 +209,8 @@ public class User
 
     public boolean hasPermOnServerInWorld(Sender s, String perm, String server, String world)
     {
+        access();
+        
         perm = Statics.toLower(perm);
         server = Statics.toLower(server);
         world = Statics.toLower(world);
@@ -254,6 +272,8 @@ public class User
 
     public List<String> getEffectivePerms()
     {
+        access();
+        
         List<String> effperms = cachedPerms.get("global");
         if (effperms == null)
         {
@@ -266,6 +286,8 @@ public class User
 
     public List<String> getEffectivePerms(String server)
     {
+        access();
+        
         server = Statics.toLower(server);
 
         List<String> effperms = cachedPerms.get(Statics.toLower(server));
@@ -280,6 +302,8 @@ public class User
 
     public List<String> getEffectivePerms(String server, String world)
     {
+        access();
+        
         server = Statics.toLower(server);
         world = Statics.toLower(world);
 
@@ -295,6 +319,8 @@ public class User
 
     public List<String> calcEffectivePerms()
     {
+        access();
+        
         List<String> ret = new ArrayList<>();
         for (Group g : groups)
         {
@@ -310,6 +336,8 @@ public class User
 
     public List<String> calcEffectivePerms(String server)
     {
+        access();
+        
         List<String> ret = new ArrayList<>();
         for (Group g : groups)
         {
@@ -333,6 +361,8 @@ public class User
 
     public List<String> calcEffectivePerms(String server, String world)
     {
+        access();
+        
         List<String> ret = new ArrayList<>();
         for (Group g : groups)
         {
@@ -364,6 +394,8 @@ public class User
 
     public void recalcPerms()
     {
+        access();
+        
         for (Map.Entry<String, List<String>> e : cachedPerms.entrySet())
         {
             String where = e.getKey();
@@ -397,6 +429,8 @@ public class User
 
     public void recalcPerms(String server)
     {
+        access();
+        
         server = Statics.toLower(server);
 
         for (Map.Entry<String, List<String>> e : cachedPerms.entrySet())
@@ -435,6 +469,8 @@ public class User
 
     public void recalcPerms(String server, String world)
     {
+        access();
+        
         server = Statics.toLower(server);
         world = Statics.toLower(world);
 
@@ -454,6 +490,8 @@ public class User
 
     public boolean isNothingSpecial()
     {
+        access();
+        
         for (Group g : groups)
         {
             if (!g.isDefault())
@@ -480,6 +518,8 @@ public class User
 
     public Group getGroupByLadder(String ladder)
     {
+        access();
+        
         for (Group g : groups)
         {
             if (g.getLadder().equalsIgnoreCase(ladder))
@@ -492,6 +532,8 @@ public class User
 
     public List<BPPermission> getPermsWithOrigin(String server, String world)
     {
+        access();
+        
         List<BPPermission> ret = new ArrayList<>();
 
         //add groups' perms
@@ -546,6 +588,8 @@ public class User
 
     public List<String> getGroupsString()
     {
+        access();
+        
         List<String> ret = new ArrayList<>();
         for (Group g : groups)
         {
@@ -557,6 +601,8 @@ public class User
 
     public int getOwnPermissionsCount()
     {
+        access();
+        
         int count = extraPerms.size();
 
         for (Server s : servers.values())
@@ -573,6 +619,8 @@ public class User
 
     public int getPermissionsCount()
     {
+        access();
+        
         int count = getOwnPermissionsCount();
 
         for (Group g : groups)
@@ -585,18 +633,24 @@ public class User
 
     public String buildPrefix()
     {
+        access();
+        
         Sender sender = getSender();
         return buildPrefix(sender);
     }
 
     public String buildSuffix()
     {
+        access();
+        
         Sender sender = getSender();
         return buildSuffix(sender);
     }
 
     public String buildPrefix(Sender sender)
     {
+        access();
+        
         String prefix = "";
 
         List<String> prefixes = new ArrayList<>();
@@ -674,6 +728,8 @@ public class User
 
     public String buildSuffix(Sender sender)
     {
+        access();
+        
         String suffix = "";
         
         List<String> suffixes = new ArrayList<>();
@@ -762,5 +818,10 @@ public class User
         {
             BungeePerms.getLogger().info("perm check: " + name + " has " + perm + ": " + result);
         }
+    }
+    
+    private void access()
+    {
+        lastAccess = System.currentTimeMillis();
     }
 }

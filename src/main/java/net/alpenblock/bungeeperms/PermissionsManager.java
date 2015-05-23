@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.alpenblock.bungeeperms.Lang.MessageType;
@@ -47,6 +48,7 @@ public class PermissionsManager
     private int permsversion;
     
     private final ReadWriteLock grouplock = new ReentrantReadWriteLock();
+    @Getter(value = AccessLevel.PACKAGE) //for cleanup
     private final ReadWriteLock userlock = new ReentrantReadWriteLock();
 
     public PermissionsManager(PlatformPlugin p, BPConfig conf, Debug d)
@@ -1584,4 +1586,7 @@ public class PermissionsManager
         groups.remove(g);
         grouplock.writeLock().unlock();
     }
+    
+//cleanup getter
+    
 }

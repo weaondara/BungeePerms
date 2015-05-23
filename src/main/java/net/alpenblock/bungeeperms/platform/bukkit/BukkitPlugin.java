@@ -28,7 +28,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
 {
-
+    private static final double MILLI2TICK = 20F / 1000;
+    
     @Getter
     private static BukkitPlugin instance;
 
@@ -264,5 +265,17 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     public MessageEncoder newMessageEncoder()
     {
         return new BukkitMessageEncoder("");
+    }
+    
+    @Override
+    public int registerRepeatingTask(Runnable r, long delay, long interval)
+    {
+        return getServer().getScheduler().runTaskTimer(this, r, (long)(delay * MILLI2TICK), (long)(interval * MILLI2TICK)).getTaskId();
+    }
+    
+    @Override
+    public void cancelTask(int id)
+    {
+        getServer().getScheduler().cancelTask(id);
     }
 }

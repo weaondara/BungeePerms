@@ -29,6 +29,8 @@ public class BungeePerms
     private final NetworkNotifier networkNotifier;
     private final EventListener eventListener;
     private final PermissionsResolver permissionsResolver;
+    private final CleanupTask cleanupTask;
+    private int cleanupTaskId = -1;
     
     private boolean enabled;
     
@@ -55,6 +57,7 @@ public class BungeePerms
         this.networkNotifier = networkNotifier;
         this.eventListener = eventListener;
         permissionsResolver = new PermissionsResolver();
+        cleanupTask = new CleanupTask();
     }
     
     public void load()
@@ -74,6 +77,7 @@ public class BungeePerms
         logger.info("Activating BungeePerms ...");
         permissionsManager.enable();
         eventListener.enable();
+        cleanupTaskId = plugin.registerRepeatingTask(cleanupTask, 0, config.getCleanupInterval() * 1000);
     }
     
     public void disable()
@@ -85,6 +89,7 @@ public class BungeePerms
         enabled = false;
         
         logger.info("Deactivating BungeePerms ...");
+        plugin.cancelTask(cleanupTaskId);
         eventListener.disable();
         permissionsManager.disable();
     }
