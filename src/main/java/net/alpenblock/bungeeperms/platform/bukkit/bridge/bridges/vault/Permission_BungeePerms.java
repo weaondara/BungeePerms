@@ -1,9 +1,12 @@
 package net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.vault;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
@@ -297,7 +300,8 @@ public class Permission_BungeePerms extends Permission
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
         {
-            return null;
+            u =  new User(player, Bukkit.getOfflinePlayer(player).getUniqueId(), BungeePerms.getInstance().getPermissionsManager().getDefaultGroups(), new ArrayList<String>(), new HashMap<String, Server>(), "", "", "");
+            BungeePerms.getInstance().getPermissionsManager().addUserToCache(u);
         }
         Group g = BungeePerms.getInstance().getPermissionsManager().getMainGroup(u);
         return g != null ? g.getName() : null;

@@ -497,11 +497,6 @@ public class MySQL2BackEnd implements BackEnd
     {
         if (BungeePerms.getInstance().getConfig().isSaveAllUsers() ? true : !user.isNothingSpecial())
         {
-            List<String> groups = new ArrayList<>();
-            for (Group g : user.getGroups())
-            {
-                groups.add(g.getName());
-            }
             saveUserGroups(user);
             saveUserPerms(user);
             saveUserDisplay(user, null, null);
