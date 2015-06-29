@@ -2,7 +2,11 @@ package net.alpenblock.bungeeperms.uuid;
 
 import com.google.gson.Gson;
 import com.mojang.api.profiles.Profile;
-import com.mojang.api.profiles.ProfileCriteria;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import net.alpenblock.bungeeperms.Statics;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -10,10 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import net.alpenblock.bungeeperms.Statics;
 
 public class UUIDFetcher
 {
@@ -75,7 +75,7 @@ public class UUIDFetcher
             repo = new HttpProfileRepository();
         }
 
-        Profile[] profiles = repo.findProfilesByCriteria(new ProfileCriteria(player, "minecraft"));
+        Profile[] profiles = repo.findProfilesOfUsers(new String[]{player});
         for (Profile p : profiles)
         {
             UUID uuid = Statics.parseUUID(p.getId());
