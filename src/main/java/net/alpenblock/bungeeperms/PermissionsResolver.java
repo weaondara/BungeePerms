@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -149,93 +150,31 @@ public class PermissionsResolver
 
     public List<String> simplify(List<String> perms)
     {
-        if (useRegex)
-        {
-            return simplifyRegex(perms);
-        }
-        else
-        {
-            return simplifyNormal(perms);
-        }
-    }
-
-    public static List<String> simplifyNormal(List<String> perms)
-    {
         List<String> ret=new ArrayList<>();
 
         for(String perm:perms)
         {
-            boolean added=false;
+            String tocheck=perm;
+            if(tocheck.startsWith("-"))
+            {
+                tocheck=tocheck.substring(1);
+            }
+
             for(int i=0;i<ret.size();i++)
             {
-                if(ret.get(i).equalsIgnoreCase(perm))
+                String existingPermission = ret.get(i);
+                if(existingPermission.startsWith("-"))
                 {
-                    added=true;
-                    break;
+                    existingPermission = existingPermission.substring(1);
                 }
-                else if(ret.get(i).equalsIgnoreCase("-"+perm))
+                Boolean matches=has(Collections.singletonList(tocheck), existingPermission);
+
+                if(matches != null)
                 {
-                    ret.set(i,perm);
-                    added=true;
-                    break;
-                }
-                else if(perm.equalsIgnoreCase("-"+ret.get(i)))
-                {
-                    ret.remove(i);
-                    added=true;
-                    break;
+                    ret.remove(i--);
                 }
             }
-            if(!added)
-            {
-                ret.add(perm);
-            }
-        }
-
-        return ret;
-    }
-
-    public static List<String> simplifyRegex(List<String> perms)
-    {
-        List<String> ret=new ArrayList<>();
-
-        for(String perm:perms)
-        {
-            boolean added=false;
-            for(int i=0;i<ret.size();i++)
-            {
-                String tocheck=perm;
-                boolean negate=false;
-                if(tocheck.startsWith("-"))
-                {
-                    negate=true;
-                    tocheck=tocheck.substring(1);
-                }
-
-                tocheck=tocheck
-                    .replaceAll("\\.", "\\\\.")
-                    .replaceAll("\\*", "\\.\\*")
-                    .replaceAll("#", "\\.");
-
-                boolean matches=ret.get(i).matches(tocheck);
-
-                if(matches)
-                {
-                    if(negate)
-                    {
-                        ret.remove(i--);
-                    }
-                    else
-                    {
-                        ret.set(i, perm);
-                    }
-                    added=true;
-                }
-            }
-            if(!added)
-            {
-                ret.add(perm);
-            }
+            ret.add(perm);
         }
 
         return ret;
