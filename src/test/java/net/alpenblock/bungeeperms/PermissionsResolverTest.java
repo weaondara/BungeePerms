@@ -279,7 +279,6 @@ public class PermissionsResolverTest
         perms.add("-multiverse.access.vipfarm");
 
         List<String> s=resolver.simplify(perms);
-        System.out.println(s);
         assertTrue(s.size()==2);
     }
     
@@ -307,8 +306,6 @@ public class PermissionsResolverTest
 
 
         List<String> s=resolver.simplify(perms);
-        System.out.println(s);
-        System.out.println(resolver.has(perms, "chatty.join.mb"));
         assertTrue(s.size()==5);
     }
     @Test
