@@ -210,7 +210,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
             s = new BukkitSender(sender);
         }
 
-        return null;
+        return s;
     }
 
     @Override
@@ -225,7 +225,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
             s = new BukkitSender(sender);
         }
 
-        return null;
+        return s;
     }
 
     @Override
