@@ -309,7 +309,7 @@ public class PermissionsResolverTest
         List<String> s=resolver.simplify(perms);
         System.out.println(s);
         System.out.println(resolver.has(perms, "chatty.join.mb"));
-        assertTrue(s.size()==2);
+        assertTrue(s.size()==5);
     }
     @Test
     public void testSimplifyRegex1()
@@ -331,7 +331,9 @@ public class PermissionsResolverTest
         perms.add("-test.test1.*");
 
         List<String> s=regexResolver.simplify(perms);
-        assertTrue(s.isEmpty());
+        assertTrue(s.size() == 1);
+        assertFalse(regexResolver.has(s, "test.test1.test2"));
+        assertFalse(regexResolver.has(s, "test.test1.test5"));
     }
     @Test
     public void testSimplifyRegex3()
@@ -342,7 +344,8 @@ public class PermissionsResolverTest
         perms.add("-test.*");
 
         List<String> s=regexResolver.simplify(perms);
-        assertTrue(s.isEmpty());
+        assertTrue(s.size() == 1);
+        assertFalse(regexResolver.has(s, "test.test1.test2"));
     }
     @Test
     public void testSimplifyRegex4()
@@ -352,7 +355,10 @@ public class PermissionsResolverTest
         perms.add("-test.*.test2");
 
         List<String> s=regexResolver.simplify(perms);
-        assertTrue(s.isEmpty());
+        assertTrue(s.size() == 1);
+        assertFalse(regexResolver.has(s, "test.test1.test2"));
+        assertFalse(regexResolver.has(s, "test.abc.test2"));
+        assertNull(regexResolver.has(s, "test.test1.test3"));
     }
     @Test
     public void testSimplifyRegex5()
@@ -362,7 +368,10 @@ public class PermissionsResolverTest
         perms.add("-test.*.*");
 
         List<String> s=regexResolver.simplify(perms);
-        assertTrue(s.isEmpty());
+        assertTrue(s.size() == 1);
+        assertFalse(regexResolver.has(s, "test.test1.test2"));
+        assertFalse(regexResolver.has(s, "test.abc.test2"));
+        assertFalse(regexResolver.has(s, "test.test1.test3"));
     }
     @Test
     public void testSimplifyRegex6()
