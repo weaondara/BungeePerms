@@ -150,6 +150,21 @@ public class PermissionsResolver
 
     public List<String> simplify(List<String> perms)
     {
+        if(isUseRegex())
+        {
+            // Don't simplify regex perms
+            // Simplifying them is possible, but requires the program to test
+            // whether one regex is a subset of another. Such a test is possible
+            // but not provided by the java runtime library. Despite such a test
+            // would be difficult to implement and require exponential time to complete
+            return perms;
+        }
+        else {
+            return simplifyNormal(perms);
+        }
+    }
+
+    private List<String> simplifyNormal(List<String> perms) {
         List<String> ret=new ArrayList<>();
 
         for(String perm:perms)
