@@ -6,22 +6,27 @@ import java.util.Map;
 import java.util.Set;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Statics;
+import net.alpenblock.bungeeperms.User;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 
 public class Permissible extends PermissibleBase
 {
 
     private CommandSender sender;
+    private PermissionAttachment attachement;
     private Map<String, PermissionAttachmentInfo> permissions;
     private org.bukkit.permissions.Permissible oldpermissible = new PermissibleBase(null);
 
-    public Permissible(CommandSender sender)
+    public Permissible(CommandSender sender, User u)
     {
         super(sender);
         this.sender = sender;
@@ -40,6 +45,9 @@ public class Permissible extends PermissibleBase
         };
 
         Statics.setField(PermissibleBase.class, this, permissions, "permissions");
+        
+        attachement = addAttachment(BukkitPlugin.getInstance());
+        attachement.setPermission(getUserNodeName(u), true);
     }
 
     public org.bukkit.permissions.Permissible getOldPermissible()
@@ -197,5 +205,59 @@ public class Permissible extends PermissibleBase
             PermissibleBase base = (PermissibleBase) oldpermissible;
             base.clearPermissions();
         }
+    }
+
+    public void updateAttachment(User u, String server, String world)
+    {
+        Permission perm = getUserNode(u);
+        
+        perm.getChildren().clear();
+        for (String p : u.getEffectivePerms(server, world))
+        {
+            if (p.startsWith("-"))
+            {
+                perm.getChildren().put(p.substring(1), false);
+            }
+            else
+            {
+                perm.getChildren().put(p, true);
+            }
+        }
+        recalculatePermissions();
+        
+        for(PermissionAttachmentInfo pai : this.getEffectivePermissions())
+        {
+            System.out.println(pai.getPermission() + ": " + pai.getValue());
+        }
+    }
+    
+    private Permission getUserNode(User u)
+    {
+        String permname = getUserNodeName(u);
+        Permission perm = Bukkit.getPluginManager().getPermission(permname);
+        if(perm == null)
+        {
+            perm = new Permission(permname, "Internal permission for BungeePerms. DO NOT SET DIRECTLY", PermissionDefault.FALSE) 
+            {
+				@Override
+				public void recalculatePermissibles() 
+                {
+					// nothing to do here
+				}
+			};
+            Bukkit.getPluginManager().addPermission(perm);
+        }
+        
+        return perm;
+    }
+    
+    private String getUserNodeName(User u)
+    {
+        if(sender instanceof ConsoleCommandSender)
+        {
+            return "bungeeperms.user.console";
+        }
+        String id = BungeePerms.getInstance().getConfig().isUseUUIDs() ? u.getUUID().toString() : u.getName();
+        return "bungeeperms.user." + id;
     }
 }
