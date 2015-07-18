@@ -103,7 +103,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
                 BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.ADDING_DEFAULT_GROUPS, playername));
             }
 
-            pm().createTempUser(playername, uuid);
+            u = pm().createTempUser(playername, uuid);
             pm().getBackEnd().saveUser(u, true);
         }
 
