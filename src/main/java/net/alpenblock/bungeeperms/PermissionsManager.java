@@ -2,6 +2,7 @@ package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -139,11 +140,11 @@ public class PermissionsManager
         {
             if (config.isUseUUIDs())
             {
-                getUser(s.getUUID());
+                createTempUser(s.getName(), s.getUUID());
             }
             else
             {
-                getUser(s.getName());
+                createTempUser(s.getName(), null);
             }
         }
 
@@ -521,6 +522,15 @@ public class PermissionsManager
         }
 
         return null;
+    }
+    
+    public User createTempUser(String playername, UUID uuid)
+    {
+        List<Group> groups = getDefaultGroups();
+        User u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), "", "", "");
+        addUserToCache(u);
+        
+        return u;
     }
 
     /**

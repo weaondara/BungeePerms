@@ -94,10 +94,7 @@ public class BungeeEventListener implements Listener, EventListener
                 BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.ADDING_DEFAULT_GROUPS, playername));
             }
 
-            List<Group> groups = pm().getDefaultGroups();
-            u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), "", "", "");
-            pm().addUserToCache(u);
-
+            u = pm().createTempUser(playername, uuid);
             pm().getBackEnd().saveUser(u, true);
         }
     }

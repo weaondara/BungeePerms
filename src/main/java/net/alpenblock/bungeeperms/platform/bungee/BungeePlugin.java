@@ -149,7 +149,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
             s = new BungeeSender(sender);
         }
 
-        return null;
+        return s;
     }
 
     @Override
@@ -164,7 +164,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
             s = new BungeeSender(sender);
         }
 
-        return null;
+        return s;
     }
 
     @Override
