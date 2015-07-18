@@ -501,13 +501,13 @@ public class User
         }
         for (Server s : servers.values())
         {
-            if (!s.getPerms().isEmpty() || !s.getDisplay().isEmpty() || !s.getDisplay().isEmpty() || !s.getDisplay().isEmpty())
+            if (!s.getPerms().isEmpty() || !s.getDisplay().isEmpty() || !s.getPrefix().isEmpty() || !s.getSuffix().isEmpty())
             {
                 return false;
             }
             for (World w : s.getWorlds().values())
             {
-                if (!s.getPerms().isEmpty() || !w.getDisplay().isEmpty() || !w.getDisplay().isEmpty() || !w.getDisplay().isEmpty())
+                if (!s.getPerms().isEmpty() || !w.getDisplay().isEmpty() || !w.getPrefix().isEmpty() || !w.getSuffix().isEmpty())
                 {
                     return false;
                 }
