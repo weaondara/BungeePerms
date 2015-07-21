@@ -575,6 +575,17 @@ public class PermissionsResolverTest
 
         assertFalse(resolver.has(perms, perm));
     }
+    @Test
+    public void testSimplify19()
+    {
+        List<String> perms=new ArrayList<>();
+        perms.add("test.*");
+        perms.add("test.test1");
+
+        perms = resolver.simplify(perms);
+
+        assertEquals(1, perms.size());
+    }
 
     @Test
     public void testSimplifyRegex8()

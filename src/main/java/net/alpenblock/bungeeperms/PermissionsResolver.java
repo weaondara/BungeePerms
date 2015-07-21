@@ -170,11 +170,15 @@ public class PermissionsResolver
         for(String perm:perms)
         {
             String tocheck=perm;
+            boolean negative = false;
             if(tocheck.startsWith("-"))
             {
+                negative = true;
                 tocheck=tocheck.substring(1);
             }
 
+            // remove nodes which will be hidden by the one we're adding
+            boolean removedPermissions = false;
             for(int i=0;i<ret.size();i++)
             {
                 String existingPermission = ret.get(i);
@@ -186,9 +190,22 @@ public class PermissionsResolver
 
                 if(matches != null)
                 {
+                    removedPermissions = true;
                     ret.remove(i--);
                 }
             }
+
+
+            // check whether previous permission nodes already cover the permission where processing right now
+            if(!removedPermissions)
+            {
+                Boolean check = hasNormal(ret, tocheck);
+                if (check != null && check != negative)
+                {
+                    continue;
+                }
+            }
+
             ret.add(perm);
         }
 
