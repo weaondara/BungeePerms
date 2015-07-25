@@ -15,40 +15,12 @@ public class PermissionsChecker
      */
     public boolean hasPerm(String sender, String permission)
     {
-        if (!sender.equalsIgnoreCase("CONSOLE"))
+        User u = pm().getUser(sender);
+        if (u == null)
         {
-            User u = pm().getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-            return u.hasPerm(permission);
+            return false;
         }
-        return false;
-    }
-
-    /**
-     * Checks if a user (or console) has a specific permission (globally). If sender is console this function return true.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @return the result of the permission check
-     */
-    public boolean hasPermOrConsole(String sender, String permission)
-    {
-        if (sender.equalsIgnoreCase("CONSOLE"))
-        {
-            return true;
-        }
-        else
-        {
-            User u = pm().getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-            return u.hasPerm(permission);
-        }
+        return u.hasPerm(permission);
     }
 
     /**
@@ -61,53 +33,18 @@ public class PermissionsChecker
      */
     public boolean hasPermOnServer(String sender, String permission, String server)
     {
-        if (!sender.equalsIgnoreCase("CONSOLE"))
+        User u = pm().getUser(sender);
+        if (u == null)
         {
-            User u = pm().getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-
-            if (server == null)
-            {
-                return hasPerm(sender, permission);
-            }
-
-            return u.hasPermOnServer(permission, server);
+            return false;
         }
-        return false;
-    }
 
-    /**
-     * Checks if a user (or console) has a specific permission on the given server.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @param server the server for additional permissions
-     * @return the result of the permission check
-     */
-    public boolean hasPermOrConsoleOnServer(String sender, String permission, String server)
-    {
-        if (sender.equalsIgnoreCase("CONSOLE"))
+        if (server == null)
         {
-            return true;
+            return hasPerm(sender, permission);
         }
-        else
-        {
-            User u = pm().getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
 
-            if (server == null)
-            {
-                return hasPerm(sender, permission);
-            }
-
-            return u.hasPermOnServer(permission, server);
-        }
+        return u.hasPermOnServer(permission, server);
     }
 
     /**
@@ -121,64 +58,23 @@ public class PermissionsChecker
      */
     public boolean hasPermOnServerInWorld(String sender, String permission, String server, String world)
     {
-        if (!sender.equalsIgnoreCase("CONSOLE"))
+        User u = pm().getUser(sender);
+        if (u == null)
         {
-            User u = pm().getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-
-            if (server == null)
-            {
-                return hasPerm(sender, permission);
-            }
-
-            if (world == null)
-            {
-                return hasPermOnServer(sender, permission, server);
-            }
-
-            return u.hasPermOnServerInWorld(permission, server, world);
+            return false;
         }
-        return false;
-    }
 
-    /**
-     * Checks if a user (or console) has a specific permission on the given server and in the given world.
-     *
-     * @param sender the command sender to check a permission for
-     * @param permission the permission to check
-     * @param server the server for additional permissions
-     * @param world the world for additional permissions
-     * @return the result of the permission check
-     */
-    public boolean hasPermOrConsoleOnServerInWorld(String sender, String permission, String server, String world)
-    {
-        if (sender.equalsIgnoreCase("CONSOLE"))
+        if (server == null)
         {
-            return true;
+            return hasPerm(sender, permission);
         }
-        else
+
+        if (world == null)
         {
-            User u = pm().getUser(sender);
-            if (u == null)
-            {
-                return false;
-            }
-
-            if (server == null)
-            {
-                return hasPerm(sender, permission);
-            }
-
-            if (world == null)
-            {
-                return hasPermOnServer(sender, permission, server);
-            }
-
-            return u.hasPermOnServerInWorld(permission, server, world);
+            return hasPermOnServer(sender, permission, server);
         }
+
+        return u.hasPermOnServerInWorld(permission, server, world);
     }
 
 //with wrapped command senders
@@ -191,7 +87,7 @@ public class PermissionsChecker
      */
     public boolean hasPerm(Sender sender, String permission)
     {
-        if (!sender.getName().equalsIgnoreCase("CONSOLE"))
+        if (!sender.isConsole())
         {
             User u = pm().getUser(sender.getName());
             if (u == null)
@@ -212,7 +108,7 @@ public class PermissionsChecker
      */
     public boolean hasPermOrConsole(Sender sender, String permission)
     {
-        if (sender.getName().equalsIgnoreCase("CONSOLE"))
+        if (sender.isConsole())
         {
             return true;
         }
@@ -236,22 +132,18 @@ public class PermissionsChecker
      */
     public boolean hasPermOnServer(Sender sender, String permission)
     {
-        if (!sender.getName().equalsIgnoreCase("CONSOLE"))
+        User u = pm().getUser(sender.getName());
+        if (u == null)
         {
-            User u = pm().getUser(sender.getName());
-            if (u == null)
-            {
-                return false;
-            }
-
-            if (sender.getServer() == null)
-            {
-                return hasPerm(sender, permission);
-            }
-
-            return u.hasPermOnServer(sender, permission, sender.getServer());
+            return false;
         }
-        return false;
+
+        if (sender.getServer() == null)
+        {
+            return hasPerm(sender, permission);
+        }
+
+        return u.hasPermOnServer(sender, permission, sender.getServer());
     }
 
     /**
@@ -263,7 +155,7 @@ public class PermissionsChecker
      */
     public boolean hasPermOrConsoleOnServer(Sender sender, String permission)
     {
-        if (sender.getName().equalsIgnoreCase("CONSOLE"))
+        if (sender.isConsole())
         {
             return true;
         }
@@ -293,27 +185,23 @@ public class PermissionsChecker
      */
     public boolean hasPermOnServerInWorld(Sender sender, String permission)
     {
-        if (!sender.getName().equalsIgnoreCase("CONSOLE"))
+        User u = pm().getUser(sender.getName());
+        if (u == null)
         {
-            User u = pm().getUser(sender.getName());
-            if (u == null)
-            {
-                return false;
-            }
-
-            if (sender.getServer() == null)
-            {
-                return hasPerm(sender, permission);
-            }
-
-            if (sender.getWorld()== null)
-            {
-                return hasPermOnServer(sender, permission);
-            }
-
-            return u.hasPermOnServerInWorld(sender, permission, sender.getServer(), sender.getWorld());
+            return false;
         }
-        return false;
+
+        if (sender.getServer() == null)
+        {
+            return hasPerm(sender, permission);
+        }
+
+        if (sender.getWorld() == null)
+        {
+            return hasPermOnServer(sender, permission);
+        }
+
+        return u.hasPermOnServerInWorld(sender, permission, sender.getServer(), sender.getWorld());
     }
 
     /**
@@ -325,7 +213,7 @@ public class PermissionsChecker
      */
     public boolean hasPermOrConsoleOnServerInWorld(Sender sender, String permission)
     {
-        if (sender.getName().equalsIgnoreCase("CONSOLE"))
+        if (sender.isConsole())
         {
             return true;
         }

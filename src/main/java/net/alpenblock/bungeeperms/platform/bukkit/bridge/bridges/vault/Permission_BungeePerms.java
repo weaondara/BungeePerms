@@ -99,7 +99,7 @@ public class Permission_BungeePerms extends Permission
         String server = Statics.toLower(((BukkitConfig) BungeePerms.getInstance().getConfig()).getServername());
         world = Statics.toLower(world);
         permission = Statics.toLower(permission);
-        return BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(player, permission, server, world);
+        return BungeePerms.getInstance().getPermissionsChecker().hasPermOnServerInWorld(player, permission, server, world);
     }
 
     @Override
