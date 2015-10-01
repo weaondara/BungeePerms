@@ -3,12 +3,14 @@ package net.alpenblock.bungeeperms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import net.alpenblock.bungeeperms.platform.Sender;
 
 public class PermissionsResolver
 {
+    public final static Pattern PATTERN_BASIC_PERMISSION = Pattern.compile("(?:\\p{Alnum}|\\.)+");
 
     public final List<PermissionsPreProcessor> preprocessors = new ArrayList<>();
     public final List<PermissionsPostProcessor> postprocessors = new ArrayList<>();
@@ -52,7 +54,7 @@ public class PermissionsResolver
 
         return result;
     }
-    
+
     @Getter
     @Setter
     private boolean useRegex = false;
@@ -157,7 +159,7 @@ public class PermissionsResolver
             // whether one regex is a subset of another. Such a test is possible
             // but not provided by the java runtime library. Despite such a test
             // would be difficult to implement and require exponential time to complete
-            return perms;
+            return simplifyRegex(perms);
         }
         else {
             return simplifyNormal(perms);
@@ -200,6 +202,57 @@ public class PermissionsResolver
             if(!removedPermissions)
             {
                 Boolean check = hasNormal(ret, tocheck);
+                if (check != null && check != negative)
+                {
+                    continue;
+                }
+            }
+
+            ret.add(perm);
+        }
+
+        return ret;
+    }
+
+    private List<String> simplifyRegex(List<String> perms) {
+        List<String> ret=new ArrayList<>();
+
+        for(String perm:perms)
+        {
+            String tocheck=perm;
+            boolean negative = false;
+            if(tocheck.startsWith("-"))
+            {
+                negative = true;
+                tocheck=tocheck.substring(1);
+            }
+
+            // remove nodes which will be hidden by the one we're adding
+            boolean removedPermissions = false;
+            for(int i=0;i<ret.size();i++)
+            {
+                String existingPermission = ret.get(i);
+                if(existingPermission.startsWith("-"))
+                {
+                    existingPermission = existingPermission.substring(1);
+                }
+                if(PATTERN_BASIC_PERMISSION.matcher(existingPermission).matches())
+                {
+                    Boolean matches = hasRegex(Collections.singletonList(tocheck), existingPermission);
+
+                    if (matches != null)
+                    {
+                        removedPermissions = true;
+                        ret.remove(i--);
+                    }
+                }
+            }
+
+
+            // check whether previous permission nodes already cover the permission where processing right now
+            if(!removedPermissions && PATTERN_BASIC_PERMISSION.matcher(tocheck).matches())
+            {
+                Boolean check = hasRegex(ret, tocheck);
                 if (check != null && check != negative)
                 {
                     continue;
