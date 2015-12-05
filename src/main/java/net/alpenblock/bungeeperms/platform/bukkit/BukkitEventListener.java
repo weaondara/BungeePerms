@@ -22,7 +22,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissibleBase;
-import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 public class BukkitEventListener implements Listener, EventListener, PluginMessageListener
@@ -226,11 +225,6 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         Permissible perm = (Permissible) base;
         perm.updateAttachment(u, ((BukkitConfig)BungeePerms.getInstance().getConfig()).getServername(), p.getWorld() == null ? null : p.getWorld().getName());
         
-//        System.out.println(p.getEffectivePermissions().size());
-//        for(PermissionAttachmentInfo pai : p.getEffectivePermissions())
-//        {
-//            System.out.println(pai.getPermission() + ": " + pai.getValue());
-//        }
         p.recalculatePermissions();
     }
 }
