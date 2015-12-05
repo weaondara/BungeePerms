@@ -63,6 +63,12 @@ public class BungeeEventListener implements Listener, EventListener
     @EventHandler(priority = Byte.MIN_VALUE + 1)
     public void onLogin(LoginEvent e)
     {
+        //don't load if cancelled
+        if(e.isCancelled())
+        {
+            return;
+        }
+        
         String playername = e.getConnection().getName();
         UUID uuid = null;
         if (config.isUseUUIDs())
