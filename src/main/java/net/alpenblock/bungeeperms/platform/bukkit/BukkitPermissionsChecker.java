@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 public class BukkitPermissionsChecker extends PermissionsChecker
 {
 
-    private final BukkitConfig config;
-
 //without message
     /**
      * Checks if a user (no console) has a specific permission (globally).
