@@ -29,11 +29,10 @@ public class BukkitSender implements Sender
     public void sendMessage(MessageEncoder encoder)
     {
         BukkitMessageEncoder e = (BukkitMessageEncoder) encoder;
-        if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
+        if (isPlayer() && BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             BaseComponent[] converted = BukkitMessageEncoder.convert(e.create());
-//            sender.sendMessage(converted); //todo: ... make this work
-            sender.sendMessage(e.toString());
+            ((Player)sender).spigot().sendMessage(converted);
         }
         else
         {
