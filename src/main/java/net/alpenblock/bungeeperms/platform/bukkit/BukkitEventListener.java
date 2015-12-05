@@ -1,17 +1,14 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
-import java.util.ArrayList;
 import net.alpenblock.bungeeperms.BungeePerms;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
-import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.EventListener;
@@ -25,6 +22,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissibleBase;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 public class BukkitEventListener implements Listener, EventListener, PluginMessageListener
@@ -227,6 +225,12 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         
         Permissible perm = (Permissible) base;
         perm.updateAttachment(u, ((BukkitConfig)BungeePerms.getInstance().getConfig()).getServername(), p.getWorld() == null ? null : p.getWorld().getName());
-//        p.recalculatePermissions();
+        
+//        System.out.println(p.getEffectivePermissions().size());
+//        for(PermissionAttachmentInfo pai : p.getEffectivePermissions())
+//        {
+//            System.out.println(pai.getPermission() + ": " + pai.getValue());
+//        }
+        p.recalculatePermissions();
     }
 }
