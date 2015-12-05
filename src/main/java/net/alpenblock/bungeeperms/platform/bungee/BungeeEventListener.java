@@ -1,7 +1,6 @@
 package net.alpenblock.bungeeperms.platform.bungee;
 
 import net.alpenblock.bungeeperms.BungeePerms;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +9,9 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
-import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.EventListener;
-import net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -63,7 +60,7 @@ public class BungeeEventListener implements Listener, EventListener
         ProxyServer.getInstance().getPluginManager().unregisterListener(this);
     }
 
-    @EventHandler(priority = Byte.MIN_VALUE)
+    @EventHandler(priority = Byte.MIN_VALUE + 1)
     public void onLogin(LoginEvent e)
     {
         String playername = e.getConnection().getName();
