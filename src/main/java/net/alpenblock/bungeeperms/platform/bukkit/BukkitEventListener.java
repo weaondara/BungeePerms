@@ -104,6 +104,8 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             u = pm().createTempUser(playername, uuid);
             pm().getBackEnd().saveUser(u, true);
         }
+        
+        BukkitPlugin.getInstance().getNotifier().sendWorldUpdate(e.getPlayer());
 
         //inject permissible
         Permissible permissible = new Permissible(e.getPlayer(), u);

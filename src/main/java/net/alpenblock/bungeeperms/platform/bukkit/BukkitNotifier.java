@@ -76,7 +76,7 @@ public class BukkitNotifier implements NetworkNotifier
 
         sendPMAll("reloadGroup;" + g.getName(), origin);
     }
-    
+
     @Override
     public void reloadUsers(String origin)
     {
@@ -121,7 +121,7 @@ public class BukkitNotifier implements NetworkNotifier
         {
             return;
         }
-        
+
         Player p = Bukkit.getPlayer(player);
         if (p != null)
         {
@@ -136,7 +136,7 @@ public class BukkitNotifier implements NetworkNotifier
         {
             return;
         }
-        
+
         Player p = Bukkit.getPlayer(player);
         if (p != null)
         {
@@ -151,7 +151,7 @@ public class BukkitNotifier implements NetworkNotifier
         {
             return;
         }
-        
+
         Player p = Bukkit.getOnlinePlayers().iterator().hasNext() ? Bukkit.getOnlinePlayers().iterator().next() : null;
         if (p != null)
         {
@@ -167,6 +167,7 @@ public class BukkitNotifier implements NetworkNotifier
             return;
         }
 
-        p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, ("playerworldupdate;" + p.getName() + ";" + p.getWorld().getName()).getBytes());
+        String world = p.getWorld() == null ? "" : p.getWorld().getName();
+        p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, ("playerworldupdate;" + p.getName() + ";" + world).getBytes());
     }
 }
