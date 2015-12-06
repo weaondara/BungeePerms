@@ -237,6 +237,30 @@ public class Group implements Comparable<Group>
 
     public void recalcPerms()
     {
+        recalcPerms0();
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
+    }
+
+    public void recalcPerms(String server)
+    {
+        recalcPerms0(server);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
+    }
+
+    public void recalcPerms(String server, String world)
+    {
+        recalcPerms0(server, world);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
+    }
+
+    public void recalcPerms0()
+    {
         for (Map.Entry<String, List<String>> e : cachedPerms.entrySet())
         {
             String where = e.getKey();
@@ -258,12 +282,12 @@ public class Group implements Comparable<Group>
             else if (l.size() == 2)
             {
                 String world = Statics.toLower(l.get(1));
-                recalcPerms(server, world);
+                recalcPerms0(server, world);
             }
         }
     }
 
-    public void recalcPerms(String server)
+    public void recalcPerms0(String server)
     {
         for (Map.Entry<String, List<String>> e : cachedPerms.entrySet())
         {
@@ -281,13 +305,13 @@ public class Group implements Comparable<Group>
                 else if (l.size() == 2)
                 {
                     String world = Statics.toLower(l.get(1));
-                    recalcPerms(lserver, world);
+                    recalcPerms0(lserver, world);
                 }
             }
         }
     }
 
-    public void recalcPerms(String server, String world)
+    public void recalcPerms0(String server, String world)
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);

@@ -47,7 +47,7 @@ public class PermissionsManager
     private List<Group> groups;
     private List<User> users;
     private int permsversion;
-    
+
     private final ReadWriteLock grouplock = new ReentrantReadWriteLock();
     @Getter(value = AccessLevel.PACKAGE) //for cleanup
     private final ReadWriteLock userlock = new ReentrantReadWriteLock();
@@ -188,6 +188,9 @@ public class PermissionsManager
         loadPerms();
 
         enable();
+
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchReloadedEvent();
     }
 
     /**
@@ -531,13 +534,13 @@ public class PermissionsManager
 
         return null;
     }
-    
+
     public User createTempUser(String playername, UUID uuid)
     {
         List<Group> groups = getDefaultGroups();
         User u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), "", "", "");
         addUserToCache(u);
-        
+
         return u;
     }
 
@@ -603,6 +606,9 @@ public class PermissionsManager
 
         //send bukkit update infoif(useUUIDs)
         BungeePerms.getInstance().getNetworkNotifier().deleteUser(user, null);
+
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
     }
 
     /**
@@ -623,6 +629,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().deleteGroup(group, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
     }
 
     /**
@@ -640,6 +649,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
     }
 
     /**
@@ -660,6 +672,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
     }
 
     //database and permission operations
@@ -897,6 +912,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
     }
 
     /**
@@ -928,6 +946,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
     }
 
     /**
@@ -959,6 +980,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
     }
 
     /**
@@ -1216,6 +1240,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
     }
 
     /**
@@ -1235,6 +1262,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
     }
 
     /**
@@ -1254,6 +1284,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
     }
 
     /**
@@ -1272,6 +1305,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
     }
 
     /**
@@ -1303,6 +1339,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
     }
 
     /**
@@ -1334,6 +1373,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
     }
 
     /**
@@ -1365,6 +1407,9 @@ public class PermissionsManager
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
     }
 
     /**
@@ -1604,7 +1649,4 @@ public class PermissionsManager
         groups.remove(g);
         grouplock.writeLock().unlock();
     }
-    
-//cleanup getter
-    
 }

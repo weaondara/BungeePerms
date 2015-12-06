@@ -32,6 +32,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
 
     //platform dependend parts
     private BungeeEventListener listener;
+    private BungeeEventDispatcher dispatcher;
     private BungeeNotifier notifier;
     private PluginMessageSender pmsender;
 
@@ -55,10 +56,11 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
         loadcmds();
 
         listener = new BungeeEventListener(config);
+        dispatcher = new BungeeEventDispatcher();
         notifier = new BungeeNotifier(config);
         pmsender = new BungeePluginMessageSender();
 
-        bungeeperms = new BungeePerms(this, config, pmsender, notifier, listener);
+        bungeeperms = new BungeePerms(this, config, pmsender, notifier, listener, dispatcher);
         bungeeperms.load();
         bungeeperms.getPermissionsResolver().registerProcessor(new GroupProcessor());
     }
@@ -85,25 +87,25 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     private void loadcmds()
     {
         ProxyServer.getInstance().getPluginManager().registerCommand(this,
-                                                                    new Command("bungeeperms", null, "bp")
-                                                                    {
-                                                                        @Override
-                                                                        public void execute(final CommandSender sender, final String[] args)
-                                                                        {
-                                                                            final Command cmd = this;
-                                                                            ProxyServer.getInstance().getScheduler().runAsync(instance, new Runnable()
-                                                                                                                             {
-                                                                                                                                 @Override
-                                                                                                                                 public void run()
-                                                                                                                                 {
-                                                                                                                                     if (!BungeePlugin.this.onCommand(sender, cmd, "", args))
-                                                                                                                                     {
-                                                                                                                                         sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
-                                                                                                                                     }
-                                                                                                                                 }
-                                                                            });
-                                                                        }
-                                                                    });
+                                                                     new Command("bungeeperms", null, "bp")
+                                                                     {
+                                                                         @Override
+                                                                         public void execute(final CommandSender sender, final String[] args)
+                                                                         {
+                                                                             final Command cmd = this;
+                                                                             ProxyServer.getInstance().getScheduler().runAsync(instance, new Runnable()
+                                                                             {
+                                                                                 @Override
+                                                                                 public void run()
+                                                                                 {
+                                                                                     if (!BungeePlugin.this.onCommand(sender, cmd, "", args))
+                                                                                     {
+                                                                                         sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
+                                                                                     }
+                                                                                 }
+                                                                             });
+                                                                         }
+                                                                     });
     }
 
 //plugin info
@@ -199,7 +201,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
             return false;
         }
     }
-    
+
     @Override
     public MessageEncoder newMessageEncoder()
     {

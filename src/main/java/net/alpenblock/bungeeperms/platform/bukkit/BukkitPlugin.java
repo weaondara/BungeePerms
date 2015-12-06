@@ -37,6 +37,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
 
     //platform dependend parts
     private BukkitEventListener listener;
+    private BukkitEventDispatcher dispatcher;
     private BukkitNotifier notifier;
     private PluginMessageSender pmsender;
 
@@ -64,10 +65,11 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
         loadcmds();
 
         listener = new BukkitEventListener(conf);
+        dispatcher = new BukkitEventDispatcher();
         notifier = new BukkitNotifier(conf);
         pmsender = new BukkitPluginMessageSender();
 
-        bungeeperms = new BungeePerms(this, conf, pmsender, notifier, listener);
+        bungeeperms = new BungeePerms(this, conf, pmsender, notifier, listener, dispatcher);
         bungeeperms.load();
 
         //extra part
