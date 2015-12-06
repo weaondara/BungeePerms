@@ -140,11 +140,19 @@ public class PermissionsManager
         {
             if (config.isUseUUIDs())
             {
-                createTempUser(s.getName(), s.getUUID());
+                User user = getUser(s.getUUID());
+                if (user == null)
+                {
+                    createTempUser(s.getName(), s.getUUID());
+                }
             }
             else
             {
-                createTempUser(s.getName(), null);
+                User user = getUser(s.getName());
+                if (user == null)
+                {
+                    createTempUser(s.getName(), null);
+                }
             }
         }
 
