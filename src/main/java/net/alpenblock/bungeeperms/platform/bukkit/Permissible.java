@@ -26,7 +26,7 @@ public class Permissible extends PermissibleBase
     private PermissionAttachment attachment;
     private Map<String, PermissionAttachmentInfo> permissions;
     private List<PermissionAttachment> attachments;
-    private org.bukkit.permissions.Permissible oldpermissible = new PermissibleBase(null);
+    private org.bukkit.permissions.Permissible oldpermissible = null;
 
     public Permissible(CommandSender sender, User u)
     {
