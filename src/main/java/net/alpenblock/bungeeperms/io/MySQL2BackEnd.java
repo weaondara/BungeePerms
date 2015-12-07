@@ -611,9 +611,18 @@ public class MySQL2BackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
+
+        String display = user.getDisplay();
+        if (server != null)
+        {
+            display = user.getServer(server).getDisplay();
+            if (world != null)
+            {
+                display = user.getServer(server).getWorld(world).getDisplay();
+            }
+        }
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
-                         EntityType.User, "display", mkList(new ValueEntry(user.getDisplay(), server, world)), server, world);
+                         EntityType.User, "display", mkList(new ValueEntry(display, server, world)), server, world);
     }
 
     @Override
@@ -621,9 +630,18 @@ public class MySQL2BackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
+
+        String prefix = user.getPrefix();
+        if (server != null)
+        {
+            prefix = user.getServer(server).getPrefix();
+            if (world != null)
+            {
+                prefix = user.getServer(server).getWorld(world).getPrefix();
+            }
+        }
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
-                         EntityType.User, "prefix", mkList(new ValueEntry(user.getPrefix(), server, world)), server, world);
+                         EntityType.User, "prefix", mkList(new ValueEntry(prefix, server, world)), server, world);
     }
 
     @Override
@@ -631,9 +649,18 @@ public class MySQL2BackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
+
+        String suffix = user.getSuffix();
+        if (server != null)
+        {
+            suffix = user.getServer(server).getSuffix();
+            if (world != null)
+            {
+                suffix = user.getServer(server).getWorld(world).getSuffix();
+            }
+        }
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
-                         EntityType.User, "suffix", mkList(new ValueEntry(user.getSuffix(), server, world)), server, world);
+                         EntityType.User, "suffix", mkList(new ValueEntry(suffix, server, world)), server, world);
     }
 
     @Override
@@ -694,8 +721,17 @@ public class MySQL2BackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
-        adapter.saveData(group.getName(), EntityType.Group, "display", mkList(new ValueEntry(group.getDisplay(), server, world)), server, world);
+
+        String display = group.getDisplay();
+        if (server != null)
+        {
+            display = group.getServer(server).getDisplay();
+            if (world != null)
+            {
+                display = group.getServer(server).getWorld(world).getDisplay();
+            }
+        }
+        adapter.saveData(group.getName(), EntityType.Group, "display", mkList(new ValueEntry(display, server, world)), server, world);
     }
 
     @Override
@@ -703,8 +739,17 @@ public class MySQL2BackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
-        adapter.saveData(group.getName(), EntityType.Group, "prefix", mkList(new ValueEntry(group.getPrefix(), server, world)), server, world);
+
+        String prefix = group.getPrefix();
+        if (server != null)
+        {
+            prefix = group.getServer(server).getPrefix();
+            if (world != null)
+            {
+                prefix = group.getServer(server).getWorld(world).getPrefix();
+            }
+        }
+        adapter.saveData(group.getName(), EntityType.Group, "prefix", mkList(new ValueEntry(prefix, server, world)), server, world);
     }
 
     @Override
@@ -712,8 +757,17 @@ public class MySQL2BackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
-        adapter.saveData(group.getName(), EntityType.Group, "suffix", mkList(new ValueEntry(group.getSuffix(), server, world)), server, world);
+
+        String suffix = group.getSuffix();
+        if (server != null)
+        {
+            suffix = group.getServer(server).getSuffix();
+            if (world != null)
+            {
+                suffix = group.getServer(server).getWorld(world).getSuffix();
+            }
+        }
+        adapter.saveData(group.getName(), EntityType.Group, "suffix", mkList(new ValueEntry(suffix, server, world)), server, world);
     }
 
     @Override

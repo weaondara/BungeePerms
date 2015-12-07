@@ -408,8 +408,17 @@ public class YAMLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
-        permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".display", user.getDisplay());
+
+        String display = user.getDisplay();
+        if (server != null)
+        {
+            display = user.getServer(server).getDisplay();
+            if (world != null)
+            {
+                display = user.getServer(server).getWorld(world).getDisplay();
+            }
+        }
+        permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".display", display);
     }
 
     @Override
@@ -417,8 +426,17 @@ public class YAMLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
-        permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".prefix", user.getPrefix());
+
+        String prefix = user.getPrefix();
+        if (server != null)
+        {
+            prefix = user.getServer(server).getPrefix();
+            if (world != null)
+            {
+                prefix = user.getServer(server).getWorld(world).getPrefix();
+            }
+        }
+        permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".prefix", prefix);
     }
 
     @Override
@@ -426,8 +444,17 @@ public class YAMLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
-        permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".suffix", user.getSuffix());
+
+        String suffix = user.getSuffix();
+        if (server != null)
+        {
+            suffix = user.getServer(server).getSuffix();
+            if (world != null)
+            {
+                suffix = user.getServer(server).getWorld(world).getSuffix();
+            }
+        }
+        permsconf.setStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".suffix", suffix);
     }
 
     @Override
@@ -488,8 +515,17 @@ public class YAMLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
-        permsconf.setStringAndSave("groups." + group.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".display", group.getDisplay());
+
+        String display = group.getDisplay();
+        if (server != null)
+        {
+            display = group.getServer(server).getDisplay();
+            if (world != null)
+            {
+                display = group.getServer(server).getWorld(world).getDisplay();
+            }
+        }
+        permsconf.setStringAndSave("groups." + group.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".display", display);
     }
 
     @Override
@@ -497,8 +533,17 @@ public class YAMLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
-        permsconf.setStringAndSave("groups." + group.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".prefix", group.getPrefix());
+
+        String prefix = group.getPrefix();
+        if (server != null)
+        {
+            prefix = group.getServer(server).getPrefix();
+            if (world != null)
+            {
+                prefix = group.getServer(server).getWorld(world).getPrefix();
+            }
+        }
+        permsconf.setStringAndSave("groups." + group.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".prefix", prefix);
     }
 
     @Override
@@ -506,8 +551,17 @@ public class YAMLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
-        permsconf.setStringAndSave("groups." + group.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".suffix", group.getSuffix());
+
+        String suffix = group.getSuffix();
+        if (server != null)
+        {
+            suffix = group.getServer(server).getSuffix();
+            if (world != null)
+            {
+                suffix = group.getServer(server).getWorld(world).getSuffix();
+            }
+        }
+        permsconf.setStringAndSave("groups." + group.getName() + (server != null ? ".servers." + server + (world != null ? ".worlds." + world : "") : "") + ".suffix", suffix);
     }
 
     @Override
