@@ -231,7 +231,7 @@ public class Statics
     {
         return s == null ? null : s.toLowerCase();
     }
-    
+
     public static boolean isBungeeConsole(Object o)
     {
         return o.getClass().getName().equals("net.md_5.bungee.command.ConsoleCommandSender");
@@ -264,5 +264,15 @@ public class Statics
             }
         }
         return false;
+    }
+
+    public static boolean isEmpty(String s)
+    {
+        return s == null || s.isEmpty();
+    }
+
+    public static String formatDisplay(String append)
+    {
+        return isEmpty(append) ? "" : append + " ";
     }
 }

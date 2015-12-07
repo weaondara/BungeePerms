@@ -74,7 +74,7 @@ public class User
         Server s = servers.get(name);
         if (s == null)
         {
-            s = new Server(name, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            s = new Server(name, new ArrayList<String>(), new HashMap<String, World>(), null, null, null);
             servers.put(name, s);
         }
 
@@ -395,7 +395,7 @@ public class User
     public void recalcPerms()
     {
         recalcPerms0();
-        
+
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
     }
@@ -403,7 +403,7 @@ public class User
     public void recalcPerms(String server)
     {
         recalcPerms0(server);
-        
+
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
     }
@@ -411,7 +411,7 @@ public class User
     public void recalcPerms(String server, String world)
     {
         recalcPerms0(server, world);
-        
+
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
     }
@@ -682,7 +682,7 @@ public class User
         for (Group g : groups)
         {
             //global
-            if (!g.getPrefix().isEmpty())
+            if (!Statics.isEmpty(g.getPrefix()))
             {
                 prefixes.add(g.getPrefix());
             }
@@ -691,7 +691,7 @@ public class User
             Server s = g.getServer(sender != null ? sender.getServer() : null);
             if (s != null)
             {
-                if (!s.getPrefix().isEmpty())
+                if (!Statics.isEmpty(s.getPrefix()))
                 {
                     prefixes.add(s.getPrefix());
                 }
@@ -700,7 +700,7 @@ public class User
                 World w = s.getWorld(sender != null ? sender.getWorld() : null);
                 if (w != null)
                 {
-                    if (!w.getPrefix().isEmpty())
+                    if (!Statics.isEmpty(w.getPrefix()))
                     {
                         prefixes.add(w.getPrefix());
                     }
@@ -709,7 +709,7 @@ public class User
         }
 
         //global
-        if (!this.prefix.isEmpty())
+        if (!Statics.isEmpty(this.prefix))
         {
             prefixes.add(this.prefix);
         }
@@ -718,7 +718,7 @@ public class User
         Server s = getServer(sender != null ? sender.getServer() : null);
         if (s != null)
         {
-            if (!s.getPrefix().isEmpty())
+            if (!Statics.isEmpty(s.getPrefix()))
             {
                 prefixes.add(s.getPrefix());
             }
@@ -727,7 +727,7 @@ public class User
             World w = s.getWorld(sender != null ? sender.getWorld() : null);
             if (w != null)
             {
-                if (!w.getPrefix().isEmpty())
+                if (!Statics.isEmpty(w.getPrefix()))
                 {
                     prefixes.add(w.getPrefix());
                 }
@@ -761,7 +761,7 @@ public class User
         for (Group g : groups)
         {
             //global
-            if (!g.getSuffix().isEmpty())
+            if (!Statics.isEmpty(g.getSuffix()))
             {
                 suffixes.add(g.getSuffix());
             }
@@ -770,7 +770,7 @@ public class User
             Server s = g.getServer(sender != null ? sender.getServer() : null);
             if (s != null)
             {
-                if (!s.getSuffix().isEmpty())
+                if (!Statics.isEmpty(s.getSuffix()))
                 {
                     suffixes.add(s.getSuffix());
                 }
@@ -779,7 +779,7 @@ public class User
                 World w = s.getWorld(sender != null ? sender.getWorld() : null);
                 if (w != null)
                 {
-                    if (!w.getSuffix().isEmpty())
+                    if (!Statics.isEmpty(w.getSuffix()))
                     {
                         suffixes.add(w.getSuffix());
                     }
@@ -788,7 +788,7 @@ public class User
         }
 
         //global
-        if (!this.suffix.isEmpty())
+        if (!Statics.isEmpty(this.suffix))
         {
             suffixes.add(this.suffix);
         }
@@ -797,7 +797,7 @@ public class User
         Server s = getServer(sender != null ? sender.getServer() : null);
         if (s != null)
         {
-            if (!s.getSuffix().isEmpty())
+            if (!Statics.isEmpty(s.getSuffix()))
             {
                 suffixes.add(s.getSuffix());
             }
@@ -806,7 +806,7 @@ public class User
             World w = s.getWorld(sender != null ? sender.getWorld() : null);
             if (w != null)
             {
-                if (!w.getSuffix().isEmpty())
+                if (!Statics.isEmpty(w.getSuffix()))
                 {
                     suffixes.add(w.getSuffix());
                 }

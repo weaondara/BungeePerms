@@ -197,6 +197,10 @@ public class MysqlPermsAdapter2
     {
         for (ValueEntry val : values)
         {
+            if (val.getValue() == null)
+            {
+                continue;
+            }
             String insq = "INSERT INTO `" + table + "` (`name`,`type`,`key`,`value`,`server`,`world`) VALUES"
                     + "('" + Mysql.escape(name) + "'," + type.getCode() + ",'" + Mysql.escape(key) + "','" + Mysql.escape(val.getValue()) + "',";
             if (val.getServer() == null)

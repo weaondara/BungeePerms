@@ -33,7 +33,7 @@ public class Server
         World w = worlds.get(Statics.toLower(name));
         if (w == null)
         {
-            w = new World(Statics.toLower(name), new ArrayList<String>(), "", "", "");
+            w = new World(Statics.toLower(name), new ArrayList<String>(), null, null, null);
             worlds.put(Statics.toLower(name), w);
         }
 

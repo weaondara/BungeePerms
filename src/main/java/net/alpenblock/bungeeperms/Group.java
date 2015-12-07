@@ -8,8 +8,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import net.alpenblock.bungeeperms.platform.Sender;
-import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 
 @Getter
 @Setter
@@ -60,7 +58,7 @@ public class Group implements Comparable<Group>
         Server s = servers.get(name);
         if (s == null)
         {
-            s = new Server(name, new ArrayList<String>(), new HashMap<String, World>(), "", "", "");
+            s = new Server(name, new ArrayList<String>(), new HashMap<String, World>(), null, null, null);
             servers.put(name, s);
         }
 
@@ -238,7 +236,7 @@ public class Group implements Comparable<Group>
     public void recalcPerms()
     {
         recalcPerms0();
-        
+
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
     }
@@ -246,7 +244,7 @@ public class Group implements Comparable<Group>
     public void recalcPerms(String server)
     {
         recalcPerms0(server);
-        
+
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
     }
@@ -254,7 +252,7 @@ public class Group implements Comparable<Group>
     public void recalcPerms(String server, String world)
     {
         recalcPerms0(server, world);
-        
+
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
     }
@@ -416,24 +414,24 @@ public class Group implements Comparable<Group>
     public String buildPrefix(String server, String world)
     {
         String prefix = "";
-
+        
         //global
-        prefix += this.prefix + (this.prefix.isEmpty() ? "" : " ");
+        prefix += Statics.formatDisplay(this.prefix);
 
         //server
         Server s = getServer(server);
         if (s != null)
         {
-            prefix += s.getPrefix() + (s.getPrefix().isEmpty() ? "" : " ");
+            prefix += Statics.formatDisplay(s.getPrefix());
 
             //world
             World w = s.getWorld(world);
             if (w != null)
             {
-                prefix += w.getPrefix() + (w.getPrefix().isEmpty() ? "" : " ");
+                prefix += Statics.formatDisplay(w.getPrefix());
             }
         }
-
+        
         return prefix.isEmpty() ? prefix : prefix.substring(0, prefix.length() - 1) + ChatColor.RESET;
     }
 
@@ -442,19 +440,19 @@ public class Group implements Comparable<Group>
         String suffix = "";
 
         //global
-        suffix += this.suffix + (this.suffix.isEmpty() ? "" : " ");
+        suffix += Statics.formatDisplay(this.suffix);
 
         //server
         Server s = getServer(server);
         if (s != null)
         {
-            suffix += s.getSuffix() + (s.getSuffix().isEmpty() ? "" : " ");
+            suffix += Statics.formatDisplay(s.getSuffix());
 
             //world
             World w = s.getWorld(world);
             if (w != null)
             {
-                suffix += w.getSuffix() + (w.getSuffix().isEmpty() ? "" : " ");
+                suffix += Statics.formatDisplay(w.getSuffix());
             }
         }
 

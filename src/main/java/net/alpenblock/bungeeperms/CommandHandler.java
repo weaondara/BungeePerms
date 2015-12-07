@@ -410,13 +410,13 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.USER_ALL_PERMISSIONS_COUNT, user.getPermissionsCount()));
 
         //display
-        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (user.getDisplay().length() > 0 ? user.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (!Statics.isEmpty(user.getDisplay()) ? user.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //prefix
-        sender.sendMessage(Lang.translate(MessageType.PREFIX, (user.getPrefix().length() > 0 ? user.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translate(MessageType.PREFIX, (!Statics.isEmpty(user.getPrefix()) ? user.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //suffix
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (user.getSuffix().length() > 0 ? user.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (!Statics.isEmpty(user.getSuffix()) ? user.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
 
@@ -795,7 +795,7 @@ public class CommandHandler
         }
 
         String player = Statics.getFullPlayerName(args[1]);
-        String display = args.length > 3 ? args[3] : "";
+        String display = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
         String world = args.length > 5 ? args[5].toLowerCase() : null;
         User user = pm().getUser(player);
@@ -822,7 +822,7 @@ public class CommandHandler
         }
 
         String player = Statics.getFullPlayerName(args[1]);
-        String prefix = args.length > 3 ? args[3] : "";
+        String prefix = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
         String world = args.length > 5 ? args[5].toLowerCase() : null;
         User user = pm().getUser(player);
@@ -849,7 +849,7 @@ public class CommandHandler
         }
 
         String player = Statics.getFullPlayerName(args[1]);
-        String suffix = args.length > 3 ? args[3] : "";
+        String suffix = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
         String world = args.length > 5 ? args[5].toLowerCase() : null;
         User user = pm().getUser(player);
@@ -1155,7 +1155,7 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-        Group group = new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String, Server>(), 1000, 1000, "default", false, "", "", "");
+        Group group = new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String, Server>(), 1000, 1000, "default", false, null, null, null);
         pm().addGroup(group);
         sender.sendMessage(Lang.translate(MessageType.GROUP_CREATED, groupname));
         return true;
@@ -1657,7 +1657,7 @@ public class CommandHandler
         }
 
         String groupname = args[1];
-        String display = args.length > 3 ? args[3] : "";
+        String display = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
         String world = args.length > 5 ? args[5].toLowerCase() : null;
         Group group = pm().getGroup(groupname);
@@ -1684,7 +1684,7 @@ public class CommandHandler
         }
 
         String groupname = args[1];
-        String prefix = args.length > 3 ? args[3] : "";
+        String prefix = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
         String world = args.length > 5 ? args[5].toLowerCase() : null;
         Group group = pm().getGroup(groupname);
@@ -1711,7 +1711,7 @@ public class CommandHandler
         }
 
         String groupname = args[1];
-        String suffix = args.length > 3 ? args[3] : "";
+        String suffix = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
         String world = args.length > 5 ? args[5].toLowerCase() : null;
         Group group = pm().getGroup(groupname);

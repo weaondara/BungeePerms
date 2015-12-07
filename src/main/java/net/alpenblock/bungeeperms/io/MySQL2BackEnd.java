@@ -103,9 +103,9 @@ public class MySQL2BackEnd implements BackEnd
         int rank = getFirstValue(mpe.getData("rank"), 1000);
         int weight = getFirstValue(mpe.getData("weight"), 1000);
         String ladder = getFirstValue(mpe.getData("ladder"), "default");
-        String display = getFirstValue(mpe.getData("display"), "");
-        String prefix = getFirstValue(mpe.getData("prefix"), "");
-        String suffix = getFirstValue(mpe.getData("suffix"), "");
+        String display = getFirstValue(mpe.getData("display"), null);
+        String prefix = getFirstValue(mpe.getData("prefix"), null);
+        String suffix = getFirstValue(mpe.getData("suffix"), null);
 
         //perms
         List<ValueEntry> permdata = mpe.getData("permissions");
@@ -175,29 +175,29 @@ public class MySQL2BackEnd implements BackEnd
                     }
                 }
 
-                World w = new World(Statics.toLower(world), worldperms, "", "", "");
+                World w = new World(Statics.toLower(world), worldperms, null, null, null);
                 worlds.put(Statics.toLower(world), w);
             }
 
-            Server s = new Server(Statics.toLower(server), serverperms, worlds, "", "", "");
+            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
             servers.put(Statics.toLower(server), s);
         }
 
         // display props for servers and worlds
         for (Map.Entry<String, Server> server : servers.entrySet())
         {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), "");
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), "");
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), "");
+            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
+            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
+            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
             server.getValue().setDisplay(sdisplay);
             server.getValue().setPrefix(sprefix);
             server.getValue().setSuffix(ssuffix);
 
             for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
             {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), "");
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), "");
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), "");
+                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
+                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
+                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
                 world.getValue().setDisplay(wdisplay);
                 world.getValue().setPrefix(wprefix);
                 world.getValue().setSuffix(wsuffix);
@@ -218,9 +218,9 @@ public class MySQL2BackEnd implements BackEnd
         }
 
         List<String> sgroups = getValue(mpe.getData("groups"));
-        String display = getFirstValue(mpe.getData("display"), "");
-        String prefix = getFirstValue(mpe.getData("prefix"), "");
-        String suffix = getFirstValue(mpe.getData("suffix"), "");
+        String display = getFirstValue(mpe.getData("display"), null);
+        String prefix = getFirstValue(mpe.getData("prefix"), null);
+        String suffix = getFirstValue(mpe.getData("suffix"), null);
 
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
@@ -300,29 +300,29 @@ public class MySQL2BackEnd implements BackEnd
                     }
                 }
 
-                World w = new World(Statics.toLower(world), worldperms, "", "", "");
+                World w = new World(Statics.toLower(world), worldperms, null, null, null);
                 worlds.put(Statics.toLower(world), w);
             }
 
-            Server s = new Server(Statics.toLower(server), serverperms, worlds, "", "", "");
+            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
             servers.put(Statics.toLower(server), s);
         }
 
         // display props for servers and worlds
         for (Map.Entry<String, Server> server : servers.entrySet())
         {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), "");
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), "");
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), "");
+            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
+            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
+            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
             server.getValue().setDisplay(sdisplay);
             server.getValue().setPrefix(sprefix);
             server.getValue().setSuffix(ssuffix);
 
             for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
             {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), "");
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), "");
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), "");
+                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
+                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
+                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
                 world.getValue().setDisplay(wdisplay);
                 world.getValue().setPrefix(wprefix);
                 world.getValue().setSuffix(wsuffix);
@@ -344,9 +344,9 @@ public class MySQL2BackEnd implements BackEnd
         }
 
         List<String> sgroups = getValue(mpe.getData("groups"));
-        String display = getFirstValue(mpe.getData("display"), "");
-        String prefix = getFirstValue(mpe.getData("prefix"), "");
-        String suffix = getFirstValue(mpe.getData("suffix"), "");
+        String display = getFirstValue(mpe.getData("display"), null);
+        String prefix = getFirstValue(mpe.getData("prefix"), null);
+        String suffix = getFirstValue(mpe.getData("suffix"), null);
 
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
@@ -426,29 +426,29 @@ public class MySQL2BackEnd implements BackEnd
                     }
                 }
 
-                World w = new World(Statics.toLower(world), worldperms, "", "", "");
+                World w = new World(Statics.toLower(world), worldperms, null, null, null);
                 worlds.put(Statics.toLower(world), w);
             }
 
-            Server s = new Server(Statics.toLower(server), serverperms, worlds, "", "", "");
+            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
             servers.put(Statics.toLower(server), s);
         }
 
         // display props for servers and worlds
         for (Map.Entry<String, Server> server : servers.entrySet())
         {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), "");
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), "");
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), "");
+            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
+            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
+            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
             server.getValue().setDisplay(sdisplay);
             server.getValue().setPrefix(sprefix);
             server.getValue().setSuffix(ssuffix);
 
             for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
             {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), "");
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), "");
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), "");
+                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
+                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
+                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
                 world.getValue().setDisplay(wdisplay);
                 world.getValue().setPrefix(wprefix);
                 world.getValue().setSuffix(wsuffix);
@@ -896,9 +896,9 @@ public class MySQL2BackEnd implements BackEnd
         int rank = getFirstValue(mpe.getData("rank"), 1000);
         int weight = getFirstValue(mpe.getData("weight"), 1000);
         String ladder = getFirstValue(mpe.getData("ladder"), "default");
-        String display = getFirstValue(mpe.getData("display"), "");
-        String prefix = getFirstValue(mpe.getData("prefix"), "");
-        String suffix = getFirstValue(mpe.getData("suffix"), "");
+        String display = getFirstValue(mpe.getData("display"), null);
+        String prefix = getFirstValue(mpe.getData("prefix"), null);
+        String suffix = getFirstValue(mpe.getData("suffix"), null);
 
         //perms
         List<ValueEntry> permdata = mpe.getData("permissions");
@@ -979,18 +979,18 @@ public class MySQL2BackEnd implements BackEnd
         // display props for servers and worlds
         for (Map.Entry<String, Server> server : servers.entrySet())
         {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), "");
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), "");
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), "");
+            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
+            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
+            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
             server.getValue().setDisplay(sdisplay);
             server.getValue().setPrefix(sprefix);
             server.getValue().setSuffix(ssuffix);
 
             for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
             {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), "");
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), "");
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), "");
+                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
+                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
+                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
                 world.getValue().setDisplay(wdisplay);
                 world.getValue().setPrefix(wprefix);
                 world.getValue().setSuffix(wsuffix);
@@ -1015,9 +1015,9 @@ public class MySQL2BackEnd implements BackEnd
         MysqlPermEntity mpe = adapter.getUser(config.isUseUUIDs() ? user.getUUID().toString() : user.getName());
 
         List<String> sgroups = getValue(mpe.getData("groups"));
-        String display = getFirstValue(mpe.getData("display"), "");
-        String prefix = getFirstValue(mpe.getData("prefix"), "");
-        String suffix = getFirstValue(mpe.getData("suffix"), "");
+        String display = getFirstValue(mpe.getData("display"), null);
+        String prefix = getFirstValue(mpe.getData("prefix"), null);
+        String suffix = getFirstValue(mpe.getData("suffix"), null);
 
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
@@ -1108,18 +1108,18 @@ public class MySQL2BackEnd implements BackEnd
         // display props for servers and worlds
         for (Map.Entry<String, Server> server : servers.entrySet())
         {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), "");
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), "");
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), "");
+            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
+            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
+            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
             server.getValue().setDisplay(sdisplay);
             server.getValue().setPrefix(sprefix);
             server.getValue().setSuffix(ssuffix);
 
             for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
             {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), "");
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), "");
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), "");
+                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
+                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
+                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
                 world.getValue().setDisplay(wdisplay);
                 world.getValue().setPrefix(wprefix);
                 world.getValue().setSuffix(wsuffix);
