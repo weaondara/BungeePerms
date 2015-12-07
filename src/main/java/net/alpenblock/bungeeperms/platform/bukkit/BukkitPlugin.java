@@ -28,8 +28,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
 {
+
     private static final double MILLI2TICK = 20F / 1000;
-    
+
     @Getter
     private static BukkitPlugin instance;
 
@@ -133,17 +134,25 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
             public boolean execute(final CommandSender sender, final String alias, final String[] args)
             {
                 final Command cmd = this;
-                Bukkit.getScheduler().runTaskAsynchronously(instance, new Runnable()
-                                                    {
-                                                        @Override
-                                                        public void run()
-                                                        {
-                                                            if (!BukkitPlugin.this.onCommand(sender, cmd, alias, args))
-                                                            {
-                                                                sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
-                                                            }
-                                                        }
-                });
+                Runnable r = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if (!BukkitPlugin.this.onCommand(sender, cmd, alias, args))
+                        {
+                            sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
+                        }
+                    }
+                };
+                if (conf.isAsyncCommands())
+                {
+                    Bukkit.getScheduler().runTaskAsynchronously(instance, r);
+                }
+                else
+                {
+                    r.run();
+                }
                 return true;
             }
         };
@@ -268,13 +277,13 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         return new BukkitMessageEncoder("");
     }
-    
+
     @Override
     public int registerRepeatingTask(Runnable r, long delay, long interval)
     {
-        return getServer().getScheduler().runTaskTimer(this, r, (long)(delay * MILLI2TICK), (long)(interval * MILLI2TICK)).getTaskId();
+        return getServer().getScheduler().runTaskTimer(this, r, (long) (delay * MILLI2TICK), (long) (interval * MILLI2TICK)).getTaskId();
     }
-    
+
     @Override
     public void cancelTask(int id)
     {

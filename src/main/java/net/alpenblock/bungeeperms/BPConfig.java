@@ -42,6 +42,9 @@ public class BPConfig
     //cleanup
     private int cleanupInterval;
     private int cleanupThreshold;
+    
+    //other
+    private boolean asyncCommands;
 
     public BPConfig(Config config)
     {
@@ -78,6 +81,9 @@ public class BPConfig
         //cleanup
         cleanupInterval = config.getInt("cleanup.interval", 30 * 60);
         cleanupThreshold = config.getInt("cleanup.threshold", 10 * 60);
+        
+        //other
+        asyncCommands = config.getBoolean("async-commands", true);
     }
 
     public void setUseUUIDs(boolean useUUIDs)
