@@ -538,7 +538,7 @@ public class PermissionsManager
     public User createTempUser(String playername, UUID uuid)
     {
         List<Group> groups = getDefaultGroups();
-        User u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), "", "", "");
+        User u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), null, null, null);
         addUserToCache(u);
 
         return u;
