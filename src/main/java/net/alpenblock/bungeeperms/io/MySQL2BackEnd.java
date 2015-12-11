@@ -11,6 +11,8 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Mysql;
+import net.alpenblock.bungeeperms.PermEntity;
+import net.alpenblock.bungeeperms.Permable;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
@@ -103,108 +105,12 @@ public class MySQL2BackEnd implements BackEnd
         int rank = getFirstValue(mpe.getData("rank"), 1000);
         int weight = getFirstValue(mpe.getData("weight"), 1000);
         String ladder = getFirstValue(mpe.getData("ladder"), "default");
-        String display = getFirstValue(mpe.getData("display"), null);
-        String prefix = getFirstValue(mpe.getData("prefix"), null);
-        String suffix = getFirstValue(mpe.getData("suffix"), null);
+        
+        Group g = new Group(mpe.getName(), inheritances, new ArrayList<String>(), new HashMap<String, Server>(), rank, weight, ladder, isdefault, null, null, null);
+        loadServerWorlds(mpe, g);
 
-        //perms
-        List<ValueEntry> permdata = mpe.getData("permissions");
-        if (permdata == null)
-        {
-            permdata = new ArrayList<>();
-        }
-        List<String> globalperms = new ArrayList<>();
-        List<String> foundservers = new ArrayList<>();
-
-        //globalperms
-        for (ValueEntry e : permdata)
-        {
-            //check for servers 
-            if (e.getServer() != null)
-            {
-                if (!foundservers.contains(Statics.toLower(e.getServer())))
-                {
-                    foundservers.add(Statics.toLower(e.getServer()));
-                }
-            }
-
-            //is global perm
-            else
-            {
-                globalperms.add(Statics.toLower(e.getValue()));
-            }
-        }
-
-        //server perms
-        Map<String, Server> servers = new HashMap<>();
-        for (String server : foundservers)
-        {
-            List<String> serverperms = new ArrayList<>();
-            List<String> foundworlds = new ArrayList<>();
-            for (ValueEntry e : permdata)
-            {
-                if (e.getServer() != null && e.getServer().equalsIgnoreCase(server))
-                {
-                    //check for worlds 
-                    if (e.getWorld() != null)
-                    {
-                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
-                        {
-                            foundworlds.add(Statics.toLower(e.getWorld()));
-                        }
-                    }
-
-                    //is server perm
-                    else
-                    {
-                        serverperms.add(Statics.toLower(e.getValue()));
-                    }
-                }
-            }
-
-            //world perms
-            Map<String, World> worlds = new HashMap<>();
-            for (String world : foundworlds)
-            {
-                List<String> worldperms = new ArrayList<>();
-                for (ValueEntry e : permdata)
-                {
-                    if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
-                    {
-                        worldperms.add(Statics.toLower(e.getValue()));
-                    }
-                }
-
-                World w = new World(Statics.toLower(world), worldperms, null, null, null);
-                worlds.put(Statics.toLower(world), w);
-            }
-
-            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
-            servers.put(Statics.toLower(server), s);
-        }
-
-        // display props for servers and worlds
-        for (Map.Entry<String, Server> server : servers.entrySet())
-        {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
-            server.getValue().setDisplay(sdisplay);
-            server.getValue().setPrefix(sprefix);
-            server.getValue().setSuffix(ssuffix);
-
-            for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
-            {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
-                world.getValue().setDisplay(wdisplay);
-                world.getValue().setPrefix(wprefix);
-                world.getValue().setSuffix(wsuffix);
-            }
-        }
-
-        Group g = new Group(mpe.getName(), inheritances, globalperms, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
+        //todo fix loading ... also with users ... same bug there
+        
         return g;
     }
 
@@ -217,11 +123,8 @@ public class MySQL2BackEnd implements BackEnd
             return null;
         }
 
+        //groups
         List<String> sgroups = getValue(mpe.getData("groups"));
-        String display = getFirstValue(mpe.getData("display"), null);
-        String prefix = getFirstValue(mpe.getData("prefix"), null);
-        String suffix = getFirstValue(mpe.getData("suffix"), null);
-
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
         {
@@ -231,106 +134,11 @@ public class MySQL2BackEnd implements BackEnd
                 lgroups.add(g);
             }
         }
-
-        //perms
-        List<ValueEntry> permdata = mpe.getData("permissions");
-        if (permdata == null)
-        {
-            permdata = new ArrayList<>();
-        }
-        List<String> globalperms = new ArrayList<>();
-        List<String> foundservers = new ArrayList<>();
-
-        //globalperms
-        for (ValueEntry e : permdata)
-        {
-            //check for servers 
-            if (e.getServer() != null)
-            {
-                if (!foundservers.contains(Statics.toLower(e.getServer())))
-                {
-                    foundservers.add(Statics.toLower(e.getServer()));
-                }
-            }
-
-            //is global perm
-            else
-            {
-                globalperms.add(Statics.toLower(e.getValue()));
-            }
-        }
-
-        //server perms
-        Map<String, Server> servers = new HashMap<>();
-        for (String server : foundservers)
-        {
-            List<String> serverperms = new ArrayList<>();
-            List<String> foundworlds = new ArrayList<>();
-            for (ValueEntry e : permdata)
-            {
-                if (e.getServer() != null && e.getServer().equalsIgnoreCase(server))
-                {
-                    //check for worlds 
-                    if (e.getWorld() != null)
-                    {
-                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
-                        {
-                            foundworlds.add(Statics.toLower(e.getWorld()));
-                        }
-                    }
-
-                    //is server perm
-                    else
-                    {
-                        serverperms.add(Statics.toLower(e.getValue()));
-                    }
-                }
-            }
-
-            //world perms
-            Map<String, World> worlds = new HashMap<>();
-            for (String world : foundworlds)
-            {
-                List<String> worldperms = new ArrayList<>();
-                for (ValueEntry e : permdata)
-                {
-                    if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
-                    {
-                        worldperms.add(Statics.toLower(e.getValue()));
-                    }
-                }
-
-                World w = new World(Statics.toLower(world), worldperms, null, null, null);
-                worlds.put(Statics.toLower(world), w);
-            }
-
-            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
-            servers.put(Statics.toLower(server), s);
-        }
-
-        // display props for servers and worlds
-        for (Map.Entry<String, Server> server : servers.entrySet())
-        {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
-            server.getValue().setDisplay(sdisplay);
-            server.getValue().setPrefix(sprefix);
-            server.getValue().setSuffix(ssuffix);
-
-            for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
-            {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
-                world.getValue().setDisplay(wdisplay);
-                world.getValue().setPrefix(wprefix);
-                world.getValue().setSuffix(wsuffix);
-            }
-        }
-
+        
         UUID uuid = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(mpe.getName());
-        User u = new User(mpe.getName(), uuid, lgroups, globalperms, servers, display, prefix, suffix);
+        User u = new User(mpe.getName(), uuid, lgroups, new ArrayList<String>(), new HashMap<String, Server>(), null, null, null);
+        loadServerWorlds(mpe, u);
+
         return u;
     }
 
@@ -343,11 +151,8 @@ public class MySQL2BackEnd implements BackEnd
             return null;
         }
 
+        //groups
         List<String> sgroups = getValue(mpe.getData("groups"));
-        String display = getFirstValue(mpe.getData("display"), null);
-        String prefix = getFirstValue(mpe.getData("prefix"), null);
-        String suffix = getFirstValue(mpe.getData("suffix"), null);
-
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
         {
@@ -358,105 +163,10 @@ public class MySQL2BackEnd implements BackEnd
             }
         }
 
-        //perms
-        List<ValueEntry> permdata = mpe.getData("permissions");
-        if (permdata == null)
-        {
-            permdata = new ArrayList<>();
-        }
-        List<String> globalperms = new ArrayList<>();
-        List<String> foundservers = new ArrayList<>();
-
-        //globalperms
-        for (ValueEntry e : permdata)
-        {
-            //check for servers 
-            if (e.getServer() != null)
-            {
-                if (!foundservers.contains(Statics.toLower(e.getServer())))
-                {
-                    foundservers.add(Statics.toLower(e.getServer()));
-                }
-            }
-
-            //is global perm
-            else
-            {
-                globalperms.add(Statics.toLower(e.getValue()));
-            }
-        }
-
-        //server perms
-        Map<String, Server> servers = new HashMap<>();
-        for (String server : foundservers)
-        {
-            List<String> serverperms = new ArrayList<>();
-            List<String> foundworlds = new ArrayList<>();
-            for (ValueEntry e : permdata)
-            {
-                if (e.getServer() != null && e.getServer().equalsIgnoreCase(server))
-                {
-                    //check for worlds 
-                    if (e.getWorld() != null)
-                    {
-                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
-                        {
-                            foundworlds.add(Statics.toLower(e.getWorld()));
-                        }
-                    }
-
-                    //is server perm
-                    else
-                    {
-                        serverperms.add(Statics.toLower(e.getValue()));
-                    }
-                }
-            }
-
-            //world perms
-            Map<String, World> worlds = new HashMap<>();
-            for (String world : foundworlds)
-            {
-                List<String> worldperms = new ArrayList<>();
-                for (ValueEntry e : permdata)
-                {
-                    if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
-                    {
-                        worldperms.add(Statics.toLower(e.getValue()));
-                    }
-                }
-
-                World w = new World(Statics.toLower(world), worldperms, null, null, null);
-                worlds.put(Statics.toLower(world), w);
-            }
-
-            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
-            servers.put(Statics.toLower(server), s);
-        }
-
-        // display props for servers and worlds
-        for (Map.Entry<String, Server> server : servers.entrySet())
-        {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
-            server.getValue().setDisplay(sdisplay);
-            server.getValue().setPrefix(sprefix);
-            server.getValue().setSuffix(ssuffix);
-
-            for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
-            {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
-                world.getValue().setDisplay(wdisplay);
-                world.getValue().setPrefix(wprefix);
-                world.getValue().setSuffix(wsuffix);
-            }
-        }
-
         String username = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
-        User u = new User(username, user, lgroups, globalperms, servers, display, prefix, suffix);
+        User u = new User(username, user, lgroups, new ArrayList<String>(), new HashMap<String, Server>(), null, null, null);
+        loadServerWorlds(mpe, u);
+        
         return u;
     }
 
@@ -600,7 +310,7 @@ public class MySQL2BackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
+
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
                          EntityType.User, "permissions",
                          mkValueList(user.getServer(server).getWorld(world).getPerms(), server, world), server, world);
@@ -682,7 +392,7 @@ public class MySQL2BackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
+
         adapter.saveData(group.getName(), EntityType.Group, "permissions", mkValueList(group.getServer(server).getWorld(world).getPerms(), server, world), server, world);
     }
 
@@ -824,6 +534,61 @@ public class MySQL2BackEnd implements BackEnd
         adapter.clearTable(table);
         load();
     }
+    
+     @Override
+    public void reloadGroup(Group group)
+    {
+        MysqlPermEntity mpe = adapter.getGroup(group.getName());
+        List<String> inheritances = getValue(mpe.getData("inheritances"));
+        boolean isdefault = getFirstValue(mpe.getData("default"), false);
+        int rank = getFirstValue(mpe.getData("rank"), 1000);
+        int weight = getFirstValue(mpe.getData("weight"), 1000);
+        String ladder = getFirstValue(mpe.getData("ladder"), "default");
+
+        //set
+        group.setInheritances(inheritances);
+        group.setIsdefault(isdefault);
+        group.setRank(rank);
+        group.setWeight(weight);
+        group.setLadder(ladder);
+        
+        //reset & load
+        group.setPerms(new ArrayList<String>());
+        group.setServers(new HashMap<String, Server>());
+        group.setDisplay(null);
+        group.setPrefix(null);
+        group.setSuffix(null);
+        loadServerWorlds(mpe, group);
+    }
+
+    @Override
+    public void reloadUser(User user)
+    {
+        MysqlPermEntity mpe = adapter.getUser(config.isUseUUIDs() ? user.getUUID().toString() : user.getName());
+
+        //groups
+        List<String> sgroups = getValue(mpe.getData("groups"));
+        List<Group> lgroups = new ArrayList<>();
+        for (String s : sgroups)
+        {
+            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
+            if (g != null)
+            {
+                lgroups.add(g);
+            }
+        }
+
+        //set
+        user.setGroups(lgroups);
+
+        //reset & load
+        user.setExtraPerms(new ArrayList<String>());
+        user.setServers(new HashMap<String, Server>());
+        user.setDisplay(null);
+        user.setPrefix(null);
+        user.setSuffix(null);
+        loadServerWorlds(mpe, user);
+    }
 
     //helper functions
     private List<String> getValue(List<ValueEntry> values)
@@ -840,7 +605,24 @@ public class MySQL2BackEnd implements BackEnd
 
         return ret;
     }
+    
+    //todo rename
+    private static List<String> getValues1(List<ValueEntry> values)
+    {
+        if (values == null)
+        {
+            return new ArrayList<>();
+        }
+        List<String> ret = new ArrayList<>();
+        for (ValueEntry e : values)
+        {
+            ret.add(e.getValue());
+        }
 
+        return ret;
+    }
+
+    //todo forward call
     private String getFirstValue(List<ValueEntry> values, String def)
     {
         if (values == null || values.isEmpty())
@@ -857,7 +639,7 @@ public class MySQL2BackEnd implements BackEnd
         return def;
     }
 
-    private String getFirstValue(List<ValueEntry> values, String server, String def)
+    private static String getFirstValue1(List<ValueEntry> values, String server, String world, String def)
     {
         if (values == null || values.isEmpty())
         {
@@ -865,23 +647,11 @@ public class MySQL2BackEnd implements BackEnd
         }
         for (ValueEntry e : values)
         {
-            if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() == null)
-            {
-                return e.getValue();
-            }
-        }
-        return def;
-    }
-
-    private String getFirstValue(List<ValueEntry> values, String server, String world, String def)
-    {
-        if (values == null || values.isEmpty())
-        {
-            return def;
-        }
-        for (ValueEntry e : values)
-        {
-            if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
+            //servers == null || (servers match && (worlds == null || worlds match))
+            if ((server == null && e.getServer() == null)
+                    || (server != null && e.getServer() != null && e.getServer().equalsIgnoreCase(server)
+                    && ((world == null && e.getWorld() == null)
+                    || (world != null && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world)))))
             {
                 return e.getValue();
             }
@@ -941,250 +711,106 @@ public class MySQL2BackEnd implements BackEnd
         return l;
     }
 
-    @Override
-    public void reloadGroup(Group group)
+    static void loadServerWorlds(MysqlPermEntity mpe, PermEntity p)
     {
-        MysqlPermEntity mpe = adapter.getGroup(group.getName());
-        List<String> inheritances = getValue(mpe.getData("inheritances"));
-        boolean isdefault = getFirstValue(mpe.getData("default"), false);
-        int rank = getFirstValue(mpe.getData("rank"), 1000);
-        int weight = getFirstValue(mpe.getData("weight"), 1000);
-        String ladder = getFirstValue(mpe.getData("ladder"), "default");
-        String display = getFirstValue(mpe.getData("display"), null);
-        String prefix = getFirstValue(mpe.getData("prefix"), null);
-        String suffix = getFirstValue(mpe.getData("suffix"), null);
+        Map<String, Map<String, Map<String, List<ValueEntry>>>> map = mapServerWorlds(mpe, "permissions", "prefix", "suffix", "display");
 
-        //perms
-        List<ValueEntry> permdata = mpe.getData("permissions");
-        if (permdata == null)
+        //transfer
+        for (Map.Entry<String, Map<String, Map<String, List<ValueEntry>>>> keylvl : map.entrySet())
         {
-            permdata = new ArrayList<>();
-        }
-        List<String> globalperms = new ArrayList<>();
-        List<String> foundservers = new ArrayList<>();
-
-        //globalperms
-        for (ValueEntry e : permdata)
-        {
-            //check for servers 
-            if (e.getServer() != null)
+            for (Map.Entry<String, Map<String, List<ValueEntry>>> serverlvl : keylvl.getValue().entrySet())
             {
-                if (!foundservers.contains(Statics.toLower(e.getServer())))
+                for (Map.Entry<String, List<ValueEntry>> worldlvl : serverlvl.getValue().entrySet())
                 {
-                    foundservers.add(Statics.toLower(e.getServer()));
-                }
-            }
-
-            //is global perm
-            else
-            {
-                globalperms.add(Statics.toLower(e.getValue()));
-            }
-        }
-
-        //server perms
-        Map<String, Server> servers = new HashMap<>();
-        for (String server : foundservers)
-        {
-            List<String> serverperms = new ArrayList<>();
-            List<String> foundworlds = new ArrayList<>();
-            for (ValueEntry e : permdata)
-            {
-                if (e.getServer() != null && e.getServer().equalsIgnoreCase(server))
-                {
-                    //check for worlds 
-                    if (e.getWorld() != null)
+                    Permable permable = (Permable) p;
+                    Server s = null;
+                    World w = null;
+                    if (serverlvl.getKey() != null)
                     {
-                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
-                        {
-                            foundworlds.add(Statics.toLower(e.getWorld()));
-                        }
+                        s = p.getServer(serverlvl.getKey());
+                        permable = s;
+                    }
+                    if (worldlvl.getKey() != null)
+                    {
+                        w = s.getWorld(worldlvl.getKey());
+                        permable = w;
                     }
 
-                    //is server perm
-                    else
+                    switch (keylvl.getKey())
                     {
-                        serverperms.add(Statics.toLower(e.getValue()));
+                        case "permissions":
+                            permable.setPerms(getValues1(worldlvl.getValue()));
+                            break;
+                        case "prefix":
+                            permable.setPrefix(getFirstValue1(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
+                            break;
+                        case "suffix":
+                            permable.setSuffix(getFirstValue1(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
+                            break;
+                        case "display":
+                            permable.setDisplay(getFirstValue1(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
-
-            //world perms
-            Map<String, World> worlds = new HashMap<>();
-            for (String world : foundworlds)
-            {
-                List<String> worldperms = new ArrayList<>();
-                for (ValueEntry e : permdata)
-                {
-                    if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
-                    {
-                        worldperms.add(Statics.toLower(e.getValue()));
-                    }
-                }
-
-                World w = new World(Statics.toLower(world), worldperms, null, null, null);
-                worlds.put(Statics.toLower(world), w);
-            }
-
-            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
-            servers.put(Statics.toLower(server), s);
         }
-
-        // display props for servers and worlds
-        for (Map.Entry<String, Server> server : servers.entrySet())
-        {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
-            server.getValue().setDisplay(sdisplay);
-            server.getValue().setPrefix(sprefix);
-            server.getValue().setSuffix(ssuffix);
-
-            for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
-            {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
-                world.getValue().setDisplay(wdisplay);
-                world.getValue().setPrefix(wprefix);
-                world.getValue().setSuffix(wsuffix);
-            }
-        }
-
-        group.setInheritances(inheritances);
-        group.setPerms(globalperms);
-        group.setIsdefault(isdefault);
-        group.setRank(rank);
-        group.setWeight(weight);
-        group.setLadder(ladder);
-        group.setDisplay(display);
-        group.setPrefix(prefix);
-        group.setSuffix(suffix);
-        group.setServers(servers);
     }
 
-    @Override
-    public void reloadUser(User user)
+    //todo write test
+    //map<key, map<server, map<world, list<values>>>>
+    static Map<String, Map<String, Map<String, List<ValueEntry>>>> mapServerWorlds(MysqlPermEntity mpe, String... keys)
     {
-        MysqlPermEntity mpe = adapter.getUser(config.isUseUUIDs() ? user.getUUID().toString() : user.getName());
+        Map<String, Map<String, Map<String, List<ValueEntry>>>> map = new HashMap();
 
-        List<String> sgroups = getValue(mpe.getData("groups"));
-        String display = getFirstValue(mpe.getData("display"), null);
-        String prefix = getFirstValue(mpe.getData("prefix"), null);
-        String suffix = getFirstValue(mpe.getData("suffix"), null);
-
-        List<Group> lgroups = new ArrayList<>();
-        for (String s : sgroups)
+        for (String key : keys)
         {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
-            if (g != null)
+            //create key
+            //map<server, map<world, list<values>>>
+            Map<String, Map<String, List<ValueEntry>>> servermap = new HashMap();
+            map.put(key, servermap);
+
+            //parse servers and worlds
+            List<ValueEntry> data = mpe.getData(key);
+            if(data == null)
             {
-                lgroups.add(g);
+                data = new ArrayList();
             }
-        }
-
-        //perms
-        List<ValueEntry> permdata = mpe.getData("permissions");
-        if (permdata == null)
-        {
-            permdata = new ArrayList<>();
-        }
-        List<String> globalperms = new ArrayList<>();
-        List<String> foundservers = new ArrayList<>();
-
-        //globalperms
-        for (ValueEntry e : permdata)
-        {
-            //check for servers 
-            if (e.getServer() != null)
+            for (ValueEntry d : data)
             {
-                if (!foundservers.contains(Statics.toLower(e.getServer())))
+                String server = Statics.toLower(d.getServer());
+                String world = server == null ? null : Statics.toLower(d.getWorld()); //check just for safety
+
+                //get right maps/lists
+                //map<world, list<values>>
+                Map<String, List<ValueEntry>> worldmap;
+                //list<values>
+                List<ValueEntry> valuelist;
+                if (servermap.containsKey(server))
                 {
-                    foundservers.add(Statics.toLower(e.getServer()));
+                    worldmap = servermap.get(server);
                 }
-            }
-
-            //is global perm
-            else
-            {
-                globalperms.add(Statics.toLower(e.getValue()));
-            }
-        }
-
-        //server perms
-        Map<String, Server> servers = new HashMap<>();
-        for (String server : foundservers)
-        {
-            List<String> serverperms = new ArrayList<>();
-            List<String> foundworlds = new ArrayList<>();
-            for (ValueEntry e : permdata)
-            {
-                if (e.getServer() != null && e.getServer().equalsIgnoreCase(server))
+                else
                 {
-                    //check for worlds 
-                    if (e.getWorld() != null)
-                    {
-                        if (!foundworlds.contains(Statics.toLower(e.getWorld())))
-                        {
-                            foundworlds.add(Statics.toLower(e.getWorld()));
-                        }
-                    }
-
-                    //is server perm
-                    else
-                    {
-                        serverperms.add(Statics.toLower(e.getValue()));
-                    }
+                    worldmap = new HashMap();
+                    servermap.put(server, worldmap);
                 }
-            }
-
-            //world perms
-            Map<String, World> worlds = new HashMap<>();
-            for (String world : foundworlds)
-            {
-                List<String> worldperms = new ArrayList<>();
-                for (ValueEntry e : permdata)
+                if (worldmap.containsKey(world))
                 {
-                    if (e.getServer() != null && e.getServer().equalsIgnoreCase(server) && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world))
-                    {
-                        worldperms.add(e.getValue());
-                    }
+                    valuelist = worldmap.get(world);
+                }
+                else
+                {
+                    valuelist = new ArrayList();
+                    worldmap.put(world, valuelist);
                 }
 
-                World w = new World(Statics.toLower(world), worldperms, null, null, null);
-                worlds.put(Statics.toLower(world), w);
-            }
-
-            Server s = new Server(Statics.toLower(server), serverperms, worlds, null, null, null);
-            servers.put(Statics.toLower(server), s);
-        }
-
-        // display props for servers and worlds
-        for (Map.Entry<String, Server> server : servers.entrySet())
-        {
-            String sdisplay = getFirstValue(mpe.getData("display"), server.getKey(), null);
-            String sprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), null);
-            String ssuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), null);
-            server.getValue().setDisplay(sdisplay);
-            server.getValue().setPrefix(sprefix);
-            server.getValue().setSuffix(ssuffix);
-
-            for (Map.Entry<String, World> world : server.getValue().getWorlds().entrySet())
-            {
-                String wdisplay = getFirstValue(mpe.getData("display"), server.getKey(), world.getKey(), null);
-                String wprefix = getFirstValue(mpe.getData("prefix"), server.getKey(), world.getKey(), null);
-                String wsuffix = getFirstValue(mpe.getData("suffix"), server.getKey(), world.getKey(), null);
-                world.getValue().setDisplay(wdisplay);
-                world.getValue().setPrefix(wprefix);
-                world.getValue().setSuffix(wsuffix);
+                //addvalue
+                valuelist.add(d);
             }
         }
 
-        user.setGroups(lgroups);
-        user.setExtraPerms(globalperms);
-        user.setDisplay(display);
-        user.setPrefix(prefix);
-        user.setSuffix(suffix);
-        user.setServers(servers);
+        return map;
     }
 }

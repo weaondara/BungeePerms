@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Group implements Comparable<Group>
+public class Group implements Comparable<Group>, PermEntity
 {
 
     @Getter(value = AccessLevel.PRIVATE)
@@ -48,6 +48,7 @@ public class Group implements Comparable<Group>
         cachedPerms = new HashMap<>();
     }
 
+    @Override
     public Server getServer(String name)
     {
         name = Statics.toLower(name);

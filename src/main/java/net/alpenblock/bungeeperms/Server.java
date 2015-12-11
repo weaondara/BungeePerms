@@ -14,7 +14,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Server
+public class Server implements Permable
 {
 
     private String server;

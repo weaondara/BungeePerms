@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.Mysql;
 
 @Getter
+@AllArgsConstructor
 public class MysqlPermEntity
 {
 

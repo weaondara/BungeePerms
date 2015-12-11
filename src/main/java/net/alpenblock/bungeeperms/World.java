@@ -12,7 +12,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode
-public class World
+public class World implements Permable
 {
 
     private String world;

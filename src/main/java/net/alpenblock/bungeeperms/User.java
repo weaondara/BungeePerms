@@ -14,7 +14,7 @@ import net.alpenblock.bungeeperms.platform.Sender;
 @Getter
 @Setter
 @ToString
-public class User
+public class User implements PermEntity
 {
 
     @Getter(value = AccessLevel.PRIVATE)
@@ -33,7 +33,7 @@ public class User
     private String name;
     private UUID UUID;
     private List<Group> groups;
-    private List<String> extraPerms;
+    private List<String> perms;
     private Map<String, Server> servers;
 
     private String display;
@@ -52,7 +52,7 @@ public class User
         this.name = name;
         this.UUID = UUID;
         this.groups = groups;
-        this.extraPerms = extraPerms;
+        this.perms = extraPerms;
         this.servers = servers;
 
         this.display = display;
@@ -62,6 +62,7 @@ public class User
         access();
     }
 
+    @Override
     public Server getServer(String name)
     {
         access();
@@ -327,7 +328,7 @@ public class User
             List<String> gperms = g.getEffectivePerms();
             ret.addAll(gperms);
         }
-        ret.addAll(extraPerms);
+        ret.addAll(perms);
 
         ret = BungeePerms.getInstance().getPermissionsResolver().simplify(ret);
 
@@ -344,7 +345,7 @@ public class User
             List<String> gperms = g.getEffectivePerms(server);
             ret.addAll(gperms);
         }
-        ret.addAll(extraPerms);
+        ret.addAll(perms);
 
         //per server perms
         Server srv = getServer(server);
@@ -370,7 +371,7 @@ public class User
             ret.addAll(gperms);
         }
 
-        ret.addAll(extraPerms);
+        ret.addAll(perms);
 
         //per server perms
         Server srv = getServer(server);
@@ -537,7 +538,7 @@ public class User
                 }
             }
         }
-        return extraPerms.isEmpty() && display.isEmpty() && prefix.isEmpty() && suffix.isEmpty();
+        return perms.isEmpty() && display.isEmpty() && prefix.isEmpty() && suffix.isEmpty();
     }
 
     public Group getGroupByLadder(String ladder)
@@ -566,7 +567,7 @@ public class User
             ret.addAll(g.getPermsWithOrigin(server, world));
         }
 
-        for (String s : extraPerms)
+        for (String s : perms)
         {
             BPPermission perm = new BPPermission(s, name, false, null, null);
             ret.add(perm);
@@ -627,7 +628,7 @@ public class User
     {
         access();
 
-        int count = extraPerms.size();
+        int count = perms.size();
 
         for (Server s : servers.values())
         {
@@ -847,5 +848,17 @@ public class User
     private void access()
     {
         lastAccess = System.currentTimeMillis();
+    }
+
+    @Deprecated
+    public List<String> getExtraPerms() //todo: remove
+    {
+        return perms;
+    }
+
+    @Deprecated
+    public void setExtraPerms(List<String> perms) //todo: remove
+    {
+        this.perms = perms;
     }
 }
