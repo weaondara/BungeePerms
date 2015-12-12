@@ -100,17 +100,15 @@ public class MySQL2BackEnd implements BackEnd
             return null;
         }
 
-        List<String> inheritances = getValue(mpe.getData("inheritances"));
+        List<String> inheritances = getValues(mpe.getData("inheritances"));
         boolean isdefault = getFirstValue(mpe.getData("default"), false);
         int rank = getFirstValue(mpe.getData("rank"), 1000);
         int weight = getFirstValue(mpe.getData("weight"), 1000);
-        String ladder = getFirstValue(mpe.getData("ladder"), "default");
-        
+        String ladder = getFirstValue(mpe.getData("ladder"), null, null, "default");
+
         Group g = new Group(mpe.getName(), inheritances, new ArrayList<String>(), new HashMap<String, Server>(), rank, weight, ladder, isdefault, null, null, null);
         loadServerWorlds(mpe, g);
 
-        //todo fix loading ... also with users ... same bug there
-        
         return g;
     }
 
@@ -124,7 +122,7 @@ public class MySQL2BackEnd implements BackEnd
         }
 
         //groups
-        List<String> sgroups = getValue(mpe.getData("groups"));
+        List<String> sgroups = getValues(mpe.getData("groups"));
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
         {
@@ -134,7 +132,7 @@ public class MySQL2BackEnd implements BackEnd
                 lgroups.add(g);
             }
         }
-        
+
         UUID uuid = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(mpe.getName());
         User u = new User(mpe.getName(), uuid, lgroups, new ArrayList<String>(), new HashMap<String, Server>(), null, null, null);
         loadServerWorlds(mpe, u);
@@ -152,7 +150,7 @@ public class MySQL2BackEnd implements BackEnd
         }
 
         //groups
-        List<String> sgroups = getValue(mpe.getData("groups"));
+        List<String> sgroups = getValues(mpe.getData("groups"));
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
         {
@@ -166,7 +164,7 @@ public class MySQL2BackEnd implements BackEnd
         String username = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
         User u = new User(username, user, lgroups, new ArrayList<String>(), new HashMap<String, Server>(), null, null, null);
         loadServerWorlds(mpe, u);
-        
+
         return u;
     }
 
@@ -292,17 +290,14 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveUserPerms(User user)
     {
-        adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(), EntityType.User, "permissions", mkValueList(user.getExtraPerms(), null, null), null, null);
+        saveUserPerms(user, null, null);
     }
 
     @Override
     public synchronized void saveUserPerServerPerms(User user, String server)
     {
         server = Statics.toLower(server);
-
-        adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
-                         EntityType.User, "permissions",
-                         mkValueList(user.getServer(server).getPerms(), server, null), server, null);
+        saveUserPerms(user, server, null);
     }
 
     @Override
@@ -310,10 +305,27 @@ public class MySQL2BackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
+        saveUserPerms(user, server, world);
+    }
+
+    public synchronized void saveUserPerms(User user, String server, String world)
+    {
+        server = Statics.toLower(server);
+        world = Statics.toLower(world);
+
+        List<String> perms = user.getPerms();
+        if (server != null)
+        {
+            perms = user.getServer(server).getPerms();
+            if (world != null)
+            {
+                perms = user.getServer(server).getWorld(world).getPerms();
+            }
+        }
 
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
                          EntityType.User, "permissions",
-                         mkValueList(user.getServer(server).getWorld(world).getPerms(), server, world), server, world);
+                         mkValueList(perms, server, world), server, world);
     }
 
     @Override
@@ -534,16 +546,16 @@ public class MySQL2BackEnd implements BackEnd
         adapter.clearTable(table);
         load();
     }
-    
-     @Override
+
+    @Override
     public void reloadGroup(Group group)
     {
         MysqlPermEntity mpe = adapter.getGroup(group.getName());
-        List<String> inheritances = getValue(mpe.getData("inheritances"));
+        List<String> inheritances = getValues(mpe.getData("inheritances"));
         boolean isdefault = getFirstValue(mpe.getData("default"), false);
         int rank = getFirstValue(mpe.getData("rank"), 1000);
         int weight = getFirstValue(mpe.getData("weight"), 1000);
-        String ladder = getFirstValue(mpe.getData("ladder"), "default");
+        String ladder = getFirstValue(mpe.getData("ladder"), null, null, "default");
 
         //set
         group.setInheritances(inheritances);
@@ -551,7 +563,7 @@ public class MySQL2BackEnd implements BackEnd
         group.setRank(rank);
         group.setWeight(weight);
         group.setLadder(ladder);
-        
+
         //reset & load
         group.setPerms(new ArrayList<String>());
         group.setServers(new HashMap<String, Server>());
@@ -567,7 +579,7 @@ public class MySQL2BackEnd implements BackEnd
         MysqlPermEntity mpe = adapter.getUser(config.isUseUUIDs() ? user.getUUID().toString() : user.getName());
 
         //groups
-        List<String> sgroups = getValue(mpe.getData("groups"));
+        List<String> sgroups = getValues(mpe.getData("groups"));
         List<Group> lgroups = new ArrayList<>();
         for (String s : sgroups)
         {
@@ -591,23 +603,7 @@ public class MySQL2BackEnd implements BackEnd
     }
 
     //helper functions
-    private List<String> getValue(List<ValueEntry> values)
-    {
-        if (values == null)
-        {
-            return new ArrayList<>();
-        }
-        List<String> ret = new ArrayList<>();
-        for (ValueEntry e : values)
-        {
-            ret.add(e.getValue());
-        }
-
-        return ret;
-    }
-    
-    //todo rename
-    private static List<String> getValues1(List<ValueEntry> values)
+    private static List<String> getValues(List<ValueEntry> values)
     {
         if (values == null)
         {
@@ -622,24 +618,7 @@ public class MySQL2BackEnd implements BackEnd
         return ret;
     }
 
-    //todo forward call
-    private String getFirstValue(List<ValueEntry> values, String def)
-    {
-        if (values == null || values.isEmpty())
-        {
-            return def;
-        }
-        for (ValueEntry e : values)
-        {
-            if (e.getServer() == null && e.getWorld() == null)
-            {
-                return e.getValue();
-            }
-        }
-        return def;
-    }
-
-    private static String getFirstValue1(List<ValueEntry> values, String server, String world, String def)
+    private static String getFirstValue(List<ValueEntry> values, String server, String world, String def)
     {
         if (values == null || values.isEmpty())
         {
@@ -739,16 +718,16 @@ public class MySQL2BackEnd implements BackEnd
                     switch (keylvl.getKey())
                     {
                         case "permissions":
-                            permable.setPerms(getValues1(worldlvl.getValue()));
+                            permable.setPerms(getValues(worldlvl.getValue()));
                             break;
                         case "prefix":
-                            permable.setPrefix(getFirstValue1(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
+                            permable.setPrefix(getFirstValue(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
                             break;
                         case "suffix":
-                            permable.setSuffix(getFirstValue1(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
+                            permable.setSuffix(getFirstValue(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
                             break;
                         case "display":
-                            permable.setDisplay(getFirstValue1(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
+                            permable.setDisplay(getFirstValue(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
                             break;
                         default:
                             break;
@@ -758,7 +737,6 @@ public class MySQL2BackEnd implements BackEnd
         }
     }
 
-    //todo write test
     //map<key, map<server, map<world, list<values>>>>
     static Map<String, Map<String, Map<String, List<ValueEntry>>>> mapServerWorlds(MysqlPermEntity mpe, String... keys)
     {
@@ -773,7 +751,7 @@ public class MySQL2BackEnd implements BackEnd
 
             //parse servers and worlds
             List<ValueEntry> data = mpe.getData(key);
-            if(data == null)
+            if (data == null)
             {
                 data = new ArrayList();
             }
