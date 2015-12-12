@@ -19,6 +19,7 @@ import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PermissionCheckEvent;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.TabCompleteEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -136,6 +137,13 @@ public class BungeeEventListener implements Listener, EventListener
                 }
             }
         }
+    }
+    
+    @EventHandler
+    public void onServerConnected(ServerConnectedEvent e)
+    {
+        //plugin messages will arrive later because plugin channels are not registered at this very moment
+        playerWorlds.put(e.getPlayer().getName(), null);
     }
 
     @EventHandler
