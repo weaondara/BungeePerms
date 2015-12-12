@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
@@ -161,6 +162,17 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             return;
         }
         updateAttachment(p, e.getUser());
+    }
+
+    @EventHandler
+    public void onPluginChannelRegister(PlayerRegisterChannelEvent e)
+    {
+        if (!e.getChannel().equals(BungeePerms.CHANNEL))
+        {
+            return;
+        }
+        
+        BukkitPlugin.getInstance().getNotifier().sendWorldUpdate(e.getPlayer());
     }
 
     @Override
