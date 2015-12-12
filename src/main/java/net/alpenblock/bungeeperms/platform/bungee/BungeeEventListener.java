@@ -139,7 +139,7 @@ public class BungeeEventListener implements Listener, EventListener
         }
     }
     
-    @EventHandler
+    @EventHandler(priority = Byte.MIN_VALUE)
     public void onServerConnected(ServerConnectedEvent e)
     {
         //plugin messages will arrive later because plugin channels are not registered at this very moment
