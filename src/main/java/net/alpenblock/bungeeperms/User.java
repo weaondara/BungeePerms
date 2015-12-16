@@ -544,7 +544,7 @@ public class User implements PermEntity
                 }
             }
         }
-        return perms.isEmpty() && display.isEmpty() && prefix.isEmpty() && suffix.isEmpty();
+        return perms.isEmpty() && Statics.isEmpty(display) && Statics.isEmpty(prefix) && Statics.isEmpty(suffix);
     }
 
     public Group getGroupByLadder(String ladder)
