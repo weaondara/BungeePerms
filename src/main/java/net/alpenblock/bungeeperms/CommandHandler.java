@@ -1079,13 +1079,13 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.GROUP_DEFAULT, formatBool(group.isDefault())));
 
         //display
-        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (group.getDisplay().length() > 0 ? group.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (!Statics.isEmpty(group.getDisplay()) ? group.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //prefix
-        sender.sendMessage(Lang.translate(MessageType.PREFIX, (group.getPrefix().length() > 0 ? group.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translate(MessageType.PREFIX, (!Statics.isEmpty(group.getPrefix()) ? group.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //suffix
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (group.getSuffix().length() > 0 ? group.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (!Statics.isEmpty(group.getSuffix()) ? group.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
 
