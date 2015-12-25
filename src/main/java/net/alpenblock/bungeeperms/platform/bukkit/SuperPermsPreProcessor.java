@@ -1,12 +1,17 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.PermissionsPreProcessor;
 import net.alpenblock.bungeeperms.platform.Sender;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class SuperPermsPreProcessor implements PermissionsPreProcessor
 {
@@ -20,27 +25,65 @@ public class SuperPermsPreProcessor implements PermissionsPreProcessor
             return perms;
         }
 
+        if (s != null)
+        {
+            perms.addAll(0, getSuperPerms(s));
+        }
+
         //expand permissions
+        expandChildPerms(perms);
+
+        return perms;
+    }
+
+    private List<String> getSuperPerms(Sender s)
+    {
+        BukkitSender bs = (BukkitSender) s;
+        CommandSender sender = bs.getSender();
+        if (!(sender instanceof Player))
+        {
+            return new ArrayList();
+        }
+
+        Player p = (Player) sender;
+        PermissibleBase base = Injector.getPermissible(p);
+        if (!(base instanceof Permissible))
+        {
+            return new ArrayList();
+        }
+
+        Permissible perm = (Permissible) base;
+        List<String> l = new ArrayList(perm.getEffectiveSuperPerms().size());
+        for (PermissionAttachmentInfo e : perm.getEffectiveSuperPerms())
+        {
+            l.add((e.getValue() ? "" : "-") + e.getPermission().toLowerCase());
+        }
+        return l;
+    }
+
+    private List<String> expandChildPerms(List<String> perms)
+    {
         for (int i = 0; i < perms.size(); i++)
         {
-            //add all child perms
+            //get perm info
             String perm = perms.get(i);
             boolean neg = perm.startsWith("-");
             perm = neg ? perm.substring(1) : perm;
 
+            //check perm
             Permission p = Bukkit.getPluginManager().getPermission(perm);
             if (p == null || p.getChildren().isEmpty())
             {
                 continue;
             }
-            
+
+            //add all children
+            List<String> l = new ArrayList();
             for (Map.Entry<String, Boolean> e : p.getChildren().entrySet())
             {
-                if (e.getValue())
-                {
-                    perms.add(++i, (neg ? "-" : "") + e.getKey());
-                }
+                l.add((e.getValue() ? "" : "-") + e.getKey().toLowerCase());
             }
+            perms.addAll(i + 1, l);
         }
 
         return perms;

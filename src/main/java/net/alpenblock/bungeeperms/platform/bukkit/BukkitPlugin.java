@@ -78,8 +78,6 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
         bridge.load();
         bungeeperms.getPermissionsResolver().registerProcessor(new GroupProcessor());
         bungeeperms.getPermissionsResolver().registerProcessor(new SuperPermsPreProcessor());
-        bungeeperms.getPermissionsResolver().registerProcessor(new OpProcessor());
-        bungeeperms.getPermissionsResolver().registerProcessor(new SuperPermsPostProcessor());
     }
 
     @Override

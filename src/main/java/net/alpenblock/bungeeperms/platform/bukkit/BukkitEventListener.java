@@ -52,9 +52,8 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         Bukkit.getPluginManager().registerEvents(this, BukkitPlugin.getInstance());
 
         //inject into console // seems to be best place here
-        Permissible permissible = new Permissible(Bukkit.getConsoleSender(), null);
-        org.bukkit.permissions.Permissible oldpermissible = Injector.inject(Bukkit.getConsoleSender(), permissible);
-        permissible.setOldPermissible(oldpermissible);
+        Permissible permissible = new Permissible(Bukkit.getConsoleSender(), null, Injector.getPermissible(Bukkit.getConsoleSender()));
+        Injector.inject(Bukkit.getConsoleSender(), permissible);
     }
 
     @Override
@@ -110,9 +109,8 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         BukkitPlugin.getInstance().getNotifier().sendWorldUpdate(e.getPlayer());
 
         //inject permissible
-        Permissible permissible = new Permissible(e.getPlayer(), u);
-        org.bukkit.permissions.Permissible oldpermissible = Injector.inject(e.getPlayer(), permissible);
-        permissible.setOldPermissible(oldpermissible);
+        Permissible permissible = new Permissible(e.getPlayer(), u, Injector.getPermissible(e.getPlayer()));
+        Injector.inject(e.getPlayer(), permissible);
 
         updateAttachment(e.getPlayer(), u);
     }

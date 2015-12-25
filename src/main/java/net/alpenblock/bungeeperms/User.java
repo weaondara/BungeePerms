@@ -112,14 +112,6 @@ public class User implements PermEntity
 
         perm = Statics.toLower(perm);
 
-        //ops have every permission so * //todo
-        if (s != null && s.isOperator())
-        {
-            //debug mode
-            debug(perm, true);
-            return true;
-        }
-
         //check cached perms
         Boolean cached = checkResults.get(perm);
         if (cached != null)
@@ -159,14 +151,6 @@ public class User implements PermEntity
 
         perm = Statics.toLower(perm);
         server = Statics.toLower(server);
-
-        //ops have every permission so *
-        if (s != null && s.isOperator())
-        {
-            //debug mode
-            debug(perm, true);
-            return true;
-        }
 
         //check cached perms
         Map<String, Boolean> serverresults = serverCheckResults.get(server);
@@ -215,14 +199,6 @@ public class User implements PermEntity
         perm = Statics.toLower(perm);
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-
-        //ops have every permission so *
-        if (s != null && s.isOperator())
-        {
-            //debug mode
-            debug(perm, true);
-            return true;
-        }
 
         //check cached perms
         Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server);
@@ -288,6 +264,11 @@ public class User implements PermEntity
     public List<String> getEffectivePerms(String server)
     {
         access();
+        
+        if (server == null)
+        {
+            return getEffectivePerms();
+        }
 
         server = Statics.toLower(server);
 
@@ -304,6 +285,11 @@ public class User implements PermEntity
     public List<String> getEffectivePerms(String server, String world)
     {
         access();
+
+        if (world == null)
+        {
+            return getEffectivePerms(server);
+        }
 
         server = Statics.toLower(server);
         world = Statics.toLower(world);
@@ -526,7 +512,7 @@ public class User implements PermEntity
         }
         for (Server s : servers.values())
         {
-            if (!s.getPerms().isEmpty() 
+            if (!s.getPerms().isEmpty()
                     || !Statics.isEmpty(s.getDisplay())
                     || !Statics.isEmpty(s.getPrefix())
                     || !Statics.isEmpty(s.getSuffix()))
@@ -535,7 +521,7 @@ public class User implements PermEntity
             }
             for (World w : s.getWorlds().values())
             {
-                if (!s.getPerms().isEmpty() 
+                if (!s.getPerms().isEmpty()
                         || !Statics.isEmpty(w.getDisplay())
                         || !Statics.isEmpty(w.getPrefix())
                         || !Statics.isEmpty(w.getSuffix()))
@@ -834,6 +820,13 @@ public class User implements PermEntity
         return suffix
                 + (BungeePerms.getInstance().getConfig().isTerminateSuffixSpace() ? " " : "")
                 + (BungeePerms.getInstance().getConfig().isTerminateSuffixReset() ? ChatColor.RESET : "");
+    }
+    
+    public void flushCache()
+    {
+        checkResults.clear();
+        serverCheckResults.clear();
+        serverWorldCheckResults.clear();
     }
 
     private Sender getSender()
