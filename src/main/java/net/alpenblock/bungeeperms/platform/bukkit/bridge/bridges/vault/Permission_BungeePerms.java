@@ -162,7 +162,7 @@ public class Permission_BungeePerms extends Permission
             return false;
         }
 
-        return g.hasOnServerInWorld(permission, server, world);
+        return g.has(permission, server, world);
     }
 
     @Override

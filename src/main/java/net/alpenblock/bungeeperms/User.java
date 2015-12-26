@@ -19,7 +19,7 @@ public class User implements PermEntity
 
     @Getter(value = AccessLevel.PRIVATE)
     @Setter(value = AccessLevel.PRIVATE)
-    private Map<String, List<String>> cachedPerms;
+    private Map<String, Map<String, List<String>>> cachedPerms;
     @Getter(value = AccessLevel.PRIVATE)
     @Setter(value = AccessLevel.PRIVATE)
     private Map<String, Map<String, Map<String, Boolean>>> permCheckResults;
@@ -76,18 +76,12 @@ public class User implements PermEntity
 
     public boolean hasPerm(String perm)
     {
-        access();
-
-        Sender s = getSender();
-        return hasPerm(s, perm);
+        return hasPermOnServerInWorld(perm, null, null);
     }
 
     public boolean hasPermOnServer(String perm, String server)
     {
-        access();
-
-        Sender s = getSender();
-        return hasPermOnServer(s, perm, server);
+        return hasPermOnServerInWorld(perm, server, null);
     }
 
     public boolean hasPermOnServerInWorld(String perm, String server, String world)
@@ -100,81 +94,12 @@ public class User implements PermEntity
 
     public boolean hasPerm(Sender s, String perm)
     {
-        access();
-
-        perm = Statics.toLower(perm);
-
-        //check cached perms
-        Boolean cached = getCachedResult(perm, null, null);
-        if (cached != null)
-        {
-            //debug mode
-            debug(perm, cached);
-            return cached;
-        }
-
-        //check perms
-        List<String> perms = getEffectivePerms();
-
-        //pre process
-        perms = BungeePerms.getInstance().getPermissionsResolver().preprocess(perms, s);
-
-        //resolve
-        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm);
-
-        //post process
-        has = BungeePerms.getInstance().getPermissionsResolver().postprocess(perm, has, s);
-
-        //only true if really true
-        has = has != null && has;
-
-        //cache
-        setCachedResult(perm, has, null, null);
-
-        //debug mode
-        debug(perm, has);
-
-        return has;
+        return hasPermOnServerInWorld(s, perm, null, null);
     }
 
     public boolean hasPermOnServer(Sender s, String perm, String server)
     {
-        access();
-
-        perm = Statics.toLower(perm);
-        server = Statics.toLower(server);
-
-        //check cached perms
-        Boolean cached = getCachedResult(perm, server, null);
-        if (cached != null)
-        {
-            //debug mode
-            debug(perm, cached);
-            return cached;
-        }
-
-        //check perms
-        List<String> perms = getEffectivePerms(server);
-
-        //pre process
-        perms = BungeePerms.getInstance().getPermissionsResolver().preprocess(perms, s);
-
-        //resolve
-        Boolean has = BungeePerms.getInstance().getPermissionsResolver().has(perms, perm);
-
-        //post process
-        has = BungeePerms.getInstance().getPermissionsResolver().postprocess(perm, has, s);
-
-        //only true if really true
-        has = has != null && has;
-
-        //cache
-        setCachedResult(perm, has, server, null);
-
-        //debug mode
-        debug(perm, has);
-
-        return has;
+        return hasPermOnServerInWorld(s, perm, server, null);
     }
 
     public boolean hasPermOnServerInWorld(Sender s, String perm, String server, String world)
@@ -218,103 +143,25 @@ public class User implements PermEntity
         return has;
     }
 
-    public List<String> getEffectivePerms()
-    {
-        access();
-
-        List<String> effperms = cachedPerms.get("global");
-        if (effperms == null)
-        {
-            effperms = calcEffectivePerms();
-            cachedPerms.put("global", effperms);
-        }
-
-        return new ArrayList<>(effperms);
-    }
-
-    public List<String> getEffectivePerms(String server)
-    {
-        access();
-
-        if (server == null)
-        {
-            return getEffectivePerms();
-        }
-
-        server = Statics.toLower(server);
-
-        List<String> effperms = cachedPerms.get(Statics.toLower(server));
-        if (effperms == null)
-        {
-            effperms = calcEffectivePerms(server);
-            cachedPerms.put(server, effperms);
-        }
-
-        return new ArrayList<>(effperms);
-    }
-
     public List<String> getEffectivePerms(String server, String world)
     {
         access();
 
-        if (world == null)
-        {
-            return getEffectivePerms(server);
-        }
-
         server = Statics.toLower(server);
         world = Statics.toLower(world);
 
-        List<String> effperms = cachedPerms.get(server + ";" + world);
-        if (effperms == null)
+        List<String> effperms;
+        if (existsPermCacheList(server, world))
+        {
+            effperms = getCachedPerms(server, world);
+        }
+        else
         {
             effperms = calcEffectivePerms(server, world);
-            cachedPerms.put(server + ";" + world, effperms);
+            setCachedPerms(effperms, server, world);
         }
 
-        return new ArrayList<>(effperms);
-    }
-
-    public List<String> calcEffectivePerms()
-    {
-        access();
-
-        List<String> ret = new ArrayList<>();
-        for (Group g : groups)
-        {
-            List<String> gperms = g.getEffectivePerms();
-            ret.addAll(gperms);
-        }
-        ret.addAll(perms);
-
-        ret = BungeePerms.getInstance().getPermissionsResolver().simplify(ret);
-
-        return ret;
-    }
-
-    public List<String> calcEffectivePerms(String server)
-    {
-        access();
-
-        List<String> ret = new ArrayList<>();
-        for (Group g : groups)
-        {
-            List<String> gperms = g.getEffectivePerms(server);
-            ret.addAll(gperms);
-        }
-        ret.addAll(perms);
-
-        //per server perms
-        Server srv = getServer(server);
-        if (srv != null)
-        {
-            List<String> perserverperms = srv.getPerms();
-            ret.addAll(perserverperms);
-        }
-
-        ret = BungeePerms.getInstance().getPermissionsResolver().simplify(ret);
-
-        return ret;
+        return new ArrayList(effperms);
     }
 
     public List<String> calcEffectivePerms(String server, String world)
@@ -352,7 +199,7 @@ public class User implements PermEntity
 
     public void recalcPerms()
     {
-        recalcPerms0();
+        recalcPerms0(null, null);
 
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
@@ -360,7 +207,7 @@ public class User implements PermEntity
 
     public void recalcPerms(String server)
     {
-        recalcPerms0(server);
+        recalcPerms0(server, null);
 
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
@@ -374,70 +221,6 @@ public class User implements PermEntity
         BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
     }
 
-    private void recalcPerms0()
-    {
-        access();
-
-        for (Map.Entry<String, List<String>> e : cachedPerms.entrySet())
-        {
-            String where = e.getKey();
-            List<String> l = Statics.toList(where, ";");
-            String server = l.get(0);
-
-            if (l.size() == 1)
-            {
-                if (server.equalsIgnoreCase("global"))
-                {
-                    cachedPerms.put("global", calcEffectivePerms());
-                }
-                else
-                {
-                    List<String> effperms = calcEffectivePerms(server);
-                    cachedPerms.put(Statics.toLower(server), effperms);
-                }
-            }
-            else if (l.size() == 2)
-            {
-                String world = l.get(1);
-
-                recalcPerms0(server, world);
-            }
-        }
-
-        permCheckResults.clear();
-    }
-
-    private void recalcPerms0(String server)
-    {
-        access();
-
-        server = Statics.toLower(server);
-
-        for (Map.Entry<String, List<String>> e : cachedPerms.entrySet())
-        {
-            String where = e.getKey();
-            List<String> l = Statics.toList(where, ";");
-            String lserver = Statics.toLower(l.get(0));
-
-            if (lserver.equalsIgnoreCase(server))
-            {
-                if (l.size() == 1)
-                {
-                    List<String> effperms = calcEffectivePerms(lserver);
-                    cachedPerms.put(lserver, effperms);
-                }
-                else if (l.size() == 2)
-                {
-                    String world = Statics.toLower(l.get(1));
-                    recalcPerms0(lserver, world);
-                }
-            }
-        }
-
-        //todo maybe only server perms cache flush
-        permCheckResults.clear();
-    }
-
     private void recalcPerms0(String server, String world)
     {
         access();
@@ -445,11 +228,8 @@ public class User implements PermEntity
         server = Statics.toLower(server);
         world = Statics.toLower(world);
 
-        List<String> effperms = calcEffectivePerms(server, world);
-        cachedPerms.put(server + ";" + world, effperms);
-
-        //todo maybe only serverworld perms cache flush
-        permCheckResults.clear();
+        deletePermCache(server, world);
+        deletePermResultCache(server, world);
     }
 
     public boolean isNothingSpecial()
@@ -779,7 +559,8 @@ public class User implements PermEntity
 
     public void flushCache()
     {
-        permCheckResults.clear();
+        deletePermCache(null, null);
+        deletePermResultCache(null, null);
     }
 
     private Sender getSender()
@@ -802,17 +583,18 @@ public class User implements PermEntity
         lastAccess = System.currentTimeMillis();
     }
 
+    //perm check mgmt
     private Boolean getCachedResult(String permission, String server, String world)
     {
-        return getPermMap(server, world).get(permission);
+        return getPermResultMap(server, world).get(permission);
     }
 
     private void setCachedResult(String permission, boolean value, String server, String world)
     {
-        getPermMap(server, world).put(permission, value);
+        getPermResultMap(server, world).put(permission, value);
     }
 
-    private Map<String, Boolean> getPermMap(String server, String world)
+    private Map<String, Boolean> getPermResultMap(String server, String world)
     {
         //get server
         Map<String, Map<String, Boolean>> worldmap = permCheckResults.get(server);
@@ -831,6 +613,94 @@ public class User implements PermEntity
         }
 
         return permmap;
+    }
+
+    private void deletePermResultCache(String server, String world)
+    {
+        if (server == null)
+        {
+            permCheckResults.clear();
+            return;
+        }
+
+        //get server
+        Map<String, Map<String, Boolean>> worldmap = permCheckResults.get(server);
+        if (worldmap == null)
+        {
+            return;
+        }
+
+        if (world == null)
+        {
+            worldmap.clear();
+            return;
+        }
+
+        //get world
+        worldmap.remove(world);
+    }
+
+    //perm cache mgmt
+    private List<String> getCachedPerms(String server, String world)
+    {
+        return getPermCacheList(server, world);
+    }
+
+    private void setCachedPerms(List<String> perms, String server, String world)
+    {
+        getPermCacheList(server, world).clear();
+        getPermCacheList(server, world).addAll(perms);
+    }
+
+    private List<String> getPermCacheList(String server, String world)
+    {
+        //get server
+        Map<String, List<String>> worldmap = cachedPerms.get(server);
+        if (worldmap == null)
+        {
+            worldmap = new HashMap();
+            cachedPerms.put(server, worldmap);
+        }
+
+        //get world
+        List<String> permmap = worldmap.get(world);
+        if (permmap == null)
+        {
+            permmap = new ArrayList();
+            worldmap.put(world, permmap);
+        }
+
+        return permmap;
+    }
+
+    private void deletePermCache(String server, String world)
+    {
+        if (server == null)
+        {
+            cachedPerms.clear();
+            return;
+        }
+
+        //get server
+        Map<String, List<String>> worldmap = cachedPerms.get(server);
+        if (worldmap == null)
+        {
+            return;
+        }
+
+        if (world == null)
+        {
+            worldmap.clear();
+            return;
+        }
+
+        //get world
+        worldmap.remove(world);
+    }
+
+    private boolean existsPermCacheList(String server, String world)
+    {
+        return cachedPerms.containsKey(server) && cachedPerms.get(server).containsKey(world);
     }
 
     @Deprecated

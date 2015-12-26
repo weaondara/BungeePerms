@@ -26,15 +26,16 @@ public class Server implements Permable
 
     public World getWorld(String name)
     {
+        name = Statics.toLower(name);
         if(name == null)
         {
             return null;
         }
-        World w = worlds.get(Statics.toLower(name));
+        World w = worlds.get(name);
         if (w == null)
         {
-            w = new World(Statics.toLower(name), new ArrayList<String>(), null, null, null);
-            worlds.put(Statics.toLower(name), w);
+            w = new World(name, new ArrayList<String>(), null, null, null);
+            worlds.put(name, w);
         }
 
         return w;

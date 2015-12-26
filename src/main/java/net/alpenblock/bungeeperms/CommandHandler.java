@@ -1408,9 +1408,9 @@ public class CommandHandler
         }
 
         //global perm
+        boolean has = group.has(perm.toLowerCase(), server, world);
         if (server == null)
         {
-            boolean has = group.has(perm.toLowerCase());
             sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM, group.getName(), perm, formatBool(has)));
         }
         else
@@ -1418,14 +1418,12 @@ public class CommandHandler
             //per server perm
             if (world == null)
             {
-                boolean has = group.hasOnServer(perm.toLowerCase(), server);
                 sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER, group.getName(), perm, server, formatBool(has)));
             }
 
             //per server world perm
             else
             {
-                boolean has = group.hasOnServerInWorld(perm.toLowerCase(), server, world);
                 sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER_WORLD, group.getName(), perm, server, world, formatBool(has)));
             }
         }
