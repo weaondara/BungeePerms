@@ -247,7 +247,5 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
 
         Permissible perm = (Permissible) base;
         perm.updateAttachment(u, ((BukkitConfig) BungeePerms.getInstance().getConfig()).getServername(), p.getWorld() == null ? null : p.getWorld().getName());
-
-        p.recalculatePermissions();
     }
 }
