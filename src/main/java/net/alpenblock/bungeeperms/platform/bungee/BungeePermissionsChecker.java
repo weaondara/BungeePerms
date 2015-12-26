@@ -1,18 +1,17 @@
 package net.alpenblock.bungeeperms.platform.bungee;
 
-import lombok.AllArgsConstructor;
+import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsChecker;
-import net.alpenblock.bungeeperms.User;
-import net.alpenblock.bungeeperms.platform.Sender;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-@AllArgsConstructor
 public class BungeePermissionsChecker extends PermissionsChecker
 {
 
-    private final BungeeConfig config;
+    public BungeePermissionsChecker(BPConfig config)
+    {
+        super(config);
+    }
 
 //without message
     /**
@@ -24,13 +23,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
      */
     public boolean hasPerm(CommandSender sender, String permission)
     {
-        Sender s = new BungeeSender(sender);
-        if (s.isPlayer())
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName());
-            return user.hasPerm(permission, null, null);
-        }
-        return false;
+        return hasPerm(new BungeeSender(sender), permission);
     }
 
     /**
@@ -42,17 +35,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOrConsole(CommandSender sender, String permission)
     {
-        Sender s = new BungeeSender(sender);
-        if (s.isPlayer())
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName());
-            return user.hasPerm(permission, null, null);
-        }
-        else if (s.isConsole())
-        {
-            return true;
-        }
-        return false;
+        return hasPermOrConsole(new BungeeSender(sender), permission);
     }
 
     /**
@@ -64,13 +47,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOnServer(CommandSender sender, String permission)
     {
-        Sender s = new BungeeSender(sender);
-        if (s.isPlayer())
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName());
-            return user.hasPerm(permission, s.getServer(), null);
-        }
-        return false;
+        return hasPermOnServer(new BungeeSender(sender), permission);
     }
 
     /**
@@ -82,17 +59,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOrConsoleOnServer(CommandSender sender, String permission)
     {
-        Sender s = new BungeeSender(sender);
-        if (s.isPlayer())
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName());
-            return user.hasPerm(permission, s.getServer(), null);
-        }
-        else if (s.isConsole())
-        {
-            return true;
-        }
-        return false;
+        return hasPermOrConsoleOnServer(new BungeeSender(sender), permission);
     }
 
     /**
@@ -104,13 +71,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOnServerInWorld(CommandSender sender, String permission)
     {
-        Sender s = new BungeeSender(sender);
-        if (s.isPlayer())
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName());
-            return user.hasPerm(permission, s.getServer(), s.getWorld());
-        }
-        return false;
+        return hasPermOnServerInWorld(new BungeeSender(sender), permission);
     }
 
     /**
@@ -122,17 +83,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
      */
     public boolean hasPermOrConsoleOnServerInWorld(CommandSender sender, String permission)
     {
-        Sender s = new BungeeSender(sender);
-        if (s.isPlayer())
-        {
-            User user = config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName());
-            return user.hasPerm(permission, s.getServer(), s.getWorld());
-        }
-        else if (s.isConsole())
-        {
-            return true;
-        }
-        return false;
+        return hasPermOrConsoleOnServerInWorld(new BungeeSender(sender), permission);
     }
 
 //with message

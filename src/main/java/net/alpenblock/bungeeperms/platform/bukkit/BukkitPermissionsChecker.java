@@ -1,16 +1,18 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
-import lombok.AllArgsConstructor;
+import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsChecker;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
-@AllArgsConstructor
 public class BukkitPermissionsChecker extends PermissionsChecker
 {
 
+    public BukkitPermissionsChecker(BPConfig config)
+    {
+        super(config);
+    }
+    
 //without message
     /**
      * Checks if a user (no console) has a specific permission (globally).
@@ -95,20 +97,12 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean has(CommandSender sender, String perm, boolean msg)
     {
-        if (sender instanceof Player)
-        {
-            boolean isperm = (hasPerm(sender, perm));
-            if (!isperm && msg)
-            {
-                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            }
-            return isperm;
-        }
-        else
+        boolean isperm = hasPerm(sender, perm);
+        if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            return false;
         }
+        return isperm;
     }
 
     /**
@@ -121,7 +115,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasOrConsole(CommandSender sender, String perm, boolean msg)
     {
-        boolean isperm = hasPerm(sender, perm) || (sender instanceof ConsoleCommandSender);
+        boolean isperm = hasPermOrConsole(sender, perm);
         if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
@@ -139,20 +133,12 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasOnServer(CommandSender sender, String perm, boolean msg)
     {
-        if (sender instanceof Player)
-        {
-            boolean isperm = hasPermOnServer(sender, perm);
-            if (!isperm && msg)
-            {
-                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            }
-            return isperm;
-        }
-        else
+        boolean isperm = hasPermOnServer(sender, perm);
+        if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            return false;
         }
+        return isperm;
     }
 
     /**
@@ -165,7 +151,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasOrConsoleOnServer(CommandSender sender, String perm, boolean msg)
     {
-        boolean isperm = hasPermOnServer(sender, perm) || (sender instanceof ConsoleCommandSender);
+        boolean isperm = hasPermOrConsoleOnServer(sender, perm);
         if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
@@ -183,20 +169,12 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasOnServerInWorld(CommandSender sender, String perm, boolean msg)
     {
-        if (sender instanceof Player)
-        {
-            boolean isperm = hasPermOnServerInWorld(sender, perm);
-            if (!isperm && msg)
-            {
-                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            }
-            return isperm;
-        }
-        else
+        boolean isperm = hasPermOnServerInWorld(sender, perm);
+        if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            return false;
         }
+        return isperm;
     }
 
     /**
@@ -209,7 +187,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasOrConsoleOnServerInWorld(CommandSender sender, String perm, boolean msg)
     {
-        boolean isperm = hasPermOnServerInWorld(sender, perm) || (sender instanceof ConsoleCommandSender);
+        boolean isperm = hasPermOrConsoleOnServerInWorld(sender, perm);
         if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));

@@ -54,7 +54,7 @@ public class BungeePerms
 
         //adv
         permissionsManager = new PermissionsManager(plugin, config, debug);
-        permissionsChecker = new PermissionsChecker();
+        permissionsChecker = new PermissionsChecker(config);
         commandHandler = new CommandHandler(plugin, permissionsChecker, config);
         this.pluginMessageSender = pluginMessageSender;
         this.networkNotifier = networkNotifier;

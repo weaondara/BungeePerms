@@ -1,9 +1,13 @@
 package net.alpenblock.bungeeperms;
 
+import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.platform.Sender;
 
+@AllArgsConstructor
 public class PermissionsChecker
 {
+
+    private final BPConfig config;
 
 //withput message
     /**
@@ -61,16 +65,17 @@ public class PermissionsChecker
      */
     public boolean hasPerm(Sender sender, String permission)
     {
-        if (!sender.isConsole())
+        if (sender.isConsole())
         {
-            User u = pm().getUser(sender.getName());
-            if (u == null)
-            {
-                return false;
-            }
-            return u.hasPerm(sender, permission, null, null);
+            return false;
         }
-        return false;
+
+        User u = config.isUseUUIDs() ? pm().getUser(sender.getUUID()) : pm().getUser(sender.getName());
+        if (u == null)
+        {
+            return false;
+        }
+        return u.hasPerm(sender, permission, null, null);
     }
 
     /**
@@ -82,19 +87,7 @@ public class PermissionsChecker
      */
     public boolean hasPermOrConsole(Sender sender, String permission)
     {
-        if (sender.isConsole())
-        {
-            return true;
-        }
-        else
-        {
-            User u = pm().getUser(sender.getName());
-            if (u == null)
-            {
-                return false;
-            }
-            return u.hasPerm(sender, permission, null, null);
-        }
+        return sender.isConsole() || hasPerm(sender, permission);
     }
 
     /**
@@ -106,7 +99,12 @@ public class PermissionsChecker
      */
     public boolean hasPermOnServer(Sender sender, String permission)
     {
-        User u = pm().getUser(sender.getName());
+        if (sender.isConsole())
+        {
+            return false;
+        }
+
+        User u = config.isUseUUIDs() ? pm().getUser(sender.getUUID()) : pm().getUser(sender.getName());
         if (u == null)
         {
             return false;
@@ -124,20 +122,7 @@ public class PermissionsChecker
      */
     public boolean hasPermOrConsoleOnServer(Sender sender, String permission)
     {
-        if (sender.isConsole())
-        {
-            return true;
-        }
-        else
-        {
-            User u = pm().getUser(sender.getName());
-            if (u == null)
-            {
-                return false;
-            }
-
-            return u.hasPerm(sender, permission, sender.getServer(), null);
-        }
+        return sender.isConsole() || hasPermOnServer(sender, permission);
     }
 
     /**
@@ -149,7 +134,12 @@ public class PermissionsChecker
      */
     public boolean hasPermOnServerInWorld(Sender sender, String permission)
     {
-        User u = pm().getUser(sender.getName());
+        if (sender.isConsole())
+        {
+            return false;
+        }
+
+        User u = config.isUseUUIDs() ? pm().getUser(sender.getUUID()) : pm().getUser(sender.getName());
         if (u == null)
         {
             return false;
@@ -167,20 +157,7 @@ public class PermissionsChecker
      */
     public boolean hasPermOrConsoleOnServerInWorld(Sender sender, String permission)
     {
-        if (sender.isConsole())
-        {
-            return true;
-        }
-        else
-        {
-            User u = pm().getUser(sender.getName());
-            if (u == null)
-            {
-                return false;
-            }
-
-            return u.hasPerm(sender, permission, sender.getServer(), sender.getWorld());
-        }
+        return sender.isConsole() || hasPermOnServerInWorld(sender, permission);
     }
 
 //with message
@@ -194,20 +171,12 @@ public class PermissionsChecker
      */
     public boolean has(Sender sender, String perm, boolean msg)
     {
-        if (sender.isPlayer())
-        {
-            boolean isperm = (hasPerm(sender, perm));
-            if (!isperm && msg)
-            {
-                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            }
-            return isperm;
-        }
-        else
+        boolean isperm = hasPerm(sender, perm);
+        if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            return false;
         }
+        return isperm;
     }
 
     /**
@@ -220,7 +189,7 @@ public class PermissionsChecker
      */
     public boolean hasOrConsole(Sender sender, String perm, boolean msg)
     {
-        boolean isperm = (hasPerm(sender, perm) || sender.isConsole());
+        boolean isperm = hasPermOrConsole(sender, perm);
         if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
@@ -238,20 +207,12 @@ public class PermissionsChecker
      */
     public boolean hasOnServer(Sender sender, String perm, boolean msg)
     {
-        if (sender.isPlayer())
-        {
-            boolean isperm = hasPermOnServer(sender, perm);
-            if (!isperm && msg)
-            {
-                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            }
-            return isperm;
-        }
-        else
+        boolean isperm = hasPermOnServer(sender, perm);
+        if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            return false;
         }
+        return isperm;
     }
 
     /**
@@ -264,7 +225,7 @@ public class PermissionsChecker
      */
     public boolean hasOrConsoleOnServer(Sender sender, String perm, boolean msg)
     {
-        boolean isperm = (hasPermOnServer(sender, perm) || sender.isConsole());
+        boolean isperm = hasPermOrConsoleOnServer(sender, perm);
         if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
@@ -282,20 +243,12 @@ public class PermissionsChecker
      */
     public boolean hasOnServerInWorld(Sender sender, String perm, boolean msg)
     {
-        if (sender.isPlayer())
-        {
-            boolean isperm = hasPermOnServerInWorld(sender, perm);
-            if (!isperm && msg)
-            {
-                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            }
-            return isperm;
-        }
-        else
+        boolean isperm = hasPermOnServerInWorld(sender, perm);
+        if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
-            return false;
         }
+        return isperm;
     }
 
     /**
@@ -308,7 +261,7 @@ public class PermissionsChecker
      */
     public boolean hasOrConsoleOnServerInWorld(Sender sender, String perm, boolean msg)
     {
-        boolean isperm = (hasPermOnServerInWorld(sender, perm) || sender.isConsole());
+        boolean isperm = hasPermOrConsoleOnServerInWorld(sender, perm);
         if (!isperm && msg)
         {
             sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
