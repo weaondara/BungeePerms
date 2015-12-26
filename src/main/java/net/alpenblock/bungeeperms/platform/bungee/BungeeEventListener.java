@@ -113,14 +113,14 @@ public class BungeeEventListener implements Listener, EventListener
         pm().removeUserFromCache(u);
     }
 
-    @EventHandler
+    @EventHandler(priority = Byte.MIN_VALUE)
     public void onPermissionCheck(PermissionCheckEvent e)
     {
         CommandSender s = e.getSender();
         e.setHasPermission(BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BungeeSender(s), e.getPermission()));
     }
 
-    @EventHandler
+    @EventHandler(priority = Byte.MIN_VALUE)
     public void onTabcomplete(TabCompleteEvent e)
     {
         if (!config.isTabComplete())
@@ -146,7 +146,7 @@ public class BungeeEventListener implements Listener, EventListener
         playerWorlds.put(e.getPlayer().getName(), null);
     }
 
-    @EventHandler
+    @EventHandler(priority = Byte.MIN_VALUE)
     public void onMessage(PluginMessageEvent e)
     {
         if (!e.getTag().equalsIgnoreCase(BungeePerms.CHANNEL))

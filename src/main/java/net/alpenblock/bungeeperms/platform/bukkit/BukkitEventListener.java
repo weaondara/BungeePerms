@@ -142,7 +142,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         pm().removeUserFromCache(u);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onChangedWorld(PlayerChangedWorldEvent e)
     {
         BukkitPlugin.getInstance().getNotifier().sendWorldUpdate(e.getPlayer());
@@ -151,7 +151,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         updateAttachment(e.getPlayer(), u);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onUserUpdate(BungeePermsUserChangedEvent e)
     {
         Player p = config.isUseUUIDs() ? Bukkit.getPlayer(e.getUser().getUUID()) : Bukkit.getPlayer(e.getUser().getName());
@@ -162,7 +162,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         updateAttachment(p, e.getUser());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPluginChannelRegister(PlayerRegisterChannelEvent e)
     {
         if (!e.getChannel().equals(BungeePerms.CHANNEL))
