@@ -23,7 +23,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRegisterChannelEvent;
-import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 public class BukkitEventListener implements Listener, EventListener, PluginMessageListener
@@ -53,7 +52,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
 
         //inject into console // seems to be best place here
         Permissible permissible = new Permissible(Bukkit.getConsoleSender(), null, Injector.getPermissible(Bukkit.getConsoleSender()));
-        Injector.inject(Bukkit.getConsoleSender(), permissible);
+        permissible.inject();
     }
 
     @Override
@@ -110,7 +109,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
 
         //inject permissible
         Permissible permissible = new Permissible(e.getPlayer(), u, Injector.getPermissible(e.getPlayer()));
-        Injector.inject(e.getPlayer(), permissible);
+        permissible.inject();
 
         updateAttachment(e.getPlayer(), u);
     }
@@ -240,7 +239,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
 
     private void updateAttachment(Player p, User u)
     {
-        PermissibleBase base = Injector.getPermissible(p);
+        org.bukkit.permissions.Permissible base = Injector.getPermissible(p);
         if (!(base instanceof Permissible))
         {
             return;

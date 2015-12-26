@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -33,6 +34,8 @@ public class Permissible extends PermissibleBase
     private Map<String, PermissionAttachmentInfo> superperms;
     @Getter
     private org.bukkit.permissions.Permissible oldPermissible = null;
+    private ServerOperator oldOpable = null;
+    private ServerOperator opable = null;
     private boolean opdisabled = false;
     private boolean init = false;
 
@@ -67,14 +70,11 @@ public class Permissible extends PermissibleBase
                 return super.put(k, v);
             }
         };
-        Statics.setField(PermissibleBase.class, oldPermissible, superperms, "permissions");
-        Statics.setField(PermissibleBase.class, this, permissions, "permissions");
 
         //inject an opable
-        final ServerOperator oldopable2 = Statics.getField(PermissibleBase.class, oldPermissible, ServerOperator.class, "opable");
-        ServerOperator sop = new ServerOperator()
+        oldOpable = Statics.getField(PermissibleBase.class, oldPermissible, ServerOperator.class, "opable");
+        opable = new ServerOperator()
         {
-            private final ServerOperator oldopable = oldopable2;
             @Override
             public boolean isOp()
             {
@@ -86,16 +86,15 @@ public class Permissible extends PermissibleBase
                         return false;
                     }
                 }
-                return oldopable.isOp();
+                return oldOpable.isOp();
             }
 
             @Override
             public void setOp(boolean value)
             {
-                oldopable.setOp(value);
+                oldOpable.setOp(value);
             }
         };
-        Statics.setField(PermissibleBase.class, oldPermissible, sop, "opable");
 
         init = true;
 
@@ -131,7 +130,7 @@ public class Permissible extends PermissibleBase
         {
             return;
         }
-        
+
         //calculate superperms
         opdisabled = true;
         oldPermissible.recalculatePermissions();
@@ -380,5 +379,33 @@ public class Permissible extends PermissibleBase
         }
         String id = BungeePerms.getInstance().getConfig().isUseUUIDs() ? u.getUUID().toString() : u.getName();
         return "bungeeperms.user." + id;
+    }
+
+    //injection things
+    public void inject()
+    {
+        if (Injector.getPermissible(sender) == this)
+        {
+            return;
+        }
+        Statics.setField(PermissibleBase.class, oldPermissible, superperms, "permissions");
+        Statics.setField(PermissibleBase.class, this, permissions, "permissions");
+        Statics.setField(PermissibleBase.class, oldPermissible, opable, "opable");
+        Injector.inject(sender, this);
+
+        recalculatePermissions();
+    }
+
+    public void uninject()
+    {
+        if (Injector.getPermissible(sender) != this)
+        {
+            return;
+        }
+        Statics.setField(PermissibleBase.class, oldPermissible, new HashMap<String, PermissionAttachmentInfo>(), "permissions");
+        Statics.setField(PermissibleBase.class, oldPermissible, oldOpable, "opable");
+        Injector.inject(sender, oldPermissible);
+
+        recalculatePermissions();
     }
 }
