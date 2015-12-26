@@ -42,6 +42,16 @@ public class PermissionsResolver
         return perms;
     }
 
+    public List<BPPermission> preprocessWithOrigin(List<BPPermission> perms, Sender s)
+    {
+        for (PermissionsPreProcessor p : preprocessors)
+        {
+            perms = p.processWithOrigin(perms, s);
+        }
+
+        return perms;
+    }
+
     public Boolean postprocess(String perm, Boolean result, Sender s)
     {
         for (PermissionsPostProcessor p : postprocessors)
@@ -51,7 +61,7 @@ public class PermissionsResolver
 
         return result;
     }
-    
+
     @Getter
     @Setter
     private boolean useRegex = false;

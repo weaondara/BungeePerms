@@ -597,8 +597,10 @@ public class User implements PermEntity
                     ret.add(perm2);
                 }
             }
-
         }
+        
+        //pre process
+        ret = BungeePerms.getInstance().getPermissionsResolver().preprocessWithOrigin(ret, getSender());
 
         return ret;
     }
