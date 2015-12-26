@@ -308,14 +308,22 @@ public class CommandHandler
             return true;
         }
 
-        if (!Statics.matchArgs(sender, args, 3, 5))
+        if (!Statics.matchArgs(sender, args, 3, 6))
         {
             return true;
         }
 
+        boolean specialpage = args.length > 3 && Statics.isInt(args[args.length - 1]);
+        int page = specialpage ? Integer.parseInt(args[args.length - 1]) : 1;
+        if (page < 1)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_INT_VALUE));
+            return true;
+        }
+
         String player = Statics.getFullPlayerName(args[1]);
-        String server = args.length > 3 ? args[3].toLowerCase() : null;
-        String world = args.length > 4 ? args[4].toLowerCase() : null;
+        String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;
+        String world = args.length > (4 + (specialpage ? 1 : 0)) ? args[4].toLowerCase() : null;
 
         User user = pm().getUser(player);
         if (user == null)
@@ -333,8 +341,10 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.USER_PERMISSIONS_LIST_HEADER, user.getName()));
         }
         List<BPPermission> perms = user.getPermsWithOrigin(server, world);
-        for (BPPermission perm : perms)
+        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
+        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
         {
+            BPPermission perm = perms.get(i);
             sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
                                               perm.getPermission(),
                                               (!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(player) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
@@ -996,15 +1006,22 @@ public class CommandHandler
             return true;
         }
 
-        if (args.length > 5)
+        if (!Statics.matchArgs(sender, args, 3, 6))
         {
-            Messages.sendTooManyArgsMessage(sender);
+            return true;
+        }
+
+        boolean specialpage = args.length > 3 && Statics.isInt(args[args.length - 1]);
+        int page = specialpage ? Integer.parseInt(args[args.length - 1]) : 1;
+        if (page < 1)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_INT_VALUE));
             return true;
         }
 
         String groupname = args[1];
-        String server = args.length > 3 ? args[3] : null;
-        String world = args.length > 4 ? args[4] : null;
+        String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;
+        String world = args.length > (4 + (specialpage ? 1 : 0)) ? args[4].toLowerCase() : null;
         Group group = pm().getGroup(groupname);
 
         if (group == null)
@@ -1015,8 +1032,10 @@ public class CommandHandler
 
         sender.sendMessage(Lang.translate(MessageType.GROUP_PERMISSIONS_LIST_HEADER, group.getName()));
         List<BPPermission> perms = group.getPermsWithOrigin(server, world);
-        for (BPPermission perm : perms)
+        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
+        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
         {
+            BPPermission perm = perms.get(i);
             sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
                                               perm.getPermission(),
                                               (!perm.getOrigin().equalsIgnoreCase(groupname) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),

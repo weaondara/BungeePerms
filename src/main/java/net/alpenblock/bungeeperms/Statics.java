@@ -275,4 +275,17 @@ public class Statics
     {
         return isEmpty(append) ? "" : append + " ";
     }
+    
+    public static boolean isInt(String s)
+    {
+        try
+        {
+            Integer.parseInt(s);
+            return true;
+        }
+        catch(Exception e)
+        {
+            return false;
+        }
+    }
 }

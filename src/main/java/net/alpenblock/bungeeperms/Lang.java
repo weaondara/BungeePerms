@@ -144,11 +144,12 @@ public class Lang
         GROUP_SET_PREFIX("group.set-prefix", Color.Text.alt() + "Set prefix for group " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
         GROUP_SET_SUFFIX("group.set-suffix", Color.Text.alt() + "Set suffix for group " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
         //common
-        DISPLAY("common.display", Color.Text.alt() + "Dislay: " + ChatColor.RESET.alt() + "{0}"),
+        DISPLAY("common.display", Color.Text.alt() + "Display: " + ChatColor.RESET.alt() + "{0}"),
         PREFIX("common.prefix", Color.Text.alt() + "Prefix: " + ChatColor.RESET.alt() + "{0}"),
         SUFFIX("common.suffix", Color.Text.alt() + "Suffix: " + ChatColor.RESET.alt() + "{0}"),
         PERMISSIONS_LIST_ITEM("common.permissions-list-item", Color.Text.alt() + "- " + Color.Value.alt() + "{0}" + Color.Text.alt() + " (" + Color.Value.alt() + "{1}" + Color.Text.alt() + "{2}{3})"),
-        //util & partss
+        PERMISSIONS_LIST_HEADER_PAGE("common.permissions-list-header-page", Color.Text.alt() + "Page " + Color.Value.alt() + "{0}" + Color.Text.alt() + "/" + Color.Value.alt() + "{1}" + Color.Text.alt() + ""),
+        //util & parts
         OWN("general.own", "own"),
         NONE("general.none", "none"),
         DEFAULT("general.default", "default"),
