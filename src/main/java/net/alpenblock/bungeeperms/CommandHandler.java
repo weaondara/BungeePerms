@@ -1408,7 +1408,7 @@ public class CommandHandler
         }
 
         //global perm
-        boolean has = group.hasPerm(perm.toLowerCase(), server, world);
+        boolean has = group.hasPerm(perm, server, world);
         if (server == null)
         {
             sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM, group.getName(), perm, formatBool(has)));
