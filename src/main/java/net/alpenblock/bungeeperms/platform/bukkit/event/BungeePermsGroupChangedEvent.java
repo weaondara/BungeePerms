@@ -16,7 +16,7 @@ public class BungeePermsGroupChangedEvent extends Event
     {
         return handlers;
     }
-    
+
     @Getter
     private final Group group;
 
