@@ -78,8 +78,8 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
 
         if (config.isUseUUIDs())
         {
-            BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN_UUID, e.getPlayer().getName(), e.getPlayer().getUniqueId()));
             uuid = e.getPlayer().getUniqueId();
+            BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN_UUID, playername, uuid));
 
             //update uuid player db
             pm().getUUIDPlayerDB().update(uuid, playername);
@@ -130,15 +130,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         //uninject permissible
         Injector.uninject(e.getPlayer());
 
-        User u;
-        if (config.isUseUUIDs())
-        {
-            u = pm().getUser(e.getPlayer().getUniqueId());
-        }
-        else
-        {
-            u = pm().getUser(e.getPlayer().getName());
-        }
+        User u = config.isUseUUIDs() ? pm().getUser(e.getPlayer().getUniqueId()) : pm().getUser(e.getPlayer().getName());
         pm().removeUserFromCache(u);
     }
 
@@ -169,7 +161,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         {
             return;
         }
-        
+
         BukkitPlugin.getInstance().getNotifier().sendWorldUpdate(e.getPlayer());
     }
 
