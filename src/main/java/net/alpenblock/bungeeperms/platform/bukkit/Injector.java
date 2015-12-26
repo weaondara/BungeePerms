@@ -5,11 +5,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
 
 public class Injector
 {
 
-    public static void inject(CommandSender sender, org.bukkit.permissions.Permissible newpermissible)
+    public static void inject(CommandSender sender, Permissible newpermissible)
     {
         try
         {
@@ -29,15 +30,15 @@ public class Injector
     
     public static void uninject(CommandSender sender)
     {
-        org.bukkit.permissions.Permissible perm = getPermissible(sender);
-        if (perm instanceof Permissible)
+        Permissible perm = getPermissible(sender);
+        if (perm instanceof BPPermissible)
         {
-            net.alpenblock.bungeeperms.platform.bukkit.Permissible p = (net.alpenblock.bungeeperms.platform.bukkit.Permissible) perm;
+            net.alpenblock.bungeeperms.platform.bukkit.BPPermissible p = (net.alpenblock.bungeeperms.platform.bukkit.BPPermissible) perm;
             p.uninject();
         }
     }
 
-    public static org.bukkit.permissions.Permissible getPermissible(CommandSender sender)
+    public static Permissible getPermissible(CommandSender sender)
     {
         try
         {
@@ -47,7 +48,7 @@ public class Injector
                 return null;
             }
             perm.setAccessible(true);
-            org.bukkit.permissions.Permissible permissible = (org.bukkit.permissions.Permissible) perm.get(sender);
+            Permissible permissible = (Permissible) perm.get(sender);
 
             return permissible;
         }

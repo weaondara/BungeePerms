@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
@@ -25,7 +26,7 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.permissions.ServerOperator;
 import org.bukkit.plugin.Plugin;
 
-public class Permissible extends PermissibleBase
+public class BPPermissible extends PermissibleBase
 {
 
     private CommandSender sender;
@@ -33,13 +34,13 @@ public class Permissible extends PermissibleBase
     private Map<String, PermissionAttachmentInfo> permissions;
     private Map<String, PermissionAttachmentInfo> superperms;
     @Getter
-    private org.bukkit.permissions.Permissible oldPermissible = null;
+    private Permissible oldPermissible = null;
     private ServerOperator oldOpable = null;
     private ServerOperator opable = null;
     private boolean opdisabled = false;
     private boolean init = false;
 
-    public Permissible(CommandSender sender, User u, org.bukkit.permissions.Permissible oldPermissible)
+    public BPPermissible(CommandSender sender, User u, Permissible oldPermissible)
     {
         super(sender);
         this.sender = sender;

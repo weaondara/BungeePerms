@@ -10,6 +10,7 @@ import net.alpenblock.bungeeperms.platform.Sender;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
@@ -46,13 +47,13 @@ public class SuperPermsPreProcessor implements PermissionsPreProcessor
         }
 
         Player p = (Player) sender;
-        org.bukkit.permissions.Permissible base = Injector.getPermissible(p);
-        if (!(base instanceof Permissible))
+        Permissible base = Injector.getPermissible(p);
+        if (!(base instanceof BPPermissible))
         {
             return new ArrayList();
         }
 
-        Permissible perm = (Permissible) base;
+        BPPermissible perm = (BPPermissible) base;
         List<String> l = new ArrayList(perm.getEffectiveSuperPerms().size());
         for (PermissionAttachmentInfo e : perm.getEffectiveSuperPerms())
         {
