@@ -37,10 +37,11 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     private BukkitConfig conf;
 
     //platform dependend parts
+    private BukkitPermissionsChecker permchecker;
+    private BukkitPluginMessageSender pmsender;
+    private BukkitNotifier notifier;
     private BukkitEventListener listener;
     private BukkitEventDispatcher dispatcher;
-    private BukkitNotifier notifier;
-    private PluginMessageSender pmsender;
 
     private BungeePerms bungeeperms;
 
@@ -65,12 +66,13 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
         //register commands
         loadcmds();
 
+        permchecker = new BukkitPermissionsChecker(conf);
+        pmsender = new BukkitPluginMessageSender();
+        notifier = new BukkitNotifier(conf);
         listener = new BukkitEventListener(conf);
         dispatcher = new BukkitEventDispatcher();
-        notifier = new BukkitNotifier(conf);
-        pmsender = new BukkitPluginMessageSender();
 
-        bungeeperms = new BungeePerms(this, conf, pmsender, notifier, listener, dispatcher);
+        bungeeperms = new BungeePerms(this, conf, permchecker, pmsender, notifier, listener, dispatcher);
         bungeeperms.load();
 
         //extra part

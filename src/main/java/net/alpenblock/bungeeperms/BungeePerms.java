@@ -36,7 +36,7 @@ public class BungeePerms
 
     private boolean enabled;
 
-    public BungeePerms(PlatformPlugin plugin, BPConfig config, PluginMessageSender pluginMessageSender,
+    public BungeePerms(PlatformPlugin plugin, BPConfig config, PermissionsChecker permissionsChecker, PluginMessageSender pluginMessageSender,
             NetworkNotifier networkNotifier, EventListener eventListener, EventDispatcher eventDispatcher)
     {
         //static
@@ -54,8 +54,8 @@ public class BungeePerms
 
         //adv
         permissionsManager = new PermissionsManager(plugin, config, debug);
-        permissionsChecker = new PermissionsChecker(config);
         commandHandler = new CommandHandler(plugin, permissionsChecker, config);
+        this.permissionsChecker = permissionsChecker;
         this.pluginMessageSender = pluginMessageSender;
         this.networkNotifier = networkNotifier;
         this.eventListener = eventListener;

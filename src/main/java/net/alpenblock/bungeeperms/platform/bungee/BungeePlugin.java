@@ -31,10 +31,11 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     private BungeeConfig config;
 
     //platform dependend parts
+    private BungeePermissionsChecker permchecker;
+    private BungeePluginMessageSender pmsender;
+    private BungeeNotifier notifier;
     private BungeeEventListener listener;
     private BungeeEventDispatcher dispatcher;
-    private BungeeNotifier notifier;
-    private PluginMessageSender pmsender;
 
     private BungeePerms bungeeperms;
 
@@ -55,12 +56,13 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
         //register commands
         loadcmds();
 
+        permchecker = new BungeePermissionsChecker(config);
+        pmsender = new BungeePluginMessageSender();
+        notifier = new BungeeNotifier(config);
         listener = new BungeeEventListener(config);
         dispatcher = new BungeeEventDispatcher();
-        notifier = new BungeeNotifier(config);
-        pmsender = new BungeePluginMessageSender();
 
-        bungeeperms = new BungeePerms(this, config, pmsender, notifier, listener, dispatcher);
+        bungeeperms = new BungeePerms(this, config, permchecker, pmsender, notifier, listener, dispatcher);
         bungeeperms.load();
         bungeeperms.getPermissionsResolver().registerProcessor(new GroupProcessor());
     }
