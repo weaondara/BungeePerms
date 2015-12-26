@@ -22,13 +22,7 @@ public class User implements PermEntity
     private Map<String, List<String>> cachedPerms;
     @Getter(value = AccessLevel.PRIVATE)
     @Setter(value = AccessLevel.PRIVATE)
-    private Map<String, Boolean> checkResults;
-    @Getter(value = AccessLevel.PRIVATE)
-    @Setter(value = AccessLevel.PRIVATE)
-    private Map<String, Map<String, Boolean>> serverCheckResults;
-    @Getter(value = AccessLevel.PRIVATE)
-    @Setter(value = AccessLevel.PRIVATE)
-    private Map<String, Map<String, Map<String, Boolean>>> serverWorldCheckResults;
+    private Map<String, Map<String, Map<String, Boolean>>> permCheckResults;
 
     private String name;
     private UUID UUID;
@@ -45,9 +39,7 @@ public class User implements PermEntity
     public User(String name, UUID UUID, List<Group> groups, List<String> extraPerms, Map<String, Server> servers, String display, String prefix, String suffix)
     {
         cachedPerms = new HashMap<>();
-        checkResults = new HashMap<>();
-        serverCheckResults = new HashMap<>();
-        serverWorldCheckResults = new HashMap<>();
+        permCheckResults = new HashMap<>();
 
         this.name = name;
         this.UUID = UUID;
@@ -113,7 +105,7 @@ public class User implements PermEntity
         perm = Statics.toLower(perm);
 
         //check cached perms
-        Boolean cached = checkResults.get(perm);
+        Boolean cached = getCachedResult(perm, null, null);
         if (cached != null)
         {
             //debug mode
@@ -137,7 +129,7 @@ public class User implements PermEntity
         has = has != null && has;
 
         //cache
-        checkResults.put(perm, has);
+        setCachedResult(perm, has, null, null);
 
         //debug mode
         debug(perm, has);
@@ -153,14 +145,7 @@ public class User implements PermEntity
         server = Statics.toLower(server);
 
         //check cached perms
-        Map<String, Boolean> serverresults = serverCheckResults.get(server);
-        if (serverresults == null)
-        {
-            serverresults = new HashMap<>();
-            serverCheckResults.put(server, serverresults);
-        }
-
-        Boolean cached = serverresults.get(perm);
+        Boolean cached = getCachedResult(perm, server, null);
         if (cached != null)
         {
             //debug mode
@@ -184,7 +169,7 @@ public class User implements PermEntity
         has = has != null && has;
 
         //cache
-        serverresults.put(perm, has);
+        setCachedResult(perm, has, server, null);
 
         //debug mode
         debug(perm, has);
@@ -201,21 +186,7 @@ public class User implements PermEntity
         world = Statics.toLower(world);
 
         //check cached perms
-        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server);
-        if (serverresults == null)
-        {
-            serverresults = new HashMap<>();
-            serverWorldCheckResults.put(server, serverresults);
-        }
-
-        Map<String, Boolean> worldresults = serverresults.get(world);
-        if (worldresults == null)
-        {
-            worldresults = new HashMap<>();
-            serverresults.put(world, worldresults);
-        }
-
-        Boolean cached = worldresults.get(perm);
+        Boolean cached = getCachedResult(perm, server, world);
         if (cached != null)
         {
             //debug mode
@@ -239,7 +210,7 @@ public class User implements PermEntity
         has = has != null && has;
 
         //cache
-        worldresults.put(perm, has);
+        setCachedResult(perm, has, server, world);
 
         //debug mode
         debug(perm, has);
@@ -264,7 +235,7 @@ public class User implements PermEntity
     public List<String> getEffectivePerms(String server)
     {
         access();
-        
+
         if (server == null)
         {
             return getEffectivePerms();
@@ -433,9 +404,7 @@ public class User implements PermEntity
             }
         }
 
-        checkResults.clear();
-        serverCheckResults.clear();
-        serverWorldCheckResults.clear();
+        permCheckResults.clear();
     }
 
     private void recalcPerms0(String server)
@@ -465,17 +434,8 @@ public class User implements PermEntity
             }
         }
 
-        Map<String, Boolean> serverresults = serverCheckResults.get(server);
-        if (serverresults != null)
-        {
-            serverresults.clear();
-        }
-
-        Map<String, Map<String, Boolean>> worldresults = serverWorldCheckResults.get(server);
-        if (worldresults != null)
-        {
-            worldresults.clear();
-        }
+        //todo maybe only server perms cache flush
+        permCheckResults.clear();
     }
 
     private void recalcPerms0(String server, String world)
@@ -488,15 +448,8 @@ public class User implements PermEntity
         List<String> effperms = calcEffectivePerms(server, world);
         cachedPerms.put(server + ";" + world, effperms);
 
-        Map<String, Map<String, Boolean>> serverresults = serverWorldCheckResults.get(server);
-        if (serverresults != null)
-        {
-            Map<String, Boolean> worldresults = serverresults.get(world);
-            if (worldresults != null)
-            {
-                worldresults.clear();
-            }
-        }
+        //todo maybe only serverworld perms cache flush
+        permCheckResults.clear();
     }
 
     public boolean isNothingSpecial()
@@ -598,7 +551,7 @@ public class User implements PermEntity
                 }
             }
         }
-        
+
         //pre process
         ret = BungeePerms.getInstance().getPermissionsResolver().preprocessWithOrigin(ret, getSender());
 
@@ -823,12 +776,10 @@ public class User implements PermEntity
                 + (BungeePerms.getInstance().getConfig().isTerminateSuffixSpace() ? " " : "")
                 + (BungeePerms.getInstance().getConfig().isTerminateSuffixReset() ? ChatColor.RESET : "");
     }
-    
+
     public void flushCache()
     {
-        checkResults.clear();
-        serverCheckResults.clear();
-        serverWorldCheckResults.clear();
+        permCheckResults.clear();
     }
 
     private Sender getSender()
@@ -849,6 +800,37 @@ public class User implements PermEntity
     private void access()
     {
         lastAccess = System.currentTimeMillis();
+    }
+
+    private Boolean getCachedResult(String permission, String server, String world)
+    {
+        return getPermMap(server, world).get(permission);
+    }
+
+    private void setCachedResult(String permission, boolean value, String server, String world)
+    {
+        getPermMap(server, world).put(permission, value);
+    }
+
+    private Map<String, Boolean> getPermMap(String server, String world)
+    {
+        //get server
+        Map<String, Map<String, Boolean>> worldmap = permCheckResults.get(server);
+        if (worldmap == null)
+        {
+            worldmap = new HashMap();
+            permCheckResults.put(server, worldmap);
+        }
+
+        //get world
+        Map<String, Boolean> permmap = worldmap.get(world);
+        if (permmap == null)
+        {
+            permmap = new HashMap();
+            worldmap.put(world, permmap);
+        }
+
+        return permmap;
     }
 
     @Deprecated
