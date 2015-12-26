@@ -54,6 +54,18 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         //inject into console // seems to be best place here
         BPPermissible permissible = new BPPermissible(Bukkit.getConsoleSender(), null, Injector.getPermissible(Bukkit.getConsoleSender()));
         permissible.inject();
+        
+        //uninject from players
+        for(Player p : Bukkit.getOnlinePlayers())
+        {
+            if(!(Injector.getPermissible(p) instanceof BPPermissible))
+            {
+                User u = config.isUseUUIDs() ? pm().getUser(p.getUniqueId()) : pm().getUser(p.getName());
+                BPPermissible perm = new BPPermissible(p, u, Injector.getPermissible(p));
+                perm.inject();
+            }
+            p.recalculatePermissions();
+        }
     }
 
     @Override
@@ -68,6 +80,12 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
 
         //uninject from console // seems to be best place here
         Injector.uninject(Bukkit.getConsoleSender());
+        
+        //uninject from players
+        for(Player p : Bukkit.getOnlinePlayers())
+        {
+            Injector.uninject(p);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

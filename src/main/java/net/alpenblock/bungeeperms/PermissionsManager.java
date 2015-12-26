@@ -149,9 +149,10 @@ public class PermissionsManager
         //load online players; allows reload
         for (Sender s : BungeePerms.getInstance().getPlugin().getPlayers())
         {
+            User user;
             if (config.isUseUUIDs())
             {
-                User user = getUser(s.getUUID());
+                user = getUser(s.getUUID());
                 if (user == null)
                 {
                     createTempUser(s.getName(), s.getUUID());
@@ -159,12 +160,15 @@ public class PermissionsManager
             }
             else
             {
-                User user = getUser(s.getName());
+                user = getUser(s.getName());
                 if (user == null)
                 {
                     createTempUser(s.getName(), null);
                 }
             }
+
+            //call event
+            BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
         }
 
         enabled = true;
