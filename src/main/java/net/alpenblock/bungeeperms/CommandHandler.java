@@ -481,12 +481,12 @@ public class CommandHandler
 
         if (server == null)
         {
-            if (user.getExtraPerms().contains("-" + perm))
+            if (user.getPerms().contains("-" + perm))
             {
                 pm().removeUserPerm(user, "-" + perm);
                 sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM, perm, user.getName()));
             }
-            else if (!user.getExtraPerms().contains(perm))
+            else if (!user.getPerms().contains(perm))
             {
                 pm().addUserPerm(user, perm);
                 sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM, perm, user.getName()));
@@ -565,12 +565,12 @@ public class CommandHandler
 
         if (server == null)
         {
-            if (user.getExtraPerms().contains(perm))
+            if (user.getPerms().contains(perm))
             {
                 pm().removeUserPerm(user, perm);
                 sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));
             }
-            else if (!user.getExtraPerms().contains("-" + perm))
+            else if (!user.getPerms().contains("-" + perm))
             {
                 pm().addUserPerm(user, "-" + perm);
                 sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));
@@ -1408,7 +1408,7 @@ public class CommandHandler
         }
 
         //global perm
-        boolean has = group.has(perm.toLowerCase(), server, world);
+        boolean has = group.hasPerm(perm.toLowerCase(), server, world);
         if (server == null)
         {
             sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM, group.getName(), perm, formatBool(has)));

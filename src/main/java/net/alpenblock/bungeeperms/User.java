@@ -74,35 +74,15 @@ public class User implements PermEntity
         return s;
     }
 
-    public boolean hasPerm(String perm)
-    {
-        return hasPermOnServerInWorld(perm, null, null);
-    }
-
-    public boolean hasPermOnServer(String perm, String server)
-    {
-        return hasPermOnServerInWorld(perm, server, null);
-    }
-
-    public boolean hasPermOnServerInWorld(String perm, String server, String world)
+    public boolean hasPerm(String perm, String server, String world)
     {
         access();
 
         Sender s = getSender();
-        return hasPermOnServerInWorld(s, perm, server, world);
+        return hasPerm(s, perm, server, world);
     }
 
-    public boolean hasPerm(Sender s, String perm)
-    {
-        return hasPermOnServerInWorld(s, perm, null, null);
-    }
-
-    public boolean hasPermOnServer(Sender s, String perm, String server)
-    {
-        return hasPermOnServerInWorld(s, perm, server, null);
-    }
-
-    public boolean hasPermOnServerInWorld(Sender s, String perm, String server, String world)
+    public boolean hasPerm(Sender s, String perm, String server, String world)
     {
         access();
 
@@ -197,31 +177,7 @@ public class User implements PermEntity
         return ret;
     }
 
-    public void recalcPerms()
-    {
-        recalcPerms0(null, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
-    }
-
-    public void recalcPerms(String server)
-    {
-        recalcPerms0(server, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
-    }
-
     public void recalcPerms(String server, String world)
-    {
-        recalcPerms0(server, world);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
-    }
-
-    private void recalcPerms0(String server, String world)
     {
         access();
 
@@ -230,6 +186,9 @@ public class User implements PermEntity
 
         deletePermCache(server, world);
         deletePermResultCache(server, world);
+
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
     }
 
     public boolean isNothingSpecial()
@@ -701,17 +660,5 @@ public class User implements PermEntity
     private boolean existsPermCacheList(String server, String world)
     {
         return cachedPerms.containsKey(server) && cachedPerms.get(server).containsKey(world);
-    }
-
-    @Deprecated
-    public List<String> getExtraPerms() //todo: remove
-    {
-        return perms;
-    }
-
-    @Deprecated
-    public void setExtraPerms(List<String> perms) //todo: remove
-    {
-        this.perms = perms;
     }
 }

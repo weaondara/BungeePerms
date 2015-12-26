@@ -71,7 +71,7 @@ public class Group implements Comparable<Group>, PermEntity
         return isdefault;
     }
 
-    public void setIsdefault(boolean isdefault)
+    public void setDefault(boolean isdefault)
     {
         this.isdefault = isdefault;
     }
@@ -132,7 +132,7 @@ public class Group implements Comparable<Group>, PermEntity
         return ret;
     }
 
-    public boolean has(String perm, String server, String world)
+    public boolean hasPerm(String perm, String server, String world)
     {
         perm = Statics.toLower(perm);
         server = Statics.toLower(server);
@@ -145,36 +145,15 @@ public class Group implements Comparable<Group>, PermEntity
         return has != null && has;
     }
 
-    public void recalcPerms()
-    {
-        recalcPerms0(null,null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
-    }
-
-    public void recalcPerms(String server)
-    {
-        recalcPerms0(server,null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
-    }
-
     public void recalcPerms(String server, String world)
-    {
-        recalcPerms0(server, world);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
-    }
-
-    public void recalcPerms0(String server, String world)
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
 
         deletePermCache(server, world);
+
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
     }
 
     public List<BPPermission> getPermsWithOrigin(String server, String world)

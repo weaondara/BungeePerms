@@ -559,7 +559,7 @@ public class MySQL2BackEnd implements BackEnd
 
         //set
         group.setInheritances(inheritances);
-        group.setIsdefault(isdefault);
+        group.setDefault(isdefault);
         group.setRank(rank);
         group.setWeight(weight);
         group.setLadder(ladder);
@@ -594,7 +594,7 @@ public class MySQL2BackEnd implements BackEnd
         user.setGroups(lgroups);
 
         //reset & load
-        user.setExtraPerms(new ArrayList<String>());
+        user.setPerms(new ArrayList<String>());
         user.setServers(new HashMap<String, Server>());
         user.setDisplay(null);
         user.setPrefix(null);

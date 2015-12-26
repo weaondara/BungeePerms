@@ -302,7 +302,7 @@ public class YAMLBackEnd implements BackEnd
             String uname = BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName();
 
             permsconf.setListString("users." + uname + ".groups", groups);
-            permsconf.setListString("users." + uname + ".permissions", user.getExtraPerms());
+            permsconf.setListString("users." + uname + ".permissions", user.getPerms());
 
             for (Map.Entry<String, Server> se : user.getServers().entrySet())
             {
@@ -383,7 +383,7 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public synchronized void saveUserPerms(User user)
     {
-        permsconf.setListStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".permissions", user.getExtraPerms());
+        permsconf.setListStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".permissions", user.getPerms());
     }
 
     @Override
@@ -666,7 +666,7 @@ public class YAMLBackEnd implements BackEnd
 
         group.setInheritances(inheritances);
         group.setPerms(permissions);
-        group.setIsdefault(isdefault);
+        group.setDefault(isdefault);
         group.setRank(rank);
         group.setWeight(weight);
         group.setLadder(ladder);
@@ -726,7 +726,7 @@ public class YAMLBackEnd implements BackEnd
         }
 
         user.setGroups(lgroups);
-        user.setExtraPerms(perms);
+        user.setPerms(perms);
         user.setDisplay(display);
         user.setPrefix(prefix);
         user.setSuffix(suffix);

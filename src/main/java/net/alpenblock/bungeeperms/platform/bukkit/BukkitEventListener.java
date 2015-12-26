@@ -206,11 +206,11 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             pm().removeGroupFromCache(g);
             for (Group gr : pm().getGroups())
             {
-                gr.recalcPerms();
+                gr.recalcPerms(null, null);
             }
             for (User u : pm().getUsers())
             {
-                u.recalcPerms();
+                u.recalcPerms(null, null);
             }
         }
         else if (cmd.equalsIgnoreCase("reloaduser"))

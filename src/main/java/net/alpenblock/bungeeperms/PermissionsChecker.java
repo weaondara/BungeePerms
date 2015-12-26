@@ -15,12 +15,7 @@ public class PermissionsChecker
      */
     public boolean hasPerm(String sender, String permission)
     {
-        User u = pm().getUser(sender);
-        if (u == null)
-        {
-            return false;
-        }
-        return u.hasPerm(permission);
+        return hasPermOnServerInWorld(sender, permission, null, null);
     }
 
     /**
@@ -33,18 +28,7 @@ public class PermissionsChecker
      */
     public boolean hasPermOnServer(String sender, String permission, String server)
     {
-        User u = pm().getUser(sender);
-        if (u == null)
-        {
-            return false;
-        }
-
-        if (server == null)
-        {
-            return hasPerm(sender, permission);
-        }
-
-        return u.hasPermOnServer(permission, server);
+        return hasPermOnServerInWorld(sender, permission, server, null);
     }
 
     /**
@@ -64,17 +48,7 @@ public class PermissionsChecker
             return false;
         }
 
-        if (server == null)
-        {
-            return hasPerm(sender, permission);
-        }
-
-        if (world == null)
-        {
-            return hasPermOnServer(sender, permission, server);
-        }
-
-        return u.hasPermOnServerInWorld(permission, server, world);
+        return u.hasPerm(permission, server, world);
     }
 
 //with wrapped command senders
@@ -94,7 +68,7 @@ public class PermissionsChecker
             {
                 return false;
             }
-            return u.hasPerm(sender, permission);
+            return u.hasPerm(sender, permission, null, null);
         }
         return false;
     }
@@ -119,7 +93,7 @@ public class PermissionsChecker
             {
                 return false;
             }
-            return u.hasPerm(sender, permission);
+            return u.hasPerm(sender, permission, null, null);
         }
     }
 
@@ -138,12 +112,7 @@ public class PermissionsChecker
             return false;
         }
 
-        if (sender.getServer() == null)
-        {
-            return hasPerm(sender, permission);
-        }
-
-        return u.hasPermOnServer(sender, permission, sender.getServer());
+        return u.hasPerm(sender, permission, sender.getServer(), null);
     }
 
     /**
@@ -167,12 +136,7 @@ public class PermissionsChecker
                 return false;
             }
 
-            if (sender.getServer() == null)
-            {
-                return hasPerm(sender, permission);
-            }
-
-            return u.hasPermOnServer(sender, permission, sender.getServer());
+            return u.hasPerm(sender, permission, sender.getServer(), null);
         }
     }
 
@@ -191,17 +155,7 @@ public class PermissionsChecker
             return false;
         }
 
-        if (sender.getServer() == null)
-        {
-            return hasPerm(sender, permission);
-        }
-
-        if (sender.getWorld() == null)
-        {
-            return hasPermOnServer(sender, permission);
-        }
-
-        return u.hasPermOnServerInWorld(sender, permission, sender.getServer(), sender.getWorld());
+        return u.hasPerm(sender, permission, sender.getServer(), sender.getWorld());
     }
 
     /**
@@ -225,17 +179,7 @@ public class PermissionsChecker
                 return false;
             }
 
-            if (sender.getServer() == null)
-            {
-                return hasPerm(sender, permission);
-            }
-
-            if (sender.getWorld() == null)
-            {
-                return hasPermOnServer(sender, permission);
-            }
-
-            return u.hasPermOnServerInWorld(sender, permission, sender.getServer(), sender.getWorld());
+            return u.hasPerm(sender, permission, sender.getServer(), sender.getWorld());
         }
     }
 
