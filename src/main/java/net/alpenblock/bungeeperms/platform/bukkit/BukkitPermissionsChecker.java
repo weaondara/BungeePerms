@@ -1,8 +1,7 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
 import lombok.AllArgsConstructor;
-import net.alpenblock.bungeeperms.ChatColor;
-import net.alpenblock.bungeeperms.Color;
+import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsChecker;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -101,13 +100,13 @@ public class BukkitPermissionsChecker extends PermissionsChecker
             boolean isperm = (hasPerm(sender, perm));
             if (!isperm && msg)
             {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             }
             return isperm;
         }
         else
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -125,7 +124,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
         boolean isperm = hasPerm(sender, perm) || (sender instanceof ConsoleCommandSender);
         if (!isperm && msg)
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
         }
         return isperm;
     }
@@ -145,13 +144,13 @@ public class BukkitPermissionsChecker extends PermissionsChecker
             boolean isperm = hasPermOnServer(sender, perm);
             if (!isperm && msg)
             {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             }
             return isperm;
         }
         else
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -169,7 +168,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
         boolean isperm = hasPermOnServer(sender, perm) || (sender instanceof ConsoleCommandSender);
         if (!isperm && msg)
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
         }
         return isperm;
     }
@@ -189,13 +188,13 @@ public class BukkitPermissionsChecker extends PermissionsChecker
             boolean isperm = hasPermOnServerInWorld(sender, perm);
             if (!isperm && msg)
             {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             }
             return isperm;
         }
         else
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -213,7 +212,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
         boolean isperm = hasPermOnServerInWorld(sender, perm) || (sender instanceof ConsoleCommandSender);
         if (!isperm && msg)
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
         }
         return isperm;
     }

@@ -1,10 +1,9 @@
 package net.alpenblock.bungeeperms.platform.bungee;
 
 import lombok.AllArgsConstructor;
-import net.alpenblock.bungeeperms.Color;
+import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsChecker;
 import net.alpenblock.bungeeperms.User;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -177,13 +176,13 @@ public class BungeePermissionsChecker extends PermissionsChecker
             boolean isperm = (hasPerm(sender, perm));
             if (!isperm && msg)
             {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             }
             return isperm;
         }
         else
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -201,7 +200,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
         boolean isperm = hasPerm(sender, perm) || new BungeeSender(sender).isConsole();
         if (!isperm && msg)
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
         }
         return isperm;
     }
@@ -221,13 +220,13 @@ public class BungeePermissionsChecker extends PermissionsChecker
             boolean isperm = hasPermOnServer(sender, perm);
             if (!isperm && msg)
             {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             }
             return isperm;
         }
         else
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -245,7 +244,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
         boolean isperm = hasPermOnServer(sender, perm) || new BungeeSender(sender).isConsole();
         if (!isperm && msg)
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
         }
         return isperm;
     }
@@ -265,13 +264,13 @@ public class BungeePermissionsChecker extends PermissionsChecker
             boolean isperm = hasPermOnServerInWorld(sender, perm);
             if (!isperm && msg)
             {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             }
             return isperm;
         }
         else
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -289,7 +288,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
         boolean isperm = hasPermOnServerInWorld(sender, perm) || new BungeeSender(sender).isConsole();
         if (!isperm && msg)
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
         }
         return isperm;
     }

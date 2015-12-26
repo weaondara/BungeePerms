@@ -38,7 +38,7 @@ public class Lang
     public static enum MessageType
     {
 
-        BUNGEEPERMS("bungeeperms", ChatColor.GOLD.alt() + "Welcome to BungeePerms, a BungeeCord permissions plugin"),
+        BUNGEEPERMS("bungeeperms", ChatColor.GOLD.alt() + "Welcome to BungeePerms, a BungeeCord/Spigot permissions plugin"),
         VERSION("version", Color.Text.alt() + "Version " + ChatColor.GOLD.alt() + "{0}"),
         AUTHOR("author", Color.Text.alt() + "Author " + ChatColor.GOLD.alt() + "{0}"),
         PERMISSIONS_RELOADED("permissions-reloaded", Color.Text.alt() + "Permissions reloaded"),
@@ -52,6 +52,7 @@ public class Lang
         FORMATTING_DONE("formatting-done", Color.Message.alt() + "Finished formatting."),
         CLEANING("cleaning", Color.Text.alt() + "Cleaning up permissions file/table ..."),
         CLEANING_DONE("cleaning-done", Color.Message.alt() + "Finished cleaning. Deleted " + Color.Value.alt() + "{0} users" + Color.Message.alt() + "."),
+        NO_PERM("no-permission", ChatColor.RED.alt() + "You don't have permission to do that!"),
         //error msgs
         ERR_INVALID_BOOL_VALUE("error.invalid-bool-value", Color.Error.alt() + "A boolean value is required!"),
         ERR_INVALID_INT_VALUE("error.invalid-int-value", Color.Error.alt() + "An integer value greater than 0 is required!"),

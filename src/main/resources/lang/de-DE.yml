@@ -1,4 +1,4 @@
-bungeeperms: '&6Willkommen zu BungeePerms, einem BungeeCord-Permission Plugin'
+bungeeperms: '&6Willkommen zu BungeePerms, einem BungeeCord/Spigot-Permission Plugin'
 version: '&7Version &6{0}'
 author: '&7Autor &6{0}'
 permissions-reloaded: '&7Rechte neu geladen'
@@ -13,6 +13,7 @@ formatting: '&7Formatiere Permission-Datei/Tabelle ...'
 formatting-done: '&2Formatierung abgeschlossen.'
 cleaning: '&7Bereinige Permission-Datei/Tabelle ...'
 cleaning-done: '&2Bereinigung abgeschlossen. &6{0} &2User geloescht.'
+no-permission: '&cDu hast keine Rechte um das zu tun!'
 error:
   invalid-bool-value: '&4Eine boolscher Wert ist erforderlich!'
   invalid-int-value: '&4Ein Integer-Wert groeßer 0 ist erforderlich!'

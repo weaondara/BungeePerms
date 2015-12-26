@@ -255,13 +255,13 @@ public class PermissionsChecker
             boolean isperm = (hasPerm(sender, perm));
             if (!isperm && msg)
             {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             }
             return isperm;
         }
         else
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -279,7 +279,7 @@ public class PermissionsChecker
         boolean isperm = (hasPerm(sender, perm) || sender.isConsole());
         if (!isperm && msg)
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
         }
         return isperm;
     }
@@ -299,13 +299,13 @@ public class PermissionsChecker
             boolean isperm = hasPermOnServer(sender, perm);
             if (!isperm && msg)
             {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             }
             return isperm;
         }
         else
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -323,7 +323,7 @@ public class PermissionsChecker
         boolean isperm = (hasPermOnServer(sender, perm) || sender.isConsole());
         if (!isperm && msg)
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
         }
         return isperm;
     }
@@ -343,13 +343,13 @@ public class PermissionsChecker
             boolean isperm = hasPermOnServerInWorld(sender, perm);
             if (!isperm && msg)
             {
-                sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             }
             return isperm;
         }
         else
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -367,7 +367,7 @@ public class PermissionsChecker
         boolean isperm = (hasPermOnServerInWorld(sender, perm) || sender.isConsole());
         if (!isperm && msg)
         {
-            sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
+            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
         }
         return isperm;
     }
