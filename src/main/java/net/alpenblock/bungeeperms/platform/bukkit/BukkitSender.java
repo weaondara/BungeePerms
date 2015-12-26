@@ -32,7 +32,7 @@ public class BukkitSender implements Sender
         if (isPlayer() && BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             BaseComponent[] converted = BukkitMessageEncoder.convert(e.create());
-            ((Player)sender).spigot().sendMessage(converted);
+            ((Player) sender).spigot().sendMessage(converted);
         }
         else
         {
@@ -49,6 +49,10 @@ public class BukkitSender implements Sender
     @Override
     public UUID getUUID()
     {
+        if (!BungeePerms.getInstance().getConfig().isUseUUIDs())
+        {
+            throw new IllegalStateException("useuuid not enabled but uuid functionality called");
+        }
         if (sender instanceof ConsoleCommandSender)
         {
             return UUID.fromString("00000000-0000-0000-0000-000000000000");
