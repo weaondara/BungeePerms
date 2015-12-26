@@ -16,7 +16,7 @@ cleaning-done: '&2Bereinigung abgeschlossen. &6{0} &2User geloescht.'
 no-permission: '&cDu hast keine Rechte um das zu tun!'
 error:
   invalid-bool-value: '&4Eine boolscher Wert ist erforderlich!'
-  invalid-int-value: '&4Ein Integer-Wert groeßer 0 ist erforderlich!'
+  invalid-int-value: '&4Ein Integer-Wert groesser 0 ist erforderlich!'
   user:
     not-existing: '&4Der Spieler &3{0}&4 existiert nicht!'
     already-in-group: '&4Der Spieler ist bereits in der Gruppe &6{0}&4!'
