@@ -122,7 +122,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasOrConsole(CommandSender sender, String perm, boolean msg)
     {
-        boolean isperm = (hasPerm(sender, perm) | (sender instanceof ConsoleCommandSender));
+        boolean isperm = hasPerm(sender, perm) || (sender instanceof ConsoleCommandSender);
         if (!isperm && msg)
         {
             sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
@@ -166,7 +166,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasOrConsoleOnServer(CommandSender sender, String perm, boolean msg)
     {
-        boolean isperm = (hasPermOnServer(sender, perm) | (sender instanceof ConsoleCommandSender));
+        boolean isperm = hasPermOnServer(sender, perm) || (sender instanceof ConsoleCommandSender);
         if (!isperm && msg)
         {
             sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);
@@ -210,7 +210,7 @@ public class BukkitPermissionsChecker extends PermissionsChecker
      */
     public boolean hasOrConsoleOnServerInWorld(CommandSender sender, String perm, boolean msg)
     {
-        boolean isperm = (hasPermOnServerInWorld(sender, perm) | (sender instanceof ConsoleCommandSender));
+        boolean isperm = hasPermOnServerInWorld(sender, perm) || (sender instanceof ConsoleCommandSender);
         if (!isperm && msg)
         {
             sender.sendMessage(Color.Error + "You don't have permission to do that!" + ChatColor.RESET);

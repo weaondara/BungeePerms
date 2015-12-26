@@ -8,6 +8,7 @@ import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -49,7 +50,7 @@ public class BungeeSender implements Sender
     @Override
     public UUID getUUID()
     {
-        if (Statics.isBungeeConsole(sender))
+        if (isConsole())
         {
             return UUID.fromString("00000000-0000-0000-0000-000000000000");
         }
@@ -88,7 +89,7 @@ public class BungeeSender implements Sender
     @Override
     public boolean isConsole()
     {
-        return Statics.isBungeeConsole(sender);
+        return sender.getClass().getName().equals("net.md_5.bungee.command.ConsoleCommandSender");
     }
 
     @Override
