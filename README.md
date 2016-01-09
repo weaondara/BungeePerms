@@ -5,6 +5,10 @@ BungeePerms is a permissions plugin for BungeeCord and Spigot. It overrides the 
 so you don't need BungeeCord/Spigot permissions (anymore). BungeePerms can form a network so that it's a single
 system managing all permissions in your network.
 
+**Binaries**
+
+Dev builds of this project are available at http://ci.wea-ondara.net/job/BungeePerms/  
+
 **Functionality:**
 
 - permission groups  
