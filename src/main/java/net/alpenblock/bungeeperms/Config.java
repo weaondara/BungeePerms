@@ -16,17 +16,14 @@ public class Config
 
     public Config(PlatformPlugin p, String path)
     {
-        this.path = p.getPluginFolder() + path;
-        createFile();
-        fconfig = YamlConfiguration.loadConfiguration(new File(this.path));
-        allowsave = false;
+        this(p.getPluginFolder() + path);
     }
 
     public Config(String path)
     {
         this.path = path;
         createFile();
-        fconfig = YamlConfiguration.loadConfiguration(new File(this.path));
+        fconfig = new YamlConfiguration();
         allowsave = false;
     }
 
@@ -65,7 +62,7 @@ public class Config
         }
     }
 
-    public void createFile()
+    private void createFile()
     {
         File file = new File(path);
         if (!file.exists())
