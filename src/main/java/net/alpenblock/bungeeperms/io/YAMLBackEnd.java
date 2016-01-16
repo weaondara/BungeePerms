@@ -621,6 +621,7 @@ public class YAMLBackEnd implements BackEnd
     {
         new File(BungeePerms.getInstance().getPlugin().getPluginFolder() + permspath).delete();
         permsconf = new Config(BungeePerms.getInstance().getPlugin(), permspath);
+        load();
     }
 
     @Override
