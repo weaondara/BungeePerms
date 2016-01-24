@@ -107,13 +107,7 @@ public class Chat_BungeePerms extends Chat
         }
 
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        Server s = u.getServer(config.getServername());
-        if (world == null)
-        {
-            s.setPrefix(prefix);
-            return;
-        }
-        s.getWorld(world).setPrefix(prefix);
+        perms.getPermissionsManager().setUserPrefix(u, prefix, config.getServername(), world);
     }
 
     @Override
@@ -135,13 +129,7 @@ public class Chat_BungeePerms extends Chat
         }
 
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        Server s = u.getServer(config.getServername());
-        if (world == null)
-        {
-            s.setSuffix(suffix);
-            return;
-        }
-        s.getWorld(world).setSuffix(suffix);
+        perms.getPermissionsManager().setUserSuffix(u, suffix, config.getServername(), world);
     }
 
     @Override
@@ -164,13 +152,7 @@ public class Chat_BungeePerms extends Chat
         }
 
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        Server s = g.getServer(config.getServername());
-        if (world == null)
-        {
-            s.setPrefix(prefix);
-            return;
-        }
-        s.getWorld(world).setPrefix(prefix);
+        perms.getPermissionsManager().setGroupPrefix(g, prefix, config.getServername(), world);
     }
 
     @Override
@@ -193,13 +175,7 @@ public class Chat_BungeePerms extends Chat
         }
 
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        Server s = g.getServer(config.getServername());
-        if (world == null)
-        {
-            s.setSuffix(suffix);
-            return;
-        }
-        s.getWorld(world).setSuffix(suffix);
+        perms.getPermissionsManager().setGroupSuffix(g, suffix, config.getServername(), world);
     }
 
     @Override
