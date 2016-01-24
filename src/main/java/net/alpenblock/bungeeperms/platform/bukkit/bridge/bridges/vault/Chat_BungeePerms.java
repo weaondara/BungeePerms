@@ -7,7 +7,6 @@ import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin;
-import net.alpenblock.bungeeperms.platform.bukkit.BukkitSender;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
