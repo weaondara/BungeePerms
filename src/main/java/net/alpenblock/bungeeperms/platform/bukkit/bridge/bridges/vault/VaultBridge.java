@@ -10,14 +10,12 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin;
 import net.alpenblock.bungeeperms.platform.bukkit.bridge.Bridge;
 import net.milkbowl.vault.Vault;
-import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
 
 public class VaultBridge implements Bridge
