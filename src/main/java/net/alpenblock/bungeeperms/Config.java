@@ -143,7 +143,7 @@ public class Config
             T[] constants = (T[]) def.getDeclaringClass().getEnumConstants();
             for (T constant : constants)
             {
-                if (constant.name().equals(s))
+                if (constant.name().equalsIgnoreCase(s))
                 {
                     return constant;
                 }
