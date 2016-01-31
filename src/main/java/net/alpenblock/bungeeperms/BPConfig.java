@@ -62,7 +62,7 @@ public class BPConfig
 
         //db
         backEndType = config.getEnumValue("backendtype", BackEndType.YAML);
-        UUIDPlayerDBType = config.getEnumValue("uuidplayerdb", UUIDPlayerDBType.None);
+        UUIDPlayerDBType = config.getEnumValue("uuidplayerdb", UUIDPlayerDBType.YAML);
         tablePrefix = config.getString("tablePrefix", "bungeeperms_");
         fetcherCooldown = config.getInt("uuidfetcher.cooldown", 3000);
         saveAllUsers = config.getBoolean("saveAllUsers", true);
