@@ -16,18 +16,23 @@ import net.alpenblock.bungeeperms.uuid.UUIDFetcher;
 @AllArgsConstructor
 public class CommandHandler
 {
-
+    
     protected PlatformPlugin plugin;
     protected PermissionsChecker checker;
     protected BPConfig config;
-
+    
     public boolean onCommand(Sender sender, String cmd, String label, String[] args)
     {
         if (!cmd.equalsIgnoreCase("bungeeperms"))
         {
             return false;
         }
-
+        
+        if (BungeePerms.getInstance().getConfig().isDebug())
+        {
+            BungeePerms.getInstance().getPlugin().getLogger().info(sender.getName() + " issued bungeeperms command /" + cmd + " " + Statics.arrayToString(args, 0, args.length, " "));
+        }
+        
         if (args.length == 0)
         {
             sender.sendMessage(Lang.translate(MessageType.BUNGEEPERMS));
@@ -92,7 +97,7 @@ public class CommandHandler
         }
         return false;
     }
-
+    
     private boolean handleHelp(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.help", true))
@@ -100,12 +105,12 @@ public class CommandHandler
 //            showHelp(sender);
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 1, 2))
         {
             return true;
         }
-
+        
         int page = 1;
         if (args.length == 2)
         {
@@ -123,38 +128,38 @@ public class CommandHandler
                 return true;
             }
         }
-
+        
         page--;
-
+        
         HelpProvider.sendHelpPage(sender, page);
-
+        
         return true;
     }
-
+    
     private boolean handleReload(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.reload", true))
         {
             return true;
         }
-
+        
         BungeePerms.getInstance().reload(true);
         sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_RELOADED));
         return true;
     }
-
+    
     private boolean handleDebug(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.debug", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 2))
         {
             return true;
         }
-
+        
         boolean val;
         try
         {
@@ -165,7 +170,7 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_BOOL_VALUE));
             return true;
         }
-
+        
         if (val)
         {
             config.setDebug(true);
@@ -179,26 +184,26 @@ public class CommandHandler
             return true;
         }
     }
-
+    
     private boolean handleUsers(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.users.list", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 1, 2))
         {
             return true;
         }
-
+        
         List<String> users = pm().getRegisteredUsers();
         if (users.isEmpty())
         {
             sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
             return true;
         }
-
+        
         if (args.length == 1)
         {
             String out = Lang.translate(MessageType.REGISTERED_USERS);
@@ -216,12 +221,12 @@ public class CommandHandler
             {
                 return false;
             }
-
+            
             sender.sendMessage(Lang.translate(MessageType.REGISTERED_USERS_COUNT, pm().getRegisteredUsers().size()));
             return true;
         }
     }
-
+    
     private boolean handleUserCommands(Sender sender, String[] args)
     {
         if (args.length < 3)
@@ -229,7 +234,7 @@ public class CommandHandler
             Messages.sendTooLessArgsMessage(sender);
             return true;
         }
-
+        
         if (args[2].equalsIgnoreCase("list"))
         {
             return handleUserCommandsList(sender, args);
@@ -290,7 +295,7 @@ public class CommandHandler
             {
                 return true;
             }
-
+            
             String[] newargs =
             {
                 args[0], args[1], args[3] + args[2], args[4]
@@ -307,12 +312,12 @@ public class CommandHandler
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3, 6))
         {
             return true;
         }
-
+        
         boolean specialpage = args.length > 3 && Statics.isInt(args[args.length - 1]);
         int page = specialpage ? Integer.parseInt(args[args.length - 1]) : 1;
         if (page < 1)
@@ -320,18 +325,18 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_INT_VALUE));
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;
         String world = args.length > (4 + (specialpage ? 1 : 0)) ? args[4].toLowerCase() : null;
-
+        
         User user = pm().getUser(player);
         if (user == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         if (config.isUseUUIDs())
         {
             sender.sendMessage(Lang.translate(MessageType.USER_PERMISSIONS_LIST_HEADER_UUID, user.getName(), user.getUUID()));
@@ -353,19 +358,19 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleUserCommandsGroups(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.groups", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         User user = pm().getUser(player);
         if (user == null)
@@ -373,7 +378,7 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         sender.sendMessage(Lang.translate(MessageType.USER_GROUPS_HEADER, user.getName()));
         for (Group g : user.getGroups())
         {
@@ -381,19 +386,19 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleUserCommandsInfo(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.info", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         User user = pm().getUser(player);
         if (user == null)
@@ -401,11 +406,11 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         sender.sendMessage(Lang.translate(MessageType.USER_ABOUT, user.getName()));
-
+        
         sender.sendMessage(Lang.translate(MessageType.USER_UUID, user.getUUID()));
-
+        
         String groups = "";
         for (int i = 0; i < user.getGroups().size(); i++)
         {
@@ -429,19 +434,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.SUFFIX, (!Statics.isEmpty(user.getSuffix()) ? user.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
-
+    
     private boolean handleUserCommandsDelete(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.delete", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         User user = pm().getUser(player);
         if (user == null)
@@ -449,25 +454,25 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         pm().deleteUser(user);
-
+        
         sender.sendMessage(Lang.translate(MessageType.USER_DELETED));
         return true;
     }
-
+    
     private boolean handleUserCommandsPermAdd(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.perms.add", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String perm = args[3].toLowerCase();
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -478,7 +483,7 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         if (server == null)
         {
             if (user.getExtraPerms().contains("-" + perm))
@@ -499,7 +504,7 @@ public class CommandHandler
         else
         {
             Server srv = user.getServer(server);
-
+            
             if (world == null)
             {
                 if (srv.getPerms().contains("-" + perm))
@@ -520,7 +525,7 @@ public class CommandHandler
             else
             {
                 World w = srv.getWorld(world);
-
+                
                 if (w.getPerms().contains("-" + perm))
                 {
                     pm().removeUserPerServerWorldPerm(user, server, world, "-" + perm);
@@ -539,19 +544,19 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleUserCommandsPermRemove(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.perms.remove", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String perm = args[3].toLowerCase();
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -562,7 +567,7 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         if (server == null)
         {
             if (user.getExtraPerms().contains(perm))
@@ -583,7 +588,7 @@ public class CommandHandler
         else
         {
             Server srv = user.getServer(server);
-
+            
             if (world == null)
             {
                 if (srv.getPerms().contains(perm))
@@ -604,7 +609,7 @@ public class CommandHandler
             else
             {
                 World w = srv.getWorld(world);
-
+                
                 if (w.getPerms().contains(perm))
                 {
                     pm().removeUserPerServerWorldPerm(user, server, world, perm);
@@ -623,19 +628,19 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleUserCommandsHas(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.perms.has", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String perm = args[3].toLowerCase();
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -646,40 +651,37 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         if (server == null)
         {
             boolean has = checker.hasPerm(player, perm.toLowerCase());
             sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM, user.getName(), perm, formatBool(has)));
         }
+        else if (world == null)
+        {
+            boolean has = checker.hasPermOnServer(user.getName(), perm.toLowerCase(), server);
+            sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM_SERVER, user.getName(), perm, server, formatBool(has)));
+        }
         else
         {
-            if (world == null)
-            {
-                boolean has = checker.hasPermOnServer(user.getName(), perm.toLowerCase(), server);
-                sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM_SERVER, user.getName(), perm, server, formatBool(has)));
-            }
-            else
-            {
-                boolean has = checker.hasPermOnServerInWorld(user.getName(), perm.toLowerCase(), server, world);
-                sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM_SERVER_WORLD, user.getName(), perm, server, world, formatBool(has)));
-            }
+            boolean has = checker.hasPermOnServerInWorld(user.getName(), perm.toLowerCase(), server, world);
+            sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM_SERVER_WORLD, user.getName(), perm, server, world, formatBool(has)));
         }
         return true;
     }
-
+    
     private boolean handleUserCommandsGroupAdd(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.group.add", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String groupname = args[3];
         Group group = pm().getGroup(groupname);
@@ -688,14 +690,14 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         User u = pm().getUser(player);
         if (u == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         List<Group> groups = u.getGroups();
         for (Group g : groups)
         {
@@ -705,24 +707,24 @@ public class CommandHandler
                 return true;
             }
         }
-
+        
         pm().addUserGroup(u, group);
         sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP, groupname, u.getName()));
         return true;
     }
-
+    
     private boolean handleUserCommandsGroupRemove(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.group.remove", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String groupname = args[3];
         Group group = pm().getGroup(groupname);
@@ -731,14 +733,14 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         User u = pm().getUser(player);
         if (u == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         List<Group> groups = u.getGroups();
         for (Group g : groups)
         {
@@ -752,19 +754,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_IN_GROUP, groupname));
         return true;
     }
-
+    
     private boolean handleUserCommandsGroupSet(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.group.set", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String groupname = args[3];
         Group group = pm().getGroup(groupname);
@@ -773,37 +775,37 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         User u = pm().getUser(player);
         if (u == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
-
+        
         List<Group> laddergroups = pm().getLadderGroups(group.getLadder());
         for (Group g : laddergroups)
         {
             pm().removeUserGroup(u, g);
         }
-
+        
         pm().addUserGroup(u, group);
         sender.sendMessage(Lang.translate(MessageType.USER_SET_GROUP, groupname, u.getName()));
         return true;
     }
-
+    
     private boolean handleUserCommandsDisplay(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.display", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3, 6))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String display = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -818,19 +820,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.USER_SET_DISPLAY, user.getName()));
         return true;
     }
-
+    
     private boolean handleUserCommandsPrefix(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.prefix", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3, 6))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String prefix = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -845,19 +847,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.USER_SET_PREFIX, user.getName()));
         return true;
     }
-
+    
     private boolean handleUserCommandsSuffix(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.user.suffix", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3, 6))
         {
             return true;
         }
-
+        
         String player = Statics.getFullPlayerName(args[1]);
         String suffix = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -880,12 +882,12 @@ public class CommandHandler
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 1))
         {
             return true;
         }
-
+        
         if (pm().getGroups().isEmpty())
         {
             sender.sendMessage(Lang.translate(MessageType.NO_GROUPS_FOUND));
@@ -903,7 +905,7 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleGroupCommands(Sender sender, String[] args)
     {
         if (args.length < 3)
@@ -911,7 +913,7 @@ public class CommandHandler
             Messages.sendTooLessArgsMessage(sender);
             return true;
         }
-
+        
         if (args[2].equalsIgnoreCase("list"))
         {
             return handleGroupCommandsList(sender, args);
@@ -988,7 +990,7 @@ public class CommandHandler
             {
                 return true;
             }
-
+            
             String[] newargs =
             {
                 args[0], args[1], args[3] + args[2], args[4]
@@ -1005,12 +1007,12 @@ public class CommandHandler
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3, 6))
         {
             return true;
         }
-
+        
         boolean specialpage = args.length > 3 && Statics.isInt(args[args.length - 1]);
         int page = specialpage ? Integer.parseInt(args[args.length - 1]) : 1;
         if (page < 1)
@@ -1018,18 +1020,18 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_INT_VALUE));
             return true;
         }
-
+        
         String groupname = args[1];
         String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;
         String world = args.length > (4 + (specialpage ? 1 : 0)) ? args[4].toLowerCase() : null;
         Group group = pm().getGroup(groupname);
-
+        
         if (group == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         sender.sendMessage(Lang.translate(MessageType.GROUP_PERMISSIONS_LIST_HEADER, group.getName()));
         List<BPPermission> perms = group.getPermsWithOrigin(server, world);
         sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
@@ -1044,19 +1046,19 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleGroupCommandsInfo(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.info", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         Group group = pm().getGroup(groupname);
         if (group == null)
@@ -1064,7 +1066,7 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         sender.sendMessage(Lang.translate(MessageType.GROUP_ABOUT, group.getName()));
 
         //inheritances
@@ -1107,20 +1109,20 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.SUFFIX, (!Statics.isEmpty(group.getSuffix()) ? group.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
-
+    
     private boolean handleGroupCommandsUsers(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.users", true))
         {
             return true;
         }
-
+        
         if (args.length > 4)
         {
             Messages.sendTooManyArgsMessage(sender);
             return true;
         }
-
+        
         String groupname = args[1];
         Group group = pm().getGroup(groupname);
         if (group == null)
@@ -1133,7 +1135,7 @@ public class CommandHandler
         {
             sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
         }
-
+        
         if (args.length == 3)
         {
             String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
@@ -1155,19 +1157,19 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleGroupCommandsCreate(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.create", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         if (pm().getGroup(groupname) != null)
         {
@@ -1179,19 +1181,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.GROUP_CREATED, groupname));
         return true;
     }
-
+    
     private boolean handleGroupCommandsDelete(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.delete", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         Group group = pm().getGroup(groupname);
         if (group == null)
@@ -1199,25 +1201,25 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         sender.sendMessage(Lang.translate(MessageType.GROUP_DELETION_IN_PROGRESS));
         pm().deleteGroup(group);
         sender.sendMessage(Lang.translate(MessageType.GROUP_DELETED, group.getName()));
         return true;
     }
-
+    
     private boolean handleGroupCommandsPermAdd(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.perms.add", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         String perm = args[3].toLowerCase();
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -1275,7 +1277,7 @@ public class CommandHandler
             else
             {
                 World w = srv.getWorld(world);
-
+                
                 List<String> perserverworldperms = w.getPerms();
                 if (perserverworldperms.contains("-" + perm))
                 {
@@ -1295,19 +1297,19 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleGroupCommandsPermRemove(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.perms.remove", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         String perm = args[3].toLowerCase();
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -1363,7 +1365,7 @@ public class CommandHandler
             else
             {
                 World w = srv.getWorld(world);
-
+                
                 List<String> perserverworldperms = w.getPerms();
                 if (perserverworldperms.contains(perm))
                 {
@@ -1383,19 +1385,19 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleGroupCommandsHas(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.perms.has", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         String perm = args[3].toLowerCase();
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -1413,37 +1415,34 @@ public class CommandHandler
             boolean has = group.has(perm.toLowerCase());
             sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM, group.getName(), perm, formatBool(has)));
         }
+        else //per server perm
+        if (world == null)
+        {
+            boolean has = group.hasOnServer(perm.toLowerCase(), server);
+            sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER, group.getName(), perm, server, formatBool(has)));
+        }
+
+        //per server world perm
         else
         {
-            //per server perm
-            if (world == null)
-            {
-                boolean has = group.hasOnServer(perm.toLowerCase(), server);
-                sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER, group.getName(), perm, server, formatBool(has)));
-            }
-
-            //per server world perm
-            else
-            {
-                boolean has = group.hasOnServerInWorld(perm.toLowerCase(), server, world);
-                sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER_WORLD, group.getName(), perm, server, world, formatBool(has)));
-            }
+            boolean has = group.hasOnServerInWorld(perm.toLowerCase(), server, world);
+            sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER_WORLD, group.getName(), perm, server, world, formatBool(has)));
         }
         return true;
     }
-
+    
     private boolean handleGroupCommandsInheritAdd(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.inheritances.add", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         String addgroup = args[3];
 
@@ -1454,14 +1453,14 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         Group toadd = pm().getGroup(addgroup);
         if (toadd == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, addgroup));
             return true;
         }
-
+        
         List<String> inheritances = group.getInheritances();
 
         //check for already existing inheritance
@@ -1473,49 +1472,49 @@ public class CommandHandler
                 return true;
             }
         }
-
+        
         pm().addGroupInheritance(group, toadd);
-
+        
         sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE, addgroup, groupname));
         return true;
     }
-
+    
     private boolean handleGroupCommandsInheritRemove(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.inheritances.remove", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         String removegroup = args[3];
-
+        
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         Group toremove = pm().getGroup(removegroup);
         if (toremove == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, removegroup));
             return true;
         }
-
+        
         List<String> inheritances = group.getInheritances();
         for (String s : inheritances)
         {
             if (s.equalsIgnoreCase(toremove.getName()))
             {
                 pm().removeGroupInheritance(group, toremove);
-
+                
                 sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE, removegroup, groupname));
                 return true;
             }
@@ -1523,19 +1522,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_INHERITS, groupname, removegroup));
         return true;
     }
-
+    
     private boolean handleGroupCommandsRank(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.rank", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         int rank;
         try
@@ -1551,31 +1550,31 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_INT_VALUE));
             return true;
         }
-
+        
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         pm().rankGroup(group, rank);
         sender.sendMessage(Lang.translate(MessageType.GROUP_SET_RANK, group.getName()));
         return true;
     }
-
+    
     private boolean handleGroupCommandsWeight(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.weight", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         int weight;
         try
@@ -1597,24 +1596,24 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-
+        
         pm().weightGroup(group, weight);
         sender.sendMessage(Lang.translate(MessageType.GROUP_SET_WEIGHT, group.getName()));
         return true;
     }
-
+    
     private boolean handleGroupCommandsLadder(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.ladder", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         String ladder = args[3];
         Group group = pm().getGroup(groupname);
@@ -1627,19 +1626,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.GROUP_SET_LADDER, group.getName()));
         return true;
     }
-
+    
     private boolean handleGroupCommandsDefault(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.default", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 4))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         boolean isdefault;
         try
@@ -1651,7 +1650,7 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_BOOL_VALUE));
             return true;
         }
-
+        
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
@@ -1662,19 +1661,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.GROUP_SET_DEFAULT, group.getName(), isdefault ? Lang.translate(MessageType.DEFAULT) : Lang.translate(MessageType.NONDEFAULT)));
         return true;
     }
-
+    
     private boolean handleGroupCommandsDisplay(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.display", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3, 6))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         String display = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -1689,19 +1688,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.GROUP_SET_DISPLAY, group.getName()));
         return true;
     }
-
+    
     private boolean handleGroupCommandsPrefix(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.prefix", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3, 6))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         String prefix = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -1716,19 +1715,19 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.GROUP_SET_PREFIX, group.getName()));
         return true;
     }
-
+    
     private boolean handleGroupCommandsSuffix(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.group.suffix", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 3, 6))
         {
             return true;
         }
-
+        
         String groupname = args[1];
         String suffix = args.length > 3 ? args[3] : null;
         String server = args.length > 4 ? args[4].toLowerCase() : null;
@@ -1801,7 +1800,7 @@ public class CommandHandler
             }
             nextgroup = pm().getNextGroup(playergroup);
         }
-
+        
         if (nextgroup == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_CANNOT_BE_PROMOTED, user.getName()));
@@ -1854,10 +1853,10 @@ public class CommandHandler
                 sender.sendMessage(Lang.translate(MessageType.PROMOTE_MESSAGE_TO_USER, nextgroup.getName()));
             }
         }
-
+        
         return true;
     }
-
+    
     private boolean handleDemote(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.demote", true))
@@ -1906,7 +1905,7 @@ public class CommandHandler
             }
             previousgroup = pm().getPreviousGroup(playergroup);
         }
-
+        
         if (previousgroup == null)
         {
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_CANNOT_BE_DEMOTED, user.getName()));
@@ -1961,27 +1960,27 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleFormat(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.format", true))
         {
             return true;
         }
-
+        
         sender.sendMessage(Lang.translate(MessageType.FORMATTING));
         pm().format();
         sender.sendMessage(Lang.translate(MessageType.FORMATTING_DONE));
         return true;
     }
-
+    
     private boolean handleCleanup(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.cleanup", true))
         {
             return true;
         }
-
+        
         sender.sendMessage(Lang.translate(MessageType.CLEANING));
         sender.sendMessage(Color.Text + "Cleaning up permissions file/table ...");
         int deleted = pm().cleanup();
@@ -1989,7 +1988,7 @@ public class CommandHandler
         sender.sendMessage(Color.Message + "Finished cleaning. Deleted " + Color.Value + deleted + " users" + Color.Message + ".");
         return true;
     }
-
+    
     private boolean handleMigrate(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.migrate", true))
@@ -2003,7 +2002,7 @@ public class CommandHandler
             Messages.sendTooLessArgsMessage(sender);
             return true;
         }
-
+        
         String migratetype = args[1];
         if (migratetype.equalsIgnoreCase("backend"))
         {
@@ -2022,7 +2021,7 @@ public class CommandHandler
             return false;
         }
     }
-
+    
     private boolean handleMigrateBackend(Sender sender, String[] args)
     {
         if (args.length == 2)
@@ -2052,13 +2051,13 @@ public class CommandHandler
                 sender.sendMessage(ChatColor.RED + "The MySQL backend is deprecated! Please use MySQL2.");
                 return true;
             }
-
+            
             if (type == pm().getBackEnd().getType())
             {
                 sender.sendMessage(Color.Error + "Invalid backend type! You can't migrate to same type!");
                 return true;
             }
-
+            
             sender.sendMessage(Color.Text + "Migrating permissions to " + Color.Value + type.name() + Color.Text + " ...");
             pm().migrateBackEnd(type);
             sender.sendMessage(Color.Message + "Finished migration.");
@@ -2069,7 +2068,7 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleMigrateUseUUID(Sender sender, String[] args)
     {
         if (args.length == 2)
@@ -2094,13 +2093,13 @@ public class CommandHandler
                         + Color.Value + "false" + Color.Error + " is required!");
                 return true;
             }
-
+            
             if (type == config.isUseUUIDs())
             {
                 sender.sendMessage(Color.Error + "Invalid use-uuid type! You can't migrate to same type!");
                 return true;
             }
-
+            
             if (type)
             {
                 sender.sendMessage(Color.Text + "Migrating permissions using UUIDs for player identification ...");
@@ -2149,7 +2148,7 @@ public class CommandHandler
                 }
                 sender.sendMessage(Color.Message + "Finished applying of fetched data to player-uuid-database.");
             }
-
+            
             sender.sendMessage(Color.Message + "Finished migration.");
         }
         else
@@ -2158,7 +2157,7 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleMigrateUUIDPlayerDB(Sender sender, String[] args)
     {
         if (args.length == 2)
@@ -2177,13 +2176,13 @@ public class CommandHandler
                         + Color.Value + UUIDPlayerDBType.MySQL.name() + Color.Error + " is required!");
                 return true;
             }
-
+            
             if (type == pm().getUUIDPlayerDB().getType())
             {
                 sender.sendMessage(Color.Error + "Invalid uuid-player-database type! You can't migrate to same type!");
                 return true;
             }
-
+            
             sender.sendMessage(Color.Text + "Migrating uuid-player-database to " + Color.Value + type.name() + Color.Text + " ...");
             pm().migrateUUIDPlayerDB(type);
             sender.sendMessage(Color.Message + "Finished migration.");
@@ -2194,19 +2193,19 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private boolean handleUUID(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.uuid", true))
         {
             return true;
         }
-
+        
         if (!Statics.matchArgs(sender, args, 2, 3))
         {
             return true;
         }
-
+        
         boolean reverse = false;
         boolean mojang = false;
         String what = args[1];
@@ -2220,7 +2219,7 @@ public class CommandHandler
                 mojang = params.contains("m");
             }
         }
-
+        
         if (reverse)
         {
             if (uuidwhat == null)
@@ -2229,7 +2228,7 @@ public class CommandHandler
                 return true;
             }
         }
-
+        
         if (mojang && reverse)
         {
             String name = UUIDFetcher.getPlayerNameFromMojang(uuidwhat);
@@ -2280,12 +2279,12 @@ public class CommandHandler
         }
         return true;
     }
-
+    
     private PermissionsManager pm()
     {
         return BungeePerms.getInstance().getPermissionsManager();
     }
-
+    
     private boolean parseTrueFalse(String truefalse)
     {
         if (Statics.argAlias(truefalse, "true", "yes", "t", "y", "+"))
@@ -2298,7 +2297,7 @@ public class CommandHandler
         }
         throw new IllegalArgumentException("truefalse does not represent a boolean value");
     }
-
+    
     private String formatBool(boolean b)
     {
         return (b ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(b).toUpperCase();

@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -270,7 +272,7 @@ public class Statics
     {
         return isEmpty(append) ? "" : append + " ";
     }
-    
+
     public static boolean isInt(String s)
     {
         try
@@ -278,9 +280,23 @@ public class Statics
             Integer.parseInt(s);
             return true;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return false;
         }
+    }
+
+    public static String arrayToString(String[] arr, int start, int count, String seperator)
+    {
+        String s = "";
+        for (int i = 0; i < count; i++)
+        {
+            s += arr[start + i] + seperator;
+        }
+        if (s.length() >= seperator.length())
+        {
+            s = s.substring(0, s.length() - seperator.length());
+        }
+        return s;
     }
 }
