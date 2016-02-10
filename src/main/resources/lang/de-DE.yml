@@ -139,6 +139,7 @@ general:
   none: keine
   default: Standard
   nondefault: Nicht-Standard
+  misconfiguration: '&4Fehlkonfiguration'
 log:
   extraction:
     extracting: Extrahiere {0}
@@ -152,7 +153,14 @@ log:
     adding-default-groups-uuid: Standardgruppen zu {0} ({1}) hinzugefuegt
   login: Login von {0}
   login-uuid: Login von {0} ({1})
+warning:
   intrusion-detected: '&4Moeglicher Angriff erkannt. Sender ist {0}'
+  misconfig:
+    bungee:
+      standalone: Pluginachricht von Bukkit/Spigot Server {0} erhalten aber BungeePerms ist im Standalonemodus. Ignoriere Nachricht ...
+      serverdependend: Pluginachricht von Bukkit/Spigot Server {0} erhalten aber BungeePerms ist im serverabhängigen Modus. Ignoriere Nachricht ...
+    bukkit:
+      standalone: Pluginachricht von Bungeecord Proxy erhalten aber BungeePerms ist im Standalonemodus. Ignoriere Nachricht ...
 help:
   welcome: Heisst dich zu BungeePerms willkommen
   help: Zeigt diese Hilfe

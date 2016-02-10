@@ -65,11 +65,11 @@ public class BungeeEventListener implements Listener, EventListener
     public void onLogin(LoginEvent e)
     {
         //don't load if cancelled
-        if(e.isCancelled())
+        if (e.isCancelled())
         {
             return;
         }
-        
+
         String playername = e.getConnection().getName();
         UUID uuid = null;
         if (config.isUseUUIDs())
@@ -91,7 +91,7 @@ public class BungeeEventListener implements Listener, EventListener
         {
             pm().removeUserFromCache(oldu);
         }
-        
+
         //load user from db
         User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
         if (u == null)
@@ -146,7 +146,7 @@ public class BungeeEventListener implements Listener, EventListener
             }
         }
     }
-    
+
     @EventHandler(priority = Byte.MIN_VALUE)
     public void onServerConnected(ServerConnectedEvent e)
     {
@@ -165,7 +165,7 @@ public class BungeeEventListener implements Listener, EventListener
         if (!(e.getReceiver() instanceof ProxiedPlayer))
         {
             //lock out silly hackers
-            BungeePerms.getLogger().severe(Lang.translate(Lang.MessageType.INTRUSTION_DETECTED, e.getSender()));
+            BungeePerms.getLogger().severe(Lang.translate(Lang.MessageType.INTRUSION_DETECTED, e.getSender()));
             e.setCancelled(true);
             return;
         }
@@ -173,16 +173,26 @@ public class BungeeEventListener implements Listener, EventListener
         net.md_5.bungee.api.connection.Server scon = (net.md_5.bungee.api.connection.Server) e.getSender();
 
         //check network type // ignore if standalone or not registered server
-        if (config.getNetworkType() == NetworkType.Standalone
-                || (config.getNetworkType() == NetworkType.ServerDependend && !config.getNetworkServers().contains(scon.getInfo().getName())))
+        if (config.getNetworkType() == NetworkType.Standalone)
         {
-            //todo add misconfiguration message
+            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_STANDALONE, scon.getInfo().getName()));
+            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_STANDALONE, scon.getInfo().getName()));
+            BungeePerms.getInstance().getDebug().log("sender = " + scon.getInfo().getName());
+            BungeePerms.getInstance().getDebug().log("msg = " + new String(e.getData()));
+            return;
+        }
+        if (config.getNetworkType() == NetworkType.ServerDependend && !config.getNetworkServers().contains(scon.getInfo().getName()))
+        {
+            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDEND, scon.getInfo().getName()));
+            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDEND, scon.getInfo().getName()));
+            BungeePerms.getInstance().getDebug().log("sender = " + scon.getInfo().getName());
+            BungeePerms.getInstance().getDebug().log("msg = " + new String(e.getData()));
             return;
         }
 
         //process message
         String msg = new String(e.getData());
-        if(config.isDebug())
+        if (config.isDebug())
         {
             BungeePerms.getLogger().info("msg=" + msg);
         }

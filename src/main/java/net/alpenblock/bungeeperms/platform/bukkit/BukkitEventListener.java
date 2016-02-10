@@ -194,6 +194,15 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] bytes)
     {
+        if (config.isStandalone())
+        {
+            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_STANDALONE));
+            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_STANDALONE));
+            BungeePerms.getInstance().getDebug().log("sender = BungeeCord");
+            BungeePerms.getInstance().getDebug().log("msg = " + new String(bytes));
+            return;
+        }
+
         String msg = new String(bytes);
         if (config.isDebug())
         {

@@ -70,7 +70,7 @@ public class Lang
         ERR_GROUP_ALREADY_INHERITS("error.group.already-inherits", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " already inherits from " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
         ERR_GROUP_DOES_NOT_INHERITS("error.group.does-not-inherit", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Error.alt() + " does not inherit from group " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
         //user msgs
-        NO_USERS_FOUND("user.nu-users-found", Color.Text.alt() + "No players found!"),
+        NO_USERS_FOUND("user.no-users-found", Color.Text.alt() + "No players found!"),
         REGISTERED_USERS("user.registered-users", Color.Text.alt() + "Following players are registered: "),
         REGISTERED_USERS_COUNT("user.registered-users-count", Color.Text.alt() + "There are " + Color.Value.alt() + "{0}" + Color.Text.alt() + " players registered."),
         USER_PERMISSIONS_LIST_HEADER("user.permissions-list-header", Color.Text.alt() + "Permissions of the player " + Color.User.alt() + "{0}" + Color.Text.alt() + ":"),
@@ -157,6 +157,7 @@ public class Lang
         NONE("general.none", "none"),
         DEFAULT("general.default", "default"),
         NONDEFAULT("general.nondefault", "non-default"),
+        MISCONFIGURATION("general.misconfiguration", Color.Error.alt() + "Misconfiguration"),
         //extraction
         EXTRACTING("log.extraction.extracting", "extracting {0}"),
         EXTRACTION_FAILED("log.extraction.failed", "could not extract file {0}: {1}"),
@@ -169,7 +170,11 @@ public class Lang
         LOGIN_UUID("log.login-uuid", "Login by {0} ({1})"),
         ADDING_DEFAULT_GROUPS("log.permissions.adding-default-groups", "Adding default groups to {0}"),
         ADDING_DEFAULT_GROUPS_UUID("log.permissions.adding-default-groups-uuid", "Adding default groups to {0} ({1})"),
-        INTRUSTION_DETECTED("log.intrusion-detected", Color.Error.alt() + "Possible intrusion detected. Sender is {0}"),
+        //warnings
+        INTRUSION_DETECTED("warning.intrusion-detected", Color.Error.alt() + "Possible intrusion detected. Sender is {0}"),
+        MISCONFIG_BUNGEE_STANDALONE("warning.misconfig.bungee.standalone", "Received a plugin message from Bukkit/Spigot server {0} but BungeePerms is in standalone mode. Ignoring it ..."),
+        MISCONFIG_BUNGEE_SERVERDEPENDEND("warning.misconfig.bungee.serverdependend", "Received a plugin message from Bukkit/Spigot server {0} but BungeePerms is in serverdependend mode. Ignoring it ..."),
+        MISCONFIG_BUKKIT_STANDALONE("warning.misconfig.bukkit.standalone", "Received a plugin message from Bungeecord proxy but BungeePerms is in standalone mode. Ignoring it ..."),
         //help
         HELP_WELCOME("help.welcome", "Welcomes you to BungeePerms"),
         HELP_HELP("help.help", "Shows this help"),
