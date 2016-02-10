@@ -174,6 +174,7 @@ public class Lang
         INTRUSION_DETECTED("warning.intrusion-detected", Color.Error.alt() + "Possible intrusion detected. Sender is {0}"),
         MISCONFIG_BUNGEE_STANDALONE("warning.misconfig.bungee.standalone", "Server {0}: Received a plugin message from Bukkit/Spigot but BungeePerms is in standalone mode. Ignoring it ..."),
         MISCONFIG_BUNGEE_SERVERDEPENDEND("warning.misconfig.bungee.serverdependend", "Server {0}: Received a plugin message from Bukkit/Spigot but BungeePerms is in serverdependend mode. Ignoring it ..."),
+        MISCONFIG_BUNGEE_SERVERDEPENDENDBLACKLIST("warning.misconfig.bungee.serverdependend-blacklist", "Server {0}: Received a plugin message from Bukkit/Spigot but BungeePerms is in serverdependend-blacklist mode. Ignoring it ..."),
         MISCONFIG_BUNGEE_SERVERNAME("warning.misconfig.bungee.servername", "Server {0}: The server names of the Bungeecord config and BungeePerms config do not match."),
         MISCONFIG_BUNGEE_BACKEND("warning.misconfig.bungee.backend", "Server {0}: The backend types of the BungeePerms configs do not match."),
         MISCONFIG_BUNGEE_UUIDPLAYERDB("warning.misconfig.bungee.uuidplayerdb", "Server {0}: The uuidplayerdb types of the BungeePerms configs do not match."),

@@ -159,6 +159,7 @@ warning:
     bungee:
       standalone: 'Server {0}: Pluginachricht von Bukkit/Spigot erhalten aber BungeePerms ist im Standalonemodus. Ignoriere Nachricht ...'
       serverdependend: 'Server {0}: Pluginachricht von Bukkit/Spigot erhalten aber BungeePerms ist im serverabhängigen Modus. Ignoriere Nachricht ...'
+      serverdependend-blacklist: 'Server {0}: Pluginachricht von Bukkit/Spigot erhalten aber BungeePerms ist im serverabhängigen-blacklist Modus. Ignoriere Nachricht ...'
       servername: 'Server {0}: Der Servername der Bungeecordkonfiguration und der BungeePermskonfigurationen stimmen nicht ueberein.'
       backend: 'Server {0}: Die backend Typen der BungeePermskonfigurationen stimmen nicht überein.'
       uuidplayerdb: 'Server {0}: The uuidplayerdb Typen der BungeePermskonfigurationen stimmen nicht ueberein.'

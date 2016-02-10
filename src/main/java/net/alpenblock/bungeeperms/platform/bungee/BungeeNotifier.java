@@ -99,6 +99,11 @@ public class BungeeNotifier implements NetworkNotifier
             {
                 return;
             }
+            if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
+                    && Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+            {
+                return;
+            }
 
             //no feedback loop
             if (origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
@@ -129,6 +134,11 @@ public class BungeeNotifier implements NetworkNotifier
             {
                 return;
             }
+            if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
+                    && Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+            {
+                return;
+            }
 
             //no feedback loop
             if (origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
@@ -155,6 +165,11 @@ public class BungeeNotifier implements NetworkNotifier
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
                     && !Statics.listContains(config.getNetworkServers(), si.getName()))
+            {
+                return;
+            }
+            if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
+                    && Statics.listContains(config.getNetworkServers(), si.getName()))
             {
                 return;
             }

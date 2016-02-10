@@ -206,6 +206,14 @@ public class BungeeEventListener implements Listener, EventListener
             BungeePerms.getInstance().getDebug().log("msg = " + new String(e.getData()));
             return;
         }
+        if (config.getNetworkType() == NetworkType.ServerDependendBlacklist && config.getNetworkServers().contains(scon.getInfo().getName()))
+        {
+            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDENDBLACKLIST, scon.getInfo().getName()));
+            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDENDBLACKLIST, scon.getInfo().getName()));
+            BungeePerms.getInstance().getDebug().log("sender = " + scon.getInfo().getName());
+            BungeePerms.getInstance().getDebug().log("msg = " + new String(e.getData()));
+            return;
+        }
 
         //process message
         String msg = new String(e.getData());

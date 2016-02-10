@@ -25,13 +25,13 @@ public class BungeeConfig extends BPConfig
         super.load();
         
         networkType = config.getEnumValue("networktype", NetworkType.Global);
-        if(networkType == NetworkType.ServerDependend)
+        if (networkType == NetworkType.ServerDependend || networkType == NetworkType.ServerDependendBlacklist)
         {
             networkServers = config.getListString("networkservers", Arrays.asList("lobby"));
         }
         else
         {
-            //create option if not in  server dependend
+            //create option if not server dependend
             if(!config.keyExists("networkservers"))
             {
                 config.setListString("networkservers", new ArrayList<String>());
