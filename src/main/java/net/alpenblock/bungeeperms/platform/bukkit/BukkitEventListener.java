@@ -201,8 +201,6 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         }
         List<String> data = Statics.toList(msg, ";");
 
-        BungeePerms.getInstance().getDebug().log("msg=" + msg);
-
         String cmd = data.get(0);
         String userorgroup = data.size() > 1 ? data.get(1) : null;
 
