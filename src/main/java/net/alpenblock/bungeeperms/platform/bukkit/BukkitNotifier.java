@@ -1,7 +1,7 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
 import java.util.UUID;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
@@ -9,7 +9,7 @@ import net.alpenblock.bungeeperms.platform.NetworkNotifier;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BukkitNotifier implements NetworkNotifier
 {
 
@@ -127,6 +127,9 @@ public class BukkitNotifier implements NetworkNotifier
         {
             p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());
         }
+
+        //send config for match checking
+        sendConfig(p);
     }
 
     private void sendPM(UUID player, String msg, String origin)
@@ -142,6 +145,9 @@ public class BukkitNotifier implements NetworkNotifier
         {
             p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());
         }
+
+        //send config for match checking
+        sendConfig(p);
     }
 
     private void sendPMAll(String msg, String origin)
@@ -157,6 +163,9 @@ public class BukkitNotifier implements NetworkNotifier
         {
             p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());
         }
+
+        //send config for match checking
+        sendConfig(p);
     }
 
     public void sendWorldUpdate(Player p)
@@ -169,5 +178,23 @@ public class BukkitNotifier implements NetworkNotifier
 
         String world = p.getWorld() == null ? "" : p.getWorld().getName();
         p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, ("playerworldupdate;" + p.getName() + ";" + world).getBytes());
+
+        //send config for match checking
+        sendConfig(p);
+    }
+
+    private long lastConfigUpdate = 0;
+
+    private void sendConfig(Player p)
+    {
+        synchronized (this)
+        {
+            long now = System.currentTimeMillis();
+            if (lastConfigUpdate + 5 * 60 * 1000 < now)
+            {
+                lastConfigUpdate = now;
+                p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, ("configcheck;" + config.getServername() + ";" + config.getBackEndType() + ";" + config.getUUIDPlayerDBType() + ";" + config.isUseUUIDs()).getBytes());
+            }
+        }
     }
 }

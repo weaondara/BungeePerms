@@ -84,6 +84,16 @@ public class BPConfig
         
         //other
         asyncCommands = config.getBoolean("async-commands", true);
+        
+        validate();
+    }
+    
+    public void validate()
+    {
+        if(useUUIDs && UUIDPlayerDBType == UUIDPlayerDBType.None)
+        {
+            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_USEUUID_NONE_UUID_DB));
+        }
     }
 
     public void setUseUUIDs(boolean useUUIDs)

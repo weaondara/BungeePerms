@@ -11,7 +11,10 @@ import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
+import net.alpenblock.bungeeperms.io.BackEndType;
+import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.platform.EventListener;
+import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.bukkit.event.BungeePermsUserChangedEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -258,6 +261,42 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
                 }
             };
             Bukkit.getScheduler().runTaskLater(BukkitPlugin.getInstance(), r, 1);
+        }
+        else if (cmd.equalsIgnoreCase("configcheck"))
+        {
+            String servername = data.get(1);
+            BackEndType backend = BackEndType.getByName(data.get(2));
+            UUIDPlayerDBType uuidplayerdb = UUIDPlayerDBType.getByName(data.get(3));
+            boolean useuuid = Boolean.parseBoolean(data.get(4));
+            if (!config.getServername().equals(servername))
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_SERVERNAME));
+            }
+            if (config.getBackEndType() != backend)
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_BACKEND));
+            }
+            if (config.getUUIDPlayerDBType() != uuidplayerdb)
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_UUIDPLAYERDB));
+            }
+            if (config.isUseUUIDs() != useuuid)
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_USEUUID));
+            }
+        }
+        else if (cmd.equalsIgnoreCase("uuidcheck"))
+        {
+            if (!config.isUseUUIDs())
+            {
+                return;
+            }
+            String uuid = data.get(2);
+            Sender p = BukkitPlugin.getInstance().getPlayer(userorgroup);
+            if (p != null && !p.getUUID().equals(UUID.fromString(uuid)))
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEECORD_BUKKIT_CONFIG));
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 package net.alpenblock.bungeeperms.platform.bungee;
 
 import java.util.UUID;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Statics;
@@ -11,7 +11,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BungeeNotifier implements NetworkNotifier
 {
 
@@ -58,7 +58,7 @@ public class BungeeNotifier implements NetworkNotifier
     @Override
     public void reloadUsers(String origin)
     {
-        sendPMAll("reloadUsers" , origin);
+        sendPMAll("reloadUsers", origin);
     }
 
     @Override
@@ -71,6 +71,14 @@ public class BungeeNotifier implements NetworkNotifier
     public void reloadAll(String origin)
     {
         sendPMAll("reloadall", origin);
+    }
+
+    public void sendUUIDAndPlayer(String name, UUID uuid)
+    {
+        if (config.isUseUUIDs())
+        {
+            sendPM(uuid, "uuidcheck;" + name + ";" + uuid, null);
+        }
     }
 
     //bukkit-bungeeperms reload information functions
@@ -100,6 +108,7 @@ public class BungeeNotifier implements NetworkNotifier
 
             //send message
             pp.getServer().getInfo().sendData(BungeePerms.CHANNEL, msg.getBytes());
+            sendConfig(pp.getServer().getInfo());
         }
     }
 
@@ -129,6 +138,7 @@ public class BungeeNotifier implements NetworkNotifier
 
             //send message
             pp.getServer().getInfo().sendData(BungeePerms.CHANNEL, msg.getBytes());
+            sendConfig(pp.getServer().getInfo());
         }
     }
 
@@ -157,6 +167,22 @@ public class BungeeNotifier implements NetworkNotifier
 
             //send message
             si.sendData(BungeePerms.CHANNEL, msg.getBytes());
+            sendConfig(si);
+        }
+    }
+
+    private long lastConfigUpdate = 0;
+
+    private void sendConfig(ServerInfo info)
+    {
+        synchronized (this)
+        {
+            long now = System.currentTimeMillis();
+            if (lastConfigUpdate + 5 * 60 * 1000 < now)
+            {
+                lastConfigUpdate = now;
+                info.sendData(BungeePerms.CHANNEL, ("configcheck;" + info.getName() + ";" + config.getBackEndType() + ";" + config.getUUIDPlayerDBType() + ";" + config.isUseUUIDs()).getBytes());
+            }
         }
     }
 }
