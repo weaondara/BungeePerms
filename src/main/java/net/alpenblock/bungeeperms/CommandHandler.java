@@ -1900,7 +1900,7 @@ public class CommandHandler
             Sender s = plugin.getPlayer(user.getName());
             if (s != null)
             {
-                sender.sendMessage(Lang.translate(MessageType.PROMOTE_MESSAGE_TO_USER, nextgroup.getName()));
+                s.sendMessage(Lang.translate(MessageType.PROMOTE_MESSAGE_TO_USER, nextgroup.getName()));
             }
         }
 
@@ -2005,7 +2005,7 @@ public class CommandHandler
             Sender s = plugin.getPlayer(user.getName());
             if (s != null)
             {
-                sender.sendMessage(Lang.translate(MessageType.DEMOTE_MESSAGE_TO_USER, previousgroup.getName()));
+                s.sendMessage(Lang.translate(MessageType.DEMOTE_MESSAGE_TO_USER, previousgroup.getName()));
             }
         }
         return true;
