@@ -30,7 +30,7 @@ public class Lang
             s = type.getDefaultValue();
         }
         s = Statics.format(s, vars);
-        return s.replaceAll("&", "§");
+        return s.replaceAll("&", ChatColor.COLOR_CHAR + "");
     }
 
     @AllArgsConstructor

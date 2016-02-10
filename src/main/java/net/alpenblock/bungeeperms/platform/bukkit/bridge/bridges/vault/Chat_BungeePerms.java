@@ -2,6 +2,7 @@ package net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.vault;
 
 import java.util.logging.Logger;
 import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
@@ -98,7 +99,7 @@ public class Chat_BungeePerms extends Chat
     @Override
     public void setPlayerPrefix(String world, String player, String prefix)
     {
-        prefix = prefix.replaceAll("&", "§");
+        prefix = prefix.replaceAll("&", ChatColor.COLOR_CHAR + "");
 
         User u = perms.getPermissionsManager().getUser(player);
         if (u == null)
@@ -120,7 +121,7 @@ public class Chat_BungeePerms extends Chat
     @Override
     public void setPlayerSuffix(String world, String player, String suffix)
     {
-        suffix = suffix.replaceAll("&", "§");
+        suffix = suffix.replaceAll("&", ChatColor.COLOR_CHAR + "");
 
         User u = perms.getPermissionsManager().getUser(player);
         if (u == null)
@@ -143,7 +144,7 @@ public class Chat_BungeePerms extends Chat
     @Override
     public void setGroupPrefix(String world, String group, String prefix)
     {
-        prefix = prefix.replaceAll("&", "§");
+        prefix = prefix.replaceAll("&", ChatColor.COLOR_CHAR + "");
 
         Group g = perms.getPermissionsManager().getGroup(group);
         if (g == null)
@@ -166,7 +167,7 @@ public class Chat_BungeePerms extends Chat
     @Override
     public void setGroupSuffix(String world, String group, String suffix)
     {
-        suffix = suffix.replaceAll("&", "§");
+        suffix = suffix.replaceAll("&", ChatColor.COLOR_CHAR + "");
 
         Group g = perms.getPermissionsManager().getGroup(group);
         if (g == null)

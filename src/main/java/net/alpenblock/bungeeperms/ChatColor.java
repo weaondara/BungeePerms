@@ -33,7 +33,7 @@ public enum ChatColor
 
     static String strip(String text)
     {
-        return text.replaceAll("§.", "");
+        return text.replaceAll(COLOR_CHAR + ".", "");
     }
 
     private final char code;

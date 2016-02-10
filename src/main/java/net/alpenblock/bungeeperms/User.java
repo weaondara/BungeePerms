@@ -684,9 +684,9 @@ public class User implements PermEntity
 
         for (String p : prefixes)
         {
-            if (!ChatColor.strip(p.replaceAll("&", "§")).isEmpty()
+            if (!ChatColor.strip(p.replaceAll("&", ChatColor.COLOR_CHAR + "")).isEmpty()
                     && !prefix.isEmpty()
-                    && !ChatColor.strip(prefix.replaceAll("&", "§")).endsWith(" "))
+                    && !ChatColor.strip(prefix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" "))
             {
                 prefix += " ";
             }
@@ -763,9 +763,9 @@ public class User implements PermEntity
 
         for (String suf : suffixes)
         {
-            if (!ChatColor.strip(suf.replaceAll("&", "§")).isEmpty()
+            if (!ChatColor.strip(suf.replaceAll("&", ChatColor.COLOR_CHAR + "")).isEmpty()
                     && !suffix.isEmpty()
-                    && !ChatColor.strip(suffix.replaceAll("&", "§")).endsWith(" "))
+                    && !ChatColor.strip(suffix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" "))
             {
                 suffix += " ";
             }
