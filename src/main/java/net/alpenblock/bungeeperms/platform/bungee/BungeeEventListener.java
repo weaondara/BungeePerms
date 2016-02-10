@@ -182,7 +182,10 @@ public class BungeeEventListener implements Listener, EventListener
 
         //process message
         String msg = new String(e.getData());
-        BungeePerms.getLogger().info("msg=" + msg);
+        if(config.isDebug())
+        {
+            BungeePerms.getLogger().info("msg=" + msg);
+        }
         List<String> data = Statics.toList(msg, ";");
 
         String cmd = data.get(0);
