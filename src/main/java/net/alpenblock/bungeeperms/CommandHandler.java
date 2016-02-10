@@ -259,7 +259,7 @@ public class CommandHandler
         {
             return handleUserCommandsPermRemove(sender, args);
         }
-        else if (args[2].equalsIgnoreCase("has"))
+        else if (Statics.argAlias(args[2], "has", "check"))
         {
             return handleUserCommandsHas(sender, args);
         }
