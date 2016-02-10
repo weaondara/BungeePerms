@@ -113,7 +113,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         {
             pm().removeUserFromCache(oldu);
         }
-        
+
         //load user from db
         User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
         if (u == null)
@@ -195,7 +195,10 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
     public void onPluginMessageReceived(String channel, Player player, byte[] bytes)
     {
         String msg = new String(bytes);
-        BungeePerms.getLogger().info("msg=" + msg);
+        if (config.isDebug())
+        {
+            BungeePerms.getLogger().info("msg=" + msg);
+        }
         List<String> data = Statics.toList(msg, ";");
 
         BungeePerms.getInstance().getDebug().log("msg=" + msg);
