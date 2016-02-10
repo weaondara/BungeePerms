@@ -148,6 +148,8 @@ public class Lang
         DISPLAY("common.display", Color.Text.alt() + "Display: " + ChatColor.RESET.alt() + "{0}"),
         PREFIX("common.prefix", Color.Text.alt() + "Prefix: " + ChatColor.RESET.alt() + "{0}"),
         SUFFIX("common.suffix", Color.Text.alt() + "Suffix: " + ChatColor.RESET.alt() + "{0}"),
+        PREFIX_FULL("common.prefix-full", Color.Text.alt() + "Full prefix: " + ChatColor.RESET.alt() + "{0}"),
+        SUFFIX_FULL("common.suffix-full", Color.Text.alt() + "Full suffix: " + ChatColor.RESET.alt() + "{0}"),
         PERMISSIONS_LIST_ITEM("common.permissions-list-item", Color.Text.alt() + "- " + Color.Value.alt() + "{0}" + Color.Text.alt() + " (" + Color.Value.alt() + "{1}" + Color.Text.alt() + "{2}{3})"),
         PERMISSIONS_LIST_HEADER_PAGE("common.permissions-list-header-page", Color.Text.alt() + "Page " + Color.Value.alt() + "{0}" + Color.Text.alt() + "/" + Color.Value.alt() + "{1}" + Color.Text.alt() + ""),
         //util & parts

@@ -379,25 +379,30 @@ public class Group implements Comparable<Group>, PermEntity
         return ret;
     }
 
-    public int getOwnPermissionsCount()
+    public int getOwnPermissionsCount(String server, String world)
     {
         int count = perms.size();
 
-        for (Server s : servers.values())
+        Server s = getServer(server);
+        if (s == null)
         {
-            count += s.getPerms().size();
-            for (World w : s.getWorlds().values())
-            {
-                count += w.getPerms().size();
-            }
+            return count;
         }
+        count += s.getPerms().size();
+
+        World w = s.getWorld(world);
+        if (world == null)
+        {
+            return count;
+        }
+        count += w.getPerms().size();
 
         return count;
     }
 
-    public int getPermissionsCount()
+    public int getPermissionsCount(String server, String world)
     {
-        int count = getOwnPermissionsCount();
+        int count = getOwnPermissionsCount(server, world);
 
         for (String group : inheritances)
         {
@@ -406,7 +411,7 @@ public class Group implements Comparable<Group>, PermEntity
             {
                 continue;
             }
-            count += g.getOwnPermissionsCount();
+            count += g.getPermissionsCount(server, world);
         }
 
         return count;
@@ -415,7 +420,7 @@ public class Group implements Comparable<Group>, PermEntity
     public String buildPrefix(String server, String world)
     {
         String prefix = "";
-        
+
         //global
         prefix += Statics.formatDisplay(this.prefix);
 
@@ -432,7 +437,7 @@ public class Group implements Comparable<Group>, PermEntity
                 prefix += Statics.formatDisplay(w.getPrefix());
             }
         }
-        
+
         return prefix.isEmpty() ? prefix : prefix.substring(0, prefix.length() - 1) + ChatColor.RESET;
     }
 
