@@ -85,6 +85,14 @@ public class BungeeEventListener implements Listener, EventListener
             BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN, playername));
         }
 
+        //remove user from cache if present
+        User oldu = config.isUseUUIDs() ? pm().getUser(uuid, false) : pm().getUser(playername, false);
+        if (oldu != null)
+        {
+            pm().removeUserFromCache(oldu);
+        }
+        
+        //load user from db
         User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
         if (u == null)
         {

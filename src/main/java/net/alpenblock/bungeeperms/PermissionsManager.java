@@ -509,6 +509,18 @@ public class PermissionsManager
      */
     public synchronized User getUser(String usernameoruuid)
     {
+        return getUser(usernameoruuid, true);
+    }
+
+    /**
+     * Gets a user by its name. If the user is not loaded it will be loaded if loadfromdb is true.
+     *
+     * @param usernameoruuid the name or the UUID of the user to get
+     * @param loadfromdb whether or not to load the user from the database if not already loaded
+     * @return the found user or null if it does not exist
+     */
+    public synchronized User getUser(String usernameoruuid, boolean loadfromdb)
+    {
         if (usernameoruuid == null)
         {
             return null;
@@ -540,26 +552,29 @@ public class PermissionsManager
         }
 
         //load user from database
-        User u = null;
-        if (config.isUseUUIDs())
+        if (loadfromdb)
         {
-            if (uuid == null)
+            User u = null;
+            if (config.isUseUUIDs())
             {
-                uuid = UUIDPlayerDB.getUUID(usernameoruuid);
+                if (uuid == null)
+                {
+                    uuid = UUIDPlayerDB.getUUID(usernameoruuid);
+                }
+                if (uuid != null)
+                {
+                    u = backEnd.loadUser(uuid);
+                }
             }
-            if (uuid != null)
+            else
             {
-                u = backEnd.loadUser(uuid);
+                u = backEnd.loadUser(usernameoruuid);
             }
-        }
-        else
-        {
-            u = backEnd.loadUser(usernameoruuid);
-        }
-        if (u != null)
-        {
-            addUserToCache(u);
-            return u;
+            if (u != null)
+            {
+                addUserToCache(u);
+                return u;
+            }
         }
 
         return null;
@@ -572,6 +587,18 @@ public class PermissionsManager
      * @return the found user or null if it does not exist
      */
     public synchronized User getUser(UUID uuid)
+    {
+        return getUser(uuid, true);
+    }
+
+    /**
+     * Gets a user by its UUID. If the user is not loaded it will be loaded if loadfromdb is true.
+     *
+     * @param uuid the uuid of the user to get
+     * @param loadfromdb whether or not to load the user from the database if not already loaded
+     * @return the found user or null if it does not exist
+     */
+    public synchronized User getUser(UUID uuid, boolean loadfromdb)
     {
         if (uuid == null)
         {
@@ -598,11 +625,14 @@ public class PermissionsManager
         }
 
         //load user from database
-        User u = backEnd.loadUser(uuid);
-        if (u != null)
+        if (loadfromdb)
         {
-            addUserToCache(u);
-            return u;
+            User u = backEnd.loadUser(uuid);
+            if (u != null)
+            {
+                addUserToCache(u);
+                return u;
+            }
         }
 
         return null;

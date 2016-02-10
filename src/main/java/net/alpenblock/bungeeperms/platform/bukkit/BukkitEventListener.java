@@ -54,11 +54,11 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         //inject into console // seems to be best place here
         BPPermissible permissible = new BPPermissible(Bukkit.getConsoleSender(), null, Injector.getPermissible(Bukkit.getConsoleSender()));
         permissible.inject();
-        
+
         //uninject from players
-        for(Player p : Bukkit.getOnlinePlayers())
+        for (Player p : Bukkit.getOnlinePlayers())
         {
-            if(!(Injector.getPermissible(p) instanceof BPPermissible))
+            if (!(Injector.getPermissible(p) instanceof BPPermissible))
             {
                 User u = config.isUseUUIDs() ? pm().getUser(p.getUniqueId()) : pm().getUser(p.getName());
                 BPPermissible perm = new BPPermissible(p, u, Injector.getPermissible(p));
@@ -80,9 +80,9 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
 
         //uninject from console // seems to be best place here
         Injector.uninject(Bukkit.getConsoleSender());
-        
+
         //uninject from players
-        for(Player p : Bukkit.getOnlinePlayers())
+        for (Player p : Bukkit.getOnlinePlayers())
         {
             Injector.uninject(p);
         }
@@ -107,6 +107,14 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN, e.getPlayer().getName()));
         }
 
+        //remove user from cache if present
+        User oldu = config.isUseUUIDs() ? pm().getUser(uuid, false) : pm().getUser(playername, false);
+        if (oldu != null)
+        {
+            pm().removeUserFromCache(oldu);
+        }
+        
+        //load user from db
         User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
         if (u == null)
         {
