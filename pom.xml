@@ -1,20 +1,70 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <groupId>net.alpenblock</groupId>
-    <artifactId>BungeePerms</artifactId>
-    <version>3.0</version>
+    <artifactId>bungeeperms</artifactId>
+    <version>3.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    
+    <name>BungeePerms</name>
+    <description>A permissions plugin for BungeeCord!</description>
+    <url>https://github.com/weaondara/BungeePerms</url>
+    
+    <scm>
+        <connection>scm:git:https://github.com/weaondara/BungeePerms.git</connection>
+        <developerConnection>scm:git:git@github.com:weaondara/BungeePerms.git</developerConnection>
+        <url>https://github.com/weaondara/BungeePerms</url>
+    </scm>
+
+    <ciManagement>
+        <system>jenkins</system>
+        <url>http://ci.wea-ondara.net/job/BungeePerms/</url>
+    </ciManagement>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/weaondara/BungeePerms/issues</url>
+    </issueManagement>
+    
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+    
+    <prerequisites>
+        <maven>3.3.3</maven>
+    </prerequisites>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <build.major>3.0</build.major>
-        <build.type>SNAPSHOT</build.type>
-        <build.number>1</build.number>
-        <build.fullversion.file>${build.major}-${build.type}-${build.number}</build.fullversion.file>
-        <build.fullversion.resource>${build.major} ${build.type} ${build.number}</build.fullversion.resource>
-        <build.name>${project.artifactId}-${build.fullversion.file}</build.name>
+        
+        <!-- Project Properties -->
+        <jarName>${project.name}-${project.version}</jarName>
+        <!-- Default buildnumber -->
+        <buildNumber>Unknown</buildNumber>
+        
+        <!-- Change Compiler Version (JDK) HERE! -->
+        <javaVersion>1.7</javaVersion>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>jenkins</id>
+            <activation>
+                <property>
+                    <name>env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <properties>
+                <buildNumber>${env.BUILD_NUMBER}</buildNumber>
+            </properties>
+        </profile>
+    </profiles>
     
     <repositories>
         <repository>
@@ -25,6 +75,7 @@
             <id>md5-snapshot</id>
             <url>http://repo.md-5.net/content/repositories/snapshots/</url>
         </repository>
+        <!--
         <repository>
             <id>md_5-releases</id>
             <url>http://repo.md-5.net/content/repositories/releases/</url>
@@ -33,22 +84,28 @@
             <id>md_5-public</id>
             <url>http://repo.md-5.net/content/groups/public/</url>
         </repository>
+        -->
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
         <repository>
-            <id>essentials-repo</id>
-            <url>http://repo.ess3.net/content/groups/essentials</url>
+            <id>ess-repo</id>
+            <url>http://ci.drtshock.net/plugin/repository/everything</url>
         </repository>
         <repository>
             <id>sk89q-repo</id>
-            <url>http://maven.sk89q.com/repo</url>
+            <url>http://maven.sk89q.com/artifactory/repo/</url>
         </repository>
         <repository>
             <id>vault-repo</id>
             <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
         </repository>
+        <repository>
+            <id>xephi-repo</id>
+            <url>http://ci.xephi.fr/plugin/repository/</url>
+        </repository>
+        <!--
         <repository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2/</url>
@@ -67,11 +124,13 @@
             </snapshots>
             <url>file://${project.basedir}/lib/repository/</url>
         </repository>
+        -->
     </repositories>
     
     <build>
-        <finalName>${build.name}</finalName>
+        <finalName>${jarName}</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -81,32 +140,29 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.5.1</version>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.4.3</version>
-                <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <source>1.7</source>
+                    <target>${javaVersion}</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.1</version>
+                <version>2.4.3</version>
                 <configuration>
-                    <artifactSet>
-                        <includes>
-                            <include>com.mojang:AccountsClient</include>
-                            <include>com.google.code.gson:gson</include>
-                        </includes>
-                    </artifactSet>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <minimizeJar>false</minimizeJar>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.mojang.accounts-client</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.libs.accounts-client</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.google.gson</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.libs.gson</shadedPattern>
+                        </relocation>
+                    </relocations>
                 </configuration>
                 <executions>
                     <execution>
@@ -117,74 +173,76 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <finalName>${build.name}</finalName>                   
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>2.3.1</version>
-                <executions>
-                    <execution>
-                        <id>default-install</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <phase>install</phase>
-                        <configuration>
-                            <file>target/${project.build.finalName}.${project.packaging}</file>
-                            <generatePom>false</generatePom>
-                            <pomFile>pom.xml</pomFile>
-                            <version>${build.fullversion.file}</version>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
+    
     <dependencies>
-        <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>1.8-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.12.2</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>AccountsClient</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.8-SNAPSHOT</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.8-R0.1-SNAPSHOT</version>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.sk89q</groupId>
-            <artifactId>worldedit</artifactId>
-            <version>5.6.2</version>
+            <groupId>com.mojang</groupId>
+            <artifactId>accounts-client</artifactId>
+            <version>1.0.1</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>6.1.1-SNAPSHOT</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>worldedit-core</artifactId>
+            		<groupId>com.sk89q.worldedit</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>bukkit-classloader-check</artifactId>
+            		<groupId>org.sk89q.bukkit</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>bukkit</artifactId>
+            		<groupId>org.bukkit</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>dummypermscompat</artifactId>
+            		<groupId>com.sk89q</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>        
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>Vault</artifactId>
-            <version>1.2.32</version>
+            <version>1.5.6</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>       
         <dependency>
             <groupId>net.ess3</groupId>
-            <artifactId>Essentials</artifactId>
-            <version>2.13.1</version>
+            <artifactId>EssentialsX</artifactId>
+            <version>2.0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
