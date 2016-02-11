@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.Group;
-import net.alpenblock.bungeeperms.Server;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin;

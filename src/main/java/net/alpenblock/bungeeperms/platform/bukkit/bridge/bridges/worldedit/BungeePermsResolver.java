@@ -1,6 +1,5 @@
 package net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.worldedit;
 
-import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolver;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.PermissionsManager;
@@ -15,7 +14,7 @@ public class BungeePermsResolver implements PermissionsResolver
 
     private final PermissionsManager manager;
 
-    public static PermissionsResolver factory(Server server, YAMLProcessor config)
+    public static PermissionsResolver factory(Server server, BukkitConfig config)
     {
         try
         {
