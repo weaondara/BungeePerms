@@ -155,8 +155,8 @@
                     <minimizeJar>false</minimizeJar>
                     <relocations>
                         <relocation>
-                            <pattern>com.mojang.accounts-client</pattern>
-                            <shadedPattern>net.alpenblock.bungeeperms.libs.accounts-client</shadedPattern>
+                            <pattern>com.mojang.api</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.libs.accounts-client-api</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>com.google.gson</pattern>
