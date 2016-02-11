@@ -1,4 +1,4 @@
 name: BungeePerms
 main: net.alpenblock.bungeeperms.platform.bungee.BungeePlugin
-version: '${build.number}'
+version: '${build.fullversion.resource}'
 author: wea_ondara

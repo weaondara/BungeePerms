@@ -2,14 +2,18 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.alpenblock</groupId>
     <artifactId>BungeePerms</artifactId>
-    <version>3.0-alpha-1</version>
+    <version>3.0</version>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <build.number>SNAPSHOT-${project.version}</build.number>
-        <build.name>${project.artifactId}-${build.number}</build.name>
+        <build.major>3.0</build.major>
+        <build.type>SNAPSHOT</build.type>
+        <build.number>1</build.number>
+        <build.fullversion.file>${build.major}-${build.type}-${build.number}</build.fullversion.file>
+        <build.fullversion.resource>${build.major} ${build.type} ${build.number}</build.fullversion.resource>
+        <build.name>${project.artifactId}-${build.fullversion.file}</build.name>
     </properties>
     
     <repositories>
@@ -139,7 +143,7 @@
                             <file>target/${project.build.finalName}.${project.packaging}</file>
                             <generatePom>false</generatePom>
                             <pomFile>pom.xml</pomFile>
-                            <version>${build.number}</version>
+                            <version>${build.fullversion.file}</version>
                         </configuration>
                     </execution>
                 </executions>
