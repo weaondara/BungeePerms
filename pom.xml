@@ -12,7 +12,7 @@
         <build.type>SNAPSHOT</build.type>
         <build.number>1</build.number>
         <build.fullversion.file>${build.major}-${build.type}-${build.number}</build.fullversion.file>
-        <build.fullversion.resource>${build.major} ${build.type} ${build.number}</build.fullversion.resource>
+        <build.fullversion.resource>${build.major} ${build.type} #${build.number}</build.fullversion.resource>
         <build.name>${project.artifactId}-${build.fullversion.file}</build.name>
         <build.filename>${build.name}.${project.packaging}</build.filename>
     </properties>
