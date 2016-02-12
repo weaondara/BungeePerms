@@ -14,7 +14,16 @@
         <build.fullversion.file>${build.major}-${build.type}-${build.number}</build.fullversion.file>
         <build.fullversion.resource>${build.major} ${build.type} ${build.number}</build.fullversion.resource>
         <build.name>${project.artifactId}-${build.fullversion.file}</build.name>
+        <build.filename>${build.name}.${project.packaging}</build.filename>
     </properties>
+    
+    <distributionManagement>
+        <repository>
+            <id>localdeployrepo</id>
+            <name>wea_ondara's Repository</name>
+            <url>http://repo.wea-ondara.net/repository/public/</url>
+        </repository>
+    </distributionManagement>
     
     <repositories>
         <repository>
@@ -140,10 +149,36 @@
                         </goals>
                         <phase>install</phase>
                         <configuration>
-                            <file>target/${project.build.finalName}.${project.packaging}</file>
+                            <file>target/${build.filename}</file>
                             <generatePom>false</generatePom>
                             <pomFile>pom.xml</pomFile>
                             <version>${build.fullversion.file}</version>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <repositoryId>${project.distributionManagement.repository.id}</repositoryId>
+                            <url>${project.distributionManagement.repository.url}</url>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${build.fullversion.file}</version>
+                            <file>target/${build.filename}</file>
                         </configuration>
                     </execution>
                 </executions>
