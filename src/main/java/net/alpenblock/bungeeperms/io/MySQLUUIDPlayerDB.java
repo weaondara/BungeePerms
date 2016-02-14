@@ -12,11 +12,11 @@ import net.alpenblock.bungeeperms.Mysql;
 public class MySQLUUIDPlayerDB implements UUIDPlayerDB
 {
 
-    private BPConfig config;
-    private Debug debug;
-    private Mysql mysql;
+    private final BPConfig config;
+    private final Debug debug;
+    private final Mysql mysql;
 
-    private String table;
+    private final String table;
 
     public MySQLUUIDPlayerDB()
     {

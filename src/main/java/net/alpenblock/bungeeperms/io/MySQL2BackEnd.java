@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms.io;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -203,13 +204,8 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public synchronized void saveUser(User user, boolean savetodisk)
     {
-        if (BungeePerms.getInstance().getConfig().isSaveAllUsers() ? true : !user.isNothingSpecial())
+        if (BungeePerms.getInstance().getConfig().isSaveAllUsers() || !user.isNothingSpecial())
         {
-            List<String> groups = new ArrayList<>();
-            for (Group g : user.getGroups())
-            {
-                groups.add(g.getName());
-            }
             saveUserGroups(user);
             saveUserPerms(user);
             saveUserDisplay(user, null, null);
@@ -672,12 +668,7 @@ public class MySQL2BackEnd implements BackEnd
 
     private <T> List<T> mkList(T... elements)
     {
-        List<T> l = new ArrayList<>();
-        for (T e : elements)
-        {
-            l.add(e);
-        }
-        return l;
+        return new ArrayList(Arrays.asList(elements));
     }
 
     private List<ValueEntry> mkValueList(List<String> values, String server, String world)
