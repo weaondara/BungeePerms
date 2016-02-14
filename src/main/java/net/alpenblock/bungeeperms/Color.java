@@ -4,7 +4,6 @@ public class Color
 {
     //todo make caps
     public static final ChatColor Text = ChatColor.GRAY;
-    public static final ChatColor Tool = ChatColor.RED;
     public static final ChatColor User = ChatColor.DARK_AQUA;
     public static final ChatColor Success = ChatColor.GREEN;
     public static final ChatColor Error = ChatColor.DARK_RED;
