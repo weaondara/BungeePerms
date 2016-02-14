@@ -9,6 +9,25 @@ system managing all permissions in your network.
 
 Dev builds of this project are available at http://ci.wea-ondara.net/job/BungeePerms/  
 
+**Maven Repo**
+
+```xml
+<repositories>
+    <repository>
+        <id>bungeeperms-repo</id>
+        <url>http://repo.wea-ondara.net/repository/public/</url>
+    </repository>
+</repositories>
+<dependencies>
+    <dependency>
+        <groupId>net.alpenblock</groupId>
+        <artifactId>BungeePerms</artifactId>
+        <version>3.0-dev-47</version>
+    </dependency>
+</dependencies>
+```
+
+
 **Functionality:**
 
 - permission groups  
