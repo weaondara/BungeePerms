@@ -9,6 +9,7 @@ import java.sql.Statement;
 public class Mysql
 {
 
+    //todo
     public static void closeResultSet(AutoCloseable res)
     {
         if (res == null)
