@@ -2,6 +2,7 @@ package net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.worldedit;
 
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolver;
+import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Statics;
@@ -38,7 +39,7 @@ public class BungeePermsResolver implements PermissionsResolver
     {
         this.manager = manager;
     }
-    
+
     @Override
     public boolean hasPermission(String player, String permission)
     {
@@ -64,7 +65,7 @@ public class BungeePermsResolver implements PermissionsResolver
     {
         return hasPermission(worldName, player.getName(), permission);
     }
-    
+
     @Override
     public boolean inGroup(String player, String group)
     {
@@ -76,7 +77,7 @@ public class BungeePermsResolver implements PermissionsResolver
     {
         return inGroup(player.getName(), group);
     }
-    
+
     @Override
     public String[] getGroups(String player)
     {
@@ -86,13 +87,8 @@ public class BungeePermsResolver implements PermissionsResolver
             return new String[0];
         }
 
-        String[] groups = new String[user.getGroups().size()];
-        for (int i = 0; i < user.getGroups().size(); i++)
-        {
-            groups[i] = user.getGroups().get(i).getName();
-        }
-
-        return groups;
+        List<String> groups = user.getGroupsString();
+        return groups.toArray(new String[groups.size()]);
     }
 
     @Override
