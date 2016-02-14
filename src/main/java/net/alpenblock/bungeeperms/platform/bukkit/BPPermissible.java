@@ -79,13 +79,17 @@ public class BPPermissible extends PermissibleBase
             @Override
             public boolean isOp()
             {
+                BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
                 if (opdisabled)
                 {
-                    BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
                     if (!config.isAllowops())
                     {
                         return false;
                     }
+                }
+                if (config.isDebug())
+                {
+                    BungeePerms.getLogger().info("op check: " + BPPermissible.this.sender.getName() + " has OP: " + oldOpable.isOp());
                 }
                 return oldOpable.isOp();
             }
