@@ -3,6 +3,7 @@ package net.alpenblock.bungeeperms.io.mysql2;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Mysql;
 
 public class MysqlPermsAdapter2
@@ -50,7 +51,7 @@ public class MysqlPermsAdapter2
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
         }
         finally
         {
@@ -76,7 +77,7 @@ public class MysqlPermsAdapter2
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
         }
         finally
         {
@@ -100,7 +101,7 @@ public class MysqlPermsAdapter2
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
         }
         finally
         {
@@ -140,7 +141,7 @@ public class MysqlPermsAdapter2
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
             found = false;
         }
         finally
@@ -241,7 +242,7 @@ public class MysqlPermsAdapter2
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
         }
         finally
         {

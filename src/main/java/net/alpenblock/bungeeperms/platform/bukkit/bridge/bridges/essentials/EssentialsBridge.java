@@ -113,7 +113,7 @@ public class EssentialsBridge implements Bridge
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(ex);
         }
     }
 
@@ -130,11 +130,10 @@ public class EssentialsBridge implements Bridge
             PermissionsHandler permhandler = (PermissionsHandler) f.get(plugin);
 
             permhandler.checkPermissions();
-
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(ex);
         }
     }
 }

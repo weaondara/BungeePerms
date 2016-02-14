@@ -33,14 +33,11 @@ public class Permission_BungeePerms extends Permission
         Bukkit.getServer().getPluginManager().registerEvents(new PermissionServerListener(), BukkitPlugin.getInstance());
 
         // Load Plugin in case it was loaded before
-        if (perms == null)
+        Plugin p = plugin.getServer().getPluginManager().getPlugin("BungeePerms");
+        if (p != null)
         {
-            Plugin p = plugin.getServer().getPluginManager().getPlugin("BungeePerms");
-            if (p != null)
-            {
-                this.perms = BungeePerms.getInstance();
-                log.info(String.format("[%s][Permission] %s hooked.", plugin.getDescription().getName(), name));
-            }
+            this.perms = BungeePerms.getInstance();
+            log.info(String.format("[%s][Permission] %s hooked.", plugin.getDescription().getName(), name));
         }
     }
 

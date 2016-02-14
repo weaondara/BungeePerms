@@ -96,15 +96,10 @@ public class VaultBridge implements Bridge
              {
                  "net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin"
             });
-
-            //not needed
-//            f = v.getClass().getDeclaredField("chat");
-//            f.setAccessible(true);
-//            f.set(v, Bukkit.getServicesManager().getRegistration(Permission.class).getProvider());
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(ex);
         }
     }
 
@@ -133,7 +128,7 @@ public class VaultBridge implements Bridge
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(ex);
         }
     }
 }

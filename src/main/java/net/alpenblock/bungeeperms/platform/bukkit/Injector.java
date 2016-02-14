@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
 import java.lang.reflect.Field;
+import net.alpenblock.bungeeperms.BungeePerms;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -24,7 +25,7 @@ public class Injector
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
         }
     }
     
@@ -54,7 +55,7 @@ public class Injector
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
         }
         return null;
     }
@@ -75,7 +76,7 @@ public class Injector
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
         }
         return perm;
     }

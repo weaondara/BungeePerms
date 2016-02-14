@@ -52,7 +52,7 @@ public class FileExtractor
         catch (Exception e)
         {
             BungeePerms.getLogger().info(Lang.translate(MessageType.EXTRACTION_FAILED, file, e.getMessage()));
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
             return;
         }
         BungeePerms.getLogger().info(Lang.translate(MessageType.EXTRACTION_DONE, file));

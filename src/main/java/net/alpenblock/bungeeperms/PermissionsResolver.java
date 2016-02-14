@@ -119,7 +119,7 @@ public class PermissionsResolver
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    BungeePerms.getInstance().getDebug().log(e);
                 }
             }
         }

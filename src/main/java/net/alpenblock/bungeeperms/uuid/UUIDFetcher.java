@@ -14,11 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.alpenblock.bungeeperms.BungeePerms;
 
 public class UUIDFetcher
 {
 
-    private HttpProfileRepository repo;
+    private final HttpProfileRepository repo;
 
     @Getter
     private final List<String> tofetch;
@@ -27,7 +28,7 @@ public class UUIDFetcher
     @Getter
     private final Map<UUID, String> playerNames;
 
-    private int cooldown;
+    private final int cooldown;
 
     public UUIDFetcher(List<String> tofetch, int cooldown)
     {
@@ -106,7 +107,7 @@ public class UUIDFetcher
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BungeePerms.getInstance().getDebug().log(e);
         }
         return null;
     }

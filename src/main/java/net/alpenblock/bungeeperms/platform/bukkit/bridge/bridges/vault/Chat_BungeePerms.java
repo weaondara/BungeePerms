@@ -32,14 +32,11 @@ public class Chat_BungeePerms extends Chat
         Bukkit.getServer().getPluginManager().registerEvents(new ChatServerListener(), BukkitPlugin.getInstance());
 
         // Load Plugin in case it was loaded before
-        if (this.perms == null)
+        Plugin p = plugin.getServer().getPluginManager().getPlugin("BungeePerms");
+        if (p != null)
         {
-            Plugin p = plugin.getServer().getPluginManager().getPlugin("BungeePerms");
-            if (p != null)
-            {
-                this.perms = BungeePerms.getInstance();
-                log.info(String.format("[%s][Chat] %s hooked.", plugin.getDescription().getName(), name));
-            }
+            this.perms = BungeePerms.getInstance();
+            log.info(String.format("[%s][Chat] %s hooked.", plugin.getDescription().getName(), name));
         }
     }
 
