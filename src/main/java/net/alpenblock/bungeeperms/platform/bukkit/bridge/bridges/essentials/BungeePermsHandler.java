@@ -79,7 +79,6 @@ class BungeePermsHandler implements IPermissionsHandler
     @Override
     public boolean hasPermission(Player player, String node)
     {
-        BukkitConfig config = (BukkitConfig) perms.getConfig();
         return perms.getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new BukkitSender(player), Statics.toLower(node));
     }
 

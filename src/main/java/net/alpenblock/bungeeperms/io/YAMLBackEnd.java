@@ -260,7 +260,7 @@ public class YAMLBackEnd implements BackEnd
     private void checkPermFile()
     {
         File f = new File(plugin.getPluginFolder(), permspath);
-        if (!f.exists() | !f.isFile())
+        if (!f.isFile())
         {
             BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.NO_PERM_FILE));
         }

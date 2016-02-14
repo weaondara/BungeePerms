@@ -52,7 +52,7 @@ public class Debug
     public void log(String str)
     {
         File file = new File(path);
-        if (!file.isFile() | !file.exists())
+        if (!file.isFile())
         {
             try
             {
@@ -90,7 +90,7 @@ public class Debug
     public void log(Exception e)
     {
         File file = new File(path);
-        if (!file.isFile() | !file.exists())
+        if (!file.isFile())
         {
             try
             {

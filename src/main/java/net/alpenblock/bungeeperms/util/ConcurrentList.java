@@ -12,230 +12,230 @@ import lombok.SneakyThrows;
 
 public class ConcurrentList<E> extends ArrayList<E>
 {
-    private final Object lock=new Object();
-    
+
+    private final Object lock = new Object();
+
     @Override
     public boolean add(E e)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.add(e);
         }
     }
+
     @Override
-    public void add(int index, E element) 
+    public void add(int index, E element)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             super.add(index, element);
         }
     }
-    
+
     @Override
-    public boolean addAll(Collection<? extends E> c) 
+    public boolean addAll(Collection<? extends E> c)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.addAll(c);
         }
     }
+
     @Override
     public boolean addAll(int index, Collection<? extends E> c)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.addAll(index, c);
         }
     }
-    
+
     @Override
-    public void clear() 
+    public void clear()
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             super.clear();
         }
     }
+
     @Override
     @SneakyThrows
-    public Object clone() 
+    public Object clone()
     {
-        synchronized(lock)
+        synchronized (lock)
         {
-            ConcurrentList<E> clist=(ConcurrentList<E>)super.clone();
-            clist.modCount=0;
-            Field f=ArrayList.class.getDeclaredField("elementData");
+            ConcurrentList<E> clist = (ConcurrentList<E>) super.clone();
+            clist.modCount = 0;
+            Field f = ArrayList.class.getDeclaredField("elementData");
             f.setAccessible(true);
-            f.set(clist, Arrays.copyOf((Object[])f.get(this), this.size()));
-            
+            f.set(clist, Arrays.copyOf((Object[]) f.get(this), this.size()));
+
             return clist;
         }
     }
+
     @Override
-    public boolean contains(Object o) 
+    public boolean contains(Object o)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.contains(o);
         }
     }
+
     @Override
-    public void ensureCapacity(int minCapacity) 
+    public void ensureCapacity(int minCapacity)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             super.ensureCapacity(minCapacity);
         }
     }
+
     @Override
-    public E get(int index) 
+    public E get(int index)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.get(index);
         }
     }
+
     @Override
-    public int indexOf(Object o) 
+    public int indexOf(Object o)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.indexOf(o);
         }
     }
+
     @Override
-    public int lastIndexOf(Object o) 
+    public int lastIndexOf(Object o)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.lastIndexOf(o);
         }
     }
+
     @Override
-    public E remove(int index) 
+    public E remove(int index)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.remove(index);
         }
     }
+
     @Override
-    public boolean remove(Object o) 
+    public boolean remove(Object o)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.remove(o);
         }
     }
+
     @Override
-    public boolean removeAll(Collection<?> c) 
+    public boolean removeAll(Collection<?> c)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.removeAll(c);
         }
     }
+
     @Override
-    public boolean retainAll(Collection<?> c) 
+    public boolean retainAll(Collection<?> c)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.retainAll(c);
         }
     }
+
     @Override
-    public E set(int index, E element) 
+    public E set(int index, E element)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.set(index, element);
         }
     }
+
     @Override
-    public List<E> subList(int fromIndex, int toIndex) 
+    public List<E> subList(int fromIndex, int toIndex)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.subList(fromIndex, toIndex);
         }
     }
+
     @Override
-    public Object[] toArray() 
+    public Object[] toArray()
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.toArray();
         }
     }
+
     @Override
-    public <T> T[] toArray(T[] a) 
+    public <T> T[] toArray(T[] a)
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             return super.toArray(a);
         }
     }
+
     @Override
-    public void trimToSize() 
+    public void trimToSize()
     {
-        synchronized(lock)
+        synchronized (lock)
         {
             super.trimToSize();
         }
     }
-    
+
     @Override
-    public ListIterator<E> listIterator() 
+    public ListIterator<E> listIterator()
     {
         return new ListItr(0);
     }
 
     @Override
-    public Iterator<E> iterator() 
+    public Iterator<E> iterator()
     {
         return new Itr();
     }
-    
-    
-    
-    
-    @SneakyThrows
-    private Object[] getElementData()
+
+    private class Itr implements Iterator<E>
     {
-        Field f=ArrayList.class.getDeclaredField("elementData");
-        f.setAccessible(true);
-        return (Object[]) f.get(this);
-    }
-    @SneakyThrows
-    private void setElementData(Object[] elementData)
-    {
-        Field f=ArrayList.class.getDeclaredField("elementData");
-        f.setAccessible(true);
-        f.set(this, elementData);
-    }
-    
-    
-    private class Itr implements Iterator<E> 
-    {
+
         protected int cursor;
         protected int lastRet;
         final ConcurrentList l;
+
         public Itr()
         {
             cursor = 0;
             lastRet = -1;
-            l=(ConcurrentList) ConcurrentList.this.clone();
+            l = (ConcurrentList) ConcurrentList.this.clone();
         }
-        
 
         @Override
-        public boolean hasNext() 
+        public boolean hasNext()
         {
             return cursor < l.size();
         }
 
         @Override
-        public E next() 
+        public E next()
         {
             int i = cursor;
             if (i >= l.size())
@@ -247,7 +247,7 @@ public class ConcurrentList<E> extends ArrayList<E>
         }
 
         @Override
-        public void remove() 
+        public void remove()
         {
             if (lastRet < 0)
             {
@@ -261,22 +261,23 @@ public class ConcurrentList<E> extends ArrayList<E>
         }
     }
 
-    public class ListItr extends Itr implements ListIterator<E> 
+    public class ListItr extends Itr implements ListIterator<E>
     {
-        ListItr(int index) 
+
+        ListItr(int index)
         {
             super();
             cursor = index;
         }
 
         @Override
-        public boolean hasPrevious() 
+        public boolean hasPrevious()
         {
             return cursor > 0;
         }
 
         @Override
-        public int nextIndex() 
+        public int nextIndex()
         {
             return cursor;
         }
@@ -300,7 +301,7 @@ public class ConcurrentList<E> extends ArrayList<E>
         }
 
         @Override
-        public void set(E e) 
+        public void set(E e)
         {
             if (lastRet < 0)
             {
@@ -312,11 +313,11 @@ public class ConcurrentList<E> extends ArrayList<E>
         }
 
         @Override
-        public void add(E e) 
+        public void add(E e)
         {
             int i = cursor;
             l.add(i, e);
-            ConcurrentList.this.add(i,e);
+            ConcurrentList.this.add(i, e);
             cursor = i + 1;
             lastRet = -1;
         }

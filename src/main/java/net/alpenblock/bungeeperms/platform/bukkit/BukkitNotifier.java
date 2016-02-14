@@ -161,7 +161,7 @@ public class BukkitNotifier implements NetworkNotifier
         Player p = Bukkit.getOnlinePlayers().iterator().hasNext() ? Bukkit.getOnlinePlayers().iterator().next() : null;
         if (p != null)
         {
-            p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());
+            p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());//todo use utf8 encoding
         }
 
         //send config for match checking

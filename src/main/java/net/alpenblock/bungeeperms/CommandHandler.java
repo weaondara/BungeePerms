@@ -327,7 +327,7 @@ public class CommandHandler
         }
 
         String player = Statics.getFullPlayerName(args[1]);
-        String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;
+        String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;//todo tolower with config locale
         String world = args.length > (4 + (specialpage ? 1 : 0)) ? args[4].toLowerCase() : null;
 
         User user = pm().getUser(player);

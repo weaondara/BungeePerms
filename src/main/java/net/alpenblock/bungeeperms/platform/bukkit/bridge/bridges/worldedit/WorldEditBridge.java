@@ -61,7 +61,7 @@ public class WorldEditBridge implements Bridge
 
     public void inject(Plugin plugin)
     {
-        BungeePerms.getLogger().info("Injection of Bungeeperms into WorldEdit");
+        BungeePerms.getLogger().info("Injection of Bungeeperms into WorldEdit"); //todo even more lang support
         try
         {
             WorldEditPlugin we = (WorldEditPlugin) plugin;
@@ -97,7 +97,7 @@ public class WorldEditBridge implements Bridge
 
             we.getPermissionsResolver().findResolver();
         }
-        catch (Exception ex)
+        catch (Exception ex)//todo report error
         {
         }
     }

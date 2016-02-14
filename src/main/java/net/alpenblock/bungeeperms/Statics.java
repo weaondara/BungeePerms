@@ -134,15 +134,7 @@ public class Statics
 
     public static void setField(Object instance, Object var, String varname)
     {
-        try
-        {
-            Field f = instance.getClass().getDeclaredField(varname);
-            f.setAccessible(true);
-            f.set(instance, var);
-        }
-        catch (Exception ex)
-        {
-        }
+        setField(instance.getClass(), instance, var, varname);
     }
 
     public static void setField(Class clazz, Object instance, Object var, String varname)

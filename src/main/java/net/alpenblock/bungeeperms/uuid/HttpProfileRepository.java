@@ -29,7 +29,6 @@ public class HttpProfileRepository
             HttpBody body = new HttpBody(gson.toJson(names));
             List<HttpHeader> headers = new ArrayList<>();
             headers.add(new HttpHeader("Content-Type", "application/json"));
-            List<Profile> profiles = new ArrayList<>();
 
             Profile[] result = post(new URL("https://api.mojang.com/profiles/minecraft"), body, headers);
 

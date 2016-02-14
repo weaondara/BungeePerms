@@ -76,7 +76,10 @@ public class UUIDFetcher
             repo = new HttpProfileRepository();
         }
 
-        Profile[] profiles = repo.findProfilesOfUsers(new String[]{player});
+        Profile[] profiles = repo.findProfilesOfUsers(new String[]
+        {
+            player
+        });
         for (Profile p : profiles)
         {
             UUID uuid = Statics.parseUUID(p.getId());
@@ -99,8 +102,8 @@ public class UUIDFetcher
             URLConnection con = url.openConnection();
             InputStream in = con.getInputStream();
             byte[] buffer = new byte[con.getContentLength()];
-            in.read(buffer);
-            String res = new String(buffer);
+            int read = in.read(buffer);
+            String res = new String(buffer, 0, read);
             Gson gson = new Gson();
             PlayerNameFetchResult result = gson.fromJson(res, PlayerNameFetchResult.class);
             return result.getName();

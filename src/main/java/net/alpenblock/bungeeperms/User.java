@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,6 +15,7 @@ import net.alpenblock.bungeeperms.platform.Sender;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class User implements PermEntity
 {
 
