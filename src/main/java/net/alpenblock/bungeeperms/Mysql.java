@@ -9,13 +9,12 @@ import java.sql.Statement;
 public class Mysql
 {
 
-    private Config config;
-    private Debug debug;
-    private Connection connection;
-    private String configsection;
-
-    public static void closeResultSet(ResultSet res)
+    public static void closeResultSet(AutoCloseable res)
     {
+        if (res == null)
+        {
+            return;
+        }
         try
         {
             res.close();
@@ -24,6 +23,11 @@ public class Mysql
         {
         }
     }
+
+    private final Config config;
+    private final Debug debug;
+    private final String configsection;
+    private Connection connection;
 
     public Mysql(Config c, Debug d, String configsection)
     {
@@ -76,7 +80,7 @@ public class Mysql
             {
                 connected = false;
             }
-            if (rs.next())
+            else if (rs.next())
             {
                 connected = true;
             }
@@ -87,13 +91,7 @@ public class Mysql
         }
         finally
         {
-            try
-            {
-                rs.close();
-            }
-            catch (Exception e)
-            {
-            }
+            closeResultSet(rs);
         }
         return connected;
     }
@@ -186,7 +184,7 @@ public class Mysql
         //0: error
         //1: coulumn found
         //2: cloumn not found
-        int fsuccess = 0;
+        int fsuccess = 2;
 
         ResultSet res = null;
         try
@@ -201,7 +199,6 @@ public class Mysql
                     fsuccess = 1;
                 }
             }
-            fsuccess = 2;
         }
         catch (Exception e)
         {
@@ -210,7 +207,7 @@ public class Mysql
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            closeResultSet(res);
         }
         return fsuccess;
     }
@@ -230,20 +227,8 @@ public class Mysql
         }
         catch (SQLException e)
         {
-            try
-            {
-                rs.close();
-            }
-            catch (Exception ex)
-            {
-            }
-            try
-            {
-                stmt.close();
-            }
-            catch (Exception ex)
-            {
-            }
+            closeResultSet(rs);
+            closeResultSet(stmt);
             throw new RuntimeException(e);
         }
         finally
@@ -267,9 +252,11 @@ public class Mysql
             {
                 checkConnection();
             }
-            Statement stmt = this.connection.createStatement();
-            boolean success = stmt.execute(query);
-            stmt.close();
+            boolean success;
+            try (Statement stmt = this.connection.createStatement())
+            {
+                success = stmt.execute(query);
+            }
             return success;
         }
         catch (Exception e)
@@ -305,20 +292,8 @@ public class Mysql
         }
         finally
         {
-            try
-            {
-                rs.close();
-            }
-            catch (Exception e)
-            {
-            }
-            try
-            {
-                stmt.close();
-            }
-            catch (Exception e)
-            {
-            }
+            closeResultSet(rs);
+            closeResultSet(stmt);
         }
         return id;
     }
