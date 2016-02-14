@@ -11,19 +11,23 @@ public class CleanupTask implements Runnable
         long threshold = bp.getConfig().getCleanupThreshold() * 1000;
         
         pm.getUserlock().writeLock().lock();
-        
-        for(User u : pm.getUsers())
+        try
         {
-            if((bp.getConfig().isUseUUIDs() ? bp.getPlugin().getPlayer(u.getUUID()) : bp.getPlugin().getPlayer(u.getName())) != null)
+            for(User u : pm.getUsers())
             {
-                continue;
-            }
-            if(u.getLastAccess() + threshold < System.currentTimeMillis())
-            {
-                pm.removeUserFromCache(u);
+                if((bp.getConfig().isUseUUIDs() ? bp.getPlugin().getPlayer(u.getUUID()) : bp.getPlugin().getPlayer(u.getName())) != null)
+                {
+                    continue;
+                }
+                if(u.getLastAccess() + threshold < System.currentTimeMillis())
+                {
+                    pm.removeUserFromCache(u);
+                }
             }
         }
-        
-        pm.getUserlock().writeLock().unlock();
+        finally
+        {
+            pm.getUserlock().writeLock().unlock();
+        }
     }
 }
