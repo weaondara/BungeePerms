@@ -7,7 +7,7 @@ public enum EntityType
     Group(1),
     Version(2);
 
-    private int code;
+    private final int code;
 
     private EntityType(int code)
     {

@@ -8,8 +8,8 @@ import net.alpenblock.bungeeperms.Mysql;
 public class MysqlPermsAdapter2
 {
 
-    private Mysql mysql;
-    private String table;
+    private final Mysql mysql;
+    private final String table;
 
     public MysqlPermsAdapter2(Mysql m, String table)
     {

@@ -17,7 +17,7 @@ public class MysqlPermEntity
 
     private String name;
     private EntityType type;
-    private Map<String, List<ValueEntry>> data;
+    private final Map<String, List<ValueEntry>> data;
 
     public MysqlPermEntity(ResultSet res) throws SQLException
     {
