@@ -8,23 +8,23 @@ import lombok.Getter;
 public class Lang
 {
 
-    private static final Map<MessageType, String> map = new EnumMap<>(MessageType.class);
+    private static final Map<MessageType, String> MAP = new EnumMap<>(MessageType.class);
 
     public static void load(String file)
     {
         Config langconf = new Config(file);
         langconf.load();
 
-        map.clear();
+        MAP.clear();
         for (MessageType mt : MessageType.values())
         {
-            map.put(mt, langconf.getString(mt.getConfigKey(), mt.getDefaultValue()));
+            MAP.put(mt, langconf.getString(mt.getConfigKey(), mt.getDefaultValue()));
         }
     }
 
     public static String translate(MessageType type, Object... vars)
     {
-        String s = map.get(type);
+        String s = MAP.get(type);
         if (s == null)
         {
             s = type.getDefaultValue();
