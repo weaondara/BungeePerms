@@ -11,17 +11,18 @@ import net.alpenblock.bungeeperms.Lang.MessageType;
 public class FileExtractor
 {
 
-    public static final Map<String, String> allFiles = new HashMap<>();
+    public static final Map<String, String> ALL_FILES = new HashMap<>();
 
     static
     {
-        allFiles.put("permissions.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/permissions.yml");
-        allFiles.put("lang/EN-gb.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/lang/EN-gb.yml");
+        ALL_FILES.put("permissions.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/permissions.yml");
+        ALL_FILES.put("lang/EN-gb.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/lang/EN-gb.yml");
+        ALL_FILES.put("lang/DE-de.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/lang/DE-de.yml");
     }
 
     public static void extractAll()
     {
-        for (Map.Entry<String, String> e : allFiles.entrySet())
+        for (Map.Entry<String, String> e : ALL_FILES.entrySet())
         {
             extract(e.getKey(), e.getValue());
         }
