@@ -4,11 +4,9 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
-import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 

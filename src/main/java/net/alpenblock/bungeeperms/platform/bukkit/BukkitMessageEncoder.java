@@ -5,7 +5,6 @@ import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
-import static net.alpenblock.bungeeperms.platform.bungee.BungeeMessageEncoder.convert;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class BukkitMessageEncoder extends MessageEncoder

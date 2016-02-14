@@ -10,7 +10,7 @@ import org.bukkit.event.HandlerList;
 public class BungeePermsGroupChangedEvent extends Event
 {
 
-    public static HandlerList handlers = new HandlerList();
+    public static final HandlerList handlers = new HandlerList();
 
     public static HandlerList getHandlerList()
     {

@@ -5,10 +5,11 @@ import net.alpenblock.bungeeperms.platform.Sender;
 public class Messages
 {
 
-    public static String Error = Color.Error + "An error occured! Please report this error on https://github.com/weaondara/BungeePerms/issues . Please include exceptions from console.";
-    public static String TooLessArgs = Color.Error + "Too less arguments!";
-    public static String TooManyArgs = Color.Error + "Too many arguments!";
-    public static String NoRights = Color.Error + "You don't have permission to do that!";
+    //todo make caps
+    public static final String Error = Color.Error + "An error occured! Please report this error on https://github.com/weaondara/BungeePerms/issues . Please include exceptions from console.";
+    public static final String TooLessArgs = Color.Error + "Too less arguments!";
+    public static final String TooManyArgs = Color.Error + "Too many arguments!";
+    public static final String NoRights = Color.Error + "You don't have permission to do that!";
 
     public static void sendErrorMessage(Sender sender)
     {
