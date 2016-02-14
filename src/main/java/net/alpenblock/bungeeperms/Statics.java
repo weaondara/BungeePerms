@@ -78,9 +78,9 @@ public class Statics
 
     public static boolean argAlias(String arg, String... aliases)
     {
-        for (int i = 0; i < aliases.length; i++)
+        for (String aliase : aliases)
         {
-            if (aliases[i].equalsIgnoreCase(arg))
+            if (aliase.equalsIgnoreCase(arg))
             {
                 return true;
             }

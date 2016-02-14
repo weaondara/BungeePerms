@@ -72,31 +72,35 @@ public class PermissionsManager
     {
         config.load();
         BackEndType bet = config.getBackEndType();
-        if (bet == BackEndType.YAML)
+        switch (bet)
         {
-            backEnd = new YAMLBackEnd();
-        }
-        else if (bet == BackEndType.MySQL)
-        {
-            backEnd = new MySQLBackEnd();
-        }
-        else if (bet == BackEndType.MySQL2)
-        {
-            backEnd = new MySQL2BackEnd();
+            case YAML:
+                backEnd = new YAMLBackEnd();
+                break;
+            case MySQL:
+                backEnd = new MySQLBackEnd();
+                break;
+            case MySQL2:
+                backEnd = new MySQL2BackEnd();
+                break;
+            default:
+                break;
         }
 
         UUIDPlayerDBType updbt = config.getUUIDPlayerDBType();
-        if (updbt == UUIDPlayerDBType.None)
+        switch (updbt)
         {
-            UUIDPlayerDB = new NoneUUIDPlayerDB();
-        }
-        else if (updbt == UUIDPlayerDBType.YAML)
-        {
-            UUIDPlayerDB = new YAMLUUIDPlayerDB();
-        }
-        else if (updbt == UUIDPlayerDBType.MySQL)
-        {
-            UUIDPlayerDB = new MySQLUUIDPlayerDB();
+            case None:
+                UUIDPlayerDB = new NoneUUIDPlayerDB();
+                break;
+            case YAML:
+                UUIDPlayerDB = new YAMLUUIDPlayerDB();
+                break;
+            case MySQL:
+                UUIDPlayerDB = new MySQLUUIDPlayerDB();
+                break;
+            default:
+                break;
         }
     }
 
@@ -1541,27 +1545,20 @@ public class PermissionsManager
      */
     public synchronized void migrateBackEnd(BackEndType bet)
     {
-        if (bet == null)
-        {
-            throw new NullPointerException("bet must not be null");
-        }
         Migrator migrator = null;
-        if (bet == BackEndType.MySQL2)
+        switch (bet)
         {
-            migrator = new Migrate2MySQL2(config, debug);
-        }
-        else if (bet == BackEndType.MySQL)
-        {
-            migrator = new Migrate2MySQL(config, debug);
-        }
-        else if (bet == BackEndType.YAML)
-        {
-            migrator = new Migrate2YAML(config);
-        }
-
-        if (migrator == null)
-        {
-            throw new UnsupportedOperationException("bet==" + bet.name());
+            case MySQL2:
+                migrator = new Migrate2MySQL2(config, debug);
+                break;
+            case MySQL:
+                migrator = new Migrate2MySQL(config, debug);
+                break;
+            case YAML:
+                migrator = new Migrate2YAML(config);
+                break;
+            default:
+                throw new UnsupportedOperationException("bet = " + bet.name());
         }
 
         migrator.migrate(backEnd.loadGroups(), backEnd.loadUsers(), permsversion);
@@ -1636,21 +1633,19 @@ public class PermissionsManager
     {
         Map<UUID, String> map = UUIDPlayerDB.getAll();
 
-        if (type == UUIDPlayerDBType.None)
+        switch (type)
         {
-            UUIDPlayerDB = new NoneUUIDPlayerDB();
-        }
-        else if (type == UUIDPlayerDBType.YAML)
-        {
-            UUIDPlayerDB = new YAMLUUIDPlayerDB();
-        }
-        else if (type == UUIDPlayerDBType.MySQL)
-        {
-            UUIDPlayerDB = new MySQLUUIDPlayerDB();
-        }
-        else
-        {
-            throw new UnsupportedOperationException("type==" + type);
+            case None:
+                UUIDPlayerDB = new NoneUUIDPlayerDB();
+                break;
+            case YAML:
+                UUIDPlayerDB = new YAMLUUIDPlayerDB();
+                break;
+            case MySQL:
+                UUIDPlayerDB = new MySQLUUIDPlayerDB();
+                break;
+            default:
+                throw new UnsupportedOperationException("type = " + type);
         }
         BungeePerms.getInstance().getConfig().setUUIDPlayerDB(UUIDPlayerDB.getType());
         UUIDPlayerDB.clear();

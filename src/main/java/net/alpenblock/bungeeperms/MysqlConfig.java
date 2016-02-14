@@ -251,11 +251,7 @@ public class MysqlConfig
 
         //starts with same part -> check for dot
         String dotkeyrest = subnode.substring(node.length());
-        if (dotkeyrest.charAt(0) != ".".charAt(0))
-        {
-            return false;
-        }
-        return true;
+        return dotkeyrest.charAt(0) == '.';
     }
 
     public void deleteNode(String node)
