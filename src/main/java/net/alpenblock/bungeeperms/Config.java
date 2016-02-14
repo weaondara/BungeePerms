@@ -255,7 +255,7 @@ public class Config
 
     public List<String> getSubNodes(String node)
     {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         try
         {
             for (Object o : fconfig.getConfigurationSection(node).getKeys(false).toArray())
