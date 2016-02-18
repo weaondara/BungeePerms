@@ -126,10 +126,10 @@ public class BukkitNotifier implements NetworkNotifier
         if (p != null)
         {
             p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());
-        }
 
-        //send config for match checking
-        sendConfig(p);
+            //send config for match checking
+            sendConfig(p);
+        }
     }
 
     private void sendPM(UUID player, String msg, String origin)
@@ -144,10 +144,10 @@ public class BukkitNotifier implements NetworkNotifier
         if (p != null)
         {
             p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());
-        }
 
-        //send config for match checking
-        sendConfig(p);
+            //send config for match checking
+            sendConfig(p);
+        }
     }
 
     private void sendPMAll(String msg, String origin)
