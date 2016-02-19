@@ -130,6 +130,10 @@ public class BukkitNotifier implements NetworkNotifier
             //send config for match checking
             sendConfig(p);
         }
+        else
+        {
+            sendPMAll(msg, origin);
+        }
     }
 
     private void sendPM(UUID player, String msg, String origin)
@@ -148,6 +152,10 @@ public class BukkitNotifier implements NetworkNotifier
             //send config for match checking
             sendConfig(p);
         }
+        else
+        {
+            sendPMAll(msg, origin);
+        }
     }
 
     private void sendPMAll(String msg, String origin)
@@ -162,10 +170,10 @@ public class BukkitNotifier implements NetworkNotifier
         if (p != null)
         {
             p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());//todo use utf8 encoding
-        }
 
-        //send config for match checking
-        sendConfig(p);
+            //send config for match checking
+            sendConfig(p);
+        }
     }
 
     public void sendWorldUpdate(Player p)
