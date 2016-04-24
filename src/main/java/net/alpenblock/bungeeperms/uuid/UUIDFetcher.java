@@ -110,7 +110,11 @@ public class UUIDFetcher
         }
         catch (Exception e)
         {
-            BungeePerms.getInstance().getDebug().log(e);
+            if(BungeePerms.getInstance() == null){
+                e.printStackTrace();
+            }else{
+                BungeePerms.getInstance().getDebug().log(e);
+            }
         }
         return null;
     }
