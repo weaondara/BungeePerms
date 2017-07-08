@@ -440,7 +440,9 @@ public class Group implements Comparable<Group>, PermEntity
             }
         }
 
-        return prefix.isEmpty() ? prefix : prefix.substring(0, prefix.length() - 1) + ChatColor.RESET;
+        return prefix.isEmpty() ? prefix : prefix.substring(0, prefix.length() - 1)
+            + (BungeePerms.getInstance().getConfig().isTerminatePrefixSpace() ? " " : "")
+            + (BungeePerms.getInstance().getConfig().isTerminatePrefixReset() ? ChatColor.RESET : "");
     }
 
     public String buildSuffix(String server, String world)
@@ -464,7 +466,9 @@ public class Group implements Comparable<Group>, PermEntity
             }
         }
 
-        return suffix.isEmpty() ? suffix : suffix.substring(0, suffix.length() - 1) + ChatColor.RESET;
+        return suffix.isEmpty() ? suffix : suffix.substring(0, suffix.length() - 1)
+            + (BungeePerms.getInstance().getConfig().isTerminateSuffixSpace() ? " " : "")
+            + (BungeePerms.getInstance().getConfig().isTerminateSuffixReset() ? ChatColor.RESET : "");
     }
 
     @Override
