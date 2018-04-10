@@ -113,7 +113,8 @@ public class Permission_BungeePerms extends Permission
 
         if (world == null)
         {
-            BungeePerms.getInstance().getPermissionsManager().addUserPerServerPerm(u, server, permission);
+            //BungeePerms.getInstance().getPermissionsManager().addUserPerServerPerm(u, server, permission);
+            BungeePerms.getInstance().getPermissionsManager().addUserPerm(u, permission);
         }
         else
         {
