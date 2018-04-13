@@ -6,6 +6,7 @@ so you don't need BungeeCord/Spigot permissions (anymore). BungeePerms can form 
 system managing all permissions in your network.
 
 **Build Status**
+
 [![Build Status](http://ci.sgessinger.de/job/BungeePerms/badge/icon)](http://ci.sgessinger.de/job/BungeePerms/)
 
 **Binaries**
