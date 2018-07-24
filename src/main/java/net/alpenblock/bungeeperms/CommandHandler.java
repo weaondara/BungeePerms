@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,9 @@ public class CommandHandler
         {
             BungeePerms.getInstance().getPlugin().getLogger().info(sender.getName() + " issued bungeeperms command /" + cmd + " " + Statics.arrayToString(args, 0, args.length, " "));
         }
+
+        //reparse command
+        args = Statics.parseCommand(Statics.arrayToString(args, 0, args.length, " "));
 
         if (args.length == 0)
         {
@@ -680,14 +684,14 @@ public class CommandHandler
             boolean has = checker.hasPerm(player, perm.toLowerCase());
             sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM, user.getName(), perm, formatBool(has)));
         }
-        
+
         //per server perm
         else if (world == null)
         {
             boolean has = checker.hasPermOnServer(user.getName(), perm.toLowerCase(), server);
             sender.sendMessage(Lang.translate(MessageType.USER_HAS_PERM_SERVER, user.getName(), perm, server, formatBool(has)));
         }
-        
+
         //per server world perm
         else
         {
@@ -1464,7 +1468,7 @@ public class CommandHandler
             boolean has = group.has(perm.toLowerCase());
             sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM, group.getName(), perm, formatBool(has)));
         }
-        
+
         //per server perm
         else if (world == null)
         {

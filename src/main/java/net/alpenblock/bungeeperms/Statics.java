@@ -4,9 +4,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import static java.util.Collections.list;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.SneakyThrows;
 import net.alpenblock.bungeeperms.platform.Sender;
 import org.bukkit.event.Event;
@@ -288,5 +291,101 @@ public class Statics
             s = s.substring(0, s.length() - seperator.length());
         }
         return s;
+    }
+
+    public static String[] parseCommand(String cmd)
+    {
+        List<String> ret = new ArrayList();
+
+        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(cmd);
+        while (m.find())
+            ret.add(m.group(1).replaceAll("(^\")|(\"$)",""));
+
+//        int i = 0;
+//        int j = 0;
+//        boolean b = false;
+//        while ((j = cmd.indexOf("\"", j)) > -1)
+//        {
+//            if (b)
+//            {
+//                if (j < cmd.length() - 1 && cmd.charAt(j + 1) == ' ')
+//                {
+//                    ret.add(cmd.substring(i, j));
+//                    i = j;
+//                    b = !b;
+//                    continue;
+//                }
+//                else if (j == cmd.length() - 1)
+//                {
+//                    ret.add(cmd.substring(i, j));
+//                    break;
+//                }
+//                else
+//                {
+//                    continue;
+//                }
+//            }
+//            else if (!b)
+//            {
+//                if (i > 0 && cmd.charAt(i - 1) == ' ')
+//                {
+//                    b = !b;
+//                    i = j;
+//                    break;
+//                }
+//                else if (i == 0)
+//                {
+//                    b = !b;
+//                    i = j;
+//                    break;
+//                }
+//            }
+//        }
+//
+//        if (b)
+//        {
+//            System.out.println("i=" + i);
+//            System.out.println("j=" + j);
+//        }
+//        String s = "";
+//        boolean b = false;
+//        for (int i = 0; i < cmd.length(); i++)
+//        {
+//            switch (cmd.charAt(i))
+//            {
+//                case '\"':
+//                    if (b)
+//                    {
+//                        if (i < cmd.length() - 1 && cmd.charAt(i + 1) != ' ')
+//                        {
+//                            s += cmd.charAt(i);
+//                            break;
+//                        }
+//                        else
+//                        {
+//                            ret.add(s);
+//                        }
+//                    }
+//                    else
+//                    {
+//                        if (i > 0 && cmd.charAt(i - 1) != ' ')
+//                        {
+//                            s += cmd.charAt(i);
+//                            break;
+//                        }
+//                    }
+//                    b = !b;
+//                    break;
+//                default:
+//                    s += cmd.charAt(i);
+//                    break;
+//            }
+//        }
+        return ret.toArray(new String[ret.size()]);
+    }
+
+    public static String[] array(String... elements)
+    {
+        return elements;
     }
 }

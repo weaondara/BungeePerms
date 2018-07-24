@@ -12,7 +12,7 @@ import net.alpenblock.bungeeperms.platform.PluginMessageSender;
 public class BungeePerms
 {
 
-    public final static String CHANNEL = "bungeeperms";
+    public final static String CHANNEL = "bungeeperms:main";
 
     @Getter
     private static BungeePerms instance;
