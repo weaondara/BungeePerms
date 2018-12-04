@@ -171,50 +171,50 @@ warning:
       uuidplayerdb: 'Типът на uuidplayerdb в конфигурацията на BungeePerms не съвпада.'
       useuuid: 'Опциите на useuuids в конфигурацията на BungeePerms не съвпада.'
     bungee-bukkit-config: 'UUID-та на Bungeecord и Bukkit/Spigot не съвпадат. Моля проверете конфигурациите на Spigot/Bukkit и Bungeecord!'
-    useuuid-none-uuiddb: 'Die useUUIDs Option is aktiviert aber die uuidplayerdb ist auf none gestellt!'
+    useuuid-none-uuiddb: 'Oпцията useUUIDs е включена, но uuidplayerdb не е зададена!'
 help:
-  welcome: Welcomes you to BungeePerms
-  help: Shows this help
-  reload: Reloads the plugin
-  debug: En-/Disables the debug mode
-  users: Lists the users [or shows the amount]
+  welcome: 'Приветства Ви в BungeePerms'
+  help: 'Показва помощният списък'
+  reload: 'Презарежда плъгина'
+  debug: 'Включва/Изключва режима за отстраняване на грешки.'
+  users: 'Показва списъка с играчи [или показва техният брой]'
   user:
-    info: Shows information about the user
-    delete: Deletes the user
-    display: Sets the display name for the user
-    prefiy: Sets the prefix name for the user
-    suffix: Sets the suffix for the user
-    add-perm: Adds a permission to the user
-    remove-perm: Removes a permission from a the user
-    has: Checks if the user has the permission
-    list: Lists the permissions of the user
-    set-group: Removes the old group in the group's ladder and adds the group to the user
-    groups: Lists the groups the user is in
-  groups: Lists the groups
+    info: 'Показва информация относно потребителя.'
+    delete: 'Изтрива потребителя.'
+    display: 'Задава името, което се показва за потребителя.'
+    prefiy: 'Задава представка за потребителя.'
+    suffix: 'Задава наставка за потребителя.'
+    add-perm: 'Добавя права на потребителя.'
+    remove-perm: 'Премахва права на потребителя.'
+    has: 'Порверява за права на потребителя.'
+    list: 'Показва всички права на потребителя.'
+    set-group: 'Премахва предишната група в груповата стъпка и добавя новата група на потребителя.'
+    groups: 'Показва всички групи на потребителя.'
+  groups: 'Показва всички групи.'
   group:
-    info: Shows information about the group
-    users: Lists the users of the group [or shows the amount]
-    create: Create a new group
-    delete: Deletes the group
-    add-inherit: Adds the addgroup to the group as inheritance
-    remive-inherit: Removes the removegroup from the group as inheritance
-    rank: Sets the rank for the group
-    weight: Sets the weight for the group
-    ladder: Sets the ladder for the group
-    default: Determines whether the group is a default group or not
-    display: Sets the display name for the group
-    prefix: Sets the prefix for the group
-    suffix: Sets the suffix for the group
-    add-perm: Adds a permission to the group
-    remove-perm: Removes a permission from the group
-    has: Checks if the group has the permission
-    list: Lists the permissions of the group
-  promote: Promotes the user to the next rank
-  demote: Demotes the user to the previous rank
-  format: Reformates the permission.yml or mysql table - &cBE CAREFUL
-  cleanup: Cleans up the permission.yml or mysql table - &c!BE VERY CAREFUL! - removes a lot of players from the permissions db if configured
+    info: 'Показва информация относно групата.'
+    users: 'Показва всички потребители в групата [или показва техният брой].'
+    create: 'Създава нова група'
+    delete: 'Изтрива групата'
+    add-inherit: 'Добавя дадената група за наследяване към групата.'
+    remive-inherit: 'Премахва дадената група от наследяването на групата.'
+    rank: 'Задава ранг-а на групата'
+    weight: 'Задава тежестта на групата.'
+    ladder: 'Задава стъпката на групата.'
+    default: 'Задава дали групата да бъде по подразбиране или не.'
+    display: 'Задава името за показване на групата.'
+    prefix: 'Задава представка на групата.'
+    suffix: 'Задава наставка на групата.'
+    add-perm: 'Задава права на групата.'
+    remove-perm: 'Премахва права от групата.'
+    has: 'Проверява дали групата има права.'
+    list: 'Показва всички права на групата'
+  promote: 'Повишава потребителя до следващият ранг.'
+  demote: 'Понижава потребителя до предишният ранг.'
+  format: 'Пренарежда файла permission.yml или таблицата в базата данни mysql - &cБЪДЕТЕ ВНИМАТЕЛНИ!'
+  cleanup: 'Почиства файла permission.yml или таблицата в базата данни mysql - &c!БЪДЕТЕ МНОГО ВНИМАТЕЛНИ! - възможно е премахването на много играчи от базата данни ако е настроена'
   migrate:
-    backend: Migrates the backend or shows status - &c!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)
-    use-uuid: Migrates backends to (not) use UUIDs or shows status - &c!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)
-    uuid-player-db: Migrates UUID-player-databases or shows status - &c!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)
-  uuid: 'Gets the UUID of a player from database (-r: reverse; -m: ask mojang)'
+    backend: 'Мигрира бекенд-а или показва неговият статус. - &c!БЪДЕТЕ ВНИМАТЕЛНИ! (НАПРАВЕТЕ РЕЗЕРВНО КОПИЕ ПРЕДИ ДА ИЗПЪЛНЯВАТЕ ТАЗИ КОМАНДА!)'
+    use-uuid: 'Мигрира бекенд-а да (не) използва UUID-та или показва техният статус - &c!БЪДЕТЕ ВНИМАТЕЛНИ! (НАПРАВЕТЕ РЕЗЕРВНО КОПИЕ ПРЕДИ ДА ИЗПЪЛНЯВАТЕ ТАЗИ КОМАНДА!)'
+    uuid-player-db: 'Мигрира UUID базата с играчи или показва нейния статус - &c!БЪДЕТЕ ВНИМАТЕЛНИ! (НАПРАВЕТЕ РЕЗЕРВНО КОПИЕ ПРЕДИ ДА ИЗПЪЛНЯВАТЕ ТАЗИ КОМАНДА!)'
+  uuid: 'Взима UUID на играча от базата данни. (-r: наобратно; -m: попитайте mojang)'
