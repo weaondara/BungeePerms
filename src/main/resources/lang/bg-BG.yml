@@ -38,140 +38,140 @@ user:
   registered-users-count: '&7Има регистрирани &6{0}&7 играчи.'
   permissions-list-header: '&7Играчът &3{0}&7 има следните права:'
   permissions-list-header-uuid: '&7Играчът &3{0}&7 (&3{1}&7) има следните права:'
-  group-header: '&7Groups of the player &3{0}&7:'
-  about: '&7About &3{0}'
+  group-header: '&7Играчът &3{0}&7 има следните групи:'
+  about: '&7Относно &3{0}'
   uuid: '&7UUID: &6{0}'
-  groups: '&7Groups: {0}'
-  permissions: '&7User permissions: &6{0}'
-  all-permissions: '&7All permissions: &6{0}'
-  deleted: '&7User deleted'
-  added-perm: '&7Added permission &6{0}&7 to player &3{1}&7.'
-  added-perm-server: '&7Added permission &6{0}&7 to player &3{1}&7 on server &6{2}&7.'
-  added-perm-server-world: '&7Added permission &6{0}&7 to player &3{1}&7 on server
-    &6{2}&7 in world &6{3}&7.'
-  removed-perm: '&7Removed permission &6{0}&7 from player &3{1}&7.'
-  removed-perm-server: '&7Removed permission &6{0}&7 from player &3{1}&7 on server
+  groups: '&7Групи: {0}'
+  permissions: '&7Потребителски права: &6{0}'
+  all-permissions: '&7Всички права: &6{0}'
+  deleted: '&7Потребителят е изтрит'
+  added-perm: '&7Добавени права &6{0}&7 на играча &3{1}&7.'
+  added-perm-server: '&7Добавени права &6{0}&7 на играча &3{1}&7 на сървър &6{2}&7.'
+  added-perm-server-world: '&7Добавени права &6{0}&7 на играча &3{1}&7 на сървър
+    &6{2}&7 в свят &6{3}&7.'
+  removed-perm: '&7Премахнати права &6{0}&7 от играча &3{1}&7.'
+  removed-perm-server: '&7Премахнати права &6{0}&7 от играча &3{1}&7 на сървър
     &6{2}&7.'
-  removed-perm-server-world: '&7Removed permission &6{0}&7 from player &3{1}&7 on
-    server &6{2}&7 in world &6{3}&7.'
-  alreday-has-perm: '&7The player &6{0}&7 already has the permission &6{1}&7.'
-  alreday-has-perm-server: '&7The player &6{0}&7 already has the permission &6{1}&7
-    on server &6{2}&7.'
-  alreday-has-perm-server-world: '&7The player &6{0}&7 already has the permission
-    &6{1}&7 on server &6{2}&7 in world &6{3}&7.'
-  never-had-perm: '&7The player &6{0}&7 never had the permission &6{1}&7.'
-  never-had-perm-server: '&7The player &6{0}&7 never had the permission &6{1}&7 on
-    server &6{2}&7.'
-  never-had-perm-server-world: '&7The player &6{0}&7 never had the permission &6{1}&7
-    on server &6{2}&7 in world &6{3}&7.'
-  has-perm: '&7Player &3{0}&7 has the permission &6{1}&7: {2}'
-  has-perm-server: '&7Player &3{0}&7 has the permission &6{1}&7 on server &6{2}&7:
+  removed-perm-server-world: '&7Премахнати права &6{0}&7 на играча &3{1}&7 на
+    сървър &6{2}&7 в свят &6{3}&7.'
+  alreday-has-perm: '&7Играчът &6{0}&7 вече има правата &6{1}&7.'
+  alreday-has-perm-server: '&7Играчът &6{0}&7 вече има правата &6{1}&7
+    на сървър &6{2}&7.'
+  alreday-has-perm-server-world: '&7Играчът &6{0}&7 вече има правата
+    &6{1}&7 на сървър &6{2}&7 в свят &6{3}&7.'
+  never-had-perm: '&7Играчът &6{0}&7 никога не е имал правата &6{1}&7.'
+  never-had-perm-server: '&7Играчът &6{0}&7 никога не е имал правата &6{1}&7 в
+    сървър &6{2}&7.'
+  never-had-perm-server-world: '&7Играчът &6{0}&7 никога не е имал правата &6{1}&7
+    на сървър &6{2}&7 в свят &6{3}&7.'
+  has-perm: '&7Играчът &3{0}&7 има правата &6{1}&7: {2}'
+  has-perm-server: '&7Играчът &3{0}&7 има правата &6{1}&7 на сървър &6{2}&7:
     {3}'
-  has-perm-server-world: '&7Player &3{0}&7 has the permission &6{1}&7 on server &6{2}&7
-    in world &6{3}&7: {4}'
-  added-group: '&7Added group &6{0}&7 to player &3{1}&7.'
-  removed-group: '&7Removed group &6{0}&7 from player &3{1}&7.'
-  set-group: '&7Set group &6{0}&7 for player &3{1}&7.'
-  set-display: '&7Set display name for user &6{0}&7.'
-  set-prefix: '&7Set prefix for user &6{0}&7.'
-  set-suffix: '&7Set suffix for user &6{0}&7.'
+  has-perm-server-world: '&7Играчът &3{0}&7 има правата &6{1}&7 на сървър &6{2}&7
+    вв свят &6{3}&7: {4}'
+  added-group: '&7Добавена група &6{0}&7 на играча &3{1}&7.'
+  removed-group: '&7Премахната група &6{0}&7 от играча &3{1}&7.'
+  set-group: '&7зададена група &6{0}&7 на играча &3{1}&7.'
+  set-display: '&7Зададено името за показване на потребител &6{0}&7.'
+  set-prefix: '&7Зададена представка на потребител &6{0}&7.'
+  set-suffix: '&7Зададена наставка на потребител &6{0}&7.'
 group:
-  no-groups-found: '&7No groups found!'
-  groups-list-header: '&7There are following groups: '
-  permissions-list-header: '&7Permissions of the group &6{0}&7:'
-  about: '&7About group &6{0}'
-  inheritances: '&7Inheritances: {0}'
-  permissions: '&7Group permissions: &6{0}'
-  all-permissions: '&7All permissions: &6{0}'
-  rank: '&7Rank: &6{0}'
-  weight: '&7Weight: &6{0}'
-  ladder: '&7Ladder: &6{0}'
-  default: '&7Default: {0}'
-  users-header: '&7Following players are in group &6{0}&7: '
-  users-header-count: '&7There are &6{0}&7 players in group &6{1}&7.'
-  created: '&7Group {0} created'
-  deleted: '&7Group {0} deleted'
-  deletion-in-progress: '&7Group deletion in progress ... this may take a while (backend
-    integrity check).'
-  added-perm: '&7Added permission &6{0}&7 to group &6{1}&7.'
-  added-perm-server: '&7Added permission &6{0}&7 to group &6{1}&7 on server &6{2}&7.'
-  added-perm-server-world: '&7Added permission &6{0}&7 to group &6{1}&7 on server
-    &6{2}&7 in world &6{3}&7.'
-  removed-perm: '&7Removed permission &6{0}&7 from group &6{1}&7.'
-  removed-perm-server: '&7Removed permission &6{0}&7 from group &6{1}&7 on server
+  no-groups-found: '&7Не са намерени групи!'
+  groups-list-header: '&7Има следните групи: '
+  permissions-list-header: '&7Правата на група &6{0}&7:'
+  about: '&7Относно група &6{0}'
+  inheritances: '&7Наследява: {0}'
+  permissions: '&7Групови права: &6{0}'
+  all-permissions: '&7Всички права: &6{0}'
+  rank: '&7Ранг: &6{0}'
+  weight: '&7Тежест: &6{0}'
+  ladder: '&Стъпка: &6{0}'
+  default: '&7По подразбиране: {0}'
+  users-header: '&7Следните играчи са в група &6{0}&7: '
+  users-header-count: '&7Има &6{0}&7 играчи в групата &6{1}&7.'
+  created: '&7Групата {0} е създадена'
+  deleted: '&7Групата {0} е изтрита'
+  deletion-in-progress: '&7Групата е в процес на изтриване ... Това може да отнеме известно време (проверява се 
+    целостта на заден план)'
+  added-perm: '&7Добавени права &6{0}&7 на група &6{1}&7.'
+  added-perm-server: '&7Добавени права &6{0}&7 на група &6{1}&7 на сървър &6{2}&7.'
+  added-perm-server-world: '&7Добавени права &6{0}&7 на група &6{1}&7 на сървър
+    &6{2}&7 в свят &6{3}&7.'
+  removed-perm: '&7Премахнати права &6{0}&7 от група &6{1}&7.'
+  removed-perm-server: '&7Премахнати права &6{0}&7 от група &6{1}&7 на сървър
     &6{2}&7.'
-  removed-perm-server-world: '&7Removed permission &6{0}&7 from group &6{1}&7 on server
-    &6{2}&7 in world &6{3}&7.'
-  already-had-perm: '&7The group &6{0}&7 already has the permission &6{1}&7.'
-  already-had-perm-server: '&7The group &6{0}&7 already has the permission &6{1}&7
-    on server &6{2}&7.'
-  already-had-perm-server-world: '&7The group &6{0}&7 already has the permission &6{1}&7
-    on server &6{2}&7 in world &6{3}&7.'
-  never-had-perm: '&7The group &6{0}&7 never had the permission &6{1}&7.'
-  never-had-perm-server: '&7The group &6{0}&7 never had the permission &6{1}&7 on
-    server &6{2}&7.'
-  never-had-perm-server-world: '&7The group &6{0}&7 never had the permission &6{1}&7
-    on server &6{2}&7 in world &6{3}&7.'
-  has-perm: '&7Group &6{0}&7 has the permission &6{1}&7: {2}'
-  has-perm-server: '&7Group &6{0}&7 has the permission &6{1}&7 on server &6{2}&7:
+  removed-perm-server-world: '&7Премахнати права &6{0}&7 от група &6{1}&7 на сървър
+    &6{2}&7 в свят &6{3}&7.'
+  already-had-perm: '&7Групата &6{0}&7 вече има правата &6{1}&7.'
+  already-had-perm-server: '&7Групата &6{0}&7 вече има правата &6{1}&7
+    в сървър &6{2}&7.' 
+  already-had-perm-server-world: '&7Групата &6{0}&7 Вече има правата &6{1}&7
+    на сървър &6{2}&7 в свят &6{3}&7.'
+  never-had-perm: '&7Групата &6{0}&7 никога не е имала правата &6{1}&7.'
+  never-had-perm-server: '&7Групата &6{0}&7 никога не е имала правата &6{1}&7 на
+    сървър &6{2}&7.'
+  never-had-perm-server-world: '&7Групата &6{0}&7 никога не е имала правата &6{1}&7
+    на сървър &6{2}&7 в свят &6{3}&7.'
+  has-perm: '&7Групата &6{0}&7 има правата &6{1}&7: {2}'
+  has-perm-server: '&7Групата &6{0}&7 има правата &6{1}&7 на сървър &6{2}&7:
     {3}'
-  has-perm-server-world: '&7Group &6{0}&7 has the permission &6{1}&7 on server &6{2}&7
-    in world &6{3}&7: {4}'
-  added-inheritance: '&7Added inheritance &6{0}&7 to group &6{1}&7.'
-  removed-inheritance: '&7Removed inheritance &6{0}&7 from group &6{1}&7.'
-  set-rank: '&7Group rank set for group &6{0}&7.'
-  set-weight: '&7Group weight set for group &6{0}&7.'
-  set-ladder: '&7Group ladder set for group &6{0}&7.'
-  set-default: '&7Marked group &6{0}&7 as &6{1}'
-  set-display: '&7Set display name for group &6{0}&7.'
-  set-prefix: '&7Set prefix for group &6{0}&7.'
-  set-suffix: '&7Set suffix for group &6{0}&7.'
+  has-perm-server-world: '&7Групата &6{0}&7 има правата &6{1}&7 на сървър &6{2}&7
+    в свят &6{3}&7: {4}'
+  added-inheritance: '&7Добавено наследяване &6{0}&7 на групата &6{1}&7.'
+  removed-inheritance: '&7Премахнато наследяване &6{0}&7 от групата &6{1}&7.'
+  set-rank: '&7Груповият ранг на групата &6{0}&7 е зададен.'
+  set-weight: '&7Груповата тежест за групата &6{0}&7 е зададен.'
+  set-ladder: '&7Груповата стъпка за група &6{0}&7 е зададена.'
+  set-default: '&7Групата &6{0}&7 е маркирана като &6{1}'
+  set-display: '&7Показваното име на групата &6{0}&7 е зададено.'
+  set-prefix: '&7Представката на групата &6{0}&7 е зададен.'
+  set-suffix: '&7Наставката на групата &6{0}&7 е зададена.'
 common:
-  display: '&7Display: &r{0}'
-  prefix: '&7Prefix: &r{0}'
-  suffix: '&7Suffix: &r{0}'
-  prefix-full: '&7Full prefix: &r{0}'
-  suffix-full: '&7Full suffix: &r{0}'
+  display: '&7Дисплей: &r{0}'
+  prefix: '&7Представка: &r{0}'
+  suffix: '&7Наставка: &r{0}'
+  prefix-full: '&7Пълна представка: &r{0}'
+  suffix-full: '&7Пълна наставка: &r{0}'
   permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3})'
-  permissions-list-header-page: '&7Page &6{0}&7/&6{1}&7'
+  permissions-list-header-page: '&7страница &6{0}&7/&6{1}&7'
 general:
-  own: own
-  none: none
-  default: default
-  nondefault: non-default
-  misconfiguration: '&4Misconfiguration'
+  own: 'собствен'
+  none: 'без'
+  default: 'по подразбиране'
+  nondefault: 'не по подразбиране'
+  misconfiguration: '&4Неправилна конфигурация'
 log:
   extraction:
-    extracting: extracting {0}
-    failed: 'could not extract file {0}: {1}'
-    done: extracted {0}
+    extracting: 'извличане на {0}'
+    failed: 'Неуспешно извличане на файл {0}: {1}'
+    done: 'извлечен {0}'
   permissions:
-    loading: loading permissions ...
-    loaded: permissions loaded
-    no-perm-file: no permissions file found!!!
-    adding-default-groups: Adding default groups to {0}
-    adding-default-groups-uuid: Adding default groups to {0} ({1})
-  login: Login by {0}
-  login-uuid: Login by {0} ({1})
+    loading: 'Зареждане на права ...'
+    loaded: 'Правата заредени!'
+    no-perm-file: 'Не е намерен файл с права!!!'
+    adding-default-groups: 'Добавяне на групите по подразбиране на {0}'
+    adding-default-groups-uuid: 'Добавяне на групите по подразбиране на {0} ({1}) '
+  login: 'Влизане на  {0}'
+  login-uuid: 'Влизане на {0} ({1})'
 warning:
-  intrusion-detected: '&4Possible intrusion detected. Sender is {0}'
+  intrusion-detected: '&4Открит е опит за пробиване на сигурността. Изпратен е от {0}'
   misconfig:
     bungee:
-      standalone: 'Server {0}: Received a plugin message from Bukkit/Spigot but BungeePerms is in standalone mode. Ignoring it ...'
-      serverdependend: 'Server {0}: Received a plugin message from Bukkit/Spigot but BungeePerms is in serverdependend mode. Ignoring it ...'
-      serverdependend-blacklist: 'Server {0}: Received a plugin message from Bukkit/Spigot but BungeePerms is in serverdependend-blacklist mode. Ignoring it ...'
-      servername: 'Server {0}: The server names of the Bungeecord config and BungeePerms config do not match.'
-      backend: 'Server {0}: The backend types of the BungeePerms configs do not match.'
-      uuidplayerdb: 'Server {0}: The uuidplayerdb types of the BungeePerms configs do not match.'
-      useuuid: 'Server {0}: The useuuids options of the BungeePerms configs do not match.'
+      standalone: 'Сървър {0}: Получено е съобщение от плъгин от Bukkit/Spigot но BungeePerms е в самостоятелен режим на работа. Съобщението е игнорирано ...'
+      serverdependend: 'Сървър {0}: Получено е съобщение от плъгин от Bukkit/Spigot но BungeePerms е в режим serverdependend. Съобщението е игнорирано ...'
+      serverdependend-blacklist: 'Сървър {0}: Получено е съобщение от плъгин от Bukkit/Spigot но BungeePerms е в режим serverdependend-blacklist. Съобщението е игнорирано ...'
+      servername: 'Сървър {0}: Името на сървъра в конфигурацията на Bungeecord и в конфигурацията на BungeePerms не съвпадат !!!'
+      backend: 'Сървър {0}: Бекенд типовете в конфигурацията на BungeePerms не съвпадат.'
+      uuidplayerdb: 'Сървър {0}: Типът на uuidplayerdb в конфигурацията на BungeePerms не съвпада.'
+      useuuid: 'Сървър {0}: Опциите на useuuids в конфигурацията на BungeePerms не съвпада.'
     bukkit:
-      standalone: Received a plugin message from Bungeecord but BungeePerms is in standalone mode. Ignoring it ...
-      servername: The server names of the Bungeecord config and BungeePerms config do not match.
-      backend: The backend types of the BungeePerms configs do not match.
-      uuidplayerdb: The uuidplayerdb types of the BungeePerms configs do not match.
-      useuuid: The useuuids options of the BungeePerms configs do not match.
-    bungee-bukkit-config: UUIDs on Bungeecord and Bukkit/Spigot differ. Check your Spigot/Bukkit and Bungeecord config!
-    useuuid-none-uuiddb: Die useUUIDs Option is aktiviert aber die uuidplayerdb ist auf none gestellt!
+      standalone: 'Получено е съобщение от плъгин от Bungeecord но BungeePerms е в самостоятелен режим на работа. Съобщението е игнорирано ...'
+      servername: 'Името на сървъра в конфигурацията на Bungeecord и в конфигурацията на BungeePerms не съвпадат !!!'
+      backend: 'Бекенд типовете в конфигурацията на BungeePerms не съвпадат.'
+      uuidplayerdb: 'Типът на uuidplayerdb в конфигурацията на BungeePerms не съвпада.'
+      useuuid: 'Опциите на useuuids в конфигурацията на BungeePerms не съвпада.'
+    bungee-bukkit-config: 'UUID-та на Bungeecord и Bukkit/Spigot не съвпадат. Моля проверете конфигурациите на Spigot/Bukkit и Bungeecord!'
+    useuuid-none-uuiddb: 'Die useUUIDs Option is aktiviert aber die uuidplayerdb ist auf none gestellt!'
 help:
   welcome: Welcomes you to BungeePerms
   help: Shows this help
