@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms.io;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,9 +97,24 @@ public class MySQLBackEnd implements BackEnd
     {
         MysqlConfig permsconf = new MysqlConfig(mysql, table);
 
-        ResultSet res = mysql.returnQuery("SELECT `key`,`value` FROM `" + table + "` WHERE `key` LIKE 'groups." + group + "%' ORDER BY id ASC");
-
-        permsconf.fromResult(res);
+        PreparedStatement stmt = null;
+        ResultSet res = null;
+        try
+        {
+            stmt = mysql.stmt("SELECT `key`,`value` FROM `" + table + "` WHERE `key` LIKE ? ORDER BY id ASC");
+            stmt.setString(1, "groups." + group + "%");
+            res = mysql.returnQuery(stmt);
+            permsconf.fromResult(res);
+        }
+        catch (Exception e)
+        {
+            debug.log(e);
+        }
+        finally
+        {
+            Mysql.close(res);
+            Mysql.close(stmt);
+        }
 
         if (!permsconf.keyExists("groups." + group))
         {
@@ -401,7 +417,7 @@ public class MySQLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
+
         permsconf.setListString("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds." + world + ".permissions", user.getServer(server).getWorld(world).getPerms());
     }
 
@@ -478,7 +494,7 @@ public class MySQLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
+
         permsconf.setListString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".permissions", group.getServer(server).getWorld(world).getPerms());
     }
 
@@ -598,8 +614,8 @@ public class MySQLBackEnd implements BackEnd
             {
                 //check for additional permissions and non-default groups AND onlinecheck
                 if (u.isNothingSpecial()
-                        && plugin.getPlayer(u.getName()) == null
-                        && plugin.getPlayer(u.getUUID()) == null)
+                    && plugin.getPlayer(u.getName()) == null
+                    && plugin.getPlayer(u.getUUID()) == null)
                 {
                     deleted++;
                     continue;
@@ -627,11 +643,24 @@ public class MySQLBackEnd implements BackEnd
     {
         MysqlConfig permsconf = new MysqlConfig(mysql, table);
 
-        ResultSet res = mysql.returnQuery("SELECT `key`,`value` FROM `" + table + "` WHERE `key` LIKE 'groups." + group.getName() + "%' ORDER BY id ASC");
-
-        permsconf.fromResult(res);
-
-        Mysql.closeResultSet(res);
+        PreparedStatement stmt = null;
+        ResultSet res = null;
+        try
+        {
+            stmt = mysql.stmt("SELECT `key`,`value` FROM `" + table + "` WHERE `key` LIKE ? ORDER BY id ASC");
+            stmt.setString(1, "groups." + group.getName() + "%");
+            res = mysql.returnQuery(stmt);
+            permsconf.fromResult(res);
+        }
+        catch (Exception e)
+        {
+            debug.log(e);
+        }
+        finally
+        {
+            Mysql.close(res);
+            Mysql.close(stmt);
+        }
 
         //load group from database
         List<String> inheritances = permsconf.getListString("groups." + group.getName() + ".inheritances", new ArrayList<String>());
@@ -686,11 +715,24 @@ public class MySQLBackEnd implements BackEnd
     {
         MysqlConfig permsconf = new MysqlConfig(mysql, table);
 
-        ResultSet res = mysql.returnQuery("SELECT `key`,`value` FROM `" + table + "` WHERE `key` LIKE 'users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + "%' ORDER BY id ASC");
-
-        permsconf.fromResult(res);
-
-        Mysql.closeResultSet(res);
+        PreparedStatement stmt = null;
+        ResultSet res = null;
+        try
+        {
+            stmt = mysql.stmt("SELECT `key`,`value` FROM `" + table + "` WHERE `key` LIKE ? ORDER BY id ASC");
+            stmt.setString(1, "users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + "%");
+            res = mysql.returnQuery(stmt);
+            permsconf.fromResult(res);
+        }
+        catch (Exception e)
+        {
+            debug.log(e);
+        }
+        finally
+        {
+            Mysql.close(res);
+            Mysql.close(stmt);
+        }
 
         String uname = config.isUseUUIDs() ? user.getUUID().toString() : user.getName();
 

@@ -156,6 +156,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent e)
     {
+        //todo delay by one tick
         //uninject permissible
         Injector.uninject(e.getPlayer());
 

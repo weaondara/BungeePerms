@@ -2,15 +2,16 @@ package net.alpenblock.bungeeperms;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import lombok.SneakyThrows;
 
 public class Mysql
 {
 
     //todo
-    public static void closeResultSet(AutoCloseable res)
+    public static void close(AutoCloseable res)
     {
         if (res == null)
         {
@@ -73,18 +74,16 @@ public class Mysql
     {
         boolean connected = false;
 
+        PreparedStatement stmt = null;
         ResultSet rs = null;
         try
         {
-            rs = this.returnQuery("SELECT 1;", false);
+            stmt = stmt("SELECT 1;");
+            rs = this.returnQuery(stmt, false);
             if (rs == null)
-            {
                 connected = false;
-            }
             else if (rs.next())
-            {
                 connected = true;
-            }
         }
         catch (Exception e)
         {
@@ -92,34 +91,43 @@ public class Mysql
         }
         finally
         {
-            closeResultSet(rs);
+            close(rs);
+            close(stmt);
         }
         return connected;
     }
 
-    public ResultSet returnQuery(String query)
+    @SneakyThrows
+    public PreparedStatement stmt(String template)
     {
-        return returnQuery(query, true);
+        return connection.prepareStatement(template);
     }
 
-    public boolean runQuery(String query)
+    public ResultSet returnQuery(PreparedStatement stmt)
     {
-        return runQuery(query, true);
+        return returnQuery(stmt, true);
     }
 
-    public long runQueryGetId(String query)
+    public boolean runQuery(PreparedStatement stmt)
     {
-        return runQueryGetId(query, true);
+        return runQuery(stmt, true);
+    }
+
+    public long runQueryGetId(PreparedStatement stmt)
+    {
+        return runQueryGetId(stmt, true);
     }
 
     public boolean tableExists(String table)
     {
         boolean tableexists = false;
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            res = this.returnQuery("SHOW TABLES");
+            stmt = stmt("SHOW TABLES");
+            res = this.returnQuery(stmt);
             while (res.next())
             {
                 if (res.getString(1).equalsIgnoreCase(table))
@@ -135,7 +143,8 @@ public class Mysql
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
         return tableexists;
     }
@@ -144,11 +153,12 @@ public class Mysql
     {
         boolean success = false;
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            String getc = "SHOW COLUMNS FROM " + table;
-            res = returnQuery(getc);
+            stmt = stmt("SHOW COLUMNS FROM " + table);
+            res = returnQuery(stmt);
 
             boolean found = false;
             while (res.next())
@@ -159,12 +169,15 @@ public class Mysql
                     break;
                 }
             }
+            stmt.close();
             if (!found)
             {
-                String c = "ALTER TABLE `" + table + "` ADD COLUMN `" + column + "` " + type + " AFTER `" + after + "`";
-                runQuery(c);
-                c = "UPDATE " + table + " SET " + column + "=" + value;
-                runQuery(c);
+                stmt = stmt("ALTER TABLE `" + table + "` ADD COLUMN `" + column + "` " + type + " AFTER `" + after + "`");
+                runQuery(stmt);
+                stmt.close();
+                stmt = stmt("UPDATE " + table + " SET " + column + "=?");
+                stmt.setString(1, value);
+                runQuery(stmt);
             }
             success = true;
         }
@@ -175,7 +188,8 @@ public class Mysql
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
         return success;
     }
@@ -183,15 +197,16 @@ public class Mysql
     public int columnExists(String table, String column)
     {
         //0: error
-        //1: coulumn found
-        //2: cloumn not found
+        //1: column found
+        //2: column not found
         int fsuccess = 2;
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            String getc = "SHOW COLUMNS FROM " + table;
-            res = returnQuery(getc);
+            stmt = stmt("SHOW COLUMNS FROM " + table);
+            res = returnQuery(stmt);
 
             while (res.next())
             {
@@ -208,56 +223,39 @@ public class Mysql
         }
         finally
         {
-            closeResultSet(res);
+            close(res);
+            close(stmt);
         }
         return fsuccess;
     }
 
-    private ResultSet returnQuery(String query, boolean checkconnection)
+    private ResultSet returnQuery(PreparedStatement stmt, boolean checkconnection)
     {
-        Statement stmt = null;
         ResultSet rs = null;
         try
         {
             if (checkconnection)
-            {
                 checkConnection();
-            }
-            stmt = this.connection.createStatement();
-            rs = stmt.executeQuery(query);
+            rs = stmt.executeQuery();
         }
         catch (SQLException e)
         {
-            closeResultSet(rs);
-            closeResultSet(stmt);
             throw new RuntimeException(e);
         }
         finally
         {
-            try
-            {
-                //stmt.closeOnCompletion();
-            }
-            catch (Exception e)
-            {
-            }
+            close(rs);
         }
         return rs;
     }
 
-    private boolean runQuery(String query, boolean checkconnection)
+    private boolean runQuery(PreparedStatement stmt, boolean checkconnection)
     {
         try
         {
             if (checkconnection)
-            {
                 checkConnection();
-            }
-            boolean success;
-            try (Statement stmt = this.connection.createStatement())
-            {
-                success = stmt.execute(query);
-            }
+            boolean success = stmt.execute();
             return success;
         }
         catch (Exception e)
@@ -266,20 +264,16 @@ public class Mysql
         }
     }
 
-    private long runQueryGetId(String query, boolean checkconnection)
+    private long runQueryGetId(PreparedStatement stmt, boolean checkconnection)
     {
         long id = 0;
 
-        Statement stmt = null;
         ResultSet rs = null;
         try
         {
             if (checkconnection)
-            {
                 checkConnection();
-            }
-            stmt = this.connection.createStatement();
-            stmt.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+            stmt.executeUpdate();
 
             rs = stmt.getGeneratedKeys();
             if (rs.last())
@@ -293,8 +287,7 @@ public class Mysql
         }
         finally
         {
-            closeResultSet(rs);
-            closeResultSet(stmt);
+            close(rs);
         }
         return id;
     }
@@ -311,39 +304,5 @@ public class Mysql
     {
         close();
         connect();
-    }
-
-    public static String escape(String s)
-    {
-        if (s == null)
-        {
-            return null;
-        }
-        String ret = s;
-        ret = ret.replaceAll("\\\\", "\\\\\\\\");
-        ret = ret.replaceAll("\\n", "\\\\n");
-        ret = ret.replaceAll("\\r", "\\\\r");
-        ret = ret.replaceAll("\\t", "\\\\t");
-        ret = ret.replaceAll("\\00", "\\\\0");
-        ret = ret.replaceAll("'", "\\\\'");
-        ret = ret.replaceAll("\\\"", "\\\\\"");
-        return ret;
-    }
-
-    public static String unescape(String s)
-    {
-        if (s == null)
-        {
-            return null;
-        }
-        String ret = s;
-        ret = ret.replaceAll("\\\\n", "\\n");
-        ret = ret.replaceAll("\\\\r", "\\r");
-        ret = ret.replaceAll("\\\\t", "\\t");
-        ret = ret.replaceAll("\\\\0", "\\00");
-        ret = ret.replaceAll("\\\\'", "'");
-        ret = ret.replaceAll("\\\\\"", "\\\"");
-        ret = ret.replaceAll("\\\\\\\\", "\\\\");
-        return ret;
     }
 }
