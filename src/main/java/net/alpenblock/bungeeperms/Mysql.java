@@ -244,7 +244,6 @@ public class Mysql
         }
         finally
         {
-            close(rs);
         }
         return rs;
     }
