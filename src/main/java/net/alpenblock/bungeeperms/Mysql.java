@@ -39,6 +39,7 @@ public class Mysql
 
     public void connect()
     {
+        BungeePerms.getInstance().getPlugin().getLogger().info("Connecting to database");
         try
         {
             //URL zusammenbasteln
@@ -53,6 +54,7 @@ public class Mysql
 
     public void close()
     {
+        BungeePerms.getInstance().getPlugin().getLogger().info("Disconnecting from database");
         if (this.connection != null)
         {
             try
