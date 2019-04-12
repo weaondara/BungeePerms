@@ -35,6 +35,7 @@ public class MysqlPermsAdapter2
                            + "`server` VARCHAR( 64 ), "
                            + "`world` VARCHAR( 64 ) "
                            + ") ENGINE = MYISAM ;";
+                mysql.checkConnection();
                 stmt = mysql.stmt(t);
                 mysql.runQuery(stmt);
             }
@@ -57,6 +58,7 @@ public class MysqlPermsAdapter2
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.Group.getCode() + " ORDER BY id ASC");
             res = mysql.returnQuery(stmt);
             while (res.next())
@@ -86,6 +88,7 @@ public class MysqlPermsAdapter2
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " ORDER BY id ASC");
             res = mysql.returnQuery(stmt);
             while (res.next())
@@ -115,6 +118,7 @@ public class MysqlPermsAdapter2
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT `name`,`type`,`key`,`value`,`server`,`world` FROM `" + table + "` "
                               + "WHERE `type`=" + type.getCode() + " AND `name`=? ORDER BY id ASC");
             stmt.setString(1, name);
@@ -158,6 +162,7 @@ public class MysqlPermsAdapter2
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode() + " ORDER BY id ASC");
             stmt.setString(1, name);
             res = mysql.returnQuery(stmt);
@@ -186,6 +191,7 @@ public class MysqlPermsAdapter2
         PreparedStatement stmt = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("DELETE FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode());
             stmt.setString(1, name);
             mysql.runQuery(stmt);
@@ -206,6 +212,7 @@ public class MysqlPermsAdapter2
         try
         {
             //delete entries
+            mysql.checkConnection();
             stmt = mysql.stmt("DELETE FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode() + " AND `key`=?");
             stmt.setString(1, name);
             stmt.setString(2, key);
@@ -242,6 +249,7 @@ public class MysqlPermsAdapter2
             else
                 delq += "`world`=?";
 
+            mysql.checkConnection();
             stmt = mysql.stmt(delq);
             stmt.setString(1, name);
             stmt.setString(2, key);
@@ -290,6 +298,7 @@ public class MysqlPermsAdapter2
                 }
                 insq += ")";
 
+                mysql.checkConnection();
                 stmt = mysql.stmt(insq);
                 stmt.setString(1, name);
                 stmt.setString(2, key);
@@ -322,6 +331,7 @@ public class MysqlPermsAdapter2
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " AND `key`='groups' AND `value`=? ORDER BY id ASC");
             stmt.setString(1, group);
             res = mysql.returnQuery(stmt);
@@ -349,6 +359,7 @@ public class MysqlPermsAdapter2
         PreparedStatement stmt = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("TRUNCATE `" + table + "`");
             mysql.runQuery(stmt);
         }

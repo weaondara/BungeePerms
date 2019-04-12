@@ -101,6 +101,7 @@ public class MySQLBackEnd implements BackEnd
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT `key`,`value` FROM `" + table + "` WHERE `key` LIKE ? ORDER BY id ASC");
             stmt.setString(1, "groups." + group + "%");
             res = mysql.returnQuery(stmt);
@@ -647,6 +648,7 @@ public class MySQLBackEnd implements BackEnd
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT `key`,`value` FROM `" + table + "` WHERE `key` LIKE ? ORDER BY id ASC");
             stmt.setString(1, "groups." + group.getName() + "%");
             res = mysql.returnQuery(stmt);
@@ -719,6 +721,7 @@ public class MySQLBackEnd implements BackEnd
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT `key`,`value` FROM `" + table + "` WHERE `key` LIKE ? ORDER BY id ASC");
             stmt.setString(1, "users." + (config.isUseUUIDs() ? user.getUUID().toString() : user.getName()) + "%");
             res = mysql.returnQuery(stmt);

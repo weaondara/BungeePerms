@@ -30,6 +30,7 @@ public class MysqlConfig
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT `key`,`value` FROM `" + table + "` ORDER BY id ASC");
             res = mysql.returnQuery(stmt);
             fromResult(res);
@@ -80,6 +81,7 @@ public class MysqlConfig
                            + "`key` VARCHAR( 256 ) NOT NULL ,"
                            + "`value` VARCHAR( 256 ) NOT NULL "
                            + ") ENGINE = MYISAM ;";
+                mysql.checkConnection();
                 stmt = mysql.stmt(t);
                 mysql.runQuery(stmt);
             }
@@ -274,6 +276,7 @@ public class MysqlConfig
                 try
                 {
                     data.remove(key);
+                    mysql.checkConnection();
                     stmt = mysql.stmt("DELETE FROM " + table + " WHERE `key`=?");
                     stmt.setString(1, key);
                     mysql.runQuery(stmt);
@@ -301,6 +304,7 @@ public class MysqlConfig
         try
         {
             //delete all entries with the given key
+            mysql.checkConnection();
             stmt = mysql.stmt("DELETE FROM `" + table + "` WHERE `key`=?");
             stmt.setString(1, key);
             mysql.runQuery(stmt);
@@ -319,6 +323,7 @@ public class MysqlConfig
         {
             try
             {
+                mysql.checkConnection();
                 stmt = mysql.stmt("INSERT INTO `" + table + "` (`key`,`value`) VALUES(?,?)");
                 stmt.setString(1, key);
                 stmt.setString(2, val);
@@ -340,6 +345,7 @@ public class MysqlConfig
         PreparedStatement stmt = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("TRUNCATE `" + table + "`");
             mysql.runQuery(stmt);
         }

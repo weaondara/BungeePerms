@@ -10,7 +10,6 @@ import lombok.SneakyThrows;
 public class Mysql
 {
 
-    //todo
     public static void close(AutoCloseable res)
     {
         if (res == null)
@@ -43,7 +42,7 @@ public class Mysql
         try
         {
             //URL zusammenbasteln
-            String url = "jdbc:mysql://" + config.getString(configsection + ".general.mysqlhost", "localhost") + ":" + config.getString(configsection + ".general.mysqlport", "3306") + "/" + config.getString(configsection + ".general.mysqldb", configsection) + "?autoReconnect=true&dontTrackOpenResources=true";
+            String url = "jdbc:mysql://" + config.getString(configsection + ".general.mysqlhost", "localhost") + ":" + config.getString(configsection + ".general.mysqlport", "3306") + "/" + config.getString(configsection + ".general.mysqldb", "database") + "?autoReconnect=true&dontTrackOpenResources=true";
             this.connection = DriverManager.getConnection(url, config.getString(configsection + ".general.mysqluser", configsection), config.getString(configsection + ".general.mysqlpw", "password"));
         }
         catch (Exception e)
@@ -126,6 +125,7 @@ public class Mysql
         ResultSet res = null;
         try
         {
+            checkConnection();
             stmt = stmt("SHOW TABLES");
             res = this.returnQuery(stmt);
             while (res.next())
@@ -157,6 +157,7 @@ public class Mysql
         ResultSet res = null;
         try
         {
+            checkConnection();
             stmt = stmt("SHOW COLUMNS FROM " + table);
             res = returnQuery(stmt);
 
@@ -172,9 +173,12 @@ public class Mysql
             stmt.close();
             if (!found)
             {
+                checkConnection();
                 stmt = stmt("ALTER TABLE `" + table + "` ADD COLUMN `" + column + "` " + type + " AFTER `" + after + "`");
                 runQuery(stmt);
                 stmt.close();
+                
+                checkConnection();
                 stmt = stmt("UPDATE " + table + " SET " + column + "=?");
                 stmt.setString(1, value);
                 runQuery(stmt);
@@ -205,6 +209,7 @@ public class Mysql
         ResultSet res = null;
         try
         {
+            checkConnection();
             stmt = stmt("SHOW COLUMNS FROM " + table);
             res = returnQuery(stmt);
 
@@ -291,7 +296,7 @@ public class Mysql
         return id;
     }
 
-    private void checkConnection()
+    public void checkConnection()
     {
         if (!isConnected())
         {
@@ -301,6 +306,7 @@ public class Mysql
 
     private void reconnect()
     {
+        BungeePerms.getInstance().getPlugin().getLogger().info("Reconnecting to database");
         close();
         connect();
     }

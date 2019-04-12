@@ -43,6 +43,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
                            + "`uuid` VARCHAR( 40 ) NOT NULL UNIQUE KEY,"
                            + "`player` VARCHAR( 20 ) NOT NULL UNIQUE KEY"
                            + ") ENGINE = MYISAM ;";
+                mysql.checkConnection();
                 stmt = mysql.stmt(t);
                 mysql.runQuery(stmt);
             }
@@ -72,6 +73,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT uuid FROM " + table + " WHERE player=? ORDER BY id ASC LIMIT 1");
             stmt.setString(1, player);
             res = mysql.returnQuery(stmt);
@@ -102,6 +104,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT player FROM " + table + " WHERE uuid=?");
             stmt.setString(1, uuid.toString());
             res = mysql.returnQuery(stmt);
@@ -129,12 +132,14 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         PreparedStatement stmt = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("DELETE FROM " + table + " WHERE uuid=? OR player=?");
             stmt.setString(1, uuid.toString());
             stmt.setString(2, player);
             mysql.runQuery(stmt);
             Mysql.close(stmt);
             
+            mysql.checkConnection();
             stmt = mysql.stmt("INSERT IGNORE INTO " + table + " (uuid, player) VALUES (?, ?)");
             stmt.setString(1, uuid.toString());
             stmt.setString(2, player);
@@ -159,6 +164,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         ResultSet res = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("SELECT uuid, player FROM " + table);
             res = mysql.returnQuery(stmt);
             while (res.next())
@@ -188,6 +194,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         PreparedStatement stmt = null;
         try
         {
+            mysql.checkConnection();
             stmt = mysql.stmt("TRUNCATE `" + table + "`");
             mysql.runQuery(stmt);
         }
