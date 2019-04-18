@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms.io.mysql2;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +23,30 @@ public class MysqlPermsAdapter2
     {
         if (!mysql.tableExists(table))
         {
-            String t = "CREATE TABLE `" + table + "` ("
-                    + "`id` INT( 64 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,"
-                    + "`name` VARCHAR( 64 ) NOT NULL ,"
-                    + "`type` TINYINT( 2 ) NOT NULL ,"
-                    + "`key` VARCHAR( 256 ) NOT NULL, "
-                    + "`value` VARCHAR( 256 ) NOT NULL, "
-                    + "`server` VARCHAR( 64 ), "
-                    + "`world` VARCHAR( 64 ) "
-                    + ") ENGINE = MYISAM ;";
-            mysql.runQuery(t);
+            PreparedStatement stmt = null;
+            try
+            {
+                String t = "CREATE TABLE `" + table + "` ("
+                           + "`id` INT( 64 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,"
+                           + "`name` VARCHAR( 64 ) NOT NULL ,"
+                           + "`type` TINYINT( 2 ) NOT NULL ,"
+                           + "`key` VARCHAR( 256 ) NOT NULL, "
+                           + "`value` VARCHAR( 256 ) NOT NULL, "
+                           + "`server` VARCHAR( 64 ), "
+                           + "`world` VARCHAR( 64 ) "
+                           + ") ENGINE = MYISAM ;";
+                mysql.checkConnection();
+                stmt = mysql.stmt(t);
+                mysql.runQuery(stmt);
+            }
+            catch (Exception e)
+            {
+                BungeePerms.getInstance().getDebug().log(e);
+            }
+            finally
+            {
+                Mysql.close(stmt);
+            }
         }
     }
 
@@ -39,13 +54,16 @@ public class MysqlPermsAdapter2
     {
         List<String> groups = new ArrayList<>();
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.Group.getCode() + " ORDER BY id ASC");
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.Group.getCode() + " ORDER BY id ASC");
+            res = mysql.returnQuery(stmt);
             while (res.next())
             {
-                String name = Mysql.unescape(res.getString("name"));
+                String name = res.getString("name");
                 groups.add(name);
             }
         }
@@ -55,7 +73,8 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
 
         return groups;
@@ -65,13 +84,16 @@ public class MysqlPermsAdapter2
     {
         List<String> groups = new ArrayList<>();
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " ORDER BY id ASC");
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " ORDER BY id ASC");
+            res = mysql.returnQuery(stmt);
             while (res.next())
             {
-                String name = Mysql.unescape(res.getString("name"));
+                String name = res.getString("name");
                 groups.add(name);
             }
         }
@@ -81,7 +103,8 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
 
         return groups;
@@ -91,11 +114,15 @@ public class MysqlPermsAdapter2
     {
         MysqlPermEntity mpe = null;
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            res = mysql.returnQuery("SELECT `name`,`type`,`key`,`value`,`server`,`world` FROM `" + table + "` "
-                    + "WHERE `type`=" + type.getCode() + " AND `name`='" + Mysql.escape(name) + "' ORDER BY id ASC");
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT `name`,`type`,`key`,`value`,`server`,`world` FROM `" + table + "` "
+                              + "WHERE `type`=" + type.getCode() + " AND `name`=? ORDER BY id ASC");
+            stmt.setString(1, name);
+            res = mysql.returnQuery(stmt);
 
             mpe = new MysqlPermEntity(res);
         }
@@ -105,7 +132,8 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
 
         return mpe;
@@ -130,10 +158,15 @@ public class MysqlPermsAdapter2
     {
         boolean found = false;
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `name`='" + Mysql.escape(name) + "' AND `type`=" + type.getCode() + " ORDER BY id ASC");
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode() + " ORDER BY id ASC");
+            stmt.setString(1, name);
+            res = mysql.returnQuery(stmt);
+
             if (res.next())
             {
                 found = true;
@@ -146,7 +179,8 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
 
         return found;
@@ -154,14 +188,45 @@ public class MysqlPermsAdapter2
 
     public void deleteEntity(String name, EntityType type)
     {
-        mysql.runQuery("DELETE FROM `" + table + "` WHERE `name`='" + Mysql.escape(name) + "' AND `type`=" + type.getCode());
+        PreparedStatement stmt = null;
+        try
+        {
+            mysql.checkConnection();
+            stmt = mysql.stmt("DELETE FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode());
+            stmt.setString(1, name);
+            mysql.runQuery(stmt);
+        }
+        catch (Exception e)
+        {
+            BungeePerms.getInstance().getDebug().log(e);
+        }
+        finally
+        {
+            Mysql.close(stmt);
+        }
     }
 
     public void saveData(String name, EntityType type, String key, List<ValueEntry> values)
     {
-        //delete entries
-        String delq = "DELETE FROM `" + table + "` WHERE `name`='" + Mysql.escape(name) + "' AND `type`=" + type.getCode() + " AND `key`='" + Mysql.escape(key) + "'";
-        mysql.runQuery(delq);
+        PreparedStatement stmt = null;
+        try
+        {
+            //delete entries
+            mysql.checkConnection();
+            stmt = mysql.stmt("DELETE FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode() + " AND `key`=?");
+            stmt.setString(1, name);
+            stmt.setString(2, key);
+            mysql.runQuery(stmt);
+        }
+        catch (Exception e)
+        {
+            BungeePerms.getInstance().getDebug().log(e);
+            return;
+        }
+        finally
+        {
+            Mysql.close(stmt);
+        }
 
         //add values
         doSaveData(name, type, key, values);
@@ -169,26 +234,41 @@ public class MysqlPermsAdapter2
 
     public void saveData(String name, EntityType type, String key, List<ValueEntry> values, String server, String world)
     {
-        //delete entries
-        String delq = "DELETE FROM `" + table + "` WHERE `name`='" + Mysql.escape(name) + "' AND `type`=" + type.getCode() + " AND `key`='" + Mysql.escape(key) + "' AND ";
-        if (server == null)
+        PreparedStatement stmt = null;
+        try
         {
-            delq += "`server` IS NULL";
+            //delete entries
+            String delq = "DELETE FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode() + " AND `key`=? AND ";
+            if (server == null)
+                delq += "`server` IS NULL";
+            else
+                delq += "`server`=?";
+            delq += " AND ";
+            if (world == null)
+                delq += "`world` IS NULL";
+            else
+                delq += "`world`=?";
+
+            mysql.checkConnection();
+            stmt = mysql.stmt(delq);
+            stmt.setString(1, name);
+            stmt.setString(2, key);
+            if (server != null)
+                stmt.setString(3, server);
+            if (world != null)
+                stmt.setString(4, world);
+
+            mysql.runQuery(stmt);
         }
-        else
+        catch (Exception e)
         {
-            delq += "`server`='" + Mysql.escape(server) + "'";
+            BungeePerms.getInstance().getDebug().log(e);
+            return;
         }
-        delq += " AND ";
-        if (world == null)
+        finally
         {
-            delq += "`world` IS NULL";
+            Mysql.close(stmt);
         }
-        else
-        {
-            delq += "`world`='" + Mysql.escape(world) + "'";
-        }
-        mysql.runQuery(delq);
 
         //add values
         doSaveData(name, type, key, values);
@@ -198,31 +278,48 @@ public class MysqlPermsAdapter2
     {
         for (ValueEntry val : values)
         {
-            if (val.getValue() == null)
+            PreparedStatement stmt = null;
+            try
             {
-                continue;
-            }
-            String insq = "INSERT INTO `" + table + "` (`name`,`type`,`key`,`value`,`server`,`world`) VALUES"
-                    + "('" + Mysql.escape(name) + "'," + type.getCode() + ",'" + Mysql.escape(key) + "','" + Mysql.escape(val.getValue()) + "',";
-            if (val.getServer() == null)
-            {
-                insq += "null,null";
-            }
-            else
-            {
-                insq += "'" + Mysql.escape(val.getServer()) + "',";
-                if (val.getWorld() == null)
+                if (val.getValue() == null)
                 {
-                    insq += "null";
+                    continue;
                 }
+                String insq = "INSERT INTO `" + table + "` (`name`,`type`,`key`,`value`,`server`,`world`) VALUES (?," + type.getCode() + ",?,?,";
+                if (val.getServer() == null)
+                    insq += "null,null";
                 else
                 {
-                    insq += "'" + Mysql.escape(val.getWorld()) + "'";
+                    insq += "?,";
+                    if (val.getWorld() == null)
+                        insq += "null";
+                    else
+                        insq += "?";
                 }
-            }
+                insq += ")";
 
-            insq += ")";
-            mysql.runQuery(insq);
+                mysql.checkConnection();
+                stmt = mysql.stmt(insq);
+                stmt.setString(1, name);
+                stmt.setString(2, key);
+                stmt.setString(3, val.getValue());
+                if (val.getServer() != null)
+                {
+                    stmt.setString(4, val.getServer());
+                    if (val.getWorld() != null)
+                        stmt.setString(5, val.getWorld());
+                }
+
+                mysql.runQuery(stmt);
+            }
+            catch (Exception e)
+            {
+                BungeePerms.getInstance().getDebug().log(e);
+            }
+            finally
+            {
+                Mysql.close(stmt);
+            }
         }
     }
 
@@ -230,13 +327,17 @@ public class MysqlPermsAdapter2
     {
         List<String> groups = new ArrayList<>();
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            res = mysql.returnQuery("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " AND `key`='groups' AND `value`='" + Mysql.escape(group) + "' ORDER BY id ASC");
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " AND `key`='groups' AND `value`=? ORDER BY id ASC");
+            stmt.setString(1, group);
+            res = mysql.returnQuery(stmt);
             while (res.next())
             {
-                String name = Mysql.unescape(res.getString("name"));
+                String name = res.getString("name");
                 groups.add(name);
             }
         }
@@ -246,7 +347,8 @@ public class MysqlPermsAdapter2
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
 
         return groups;
@@ -254,7 +356,20 @@ public class MysqlPermsAdapter2
 
     public void clearTable(String table)
     {
-        mysql.runQuery("TRUNCATE `" + table + "`");
+        PreparedStatement stmt = null;
+        try
+        {
+            mysql.checkConnection();
+            stmt = mysql.stmt("TRUNCATE `" + table + "`");
+            mysql.runQuery(stmt);
+        }
+        catch (Exception e)
+        {
+            BungeePerms.getInstance().getDebug().log(e);
+        }
+        finally
+        {
+            Mysql.close(stmt);
+        }
     }
-
 }

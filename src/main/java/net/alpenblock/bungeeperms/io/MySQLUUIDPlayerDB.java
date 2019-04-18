@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms.io;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +35,26 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     {
         if (!mysql.tableExists(table))
         {
-            String t = "CREATE TABLE `" + table + "` ("
-                    + "`id` INT( 64 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,"
-                    + "`uuid` VARCHAR( 40 ) NOT NULL UNIQUE KEY,"
-                    + "`player` VARCHAR( 20 ) NOT NULL UNIQUE KEY"
-                    + ") ENGINE = MYISAM ;";
-            mysql.runQuery(t);
+            PreparedStatement stmt = null;
+            try
+            {
+                String t = "CREATE TABLE `" + table + "` ("
+                           + "`id` INT( 64 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,"
+                           + "`uuid` VARCHAR( 40 ) NOT NULL UNIQUE KEY,"
+                           + "`player` VARCHAR( 20 ) NOT NULL UNIQUE KEY"
+                           + ") ENGINE = MYISAM ;";
+                mysql.checkConnection();
+                stmt = mysql.stmt(t);
+                mysql.runQuery(stmt);
+            }
+            catch (Exception e)
+            {
+                debug.log(e);
+            }
+            finally
+            {
+                Mysql.close(stmt);
+            }
         }
     }
 
@@ -54,11 +69,14 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     {
         UUID ret = null;
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            String q = "SELECT uuid FROM " + table + " WHERE player='" + player + "' ORDER BY id ASC LIMIT 1";
-            res = mysql.returnQuery(q);
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT uuid FROM " + table + " WHERE player=? ORDER BY id ASC LIMIT 1");
+            stmt.setString(1, player);
+            res = mysql.returnQuery(stmt);
             if (res.last())
             {
                 ret = UUID.fromString(res.getString("uuid"));
@@ -70,7 +88,8 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
 
         return ret;
@@ -81,11 +100,14 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     {
         String ret = null;
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            String q = "SELECT player FROM " + table + " WHERE uuid='" + uuid + "'";
-            res = mysql.returnQuery(q);
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT player FROM " + table + " WHERE uuid=?");
+            stmt.setString(1, uuid.toString());
+            res = mysql.returnQuery(stmt);
             if (res.last())
             {
                 ret = res.getString("player");
@@ -97,7 +119,8 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
 
         return ret;
@@ -106,8 +129,30 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     @Override
     public void update(UUID uuid, String player)
     {
-        mysql.runQuery("DELETE FROM " + table + " WHERE uuid='" + uuid + "' OR player='" + player + "'");
-        mysql.runQuery("INSERT IGNORE INTO " + table + " (uuid, player) VALUES ('" + uuid + "', '" + player + "')");
+        PreparedStatement stmt = null;
+        try
+        {
+            mysql.checkConnection();
+            stmt = mysql.stmt("DELETE FROM " + table + " WHERE uuid=? OR player=?");
+            stmt.setString(1, uuid.toString());
+            stmt.setString(2, player);
+            mysql.runQuery(stmt);
+            Mysql.close(stmt);
+            
+            mysql.checkConnection();
+            stmt = mysql.stmt("INSERT IGNORE INTO " + table + " (uuid, player) VALUES (?, ?)");
+            stmt.setString(1, uuid.toString());
+            stmt.setString(2, player);
+            mysql.runQuery(stmt);
+        }
+        catch (Exception e)
+        {
+            debug.log(e);
+        }
+        finally
+        {
+            Mysql.close(stmt);
+        }
     }
 
     @Override
@@ -115,11 +160,13 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     {
         Map<UUID, String> ret = new HashMap<>();
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            String q = "SELECT uuid, player FROM " + table;
-            res = mysql.returnQuery(q);
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT uuid, player FROM " + table);
+            res = mysql.returnQuery(stmt);
             while (res.next())
             {
                 UUID uuid = UUID.fromString(res.getString("uuid"));
@@ -134,7 +181,8 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
 
         return ret;
@@ -143,6 +191,20 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     @Override
     public void clear()
     {
-        mysql.runQuery("TRUNCATE " + table);
+        PreparedStatement stmt = null;
+        try
+        {
+            mysql.checkConnection();
+            stmt = mysql.stmt("TRUNCATE `" + table + "`");
+            mysql.runQuery(stmt);
+        }
+        catch (Exception e)
+        {
+            debug.log(e);
+        }
+        finally
+        {
+            Mysql.close(stmt);
+        }
     }
 }

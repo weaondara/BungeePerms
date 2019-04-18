@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +26,13 @@ public class MysqlConfig
     {
         createTable();
 
+        PreparedStatement stmt = null;
         ResultSet res = null;
         try
         {
-            res = mysql.returnQuery("SELECT `key`,`value` FROM `" + table + "` ORDER BY id ASC");
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT `key`,`value` FROM `" + table + "` ORDER BY id ASC");
+            res = mysql.returnQuery(stmt);
             fromResult(res);
         }
         catch (Exception e)
@@ -37,7 +41,8 @@ public class MysqlConfig
         }
         finally
         {
-            Mysql.closeResultSet(res);
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
     }
 
@@ -47,8 +52,8 @@ public class MysqlConfig
         {
             while (res.next())
             {
-                String key = Mysql.unescape(res.getString("key"));
-                String val = Mysql.unescape(res.getString("value"));
+                String key = res.getString("key");
+                String val = res.getString("value");
                 List<String> values = data.get(key);
                 if (values == null)
                 {
@@ -68,18 +73,31 @@ public class MysqlConfig
     {
         if (!mysql.tableExists(table))
         {
-            String t = "CREATE TABLE `" + table + "` ("
-                    + "`id` INT( 64 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,"
-                    + "`key` VARCHAR( 256 ) NOT NULL ,"
-                    + "`value` VARCHAR( 256 ) NOT NULL "
-                    + ") ENGINE = MYISAM ;";
-            mysql.runQuery(t);
+            PreparedStatement stmt = null;
+            try
+            {
+                String t = "CREATE TABLE `" + table + "` ("
+                           + "`id` INT( 64 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,"
+                           + "`key` VARCHAR( 256 ) NOT NULL ,"
+                           + "`value` VARCHAR( 256 ) NOT NULL "
+                           + ") ENGINE = MYISAM ;";
+                mysql.checkConnection();
+                stmt = mysql.stmt(t);
+                mysql.runQuery(stmt);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            finally
+            {
+                Mysql.close(stmt);
+            }
         }
     }
 
     public String getString(String key, String def)
     {
-
         if (data.containsKey(key))
         {
             return data.get(key).get(0);
@@ -96,7 +114,6 @@ public class MysqlConfig
 
     public int getInt(String key, int def)
     {
-
         if (data.containsKey(key))
         {
             return Integer.parseInt(data.get(key).get(0));
@@ -109,12 +126,10 @@ public class MysqlConfig
             save(key, list);
             return def;
         }
-
     }
 
     public boolean getBoolean(String key, boolean def)
     {
-
         if (data.containsKey(key))
         {
             return Boolean.parseBoolean(data.get(key).get(0));
@@ -127,7 +142,6 @@ public class MysqlConfig
             save(key, list);
             return def;
         }
-
     }
 
     public <T extends Enum> T getEnumValue(String key, T def)
@@ -157,7 +171,6 @@ public class MysqlConfig
 
     public List<String> getListString(String key, List<String> def)
     {
-
         if (data.containsKey(key))
         {
             return data.get(key);
@@ -168,7 +181,6 @@ public class MysqlConfig
             save(key, def);
             return def;
         }
-
     }
 
     public double getDouble(String key, double def)
@@ -260,9 +272,23 @@ public class MysqlConfig
         {
             if (isSubNode(key, node))
             {
-                data.remove(key);
-                String delq = "DELETE FROM " + table + " WHERE `key`='" + key + "'";
-                mysql.runQuery(delq);
+                PreparedStatement stmt = null;
+                try
+                {
+                    data.remove(key);
+                    mysql.checkConnection();
+                    stmt = mysql.stmt("DELETE FROM " + table + " WHERE `key`=?");
+                    stmt.setString(1, key);
+                    mysql.runQuery(stmt);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                finally
+                {
+                    Mysql.close(stmt);
+                }
             }
         }
     }
@@ -274,21 +300,62 @@ public class MysqlConfig
 
     private void save(String key, List<String> values)
     {
-        //delete all entries with the given key
-        String delq = "DELETE FROM `" + table + "` WHERE `key`='" + key + "'";
-        mysql.runQuery(delq);
+        PreparedStatement stmt = null;
+        try
+        {
+            //delete all entries with the given key
+            mysql.checkConnection();
+            stmt = mysql.stmt("DELETE FROM `" + table + "` WHERE `key`=?");
+            stmt.setString(1, key);
+            mysql.runQuery(stmt);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            Mysql.close(stmt);
+        }
 
         //add values
         for (String val : values)
         {
-            String insq = "INSERT INTO `" + table + "` (`key`,`value`) VALUES('" + Mysql.escape(key) + "','" + Mysql.escape(val) + "')";
-            mysql.runQuery(insq);
+            try
+            {
+                mysql.checkConnection();
+                stmt = mysql.stmt("INSERT INTO `" + table + "` (`key`,`value`) VALUES(?,?)");
+                stmt.setString(1, key);
+                stmt.setString(2, val);
+                mysql.runQuery(stmt);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            finally
+            {
+                Mysql.close(stmt);
+            }
         }
     }
 
     public void clearTable(String table)
     {
-        String q = "TRUNCATE `" + table + "`";
-        mysql.runQuery(q);
+        PreparedStatement stmt = null;
+        try
+        {
+            mysql.checkConnection();
+            stmt = mysql.stmt("TRUNCATE `" + table + "`");
+            mysql.runQuery(stmt);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            Mysql.close(stmt);
+        }
     }
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.alpenblock.bungeeperms.Mysql;
 
 @Getter
 @AllArgsConstructor
@@ -29,7 +28,7 @@ public class MysqlPermEntity
     {
         if (res.first())
         {
-            name = Mysql.unescape(res.getString("name"));
+            name = res.getString("name");
             type = EntityType.getByCode(res.getInt("type"));
         }
 
@@ -37,14 +36,12 @@ public class MysqlPermEntity
 
         while (res.next())
         {
-            String key = Mysql.unescape(res.getString("key"));
-            String value = Mysql.unescape(res.getString("value"));
-            String server = Mysql.unescape(res.getString("server"));
+            String key = res.getString("key");
+            String value = res.getString("value");
+            String server = res.getString("server");
             String world = null;
             if (server != null)
-            {
-                world = Mysql.unescape(res.getString("world"));
-            }
+                world = res.getString("world");
 
             //add entry
             ValueEntry ve = new ValueEntry(value, server, world);

@@ -171,7 +171,7 @@ warning:
       uuidplayerdb: The uuidplayerdb types of the BungeePerms configs do not match.
       useuuid: The useuuids options of the BungeePerms configs do not match.
     bungee-bukkit-config: UUIDs on Bungeecord and Bukkit/Spigot differ. Check your Spigot/Bukkit and Bungeecord config!
-    useuuid-none-uuiddb: Die useUUIDs Option is aktiviert aber die uuidplayerdb ist auf none gestellt!
+    useuuid-none-uuiddb: The useUUIDs option is enabled, but the uuidplayerdb is set to none!
 help:
   welcome: Welcomes you to BungeePerms
   help: Shows this help
