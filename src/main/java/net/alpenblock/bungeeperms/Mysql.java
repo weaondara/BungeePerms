@@ -39,12 +39,19 @@ public class Mysql
 
     public void connect()
     {
+        String Host = BungeePerms.getInstance().getConfig().getString("Mysql.Host");
+        String Port = BungeePerms.getInstance().getConfig().getString("Mysql.Port");
+        String Databaseurl = BungeePerms.getInstance().getConfig().getString("Mysql.Database");
+        String User = BungeePerms.getInstance().getConfig().getString("Mysql.User");
+        String Password = BungeePerms.getInstance().getConfig().getString("Mysql.Password");
+
         BungeePerms.getInstance().getPlugin().getLogger().info("Connecting to database");
         try
         {
             //URL zusammenbasteln
-            String url = "jdbc:mysql://" + config.getString(configsection + ".general.mysqlhost", "localhost") + ":" + config.getString(configsection + ".general.mysqlport", "3306") + "/" + config.getString(configsection + ".general.mysqldb", "database") + "?autoReconnect=true&dontTrackOpenResources=true";
-            this.connection = DriverManager.getConnection(url, config.getString(configsection + ".general.mysqluser", configsection), config.getString(configsection + ".general.mysqlpw", "password"));
+            String url = "jdbc:mysql://" + Host + ":" + Port + "/" + Databaseurl + "?autoReconnect=true&dontTrackOpenResources=true" + "&username=" + User + "&password=" + Password;
+            //, User, Password
+            this.connection = DriverManager.getConnection(url);
         }
         catch (Exception e)
         {
