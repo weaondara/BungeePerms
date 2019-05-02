@@ -39,11 +39,11 @@ public class Mysql
 
     public void connect()
     {
-        String Host = BungeePerms.getInstance().getConfig().getString("Mysql.Host");
-        String Port = BungeePerms.getInstance().getConfig().getString("Mysql.Port");
-        String Databaseurl = BungeePerms.getInstance().getConfig().getString("Mysql.Database");
-        String User = BungeePerms.getInstance().getConfig().getString("Mysql.User");
-        String Password = BungeePerms.getInstance().getConfig().getString("Mysql.Password");
+        String Host = BungeePerms.getInstance().getExtraConfig().getString("Mysql.Host");
+        String Port = BungeePerms.getInstance().getExtraConfig().getString("Mysql.Port");
+        String Databaseurl = BungeePerms.getInstance().getExtraConfig().getString("Mysql.Database");
+        String User = BungeePerms.getInstance().getExtraConfig().getString("Mysql.User");
+        String Password = BungeePerms.getInstance().getExtraConfig().getString("Mysql.Password");
 
         BungeePerms.getInstance().getPlugin().getLogger().info("Connecting to database");
         try
