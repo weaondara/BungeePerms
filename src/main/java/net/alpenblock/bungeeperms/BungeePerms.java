@@ -7,6 +7,7 @@ import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.NetworkNotifier;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
+import org.bukkit.configuration.file.FileConfiguration;
 
 @Getter
 public class BungeePerms
@@ -20,6 +21,7 @@ public class BungeePerms
     private static Logger logger = Logger.getLogger("bungeeperms");
 
     private final PlatformPlugin plugin;
+    private FileConfiguration extraconfig;
     private final BPConfig config;
     private final Debug debug;
 
@@ -109,5 +111,13 @@ public class BungeePerms
             networkNotifier.reloadAll("");
         }
         enable();
+    }
+
+    public static BungeePerms getInstance() {
+        return BungeePerms.instance;
+    }
+
+    public FileConfiguration getExtraConfig() {
+        return extraconfig;
     }
 }
