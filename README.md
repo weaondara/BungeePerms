@@ -6,6 +6,7 @@ so you don't need BungeeCord/Spigot permissions (anymore). BungeePerms can form 
 system managing all permissions in your network.
 
 **Discord**
+
 You can ask questions directly on our Discord-Server at https://discord.gg/NaA6eQ2
 
 **Binaries**
