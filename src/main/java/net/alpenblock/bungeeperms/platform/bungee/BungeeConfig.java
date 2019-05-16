@@ -24,17 +24,17 @@ public class BungeeConfig extends BPConfig
     {
         super.load();
         
-        networkType = config.getEnumValue("networktype", NetworkType.Global);
+        networkType = getConfig().getEnumValue("networktype", NetworkType.Global);
         if (networkType == NetworkType.ServerDependend || networkType == NetworkType.ServerDependendBlacklist)
         {
-            networkServers = config.getListString("networkservers", Arrays.asList("lobby"));
+            networkServers = getConfig().getListString("networkservers", Arrays.asList("lobby"));
         }
         else
         {
             //create option if not server dependend
-            if(!config.keyExists("networkservers"))
+            if(!getConfig().keyExists("networkservers"))
             {
-                config.setListString("networkservers", new ArrayList<String>());
+                getConfig().setListString("networkservers", new ArrayList<String>());
             }
         }
     }

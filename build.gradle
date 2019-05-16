@@ -1,0 +1,24 @@
+apply plugin: 'java'
+
+group 'net.alpenblock'
+
+version '3.0'
+
+sourceCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+	maven { url "http://maven.sk89q.com/repo/" }
+	maven { url "https://oss.sonatype.org/content/groups/public/" }
+	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+	maven { url "https://hub.spigotmc.org/nexus/content/groups/public/" }
+	maven { url "http://repo.ess3.net/content/groups/essentials" }
+	maven { url "http://nexus.hc.to/content/repositories/pub_releases" }
+
+}
+
+dependencies {
+    compile fileTree(dir:'lib', include:'*.jar')
+	compile 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
+	compile 'org.projectlombok:lombok:1.18.0'
+}

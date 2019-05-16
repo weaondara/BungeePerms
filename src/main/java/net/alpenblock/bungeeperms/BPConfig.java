@@ -1,16 +1,15 @@
 package net.alpenblock.bungeeperms;
 
-import java.util.Locale;
-import lombok.Getter;
-import lombok.Setter;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 
-@Getter
+import java.util.Locale;
+
+
 public class BPConfig
 {
 
-    protected Config config;
+    private Config config;
 
     //perms
     private boolean useUUIDs;
@@ -36,7 +35,6 @@ public class BPConfig
     private boolean terminateSuffixSpace;
 
     //tmp at runtime
-    @Setter
     private boolean debug;
     
     //cleanup
@@ -115,5 +113,145 @@ public class BPConfig
         this.backEndType = type;
         config.setEnumValue("backendtype", type);
         config.save();
+    }
+
+    public void setDebug(boolean debug)
+    {
+        this.debug = debug;
+    }
+
+    public Config getConfig()
+    {
+        return config;
+    }
+
+    public Locale getLocale()
+    {
+        return locale;
+    }
+
+    public boolean isUseUUIDs()
+    {
+        return useUUIDs;
+    }
+
+    public boolean isUseRegexPerms()
+    {
+        return useRegexPerms;
+    }
+
+    public void setUseRegexPerms(boolean useRegexPerms)
+    {
+        this.useRegexPerms = useRegexPerms;
+    }
+
+    public boolean isGroupPermission()
+    {
+        return groupPermission;
+    }
+
+    public void setGroupPermission(boolean groupPermission)
+    {
+        this.groupPermission = groupPermission;
+    }
+
+    public BackEndType getBackEndType()
+    {
+        return backEndType;
+    }
+
+    public void setBackEndType(BackEndType backEndType)
+    {
+        this.backEndType = backEndType;
+    }
+
+    public net.alpenblock.bungeeperms.io.UUIDPlayerDBType getUUIDPlayerDBType()
+    {
+        return UUIDPlayerDBType;
+    }
+
+    public void setUUIDPlayerDBType(net.alpenblock.bungeeperms.io.UUIDPlayerDBType UUIDPlayerDBType)
+    {
+        this.UUIDPlayerDBType = UUIDPlayerDBType;
+    }
+
+    public String getTablePrefix()
+    {
+        return tablePrefix;
+    }
+
+    public void setTablePrefix(String tablePrefix)
+    {
+        this.tablePrefix = tablePrefix;
+    }
+
+    public int getFetcherCooldown()
+    {
+        return fetcherCooldown;
+    }
+
+    public boolean isSaveAllUsers()
+    {
+        return saveAllUsers;
+    }
+
+    public boolean isDeleteUsersOnCleanup()
+    {
+        return deleteUsersOnCleanup;
+    }
+
+    public boolean isNotifyPromote()
+    {
+        return notifyPromote;
+    }
+
+    public boolean isNotifyDemote()
+    {
+        return notifyDemote;
+    }
+
+    public boolean isTabComplete()
+    {
+        return tabComplete;
+    }
+
+    public boolean isTerminatePrefixReset()
+    {
+        return terminatePrefixReset;
+    }
+
+    public boolean isTerminateSuffixReset()
+    {
+        return terminateSuffixReset;
+    }
+
+    public boolean isTerminatePrefixSpace()
+    {
+        return terminatePrefixSpace;
+    }
+
+    public boolean isTerminateSuffixSpace()
+    {
+        return terminateSuffixSpace;
+    }
+
+    public boolean isDebug()
+    {
+        return debug;
+    }
+
+    public int getCleanupInterval()
+    {
+        return cleanupInterval;
+    }
+
+    public int getCleanupThreshold()
+    {
+        return cleanupThreshold;
+    }
+
+    public boolean isAsyncCommands()
+    {
+        return asyncCommands;
     }
 }

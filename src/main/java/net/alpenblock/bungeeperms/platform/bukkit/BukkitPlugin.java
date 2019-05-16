@@ -18,6 +18,7 @@ import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PlatformType;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
 import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
+import net.alpenblock.bungeeperms.util.VersionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -113,7 +114,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
             return l;
         }
 
-        for (Player p : Bukkit.getOnlinePlayers())
+        for (Player p : VersionUtils.getOnlinePlayers())
         {
             if (Statics.toLower(p.getName()).startsWith(Statics.toLower(args[args.length - 1])))
             {
@@ -248,7 +249,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         List<Sender> senders = new ArrayList<>();
 
-        for (Player pp : Bukkit.getOnlinePlayers())
+        for (Player pp : VersionUtils.getOnlinePlayers())
         {
             senders.add(new BukkitSender(pp));
         }

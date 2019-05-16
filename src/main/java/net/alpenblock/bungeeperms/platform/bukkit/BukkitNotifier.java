@@ -6,6 +6,7 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.NetworkNotifier;
+import net.alpenblock.bungeeperms.util.VersionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -166,7 +167,7 @@ public class BukkitNotifier implements NetworkNotifier
             return;
         }
 
-        Player p = Bukkit.getOnlinePlayers().iterator().hasNext() ? Bukkit.getOnlinePlayers().iterator().next() : null;
+        Player p = VersionUtils.getOnlinePlayers().iterator().hasNext() ? VersionUtils.getOnlinePlayers().iterator().next() : null;
         if (p != null)
         {
             p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());//todo use utf8 encoding

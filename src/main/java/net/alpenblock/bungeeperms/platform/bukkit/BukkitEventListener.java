@@ -16,6 +16,7 @@ import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.bukkit.event.BungeePermsUserChangedEvent;
+import net.alpenblock.bungeeperms.util.VersionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,7 +60,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         permissible.inject();
 
         //uninject from players
-        for (Player p : Bukkit.getOnlinePlayers())
+        for (Player p : VersionUtils.getOnlinePlayers())
         {
             if (!(Injector.getPermissible(p) instanceof BPPermissible))
             {
@@ -85,7 +86,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         Injector.uninject(Bukkit.getConsoleSender());
 
         //uninject from players
-        for (Player p : Bukkit.getOnlinePlayers())
+        for (Player p : VersionUtils.getOnlinePlayers())
         {
             Injector.uninject(p);
         }
