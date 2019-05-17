@@ -1553,7 +1553,12 @@ public class PermissionsManager
                 throw new UnsupportedOperationException("bet = " + bet.name());
         }
 
-        migrator.migrate(backEnd.loadGroups(), backEnd.loadUsers(), permsversion);
+        debug.log("migrate backend: loading all groups and users");
+        List<Group> groups = backEnd.loadGroups();
+        debug.log("migrate backend: loaded groups");
+        List<User> users = backEnd.loadUsers();
+        debug.log("migrate backend: loaded users");
+        migrator.migrate(groups, users, permsversion);
 
         backEnd.load();
     }
