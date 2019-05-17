@@ -30,24 +30,31 @@ public class Migrate2MySQL2 implements Migrator
         MySQL2BackEnd be = new MySQL2BackEnd();
         be.clearDatabase();
         be.getMysql().getConnection().setAutoCommit(false);
-        for (Group group : groups)
+        try
         {
-            be.saveGroup(group, false);
-        }
-        debug.log("migrate backend: " + groups.size() + " groups migrated");
+            for (Group group : groups)
+            {
+                be.saveGroup(group, false);
+            }
+            debug.log("migrate backend: " + groups.size() + " groups migrated");
 
-        int um = 0;
-        for (User user : users)
+            int um = 0;
+            for (User user : users)
+            {
+                be.saveUser(user, false);
+                um++;
+                if (um % 1000 == 0)
+                    debug.log("migrate backend: " + um + "/" + users.size() + " users migrated");
+            }
+            debug.log("migrate backend: " + users.size() + " users migrated");
+
+            be.saveVersion(permsversion, true);
+            be.getMysql().getConnection().commit();
+        }
+        catch (Throwable t)
         {
-            be.saveUser(user, false);
-            um++;
-            if (um % 1000 == 0)
-                debug.log("migrate backend: " + um + "/" + users.size() + " users migrated");
+            be.getMysql().getConnection().setAutoCommit(true);
         }
-        debug.log("migrate backend: " + users.size() + " users migrated");
-
-        be.saveVersion(permsversion, true);
-        be.getMysql().getConnection().commit();
 
         config.setBackendType(BackEndType.MySQL2);
 
