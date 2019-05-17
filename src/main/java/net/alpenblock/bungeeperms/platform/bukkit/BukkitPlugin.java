@@ -2,11 +2,14 @@ package net.alpenblock.bungeeperms.platform.bukkit;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
@@ -113,7 +116,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
             return l;
         }
 
-        for (Player p : Bukkit.getOnlinePlayers())
+        for (Player p : BukkitPlugin.getBukkitPlayers())
         {
             if (Statics.toLower(p.getName()).startsWith(Statics.toLower(args[args.length - 1])))
             {
@@ -248,7 +251,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         List<Sender> senders = new ArrayList<>();
 
-        for (Player pp : Bukkit.getOnlinePlayers())
+        for (Player pp : getBukkitPlayers())
         {
             senders.add(new BukkitSender(pp));
         }
@@ -286,5 +289,17 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     public void cancelTask(int id)
     {
         getServer().getScheduler().cancelTask(id);
+    }
+
+    //for compat
+    @SneakyThrows
+    public static List<Player> getBukkitPlayers()
+    {
+        Method method = Bukkit.class.getDeclaredMethod("getOnlinePlayers");
+        method.setAccessible(true);
+        if (method.getReturnType() == Player[].class)
+            return new ArrayList(Arrays.asList((Player[]) method.invoke(null)));
+        else
+            return new ArrayList((Collection) method.invoke(null));
     }
 }

@@ -58,8 +58,8 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         BPPermissible permissible = new BPPermissible(Bukkit.getConsoleSender(), null, Injector.getPermissible(Bukkit.getConsoleSender()));
         permissible.inject();
 
-        //uninject from players
-        for (Player p : Bukkit.getOnlinePlayers())
+        //inject from players
+        for (Player p : BukkitPlugin.getBukkitPlayers())
         {
             if (!(Injector.getPermissible(p) instanceof BPPermissible))
             {
@@ -85,7 +85,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         Injector.uninject(Bukkit.getConsoleSender());
 
         //uninject from players
-        for (Player p : Bukkit.getOnlinePlayers())
+        for (Player p : BukkitPlugin.getBukkitPlayers())
         {
             Injector.uninject(p);
         }

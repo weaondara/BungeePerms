@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import net.alpenblock.bungeeperms.BungeePerms;
@@ -165,8 +166,8 @@ public class BukkitNotifier implements NetworkNotifier
         {
             return;
         }
-
-        Player p = Bukkit.getOnlinePlayers().iterator().hasNext() ? Bukkit.getOnlinePlayers().iterator().next() : null;
+        List<Player> players = BukkitPlugin.getBukkitPlayers();
+        Player p = players.iterator().hasNext() ? players.iterator().next() : null;
         if (p != null)
         {
             p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, msg.getBytes());//todo use utf8 encoding
