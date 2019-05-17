@@ -51,7 +51,7 @@ public class Migrate2MySQL2 implements Migrator
             be.saveVersion(permsversion, true);
             be.getMysql().getConnection().commit();
         }
-        catch (Throwable t)
+        finally
         {
             be.getMysql().getConnection().setAutoCommit(true);
         }
