@@ -73,8 +73,13 @@ public class YAMLBackEnd implements BackEnd
         List<User> ret = new ArrayList<>();
 
         List<String> users = permsconf.getSubNodes("users");
+        BungeePerms.getInstance().getDebug().log("loading " + users.size() + " users");
+        int i = 0;
         for (String u : users)
         {
+            i++;
+            if (i % 1000 == 0)
+                BungeePerms.getInstance().getDebug().log("loaded " + i + "/" + users.size() + " users");
             User user = BungeePerms.getInstance().getConfig().isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
             ret.add(user);
         }
@@ -85,6 +90,8 @@ public class YAMLBackEnd implements BackEnd
     @Override
     public Group loadGroup(String group)
     {
+        permsconf.setAutoSavingEnabled(false);
+        
         List<String> inheritances = permsconf.getListString("groups." + group + ".inheritances", new ArrayList<String>());
         List<String> permissions = permsconf.getListString("groups." + group + ".permissions", new ArrayList<String>());
         boolean isdefault = permsconf.getBoolean("groups." + group + ".default", false);
@@ -119,6 +126,8 @@ public class YAMLBackEnd implements BackEnd
 
             servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
+        
+        permsconf.setAutoSavingEnabled(true);
 
         Group g = new Group(group, inheritances, permissions, servers, rank, weight, ladder, isdefault, display, prefix, suffix);
         return g;
@@ -131,7 +140,9 @@ public class YAMLBackEnd implements BackEnd
         {
             return null;
         }
-
+            
+        permsconf.setAutoSavingEnabled(false);
+        
         //load user from database
         List<String> sgroups = permsconf.getListString("users." + user + ".groups", new ArrayList<String>());
         List<String> perms = permsconf.getListString("users." + user + ".permissions", new ArrayList<String>());
@@ -173,6 +184,7 @@ public class YAMLBackEnd implements BackEnd
 
             servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
+        permsconf.setAutoSavingEnabled(true);
 
         UUID uuid = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(user);
         User u = new User(user, uuid, lgroups, perms, servers, display, prefix, suffix);
@@ -186,6 +198,8 @@ public class YAMLBackEnd implements BackEnd
         {
             return null;
         }
+        
+        permsconf.setAutoSavingEnabled(false);
 
         //load user from database
         List<String> sgroups = permsconf.getListString("users." + user + ".groups", new ArrayList<String>());
@@ -228,6 +242,7 @@ public class YAMLBackEnd implements BackEnd
 
             servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, worlds, sdisplay, sprefix, ssuffix));
         }
+        permsconf.setAutoSavingEnabled(true);
 
         String username = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
         User u = new User(username, user, lgroups, perms, servers, display, prefix, suffix);
@@ -399,7 +414,7 @@ public class YAMLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
+
         permsconf.setListStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".servers." + server + ".worlds." + world + ".permissions", user.getServer(server).getWorld(world).getPerms());
     }
 
@@ -476,7 +491,7 @@ public class YAMLBackEnd implements BackEnd
     {
         server = Statics.toLower(server);
         world = Statics.toLower(world);
-        
+
         permsconf.setListStringAndSave("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".permissions", group.getServer(server).getWorld(world).getPerms());
     }
 
@@ -598,8 +613,8 @@ public class YAMLBackEnd implements BackEnd
             {
                 //check for additional permissions and non-default groups AND onlinecheck
                 if (u.isNothingSpecial()
-                        && BungeePerms.getInstance().getPlugin().getPlayer(u.getName()) == null
-                        && BungeePerms.getInstance().getPlugin().getPlayer(u.getUUID()) == null)
+                    && BungeePerms.getInstance().getPlugin().getPlayer(u.getName()) == null
+                    && BungeePerms.getInstance().getPlugin().getPlayer(u.getUUID()) == null)
                 {
                     deleted++;
                     continue;
