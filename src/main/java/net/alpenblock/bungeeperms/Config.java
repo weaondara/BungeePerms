@@ -3,6 +3,8 @@ package net.alpenblock.bungeeperms;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 import net.alpenblock.bungeeperms.config.FileConfiguration;
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -13,6 +15,9 @@ public class Config
     private boolean allowsave;
     private FileConfiguration fconfig;
     private String path;
+    @Getter
+    @Setter
+    private boolean autoSavingEnabled = true;
 
     public Config(PlatformPlugin p, String path)
     {
@@ -88,7 +93,8 @@ public class Config
         else
         {
             fconfig.set(key, def);
-            save();
+            if (autoSavingEnabled)
+                save();
             return def;
         }
     }
@@ -102,7 +108,8 @@ public class Config
         else
         {
             fconfig.set(key, def);
-            save();
+            if (autoSavingEnabled)
+                save();
             return def;
         }
     }
@@ -116,7 +123,8 @@ public class Config
         else
         {
             fconfig.set(key, def);
-            save();
+            if (autoSavingEnabled)
+                save();
             return def;
         }
     }
@@ -130,7 +138,8 @@ public class Config
         else
         {
             fconfig.set(key, def);
-            save();
+            if (autoSavingEnabled)
+                save();
             return def;
         }
     }
@@ -154,7 +163,8 @@ public class Config
         {
             load();
             fconfig.set(key, def.name());
-            save();
+            if (autoSavingEnabled)
+                save();
             return def;
         }
     }
@@ -168,7 +178,8 @@ public class Config
         else
         {
             fconfig.set(key, def);
-            save();
+            if (autoSavingEnabled)
+                save();
             return def;
         }
     }
@@ -182,7 +193,8 @@ public class Config
         else
         {
             fconfig.set(key, def);
-            save();
+            if (autoSavingEnabled)
+                save();
             return def;
         }
     }
@@ -208,7 +220,7 @@ public class Config
         fconfig.set(key, val);
         save();
     }
-    
+
     public void setLong(String key, long val)
     {
         fconfig.set(key, val);
