@@ -69,7 +69,7 @@ public class Debug
             str = "null";
         }
         logger.info(str);
-        if (showlogs)
+        if (showlogs || config.getBoolean("debug", false))
         {
             BungeePerms.getLogger().info("[Debug] " + str);
         }
@@ -103,7 +103,7 @@ public class Debug
             }
         }
         logger.log(Level.SEVERE, e.getMessage(), e);
-        if (showexceptions)
+        if (showexceptions || config.getBoolean("debug", false))
         {
             e.printStackTrace();
         }
