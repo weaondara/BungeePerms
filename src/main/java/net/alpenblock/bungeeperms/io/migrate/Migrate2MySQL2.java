@@ -1,12 +1,12 @@
 package net.alpenblock.bungeeperms.io.migrate;
 
 import java.util.List;
+import lombok.SneakyThrows;
 import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
-import net.alpenblock.bungeeperms.io.BackEnd;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.MySQL2BackEnd;
 
@@ -23,19 +23,38 @@ public class Migrate2MySQL2 implements Migrator
     }
 
     @Override
+    @SneakyThrows
     public void migrate(final List<Group> groups, final List<User> users, final int permsversion)
     {
-        BackEnd be = new MySQL2BackEnd();
+        debug.log("migrate backend: migrating " + groups.size() + " groups and " + users.size() + " users");
+        MySQL2BackEnd be = new MySQL2BackEnd();
         be.clearDatabase();
-        for (Group group : groups)
+        be.getMysql().getConnection().setAutoCommit(false);
+        try
         {
-            be.saveGroup(group, false);
+            for (Group group : groups)
+            {
+                be.saveGroup(group, false);
+            }
+            debug.log("migrate backend: " + groups.size() + " groups migrated");
+
+            int um = 0;
+            for (User user : users)
+            {
+                be.saveUser(user, false);
+                um++;
+                if (um % 1000 == 0)
+                    debug.log("migrate backend: " + um + "/" + users.size() + " users migrated");
+            }
+            debug.log("migrate backend: " + users.size() + " users migrated");
+
+            be.saveVersion(permsversion, true);
+            be.getMysql().getConnection().commit();
         }
-        for (User user : users)
+        finally
         {
-            be.saveUser(user, false);
+            be.getMysql().getConnection().setAutoCommit(true);
         }
-        be.saveVersion(permsversion, true);
 
         config.setBackendType(BackEndType.MySQL2);
 

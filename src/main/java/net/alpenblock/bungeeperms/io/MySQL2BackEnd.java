@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import lombok.Getter;
 import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Debug;
@@ -30,6 +31,7 @@ public class MySQL2BackEnd implements BackEnd
     private final PlatformPlugin plugin;
     private final BPConfig config;
     private final Debug debug;
+    @Getter
     private final Mysql mysql;
 
     private final MysqlPermsAdapter2 adapter;
@@ -83,8 +85,13 @@ public class MySQL2BackEnd implements BackEnd
         List<User> ret = new ArrayList<>();
 
         List<String> users = adapter.getUsers();
+        BungeePerms.getInstance().getDebug().log("loading " + users.size() + " users");
+        int i = 0;
         for (String u : users)
         {
+            i++;
+            if (i % 1000 == 0)
+                BungeePerms.getInstance().getDebug().log("loaded " + i + "/" + users.size() + " users");
             User user = BungeePerms.getInstance().getConfig().isUseUUIDs() ? loadUser(UUID.fromString(u)) : loadUser(u);
             ret.add(user);
         }

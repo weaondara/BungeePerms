@@ -1,8 +1,8 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
+import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class BukkitPluginMessageSender implements PluginMessageSender
@@ -15,7 +15,8 @@ public class BukkitPluginMessageSender implements PluginMessageSender
         {
             return;
         }
-        Player p = Bukkit.getOnlinePlayers().iterator().hasNext() ? Bukkit.getOnlinePlayers().iterator().next() : null;
+        List<Player> players = BukkitPlugin.getBukkitPlayers();
+        Player p = players.iterator().hasNext() ? players.iterator().next() : null;
         if (p == null)
         {
             BungeePerms.getLogger().info("No server found for " + target);

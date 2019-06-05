@@ -15,14 +15,12 @@ import net.alpenblock.bungeeperms.Lang.MessageType;
 import net.alpenblock.bungeeperms.io.BackEnd;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.MySQL2BackEnd;
-import net.alpenblock.bungeeperms.io.MySQLBackEnd;
 import net.alpenblock.bungeeperms.io.MySQLUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.NoneUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.io.YAMLBackEnd;
 import net.alpenblock.bungeeperms.io.YAMLUUIDPlayerDB;
-import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
@@ -76,9 +74,6 @@ public class PermissionsManager
         {
             case YAML:
                 backEnd = new YAMLBackEnd();
-                break;
-            case MySQL:
-                backEnd = new MySQLBackEnd();
                 break;
             case MySQL2:
                 backEnd = new MySQL2BackEnd();
@@ -1551,9 +1546,6 @@ public class PermissionsManager
             case MySQL2:
                 migrator = new Migrate2MySQL2(config, debug);
                 break;
-            case MySQL:
-                migrator = new Migrate2MySQL(config, debug);
-                break;
             case YAML:
                 migrator = new Migrate2YAML(config);
                 break;
@@ -1561,7 +1553,12 @@ public class PermissionsManager
                 throw new UnsupportedOperationException("bet = " + bet.name());
         }
 
-        migrator.migrate(backEnd.loadGroups(), backEnd.loadUsers(), permsversion);
+        debug.log("migrate backend: loading all groups and users");
+        List<Group> groups = backEnd.loadGroups();
+        debug.log("migrate backend: loaded groups");
+        List<User> users = backEnd.loadUsers();
+        debug.log("migrate backend: loaded users");
+        migrator.migrate(groups, users, permsversion);
 
         backEnd.load();
     }

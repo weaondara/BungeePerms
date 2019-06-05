@@ -5,9 +5,9 @@ BungeePerms is a permissions plugin for BungeeCord and Spigot. It overrides the 
 so you don't need BungeeCord/Spigot permissions (anymore). BungeePerms can form a network so that it's a single
 system managing all permissions in your network.
 
-**Build Status**
+**Discord**
 
-[![Build Status](http://ci.sgessinger.de/job/BungeePerms/badge/icon)](http://ci.sgessinger.de/job/BungeePerms/)
+You can ask questions directly on our Discord-Server at https://discord.gg/NaA6eQ2
 
 **Binaries**
 
@@ -19,14 +19,14 @@ Dev builds of this project are available at http://ci.wea-ondara.net/job/BungeeP
 <repositories>
     <repository>
         <id>bungeeperms-repo</id>
-        <url>http://ci.sgessinger.de/plugin/repository/everything</url>
+        <url>http://repo.wea-ondara.net/repository/public/</url>
     </repository>
 </repositories>
 <dependencies>
     <dependency>
         <groupId>net.alpenblock</groupId>
         <artifactId>BungeePerms</artifactId>
-        <version>3.0</version>
+        <version>3.0-dev-47</version>
     </dependency>
 </dependencies>
 ```
