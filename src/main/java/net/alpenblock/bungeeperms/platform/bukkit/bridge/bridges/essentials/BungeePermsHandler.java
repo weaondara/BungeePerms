@@ -105,4 +105,23 @@ class BungeePermsHandler implements IPermissionsHandler
         
         return u.buildSuffix(new BukkitSender(player));
     }
+
+    @Override
+    public boolean isPermissionSet(Player player, String string)
+    {
+        User u = perms.getPermissionsManager().getUser(player.getName());
+        if (u == null)
+        {
+            return false;
+        }
+        
+        BukkitSender sender = new BukkitSender(player);
+        return u.getEffectivePerms(sender.getServer(), sender.getWorld()).contains(string.toLowerCase());
+    }
+
+    @Override
+    public boolean tryProvider()
+    {
+        return true;
+    }
 }
