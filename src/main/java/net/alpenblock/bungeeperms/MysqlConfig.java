@@ -31,7 +31,7 @@ public class MysqlConfig
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT `key`,`value` FROM `" + table + "` ORDER BY id ASC");
+            stmt = mysql.stmt("SELECT id,`key`,`value` FROM `" + table + "` ORDER BY id ASC");
             res = mysql.returnQuery(stmt);
             fromResult(res);
         }

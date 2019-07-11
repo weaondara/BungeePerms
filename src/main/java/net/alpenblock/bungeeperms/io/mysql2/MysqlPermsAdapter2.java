@@ -59,7 +59,7 @@ public class MysqlPermsAdapter2
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.Group.getCode() + " ORDER BY id ASC");
+            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.Group.getCode());
             res = mysql.returnQuery(stmt);
             while (res.next())
             {
@@ -89,7 +89,7 @@ public class MysqlPermsAdapter2
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " ORDER BY id ASC");
+            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode());
             res = mysql.returnQuery(stmt);
             while (res.next())
             {
@@ -119,7 +119,7 @@ public class MysqlPermsAdapter2
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT `name`,`type`,`key`,`value`,`server`,`world` FROM `" + table + "` "
+            stmt = mysql.stmt("SELECT id,`name`,`type`,`key`,`value`,`server`,`world` FROM `" + table + "` "
                               + "WHERE `type`=" + type.getCode() + " AND `name`=? ORDER BY id ASC");
             stmt.setString(1, name);
             res = mysql.returnQuery(stmt);
@@ -163,7 +163,7 @@ public class MysqlPermsAdapter2
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode() + " ORDER BY id ASC");
+            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode());
             stmt.setString(1, name);
             res = mysql.returnQuery(stmt);
 
@@ -332,7 +332,7 @@ public class MysqlPermsAdapter2
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " AND `key`='groups' AND `value`=? ORDER BY id ASC");
+            stmt = mysql.stmt("SELECT DISTINCT `name` FROM `" + table + "` WHERE `type`=" + EntityType.User.getCode() + " AND `key`='groups' AND `value`=?");
             stmt.setString(1, group);
             res = mysql.returnQuery(stmt);
             while (res.next())

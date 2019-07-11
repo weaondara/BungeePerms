@@ -74,7 +74,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT uuid FROM " + table + " WHERE player=? ORDER BY id ASC LIMIT 1");
+            stmt = mysql.stmt("SELECT id, uuid FROM " + table + " WHERE player=? ORDER BY id ASC LIMIT 1");
             stmt.setString(1, player);
             res = mysql.returnQuery(stmt);
             if (res.last())
@@ -138,7 +138,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
             stmt.setString(2, player);
             mysql.runQuery(stmt);
             Mysql.close(stmt);
-            
+
             mysql.checkConnection();
             stmt = mysql.stmt("INSERT IGNORE INTO " + table + " (uuid, player) VALUES (?, ?)");
             stmt.setString(1, uuid.toString());
