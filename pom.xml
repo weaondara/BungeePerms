@@ -2,13 +2,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.alpenblock</groupId>
     <artifactId>BungeePerms</artifactId>
-    <version>3.0</version>
+    <version>4.0</version>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <build.major>3.0</build.major>
+        <build.major>${project.version}</build.major>
         <build.type>SNAPSHOT</build.type>
         <build.number>1</build.number>
         <build.fullversion.file>${build.major}-${build.type}-${build.number}</build.fullversion.file>

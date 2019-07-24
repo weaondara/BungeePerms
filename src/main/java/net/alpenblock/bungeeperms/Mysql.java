@@ -48,6 +48,13 @@ public class Mysql
             String url = "jdbc:mysql://" + config.getString(configsection + ".general.mysqlhost", "localhost") + ":" + config.getString(configsection + ".general.mysqlport", "3306") + "/" + config.getString(configsection + ".general.mysqldb", "database") + "?autoReconnect=true&dontTrackOpenResources=true";
             this.connection = DriverManager.getConnection(url, config.getString(configsection + ".general.mysqluser", configsection), config.getString(configsection + ".general.mysqlpw", "password"));
         }
+        catch (SQLException e) {
+            if (e.getCause() != null && e.getCause().getMessage().startsWith("Access denied for user")) {
+                BungeePerms.getInstance().getPlugin().getLogger().severe("Failed to connect to database: " + e.getMessage());
+            } else {
+                debug.log(e);
+            }
+        }
         catch (Exception e)
         {
             debug.log(e);
@@ -56,9 +63,9 @@ public class Mysql
 
     public void close()
     {
-        BungeePerms.getInstance().getPlugin().getLogger().info("Disconnecting from database");
         if (this.connection != null)
         {
+            BungeePerms.getInstance().getPlugin().getLogger().info("Disconnecting from database");
             try
             {
                 if (isConnected())
