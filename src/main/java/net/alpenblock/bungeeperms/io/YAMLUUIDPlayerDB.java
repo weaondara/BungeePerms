@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
 
@@ -11,6 +13,9 @@ public class YAMLUUIDPlayerDB implements UUIDPlayerDB
 {
 
     private Config uuidconf;
+    @Getter
+    @Setter
+    private boolean autosave = true;
 
     public YAMLUUIDPlayerDB()
     {
@@ -19,9 +24,9 @@ public class YAMLUUIDPlayerDB implements UUIDPlayerDB
     }
 
     @Override
-    public UUIDPlayerDBType getType()
+    public BackEndType getType()
     {
-        return UUIDPlayerDBType.YAML;
+        return BackEndType.YAML;
     }
 
     @Override
@@ -67,7 +72,10 @@ public class YAMLUUIDPlayerDB implements UUIDPlayerDB
                 uuidconf.deleteNode(suuid);
             }
         }
-        uuidconf.setStringAndSave(uuid.toString(), player);
+        if (autosave)
+            uuidconf.setStringAndSave(uuid.toString(), player);
+        else
+            uuidconf.setString(uuid.toString(), player);
     }
 
     @Override
@@ -89,5 +97,10 @@ public class YAMLUUIDPlayerDB implements UUIDPlayerDB
         new File(BungeePerms.getInstance().getPlugin().getPluginFolder(), "/uuidplayerdb.yml").delete();
         uuidconf = new Config(BungeePerms.getInstance().getPlugin(), "/uuidplayerdb.yml");
         uuidconf.load();
+    }
+
+    public void save()
+    {
+        uuidconf.save();
     }
 }

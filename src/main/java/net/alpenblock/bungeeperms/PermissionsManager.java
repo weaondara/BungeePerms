@@ -16,12 +16,10 @@ import net.alpenblock.bungeeperms.io.BackEnd;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.MySQLBackEnd;
 import net.alpenblock.bungeeperms.io.MySQLUUIDPlayerDB;
-import net.alpenblock.bungeeperms.io.NoneUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDB;
-import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.io.YAMLBackEnd;
 import net.alpenblock.bungeeperms.io.YAMLUUIDPlayerDB;
-import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
+import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -40,6 +38,7 @@ public class PermissionsManager
     @Setter
     private BackEnd backEnd;
     @Getter
+    @Setter
     private UUIDPlayerDB UUIDPlayerDB;
 
     private List<Group> groups;
@@ -85,8 +84,6 @@ public class PermissionsManager
             default:
                 throw new IllegalStateException("This should not have happened!");
         }
-        if (!config.isUseUUIDs())
-            UUIDPlayerDB = new NoneUUIDPlayerDB();
     }
 
     /**
@@ -1533,11 +1530,11 @@ public class PermissionsManager
         Migrator migrator = null;
         switch (bet)
         {
-            case MySQL:
-                migrator = new Migrate2MySQL2(config, debug);
-                break;
             case YAML:
                 migrator = new Migrate2YAML(config);
+                break;
+            case MySQL:
+                migrator = new Migrate2MySQL(config, debug);
                 break;
             default:
                 throw new UnsupportedOperationException("bet = " + bet.name());
@@ -1548,7 +1545,11 @@ public class PermissionsManager
         debug.log("migrate backend: loaded groups");
         List<User> users = backEnd.loadUsers();
         debug.log("migrate backend: loaded users");
-        migrator.migrate(groups, users, permsversion);
+        Map<UUID, String> uuidplayer = new HashMap();
+        if (config.isUseUUIDs())
+            uuidplayer = UUIDPlayerDB.getAll();
+
+        migrator.migrate(groups, users, uuidplayer, permsversion);
 
         backEnd.load();
     }
@@ -1609,38 +1610,6 @@ public class PermissionsManager
             }
         }
         backEnd.saveVersion(version, true);
-    }
-
-    /**
-     * Converts the backend of the database holding the UUIDs and their corresponding player names to the new backend.
-     *
-     * @param type the new backend type
-     */
-    public void migrateUUIDPlayerDB(UUIDPlayerDBType type)
-    {
-        Map<UUID, String> map = UUIDPlayerDB.getAll();
-
-        switch (type)
-        {
-            case None:
-                UUIDPlayerDB = new NoneUUIDPlayerDB();
-                break;
-            case YAML:
-                UUIDPlayerDB = new YAMLUUIDPlayerDB();
-                break;
-            case MySQL:
-                UUIDPlayerDB = new MySQLUUIDPlayerDB();
-                break;
-            default:
-                throw new UnsupportedOperationException("type = " + type);
-        }
-        BungeePerms.getInstance().getConfig().setUUIDPlayerDB(UUIDPlayerDB.getType());
-        UUIDPlayerDB.clear();
-
-        for (Map.Entry<UUID, String> e : map.entrySet())
-        {
-            UUIDPlayerDB.update(e.getKey(), e.getValue());
-        }
     }
 
 //internal functions

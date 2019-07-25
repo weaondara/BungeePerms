@@ -202,7 +202,7 @@ public class BukkitNotifier implements NetworkNotifier
             if (lastConfigUpdate + 5 * 60 * 1000 < now)
             {
                 lastConfigUpdate = now;
-                p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, ("configcheck;" + config.getServername() + ";" + config.getBackEndType() + ";" + config.getUUIDPlayerDBType() + ";" + config.isUseUUIDs()).getBytes());
+                p.sendPluginMessage(BukkitPlugin.getInstance(), BungeePerms.CHANNEL, ("configcheck;" + config.getServername() + ";" + config.getBackEndType() + ";" + config.isUseUUIDs()).getBytes());
             }
         }
     }

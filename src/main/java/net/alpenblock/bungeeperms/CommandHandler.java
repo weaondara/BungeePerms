@@ -9,7 +9,9 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.Lang.MessageType;
 import net.alpenblock.bungeeperms.io.BackEndType;
-import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
+import net.alpenblock.bungeeperms.io.MySQLUUIDPlayerDB;
+import net.alpenblock.bungeeperms.io.UUIDPlayerDB;
+import net.alpenblock.bungeeperms.io.YAMLUUIDPlayerDB;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.uuid.UUIDFetcher;
@@ -2006,10 +2008,6 @@ public class CommandHandler
         {
             return handleMigrateUseUUID(sender, args);
         }
-        else if (migratetype.equalsIgnoreCase("uuidplayerdb"))
-        {
-            return handleMigrateUUIDPlayerDB(sender, args);
-        }
         else
         {
             return false;
@@ -2029,8 +2027,8 @@ public class CommandHandler
             if (type == null)
             {
                 sender.sendMessage(Color.Error + "Invalid backend type! "
-                        + Color.Value + BackEndType.YAML.name() + Color.Error + " or "
-                        + Color.Value + BackEndType.MySQL.name() + Color.Error + " is required!");
+                                   + Color.Value + BackEndType.YAML.name() + Color.Error + " or "
+                                   + Color.Value + BackEndType.MySQL.name() + Color.Error + " is required!");
                 return true;
             }
 
@@ -2071,8 +2069,8 @@ public class CommandHandler
             if (type == null)
             {
                 sender.sendMessage(Color.Error + "Invalid use-uuid type! "
-                        + Color.Value + "true" + Color.Error + " or "
-                        + Color.Value + "false" + Color.Error + " is required!");
+                                   + Color.Value + "true" + Color.Error + " or "
+                                   + Color.Value + "false" + Color.Error + " is required!");
                 return true;
             }
 
@@ -2100,10 +2098,13 @@ public class CommandHandler
 
                 //add fetched uuids to uuidplayerdb
                 sender.sendMessage(Color.Text + "Applying fetched data to player-uuid-database ...");
+                UUIDPlayerDB updb = config.getBackEndType() == BackEndType.YAML ? new YAMLUUIDPlayerDB() : new MySQLUUIDPlayerDB();
+                updb.clear();
                 for (Map.Entry<String, UUID> e : uuids.entrySet())
                 {
-                    pm().getUUIDPlayerDB().update(e.getValue(), e.getKey());
+                    updb.update(e.getValue(), e.getKey());
                 }
+                pm().setUUIDPlayerDB(updb);
                 sender.sendMessage(Color.Message + "Finished applying of fetched data to player-uuid-database.");
             }
             else
@@ -2124,49 +2125,14 @@ public class CommandHandler
 
                 //add fetched playername to uuidplayerdb
                 sender.sendMessage(Color.Text + "Applying fetched data to player-uuid-database ...");
-                for (Map.Entry<UUID, String> e : playernames.entrySet())
+                if (pm().getUUIDPlayerDB() != null)
                 {
-                    pm().getUUIDPlayerDB().update(e.getKey(), e.getValue());
+                    pm().getUUIDPlayerDB().clear();
+                    pm().setUUIDPlayerDB(null);
                 }
                 sender.sendMessage(Color.Message + "Finished applying of fetched data to player-uuid-database.");
             }
 
-            sender.sendMessage(Color.Message + "Finished migration.");
-        }
-        else
-        {
-            Messages.sendTooManyArgsMessage(sender);
-        }
-        return true;
-    }
-
-    private boolean handleMigrateUUIDPlayerDB(Sender sender, String[] args)
-    {
-        if (args.length == 2)
-        {
-            sender.sendMessage(Color.Text + "Currently using " + Color.Value + pm().getUUIDPlayerDB().getType().name() + Color.Text + " as uuid player database");
-        }
-        else if (args.length == 3)
-        {
-            String stype = args[2];
-            UUIDPlayerDBType type = UUIDPlayerDBType.getByName(stype);
-            if (type == null)
-            {
-                sender.sendMessage(Color.Error + "Invalid backend type! "
-                        + Color.Value + UUIDPlayerDBType.None.name() + Color.Error + ", "
-                        + Color.Value + UUIDPlayerDBType.YAML.name() + Color.Error + " or "
-                        + Color.Value + UUIDPlayerDBType.MySQL.name() + Color.Error + " is required!");
-                return true;
-            }
-
-            if (type == pm().getUUIDPlayerDB().getType())
-            {
-                sender.sendMessage(Color.Error + "Invalid uuid-player-database type! You can't migrate to same type!");
-                return true;
-            }
-
-            sender.sendMessage(Color.Text + "Migrating uuid-player-database to " + Color.Value + type.name() + Color.Text + " ...");
-            pm().migrateUUIDPlayerDB(type);
             sender.sendMessage(Color.Message + "Finished migration.");
         }
         else
