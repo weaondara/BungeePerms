@@ -8,7 +8,7 @@ import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.io.BackEndType;
-import net.alpenblock.bungeeperms.io.MySQL2BackEnd;
+import net.alpenblock.bungeeperms.io.MySQLBackEnd;
 
 public class Migrate2MySQL2 implements Migrator
 {
@@ -27,7 +27,7 @@ public class Migrate2MySQL2 implements Migrator
     public void migrate(final List<Group> groups, final List<User> users, final int permsversion)
     {
         debug.log("migrate backend: migrating " + groups.size() + " groups and " + users.size() + " users");
-        MySQL2BackEnd be = new MySQL2BackEnd();
+        MySQLBackEnd be = new MySQLBackEnd();
         be.clearDatabase();
         be.getMysql().getConnection().setAutoCommit(false);
         try
@@ -56,7 +56,7 @@ public class Migrate2MySQL2 implements Migrator
             be.getMysql().getConnection().setAutoCommit(true);
         }
 
-        config.setBackendType(BackEndType.MySQL2);
+        config.setBackendType(BackEndType.MySQL);
 
         BungeePerms.getInstance().getPermissionsManager().setBackEnd(be);
     }

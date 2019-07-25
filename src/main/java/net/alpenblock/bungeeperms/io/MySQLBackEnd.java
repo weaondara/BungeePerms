@@ -25,7 +25,7 @@ import net.alpenblock.bungeeperms.io.mysql2.MysqlPermsAdapter2;
 import net.alpenblock.bungeeperms.io.mysql2.ValueEntry;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 
-public class MySQL2BackEnd implements BackEnd
+public class MySQLBackEnd implements BackEnd
 {
 
     private final PlatformPlugin plugin;
@@ -37,7 +37,7 @@ public class MySQL2BackEnd implements BackEnd
     private final MysqlPermsAdapter2 adapter;
     private final String table;
 
-    public MySQL2BackEnd()
+    public MySQLBackEnd()
     {
         plugin = BungeePerms.getInstance().getPlugin();
         config = BungeePerms.getInstance().getConfig();
@@ -55,7 +55,7 @@ public class MySQL2BackEnd implements BackEnd
     @Override
     public BackEndType getType()
     {
-        return BackEndType.MySQL2;
+        return BackEndType.MySQL;
     }
 
     @Override

@@ -14,7 +14,7 @@ import lombok.Setter;
 import net.alpenblock.bungeeperms.Lang.MessageType;
 import net.alpenblock.bungeeperms.io.BackEnd;
 import net.alpenblock.bungeeperms.io.BackEndType;
-import net.alpenblock.bungeeperms.io.MySQL2BackEnd;
+import net.alpenblock.bungeeperms.io.MySQLBackEnd;
 import net.alpenblock.bungeeperms.io.MySQLUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.NoneUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDB;
@@ -75,8 +75,8 @@ public class PermissionsManager
             case YAML:
                 backEnd = new YAMLBackEnd();
                 break;
-            case MySQL2:
-                backEnd = new MySQL2BackEnd();
+            case MySQL:
+                backEnd = new MySQLBackEnd();
                 break;
             default:
                 break;
@@ -1543,7 +1543,7 @@ public class PermissionsManager
         Migrator migrator = null;
         switch (bet)
         {
-            case MySQL2:
+            case MySQL:
                 migrator = new Migrate2MySQL2(config, debug);
                 break;
             case YAML:

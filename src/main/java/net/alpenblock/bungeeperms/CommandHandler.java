@@ -2030,7 +2030,7 @@ public class CommandHandler
             {
                 sender.sendMessage(Color.Error + "Invalid backend type! "
                         + Color.Value + BackEndType.YAML.name() + Color.Error + " or "
-                        + Color.Value + BackEndType.MySQL2.name() + Color.Error + " is required!");
+                        + Color.Value + BackEndType.MySQL.name() + Color.Error + " is required!");
                 return true;
             }
 

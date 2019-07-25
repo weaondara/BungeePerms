@@ -57,7 +57,7 @@ public class MySQL2BackEndTest
         mpedisplay.add(new ValueEntry("display5","server6",null));
         
         MysqlPermEntity mpe = new MysqlPermEntity("", EntityType.Group, mpedata);
-        MySQL2BackEnd.loadServerWorlds(mpe, g);
+        MySQLBackEnd.loadServerWorlds(mpe, g);
         
         assertNotNull(g.getServers());
         
