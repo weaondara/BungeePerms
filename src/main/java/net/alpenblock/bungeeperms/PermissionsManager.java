@@ -74,29 +74,19 @@ public class PermissionsManager
         {
             case YAML:
                 backEnd = new YAMLBackEnd();
+                if (config.isUseUUIDs())
+                    UUIDPlayerDB = new YAMLUUIDPlayerDB();
                 break;
             case MySQL:
                 backEnd = new MySQLBackEnd();
+                if (config.isUseUUIDs())
+                    UUIDPlayerDB = new MySQLUUIDPlayerDB();
                 break;
             default:
-                break;
+                throw new IllegalStateException("This should not have happened!");
         }
-
-        UUIDPlayerDBType updbt = config.getUUIDPlayerDBType();
-        switch (updbt)
-        {
-            case None:
-                UUIDPlayerDB = new NoneUUIDPlayerDB();
-                break;
-            case YAML:
-                UUIDPlayerDB = new YAMLUUIDPlayerDB();
-                break;
-            case MySQL:
-                UUIDPlayerDB = new MySQLUUIDPlayerDB();
-                break;
-            default:
-                break;
-        }
+        if (!config.isUseUUIDs())
+            UUIDPlayerDB = new NoneUUIDPlayerDB();
     }
 
     /**
