@@ -601,11 +601,6 @@ public class CommandHandler
                 pm().removeUserPerm(user, perm);
                 sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));
             }
-            else if (!user.getExtraPerms().contains("-" + perm))
-            {
-                pm().addUserPerm(user, "-" + perm);
-                sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));
-            }
             else
             {
                 sender.sendMessage(Lang.translate(MessageType.USER_NEVER_HAD_PERM, user.getName(), perm));
@@ -622,11 +617,6 @@ public class CommandHandler
                     pm().removeUserPerServerPerm(user, server, perm);
                     sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER, perm, user.getName(), server));
                 }
-                else if (!srv.getPerms().contains("-" + perm))
-                {
-                    pm().addUserPerServerPerm(user, server, "-" + perm);
-                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER, perm, user.getName(), server));
-                }
                 else
                 {
                     sender.sendMessage(Lang.translate(MessageType.USER_NEVER_HAD_PERM_SERVER, user.getName(), perm, server));
@@ -639,11 +629,6 @@ public class CommandHandler
                 if (w.getPerms().contains(perm))
                 {
                     pm().removeUserPerServerWorldPerm(user, server, world, perm);
-                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
-                }
-                else if (!w.getPerms().contains("-" + perm))
-                {
-                    pm().addUserPerServerWorldPerm(user, server, world, "-" + perm);
                     sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
                 }
                 else
@@ -1382,11 +1367,6 @@ public class CommandHandler
                 pm().removeGroupPerm(group, perm);
                 sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM, perm, group.getName()));
             }
-            else if (!group.getPerms().contains("-" + perm))
-            {
-                pm().addGroupPerm(group, "-" + perm);
-                sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM, perm, group.getName()));
-            }
             else
             {
                 sender.sendMessage(Lang.translate(MessageType.GROUP_NEVER_HAD_PERM, group.getName(), perm));
@@ -1405,11 +1385,6 @@ public class CommandHandler
                     pm().removeGroupPerServerPerm(group, server, perm);
                     sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER, perm, group.getName(), server));
                 }
-                else if (!perserverperms.contains("-" + perm))
-                {
-                    pm().addGroupPerServerPerm(group, server, "-" + perm);
-                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER, perm, group.getName(), server));
-                }
                 else
                 {
                     sender.sendMessage(Lang.translate(MessageType.GROUP_NEVER_HAD_PERM_SERVER, group.getName(), perm, server));
@@ -1423,11 +1398,6 @@ public class CommandHandler
                 if (perserverworldperms.contains(perm))
                 {
                     pm().removeGroupPerServerWorldPerm(group, server, world, perm);
-                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
-                }
-                else if (!perserverworldperms.contains("-" + perm))
-                {
-                    pm().addGroupPerServerWorldPerm(group, server, world, "-" + perm);
                     sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
                 }
                 else
