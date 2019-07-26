@@ -153,6 +153,7 @@ log:
     adding-default-groups-uuid: Standardgruppen zu {0} ({1}) hinzugefuegt
   login: Login von {0}
   login-uuid: Login von {0} ({1})
+  update-available: '&6Neue Version verfügbar: &9https://ci.wea-ondara.net/job/BungeePerms/lastSuccessfulBuild/'
 warning:
   intrusion-detected: '&4Moeglicher Angriff erkannt. Sender ist {0}'
   misconfig:

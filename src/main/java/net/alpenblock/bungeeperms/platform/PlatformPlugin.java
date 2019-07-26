@@ -36,5 +36,9 @@ public interface PlatformPlugin
     
     public int registerRepeatingTask(Runnable r, long delay, long interval);
     
+    public int runTaskLater(Runnable r, long delay);
+    
     public void cancelTask(int id);
+    
+    public Integer getBuild();
 }

@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.SneakyThrows;
+import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.Sender;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -387,5 +388,18 @@ public class Statics
     public static String[] array(String... elements)
     {
         return elements;
+    }
+    
+    public static Integer getBuild(PlatformPlugin p) {
+        String v = p.getVersion();
+        if (v.contains("dev") && v.contains("#")) 
+        {
+            int i = Integer.parseInt(v.split("#")[1]);
+            return i;
+        } 
+        else
+        {
+            return null;
+        }
     }
 }

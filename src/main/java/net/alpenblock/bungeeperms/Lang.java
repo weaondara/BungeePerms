@@ -170,6 +170,7 @@ public class Lang
         LOGIN_UUID("log.login-uuid", "Login by {0} ({1})"),
         ADDING_DEFAULT_GROUPS("log.permissions.adding-default-groups", "Adding default groups to {0}"),
         ADDING_DEFAULT_GROUPS_UUID("log.permissions.adding-default-groups-uuid", "Adding default groups to {0} ({1})"),
+        UPDATE_AVAILABLE("log.update-available", ChatColor.GOLD.alt() +  "New version available. Please check at " + ChatColor.BLUE.alt() + "https://ci.wea-ondara.net/job/BungeePerms/lastSuccessfulBuild/"),
         //warnings
         INTRUSION_DETECTED("warning.intrusion-detected", Color.Error.alt() + "Possible intrusion detected. Sender is {0}"),
         MISCONFIG_BUNGEE_STANDALONE("warning.misconfig.bungee.standalone", "Server {0}: Received a plugin message from Bukkit/Spigot but BungeePerms is in standalone mode. Ignoring it ..."),

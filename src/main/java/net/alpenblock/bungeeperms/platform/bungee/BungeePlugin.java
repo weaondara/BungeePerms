@@ -9,6 +9,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -221,10 +222,23 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     {
         return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, interval, TimeUnit.MILLISECONDS).getId();
     }
+    
+    @Override
+    public int runTaskLater(Runnable r, long delay) 
+    {
+        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS).getId();
+    }
 
     @Override
     public void cancelTask(int id)
     {
         ProxyServer.getInstance().getScheduler().cancel(id);
     }
+
+    @Override
+    public Integer getBuild() 
+    {
+        return Statics.getBuild(this);
+    }
+
 }

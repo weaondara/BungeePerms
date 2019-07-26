@@ -284,7 +284,13 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         return getServer().getScheduler().runTaskTimer(this, r, (long) (delay * MILLI2TICK), (long) (interval * MILLI2TICK)).getTaskId();
     }
-
+    
+    @Override
+    public int runTaskLater(Runnable r, long delay) 
+    {
+        return getServer().getScheduler().runTaskLater(this, r, (long) (delay * MILLI2TICK)).getTaskId();
+    }
+    
     @Override
     public void cancelTask(int id)
     {
@@ -301,5 +307,11 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
             return new ArrayList(Arrays.asList((Player[]) method.invoke(null)));
         else
             return new ArrayList((Collection) method.invoke(null));
+    }
+
+    @Override
+    public Integer getBuild() 
+    {
+        return Statics.getBuild(this);
     }
 }
