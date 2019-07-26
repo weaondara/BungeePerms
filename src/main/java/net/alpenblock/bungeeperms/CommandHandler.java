@@ -514,7 +514,7 @@ public class CommandHandler
 
         if (server == null)
         {
-            if (!user.getExtraPerms().contains(perm))
+            if (!user.getPerms().contains(perm))
             {
                 pm().addUserPerm(user, perm);
                 sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM, perm, user.getName()));
@@ -583,7 +583,7 @@ public class CommandHandler
 
         if (server == null)
         {
-            if (user.getExtraPerms().contains(perm))
+            if (user.getPerms().contains(perm))
             {
                 pm().removeUserPerm(user, perm);
                 sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));

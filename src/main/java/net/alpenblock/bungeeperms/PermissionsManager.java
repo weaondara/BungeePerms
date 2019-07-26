@@ -862,7 +862,7 @@ public class PermissionsManager
     public void addUserPerm(User user, String perm)
     {
         //cache
-        user.getExtraPerms().add(Statics.toLower(perm));
+        user.getPerms().add(Statics.toLower(perm));
 
         //database
         backEnd.saveUserPerms(user);
@@ -883,7 +883,7 @@ public class PermissionsManager
     public void removeUserPerm(User user, String perm)
     {
         //cache
-        user.getExtraPerms().remove(Statics.toLower(perm));
+        user.getPerms().remove(Statics.toLower(perm));
 
         //database
         backEnd.saveUserPerms(user);

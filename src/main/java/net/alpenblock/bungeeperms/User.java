@@ -37,6 +37,7 @@ public class User implements PermEntity
     private String suffix;
 
     private long lastAccess;
+    private long nextTimedPermissionRunOut;
 
     public User(String name, UUID UUID, List<Group> groups, List<String> extraPerms, Map<String, Server> servers, String display, String prefix, String suffix)
     {
@@ -848,17 +849,5 @@ public class User implements PermEntity
         }
 
         return permmap;
-    }
-
-    @Deprecated
-    public List<String> getExtraPerms() //todo: remove
-    {
-        return perms;
-    }
-
-    @Deprecated
-    public void setExtraPerms(List<String> perms) //todo: remove
-    {
-        this.perms = perms;
     }
 }
