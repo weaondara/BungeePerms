@@ -10,16 +10,16 @@ import java.net.URLConnection;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Lang;
 
-public class VersionCheck 
+public class VersionCheck
 {
 
-    public static void checkForUpdate() 
+    public static void checkForUpdate()
     {
-        try 
+        try
         {
             //get current version
             int curVersion = BungeePerms.getInstance().getPlugin().getBuild();
-            
+
             URL url = new URL("https://ci.wea-ondara.net/job/BungeePerms/api/json");
             URLConnection request = url.openConnection();
             request.connect();
@@ -27,14 +27,14 @@ public class VersionCheck
             JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
             JsonObject j = root.getAsJsonObject();
             int remoteVersion = j.getAsJsonObject("lastSuccessfulBuild").get("number").getAsInt();
-            
+
             if (remoteVersion > curVersion)
             {
                 BungeePerms.getInstance().getPlugin().getConsole().sendMessage("[BungeePerms] " + Lang.translate(Lang.MessageType.UPDATE_AVAILABLE));
             }
-        } 
-        catch (Exception e) 
-        {   
+        }
+        catch (Exception e)
+        {
         }
     }
 }

@@ -112,11 +112,9 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         List<String> l = new ArrayList<>();
         if (!conf.isTabComplete() || args.length == 0)
-        {
             return l;
-        }
 
-        for (Player p : BukkitPlugin.getBukkitPlayers())
+        for (Player p : getBukkitPlayers())
         {
             if (Statics.toLower(p.getName()).startsWith(Statics.toLower(args[args.length - 1])))
             {
@@ -284,13 +282,13 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         return getServer().getScheduler().runTaskTimer(this, r, (long) (delay * MILLI2TICK), (long) (interval * MILLI2TICK)).getTaskId();
     }
-    
+
     @Override
-    public int runTaskLater(Runnable r, long delay) 
+    public int runTaskLater(Runnable r, long delay)
     {
         return getServer().getScheduler().runTaskLater(this, r, (long) (delay * MILLI2TICK)).getTaskId();
     }
-    
+
     @Override
     public void cancelTask(int id)
     {
@@ -310,7 +308,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     }
 
     @Override
-    public Integer getBuild() 
+    public Integer getBuild()
     {
         return Statics.getBuild(this);
     }

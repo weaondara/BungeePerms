@@ -47,7 +47,7 @@ public class BungeePerms
         //basic
         this.plugin = plugin;
         this.config = config;
-        debug = new Debug(plugin, config.getConfig(), "BP");
+        debug = new Debug(plugin, config, "BP");
 
         //extract packed files
         FileExtractor.extractAll();
@@ -83,10 +83,10 @@ public class BungeePerms
         permissionsManager.enable();
         eventListener.enable();
         cleanupTaskId = plugin.registerRepeatingTask(cleanupTask, 0, config.getCleanupInterval() * 1000);
-        plugin.runTaskLater(new Runnable() 
+        plugin.runTaskLater(new Runnable()
         {
             @Override
-            public void run() 
+            public void run()
             {
                 VersionCheck.checkForUpdate();
             }

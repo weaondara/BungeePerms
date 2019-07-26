@@ -9,9 +9,10 @@ public class BukkitConfig extends BPConfig
 {
 
     private String servername;
+
     private boolean allowops;
     private boolean superpermscompat;
-    
+
     private boolean standalone;
 
     public BukkitConfig(Config config)
@@ -23,10 +24,12 @@ public class BukkitConfig extends BPConfig
     public void load()
     {
         super.load();
-        servername = config.getString("servername", "servername");
-        allowops = config.getBoolean("allowops", true);
-        superpermscompat = config.getBoolean("superpermscompat", false);
-        
-        standalone = config.getBoolean("standalone", false);
+
+        //perms
+        servername = config.getString("permissions.servername", "servername");
+        allowops = config.getBoolean("permissions.allowops", true);
+        superpermscompat = config.getBoolean("permissions.superpermscompat", false);
+
+        standalone = config.getBoolean("network.standalone", false);
     }
 }

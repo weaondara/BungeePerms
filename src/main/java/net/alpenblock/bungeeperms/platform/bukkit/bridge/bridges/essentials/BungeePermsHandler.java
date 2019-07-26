@@ -66,7 +66,7 @@ class BungeePermsHandler implements IPermissionsHandler
         {
             return false;
         }
-        
+
         Group g = perms.getPermissionsManager().getGroup(group);
         if (g == null)
         {
@@ -90,7 +90,7 @@ class BungeePermsHandler implements IPermissionsHandler
         {
             return "";
         }
-        
+
         return u.buildPrefix(new BukkitSender(player));
     }
 
@@ -102,7 +102,7 @@ class BungeePermsHandler implements IPermissionsHandler
         {
             return "";
         }
-        
+
         return u.buildSuffix(new BukkitSender(player));
     }
 
@@ -114,7 +114,7 @@ class BungeePermsHandler implements IPermissionsHandler
         {
             return false;
         }
-        
+
         BukkitSender sender = new BukkitSender(player);
         return u.getEffectivePerms(sender.getServer(), sender.getWorld()).contains(string.toLowerCase());
     }

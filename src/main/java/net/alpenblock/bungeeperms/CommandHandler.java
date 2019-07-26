@@ -2098,7 +2098,7 @@ public class CommandHandler
 
                 //add fetched uuids to uuidplayerdb
                 sender.sendMessage(Color.Text + "Applying fetched data to player-uuid-database ...");
-                UUIDPlayerDB updb = config.getBackEndType() == BackEndType.YAML ? new YAMLUUIDPlayerDB() : new MySQLUUIDPlayerDB();
+                UUIDPlayerDB updb = config.getBackendType() == BackEndType.YAML ? new YAMLUUIDPlayerDB() : new MySQLUUIDPlayerDB();
                 updb.clear();
                 for (Map.Entry<String, UUID> e : uuids.entrySet())
                 {

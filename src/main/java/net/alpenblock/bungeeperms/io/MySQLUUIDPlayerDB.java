@@ -25,10 +25,10 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     {
         this.config = BungeePerms.getInstance().getConfig();
         this.debug = BungeePerms.getInstance().getDebug();
-        mysql = new Mysql(config.getConfig(), debug, "bungeeperms");
+        mysql = new Mysql(config, debug, "bungeeperms");
         mysql.connect();
 
-        table = config.getTablePrefix() + "uuidplayer";
+        table = config.getMysqlTablePrefix() + "uuidplayer";
 
         createTable();
     }

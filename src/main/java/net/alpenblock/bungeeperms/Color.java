@@ -2,6 +2,7 @@ package net.alpenblock.bungeeperms;
 
 public class Color
 {
+
     //todo make caps
     public static final ChatColor Text = ChatColor.GRAY;
     public static final ChatColor User = ChatColor.DARK_AQUA;

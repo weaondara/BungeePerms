@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import static java.util.Collections.list;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -167,10 +166,10 @@ public class Statics
         if (s.length() == 32)
         {
             s = s.substring(0, 8) + "-"
-                    + s.substring(8, 12) + "-"
-                    + s.substring(12, 16) + "-"
-                    + s.substring(16, 20) + "-"
-                    + s.substring(20, 32) + "-";
+                + s.substring(8, 12) + "-"
+                + s.substring(12, 16) + "-"
+                + s.substring(16, 20) + "-"
+                + s.substring(20, 32) + "-";
             try
             {
                 return UUID.fromString(s);
@@ -300,7 +299,7 @@ public class Statics
 
         Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(cmd);
         while (m.find())
-            ret.add(m.group(1).replaceAll("(^\")|(\"$)",""));
+            ret.add(m.group(1).replaceAll("(^\")|(\"$)", ""));
 
 //        int i = 0;
 //        int j = 0;
@@ -389,14 +388,15 @@ public class Statics
     {
         return elements;
     }
-    
-    public static Integer getBuild(PlatformPlugin p) {
+
+    public static Integer getBuild(PlatformPlugin p)
+    {
         String v = p.getVersion();
-        if (v.contains("dev") && v.contains("#")) 
+        if (v.contains("dev") && v.contains("#"))
         {
             int i = Integer.parseInt(v.split("#")[1]);
             return i;
-        } 
+        }
         else
         {
             return null;

@@ -29,16 +29,16 @@ public interface PlatformPlugin
     public Logger getLogger();
 
     public PlatformType getPlatformType();
-    
+
     public boolean isChatApiPresent();
-    
+
     public MessageEncoder newMessageEncoder();
-    
+
     public int registerRepeatingTask(Runnable r, long delay, long interval);
-    
+
     public int runTaskLater(Runnable r, long delay);
-    
+
     public void cancelTask(int id);
-    
+
     public Integer getBuild();
 }

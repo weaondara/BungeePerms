@@ -43,10 +43,10 @@ public class MySQLBackEnd implements BackEnd
         config = BungeePerms.getInstance().getConfig();
         debug = BungeePerms.getInstance().getDebug();
 
-        mysql = new Mysql(config.getConfig(), debug, "bungeeperms");
+        mysql = new Mysql(config, debug, "bungeeperms");
         mysql.connect();
 
-        table = config.getTablePrefix() + "permissions2";
+        table = config.getMysqlTablePrefix() + "permissions2";
 
         adapter = new MysqlPermsAdapter2(mysql, table);
         adapter.createTable();
@@ -527,8 +527,8 @@ public class MySQLBackEnd implements BackEnd
             {
                 //check for additional permissions and non-default groups AND onlinecheck
                 if (u.isNothingSpecial()
-                        && plugin.getPlayer(u.getName()) == null
-                        && plugin.getPlayer(u.getUUID()) == null)
+                    && plugin.getPlayer(u.getName()) == null
+                    && plugin.getPlayer(u.getUUID()) == null)
                 {
                     deleted++;
                     continue;
@@ -631,9 +631,9 @@ public class MySQLBackEnd implements BackEnd
         {
             //servers == null || (servers match && (worlds == null || worlds match))
             if ((server == null && e.getServer() == null)
-                    || (server != null && e.getServer() != null && e.getServer().equalsIgnoreCase(server)
+                || (server != null && e.getServer() != null && e.getServer().equalsIgnoreCase(server)
                     && ((world == null && e.getWorld() == null)
-                    || (world != null && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world)))))
+                        || (world != null && e.getWorld() != null && e.getWorld().equalsIgnoreCase(world)))))
             {
                 return e.getValue();
             }

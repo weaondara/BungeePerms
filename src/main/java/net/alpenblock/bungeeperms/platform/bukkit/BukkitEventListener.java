@@ -271,7 +271,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_SERVERNAME));
             }
-            if (config.getBackEndType() != backend)
+            if (config.getBackendType() != backend)
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_BACKEND));
             }

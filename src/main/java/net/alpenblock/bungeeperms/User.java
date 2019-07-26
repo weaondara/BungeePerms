@@ -468,18 +468,18 @@ public class User implements PermEntity
         for (Server s : servers.values())
         {
             if (!s.getPerms().isEmpty()
-                    || !Statics.isEmpty(s.getDisplay())
-                    || !Statics.isEmpty(s.getPrefix())
-                    || !Statics.isEmpty(s.getSuffix()))
+                || !Statics.isEmpty(s.getDisplay())
+                || !Statics.isEmpty(s.getPrefix())
+                || !Statics.isEmpty(s.getSuffix()))
             {
                 return false;
             }
             for (World w : s.getWorlds().values())
             {
                 if (!s.getPerms().isEmpty()
-                        || !Statics.isEmpty(w.getDisplay())
-                        || !Statics.isEmpty(w.getPrefix())
-                        || !Statics.isEmpty(w.getSuffix()))
+                    || !Statics.isEmpty(w.getDisplay())
+                    || !Statics.isEmpty(w.getPrefix())
+                    || !Statics.isEmpty(w.getSuffix()))
                 {
                     return false;
                 }
@@ -689,8 +689,8 @@ public class User implements PermEntity
         for (String p : prefixes)
         {
             if (!ChatColor.strip(p.replaceAll("&", ChatColor.COLOR_CHAR + "")).isEmpty()
-                    && !prefix.isEmpty()
-                    && !ChatColor.strip(prefix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" "))
+                && !prefix.isEmpty()
+                && !ChatColor.strip(prefix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" "))
             {
                 prefix += " ";
             }
@@ -698,8 +698,8 @@ public class User implements PermEntity
         }
 
         return prefix
-                + (BungeePerms.getInstance().getConfig().isTerminatePrefixSpace() ? " " : "")
-                + (BungeePerms.getInstance().getConfig().isTerminatePrefixReset() ? ChatColor.RESET : "");
+               + (BungeePerms.getInstance().getConfig().isTerminatePrefixSpace() ? " " : "")
+               + (BungeePerms.getInstance().getConfig().isTerminatePrefixReset() ? ChatColor.RESET : "");
     }
 
     public String buildSuffix()
@@ -781,8 +781,8 @@ public class User implements PermEntity
         for (String suf : suffixes)
         {
             if (!ChatColor.strip(suf.replaceAll("&", ChatColor.COLOR_CHAR + "")).isEmpty()
-                    && !suffix.isEmpty()
-                    && !ChatColor.strip(suffix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" "))
+                && !suffix.isEmpty()
+                && !ChatColor.strip(suffix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" "))
             {
                 suffix += " ";
             }
@@ -790,8 +790,8 @@ public class User implements PermEntity
         }
 
         return suffix
-                + (BungeePerms.getInstance().getConfig().isTerminateSuffixSpace() ? " " : "")
-                + (BungeePerms.getInstance().getConfig().isTerminateSuffixReset() ? ChatColor.RESET : "");
+               + (BungeePerms.getInstance().getConfig().isTerminateSuffixSpace() ? " " : "")
+               + (BungeePerms.getInstance().getConfig().isTerminateSuffixReset() ? ChatColor.RESET : "");
     }
 
     public void flushCache()

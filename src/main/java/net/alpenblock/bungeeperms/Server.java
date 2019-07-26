@@ -26,7 +26,7 @@ public class Server implements Permable
 
     public World getWorld(String name)
     {
-        if(name == null)
+        if (name == null)
         {
             return null;
         }

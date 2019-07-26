@@ -65,8 +65,8 @@ public class WorldEditBridge implements Bridge
         try
         {
             WorldEditPlugin we = (WorldEditPlugin) plugin;
-            
-            if(!we.isEnabled())
+
+            if (!we.isEnabled())
             {
                 return;
             }

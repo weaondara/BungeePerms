@@ -11,38 +11,48 @@ public class BPConfig
 
     protected Config config;
 
-    //perms
+    //backend
+    private BackEndType backendType;
     private boolean useUUIDs;
+    private boolean saveAllUsers;
+    private boolean deleteUsersOnCleanup;
+    private int fetcherCooldown;
+
+    //mysql
+    private String mysqlURL;
+    private String mysqlUser;
+    private String mysqlPassword;
+    private String mysqlTablePrefix;
+
+    //debug
+    private String debugPath;
+    private boolean debugShowExceptions;
+    private boolean debugShowLogs;
+
+    //perms
     private boolean useRegexPerms;
     private boolean groupPermission;
 
-    //db
-    private BackEndType backEndType;
-    private String tablePrefix;
-    private int fetcherCooldown;
-    private boolean saveAllUsers;
-    private boolean deleteUsersOnCleanup;
-
-    //fancy ingame
+    //ingame
     private boolean notifyPromote;
     private boolean notifyDemote;
     private boolean tabComplete;
-    private Locale locale;
     private boolean terminatePrefixReset;
     private boolean terminateSuffixReset;
     private boolean terminatePrefixSpace;
     private boolean terminateSuffixSpace;
 
-    //tmp at runtime
-    @Setter
-    private boolean debug;
-    
     //cleanup
     private int cleanupInterval;
     private int cleanupThreshold;
-    
-    //other
+
+    //misc
     private boolean asyncCommands;
+    private Locale locale;
+
+    //tmp at runtime
+    @Setter
+    private boolean debug;
 
     public BPConfig(Config config)
     {
@@ -53,38 +63,48 @@ public class BPConfig
     {
         config.load();
 
-        //perms
-        useUUIDs = config.getBoolean("useUUIDs", false);
-        useRegexPerms = config.getBoolean("useregexperms", false);
-        groupPermission = config.getBoolean("grouppermission", true);
+        //backend
+        backendType = config.getEnumValue("backend.type", BackEndType.YAML);
+        useUUIDs = config.getBoolean("backend.useuuids", true);
+        saveAllUsers = config.getBoolean("backend.saveAllUsers", false);
+        deleteUsersOnCleanup = config.getBoolean("backend.deleteUsersOnCleanup", true);
+        fetcherCooldown = config.getInt("backend.uuidfetchercooldown", 3000);
 
-        //db
-        backEndType = config.getEnumValue("backendtype", BackEndType.YAML);
-        tablePrefix = config.getString("tablePrefix", "bungeeperms_");
-        fetcherCooldown = config.getInt("uuidfetcher.cooldown", 3000);
-        saveAllUsers = config.getBoolean("saveAllUsers", true);
-        deleteUsersOnCleanup = config.getBoolean("deleteUsersOnCleanup", false);
+        //mysql
+        mysqlUser = config.getString("mysql.user", "bungeeperms");
+        mysqlPassword = config.getString("mysql.password", "password");
+        mysqlTablePrefix = config.getString("mysql.tableprefix", "bungeeperms_");
+        mysqlURL = config.getString("mysql.url", "jdbc:mysql://localhost:3306/bungeperms?autoReconnect=true&dontTrackOpenResources=true");
+
+        //debug
+        debugPath = config.getString("debug.path", "plugins/BungeePerms/debug.log");
+        debugShowExceptions = config.getBoolean("debug.showexceptions", true);
+        debugShowLogs = config.getBoolean("debug.showlogs", false);
+
+        //perms
+        useRegexPerms = config.getBoolean("permissions.useregexperms", false);
+        groupPermission = config.getBoolean("permissions.grouppermission", true);
 
         //fancy ingame
-        notifyPromote = config.getBoolean("notify.promote", false);
-        notifyDemote = config.getBoolean("notify.demote", false);
-        tabComplete = config.getBoolean("tabcomplete", false);
-        locale = Locale.forLanguageTag(config.getString("locale", Statics.localeString(new Locale("en", "GB"))));
-        terminatePrefixReset = config.getBoolean("terminate.prefix.reset", true);
-        terminateSuffixReset = config.getBoolean("terminate.suffix.reset", true);
-        terminatePrefixSpace = config.getBoolean("terminate.prefix.space", true);
-        terminateSuffixSpace = config.getBoolean("terminate.suffix.space", true);
-        
+        notifyPromote = config.getBoolean("ingame.notify.promote", false);
+        notifyDemote = config.getBoolean("ingame.notify.demote", false);
+        tabComplete = config.getBoolean("ingame.tabcomplete", false);
+        terminatePrefixReset = config.getBoolean("ingame.terminate.prefix.reset", true);
+        terminateSuffixReset = config.getBoolean("ingame.terminate.suffix.reset", true);
+        terminatePrefixSpace = config.getBoolean("ingame.terminate.prefix.space", true);
+        terminateSuffixSpace = config.getBoolean("ingame.terminate.suffix.space", true);
+
         //cleanup
-        cleanupInterval = config.getInt("cleanup.interval", 30 * 60);
-        cleanupThreshold = config.getInt("cleanup.threshold", 10 * 60);
-        
-        //other
-        asyncCommands = config.getBoolean("async-commands", true);
-        
+        cleanupInterval = config.getInt("offlinecleanup.interval", 30 * 60);
+        cleanupThreshold = config.getInt("offlinecleanup.threshold", 10 * 60);
+
+        //misc
+        asyncCommands = config.getBoolean("misc.async-commands", true);
+        locale = Locale.forLanguageTag(config.getString("misc.locale", Statics.localeString(new Locale("en", "GB"))));
+
         validate();
     }
-    
+
     public void validate()
     {
     }
@@ -92,14 +112,14 @@ public class BPConfig
     public void setUseUUIDs(boolean useUUIDs)
     {
         this.useUUIDs = useUUIDs;
-        config.setBool("useUUIDs", useUUIDs);
+        config.setBool("backend.useuuids", useUUIDs);
         config.save();
     }
 
     public void setBackendType(BackEndType type)
     {
-        this.backEndType = type;
-        config.setEnumValue("backendtype", type);
+        this.backendType = type;
+        config.setEnumValue("backend.type", type);
         config.save();
     }
 }

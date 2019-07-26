@@ -222,9 +222,9 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     {
         return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, interval, TimeUnit.MILLISECONDS).getId();
     }
-    
+
     @Override
-    public int runTaskLater(Runnable r, long delay) 
+    public int runTaskLater(Runnable r, long delay)
     {
         return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS).getId();
     }
@@ -236,7 +236,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     }
 
     @Override
-    public Integer getBuild() 
+    public Integer getBuild()
     {
         return Statics.getBuild(this);
     }

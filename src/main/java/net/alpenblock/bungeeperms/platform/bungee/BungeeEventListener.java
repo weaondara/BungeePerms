@@ -317,7 +317,7 @@ public class BungeeEventListener implements Listener, EventListener
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERNAME, scon.getInfo().getName()));
             }
-            if (config.getBackEndType() != backend)
+            if (config.getBackendType() != backend)
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_BACKEND, scon.getInfo().getName()));
             }

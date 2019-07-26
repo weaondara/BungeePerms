@@ -68,7 +68,7 @@ public class PermissionsManager
     public final void loadConfig()
     {
         config.load();
-        BackEndType bet = config.getBackEndType();
+        BackEndType bet = config.getBackendType();
         switch (bet)
         {
             case YAML:

@@ -12,12 +12,12 @@ public class Debug
 
     private Logger logger;
     private String path;
-    private Config config;
+    private BPConfig config;
     private PlatformPlugin plugin;
     private boolean showexceptions;
     private boolean showlogs;
 
-    public Debug(PlatformPlugin p, Config conf, String loggername)
+    public Debug(PlatformPlugin p, BPConfig conf, String loggername)
     {
         plugin = p;
         config = conf;
@@ -44,9 +44,9 @@ public class Debug
 
     private void loadconfig()
     {
-        path = config.getString("debug.path", plugin.getPluginFolderPath() + "/debug.log");
-        showexceptions = config.getBoolean("debug.showexceptions", true);
-        showlogs = config.getBoolean("debug.showlogs", false);
+        path = config.getDebugPath();
+        showexceptions = config.isDebugShowExceptions();
+        showlogs = config.isDebugShowLogs();
     }
 
     public void log(String str)
@@ -69,7 +69,7 @@ public class Debug
             str = "null";
         }
         logger.info(str);
-        if (showlogs || config.getBoolean("debug", false))
+        if (showlogs || config.isDebug())
         {
             BungeePerms.getLogger().info("[Debug] " + str);
         }
@@ -103,7 +103,7 @@ public class Debug
             }
         }
         logger.log(Level.SEVERE, e.getMessage(), e);
-        if (showexceptions || config.getBoolean("debug", false))
+        if (showexceptions || config.isDebug())
         {
             e.printStackTrace();
         }
