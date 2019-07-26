@@ -2,6 +2,7 @@ package net.alpenblock.bungeeperms.platform.bukkit;
 
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BPConfig;
+import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
 
 @Getter
@@ -31,5 +32,13 @@ public class BukkitConfig extends BPConfig
         superpermscompat = config.getBoolean("permissions.superpermscompat", false);
 
         standalone = config.getBoolean("network.standalone", false);
+    }
+
+    public void setServerName(String servername)
+    {
+        this.servername = servername;
+        config.setString("permissions.servername", servername);
+        config.save();
+        BungeePerms.getInstance().reload(false);
     }
 }

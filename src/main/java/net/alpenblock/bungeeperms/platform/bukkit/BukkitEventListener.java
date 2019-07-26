@@ -269,7 +269,8 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             boolean useuuid = Boolean.parseBoolean(data.get(3));
             if (!config.getServername().equals(servername))
             {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_SERVERNAME));
+                config.setServerName(servername);
+//                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_SERVERNAME));
             }
             if (config.getBackendType() != backend)
             {
