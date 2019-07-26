@@ -4,7 +4,6 @@ import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
 import net.alpenblock.bungeeperms.io.BackEndType;
-import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 
 @Getter
 public class BPConfig
@@ -19,7 +18,6 @@ public class BPConfig
 
     //db
     private BackEndType backEndType;
-    private UUIDPlayerDBType UUIDPlayerDBType;
     private String tablePrefix;
     private int fetcherCooldown;
     private boolean saveAllUsers;
@@ -62,7 +60,6 @@ public class BPConfig
 
         //db
         backEndType = config.getEnumValue("backendtype", BackEndType.YAML);
-        UUIDPlayerDBType = config.getEnumValue("uuidplayerdb", UUIDPlayerDBType.YAML);
         tablePrefix = config.getString("tablePrefix", "bungeeperms_");
         fetcherCooldown = config.getInt("uuidfetcher.cooldown", 3000);
         saveAllUsers = config.getBoolean("saveAllUsers", true);
@@ -90,23 +87,12 @@ public class BPConfig
     
     public void validate()
     {
-        if(useUUIDs && UUIDPlayerDBType == UUIDPlayerDBType.None)
-        {
-            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_USEUUID_NONE_UUID_DB));
-        }
     }
 
     public void setUseUUIDs(boolean useUUIDs)
     {
         this.useUUIDs = useUUIDs;
         config.setBool("useUUIDs", useUUIDs);
-        config.save();
-    }
-
-    public void setUUIDPlayerDB(UUIDPlayerDBType type)
-    {
-        this.UUIDPlayerDBType = type;
-        config.setEnumValue("uuidplayerdb", type);
         config.save();
     }
 

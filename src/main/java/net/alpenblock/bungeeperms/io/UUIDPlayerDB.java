@@ -12,5 +12,5 @@ public interface UUIDPlayerDB
     public Map<UUID, String> getAll();
     public void clear();
 
-    public UUIDPlayerDBType getType();
+    public BackEndType getType();
 }

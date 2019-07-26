@@ -12,7 +12,6 @@ import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.io.BackEndType;
-import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.bukkit.event.BungeePermsUserChangedEvent;
@@ -267,8 +266,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         {
             String servername = data.get(1);
             BackEndType backend = BackEndType.getByName(data.get(2));
-            UUIDPlayerDBType uuidplayerdb = UUIDPlayerDBType.getByName(data.get(3));
-            boolean useuuid = Boolean.parseBoolean(data.get(4));
+            boolean useuuid = Boolean.parseBoolean(data.get(3));
             if (!config.getServername().equals(servername))
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_SERVERNAME));
@@ -276,10 +274,6 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             if (config.getBackEndType() != backend)
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_BACKEND));
-            }
-            if (config.getUUIDPlayerDBType() != uuidplayerdb)
-            {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_UUIDPLAYERDB));
             }
             if (config.isUseUUIDs() != useuuid)
             {
