@@ -7,6 +7,7 @@ import java.util.Map;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin;
 import net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.essentials.EssentialsBridge;
+import net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.placeholderapi.PlaceholderApiBridge;
 import net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.vault.VaultBridge;
 import net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.worldedit.WorldEditBridge;
 import org.bukkit.Bukkit;
@@ -26,21 +27,22 @@ public class BridgeManager implements Listener
         return instance;
     }
 
-    private Map<Class<? extends Bridge>, String> brigdesmap;
+    private Map<Class<? extends Bridge>, String> bridgesmap;
     private List<Bridge> bridges;
 
     public void load()
     {
         instance = this;
 
-        brigdesmap = new HashMap<>();
+        bridgesmap = new HashMap<>();
         bridges = new ArrayList<>();
 
-        brigdesmap.put(WorldEditBridge.class, "com.sk89q.worldedit.bukkit.WorldEditPlugin");
-        brigdesmap.put(VaultBridge.class, "net.milkbowl.vault.Vault");
-        brigdesmap.put(EssentialsBridge.class, "com.earth2me.essentials.Essentials");
+        bridgesmap.put(WorldEditBridge.class, "com.sk89q.worldedit.bukkit.WorldEditPlugin");
+        bridgesmap.put(VaultBridge.class, "net.milkbowl.vault.Vault");
+        bridgesmap.put(EssentialsBridge.class, "com.earth2me.essentials.Essentials");
+        bridgesmap.put(PlaceholderApiBridge.class, "me.clip.placeholderapi.PlaceholderAPI");
 
-        for (Map.Entry<Class<? extends Bridge>, String> entry : brigdesmap.entrySet())
+        for (Map.Entry<Class<? extends Bridge>, String> entry : bridgesmap.entrySet())
         {
             createBridge(entry.getKey(), entry.getValue());
         }
@@ -101,7 +103,7 @@ public class BridgeManager implements Listener
     @EventHandler
     public void onPluginEnable(PluginEnableEvent e)
     {
-        for (Map.Entry<Class<? extends Bridge>, String> entry : brigdesmap.entrySet())
+        for (Map.Entry<Class<? extends Bridge>, String> entry : bridgesmap.entrySet())
         {
             try
             {
