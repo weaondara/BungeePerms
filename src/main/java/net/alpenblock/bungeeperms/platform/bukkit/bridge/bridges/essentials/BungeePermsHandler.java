@@ -7,7 +7,6 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
-import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitSender;
 import org.bukkit.entity.Player;
 
