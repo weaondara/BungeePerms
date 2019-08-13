@@ -46,11 +46,11 @@ public interface BackEnd
 
     public void saveUserGroups(User user);
 
-    public void saveUserPerms(User user);
+    public void saveUserTimedGroups(User user);
 
-    public void saveUserPerServerPerms(User user, String server);
+    public void saveUserPerms(User user, String server, String world);
 
-    public void saveUserPerServerWorldPerms(User user, String server, String world);
+    public void saveUserTimedPerms(User user, String server, String world);
 
     public void saveUserDisplay(User user, String server, String world);
 
@@ -58,13 +58,13 @@ public interface BackEnd
 
     public void saveUserSuffix(User user, String server, String world);
 
-    public void saveGroupPerms(Group group);
+    public void saveGroupPerms(Group group, String server, String world);
 
-    public void saveGroupPerServerPerms(Group group, String server);
-
-    public void saveGroupPerServerWorldPerms(Group group, String server, String world);
+    public void saveGroupTimedPerms(Group group, String server, String world);
 
     public void saveGroupInheritances(Group group);
+
+    public void saveGroupTimedInheritances(Group group);
 
     public void saveGroupRank(Group group);
 

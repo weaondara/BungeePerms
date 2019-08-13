@@ -35,20 +35,11 @@ class BungeePermsHandler implements IPermissionsHandler
     @Override
     public List<String> getGroups(Player player)
     {
-        List<String> groups = new ArrayList<>();
-
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
-            return groups;
-        }
+            return new ArrayList();
 
-        for (Group g : u.getGroups())
-        {
-            groups.add(g.getName());
-        }
-
-        return groups;
+        return new ArrayList(u.getGroupsString());
     }
 
     @Override
@@ -62,15 +53,11 @@ class BungeePermsHandler implements IPermissionsHandler
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
             return false;
-        }
 
         Group g = perms.getPermissionsManager().getGroup(group);
         if (g == null)
-        {
             return false;
-        }
 
         return u.getGroups().contains(g);
     }
@@ -86,9 +73,7 @@ class BungeePermsHandler implements IPermissionsHandler
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
             return "";
-        }
 
         return u.buildPrefix(new BukkitSender(player));
     }
@@ -98,9 +83,7 @@ class BungeePermsHandler implements IPermissionsHandler
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
             return "";
-        }
 
         return u.buildSuffix(new BukkitSender(player));
     }
@@ -110,9 +93,7 @@ class BungeePermsHandler implements IPermissionsHandler
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
             return false;
-        }
 
         BukkitSender sender = new BukkitSender(player);
         return u.getEffectivePerms(sender.getServer(), sender.getWorld()).contains(string.toLowerCase());

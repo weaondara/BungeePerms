@@ -19,22 +19,34 @@ public class Server implements Permable
 
     private String server;
     private List<String> perms;
+    private List<TimedValue<String>> timedPerms;
     private Map<String, World> worlds;
     private String display;
     private String prefix;
     private String suffix;
 
+    @Override
+    public boolean hasTimedPermSet(String perm)
+    {
+        perm = Statics.toLower(perm);
+
+        for (TimedValue<String> t : timedPerms)
+            if (t.getValue().equalsIgnoreCase(perm))
+                return true;
+        return false;
+    }
+
     public World getWorld(String name)
     {
         if (name == null)
-        {
             return null;
-        }
-        World w = worlds.get(Statics.toLower(name));
+        name = Statics.toLower(name);
+
+        World w = worlds.get(name);
         if (w == null)
         {
-            w = new World(Statics.toLower(name), new ArrayList<String>(), null, null, null);
-            worlds.put(Statics.toLower(name), w);
+            w = new World(name, new ArrayList(), new ArrayList(), null, null, null);
+            worlds.put(name, w);
         }
 
         return w;

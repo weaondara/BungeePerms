@@ -107,19 +107,9 @@ public class Permission_BungeePerms extends Permission
         permission = Statics.toLower(permission);
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
-        {
             return false;
-        }
 
-        if (world == null)
-        {
-            BungeePerms.getInstance().getPermissionsManager().addUserPerServerPerm(u, server, permission);
-        }
-        else
-        {
-            BungeePerms.getInstance().getPermissionsManager().addUserPerServerWorldPerm(u, server, world, permission);
-        }
-
+        BungeePerms.getInstance().getPermissionsManager().addUserPerm(u, server, world, permission);
         return true;
     }
 
@@ -131,19 +121,9 @@ public class Permission_BungeePerms extends Permission
         permission = Statics.toLower(permission);
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
-        {
             return false;
-        }
 
-        if (world == null)
-        {
-            BungeePerms.getInstance().getPermissionsManager().removeUserPerServerPerm(u, server, permission);
-        }
-        else
-        {
-            BungeePerms.getInstance().getPermissionsManager().removeUserPerServerWorldPerm(u, server, world, permission);
-        }
-
+        BungeePerms.getInstance().getPermissionsManager().removeUserPerm(u, server, world, permission);
         return true;
     }
 
@@ -155,11 +135,9 @@ public class Permission_BungeePerms extends Permission
         permission = Statics.toLower(permission);
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
-        {
             return false;
-        }
 
-        return g.hasOnServerInWorld(permission, server, world);
+        return g.has(permission, server, world);
     }
 
     @Override
@@ -170,19 +148,9 @@ public class Permission_BungeePerms extends Permission
         permission = Statics.toLower(permission);
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
-        {
             return false;
-        }
 
-        if (world == null)
-        {
-            BungeePerms.getInstance().getPermissionsManager().addGroupPerServerPerm(g, server, permission);
-        }
-        else
-        {
-            BungeePerms.getInstance().getPermissionsManager().addGroupPerServerWorldPerm(g, server, world, permission);
-        }
-
+        BungeePerms.getInstance().getPermissionsManager().addGroupPerm(g, server, world, permission);
         return true;
     }
 
@@ -194,19 +162,9 @@ public class Permission_BungeePerms extends Permission
         permission = Statics.toLower(permission);
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
-        {
             return false;
-        }
 
-        if (world == null)
-        {
-            BungeePerms.getInstance().getPermissionsManager().removeGroupPerServerPerm(g, server, permission);
-        }
-        else
-        {
-            BungeePerms.getInstance().getPermissionsManager().removeGroupPerServerWorldPerm(g, server, world, permission);
-        }
-
+        BungeePerms.getInstance().getPermissionsManager().removeGroupPerm(g, server, world, permission);
         return true;
     }
 
@@ -215,15 +173,11 @@ public class Permission_BungeePerms extends Permission
     {
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
-        {
             return false;
-        }
 
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
-        {
             return false;
-        }
 
         return u.getGroups().contains(g);
     }
@@ -233,20 +187,14 @@ public class Permission_BungeePerms extends Permission
     {
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
-        {
             return false;
-        }
 
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
-        {
             return false;
-        }
 
         if (u.getGroups().contains(g))
-        {
             return false;
-        }
 
         BungeePerms.getInstance().getPermissionsManager().addUserGroup(u, g);
         return true;
@@ -257,20 +205,14 @@ public class Permission_BungeePerms extends Permission
     {
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
-        {
             return false;
-        }
 
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
-        {
             return false;
-        }
 
         if (!u.getGroups().contains(g))
-        {
             return false;
-        }
 
         BungeePerms.getInstance().getPermissionsManager().removeUserGroup(u, g);
         return true;
@@ -281,9 +223,7 @@ public class Permission_BungeePerms extends Permission
     {
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
-        {
             return new String[0];
-        }
 
         return u.getGroupsString().toArray(new String[u.getGroupsString().size()]);
     }
@@ -293,9 +233,8 @@ public class Permission_BungeePerms extends Permission
     {
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(player);
         if (u == null)
-        {
             return null;
-        }
+        
         Group g = BungeePerms.getInstance().getPermissionsManager().getMainGroup(u);
         return g != null ? g.getName() : null;
     }
@@ -305,9 +244,7 @@ public class Permission_BungeePerms extends Permission
     {
         List<String> groups = new ArrayList<>();
         for (Group g : BungeePerms.getInstance().getPermissionsManager().getGroups())
-        {
             groups.add(g.getName());
-        }
         return groups.toArray(new String[groups.size()]);
     }
 

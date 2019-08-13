@@ -17,6 +17,7 @@ no-permission: '&cYou don''t have permission to do that!'
 error:
   invalid-bool-value: '&4A boolean value is required!'
   invalid-int-value: '&4An integer value greater than 0 is required!'
+  invalid-duration-value: '&4A duration of the form 1d1h1m1s is required!'
   user:
     not-existing: '&4The player &3{0}&4 does not exist!'
     already-in-group: '&4Player is already in group &6{0}&4!'
@@ -132,7 +133,7 @@ common:
   suffix: '&7Suffix: &r{0}'
   prefix-full: '&7Full prefix: &r{0}'
   suffix-full: '&7Full suffix: &r{0}'
-  permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3})'
+  permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3}{4})'
   permissions-list-header-page: '&7Page &6{0}&7/&6{1}&7'
 general:
   own: own

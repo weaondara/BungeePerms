@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.Getter;
+import net.alpenblock.bungeeperms.BPPermission;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
@@ -172,7 +173,7 @@ public class BPPermissible extends PermissibleBase
                 return;
             }
 
-            List<String> perms = u.getEffectivePerms(s.getServer(), s.getWorld());
+            List<BPPermission> perms = u.getEffectivePerms(s.getServer(), s.getWorld());
             List<PermissionAttachmentInfo> childperms = addChildPerms(perms);
 
             if (!config.isUseRegexPerms())
@@ -232,12 +233,12 @@ public class BPPermissible extends PermissibleBase
         }
     }
 
-    private List<PermissionAttachmentInfo> addChildPerms(List<String> perms)
+    private List<PermissionAttachmentInfo> addChildPerms(List<BPPermission> perms)
     {
         Map<String, Boolean> map = new LinkedHashMap();
-        for (String perm : perms)
+        for (BPPermission perm : perms)
         {
-            map.put(perm.startsWith("-") ? perm.substring(1) : perm, !perm.startsWith("-"));
+            map.put(perm.getPermission().startsWith("-") ? perm.getPermission().substring(1) : perm.getPermission(), !perm.getPermission().startsWith("-"));
         }
 
         return addChildPerms(map);
@@ -407,7 +408,7 @@ public class BPPermissible extends PermissibleBase
         {
             return;
         }
-        Statics.setField(PermissibleBase.class, oldPermissible, new HashMap<String, PermissionAttachmentInfo>(), "permissions");
+        Statics.setField(PermissibleBase.class, oldPermissible, new HashMap(), "permissions");
         Statics.setField(PermissibleBase.class, oldPermissible, oldOpable, "opable");
         Injector.inject(sender, oldPermissible);
 

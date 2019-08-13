@@ -226,13 +226,9 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             Group g = pm().getGroup(userorgroup);
             pm().removeGroupFromCache(g);
             for (Group gr : pm().getGroups())
-            {
-                gr.recalcPerms();
-            }
+                gr.invalidateCache();
             for (User u : pm().getUsers())
-            {
-                u.recalcPerms();
-            }
+                u.invalidateCache();
         }
         else if (cmd.equalsIgnoreCase("reloaduser"))
         {

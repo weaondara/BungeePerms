@@ -267,18 +267,14 @@ public class Config
 
     public List<String> getSubNodes(String node)
     {
-        List<String> ret = new ArrayList<>();
         try
         {
-            for (Object o : fconfig.getConfigurationSection(node).getKeys(false).toArray())
-            {
-                ret.add((String) o);
-            }
+            return new ArrayList(fconfig.getConfigurationSection(node).getKeys(false));
         }
         catch (Exception e)
         {
+            return new ArrayList();
         }
-        return ret;
     }
 
     public void deleteNode(String node)

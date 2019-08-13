@@ -132,7 +132,7 @@ common:
   suffix: '&7Наставка: &r{0}'
   prefix-full: '&7Пълна представка: &r{0}'
   suffix-full: '&7Пълна наставка: &r{0}'
-  permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3})'
+  permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3}{4})'
   permissions-list-header-page: '&7страница &6{0}&7/&6{1}&7'
 general:
   own: 'собствен'

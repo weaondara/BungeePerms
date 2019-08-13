@@ -2,6 +2,7 @@ package net.alpenblock.bungeeperms.io.mysql2;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,9 +43,18 @@ public class MysqlPermEntity
             String world = null;
             if (server != null)
                 world = res.getString("world");
+            Timestamp start = res.getTimestamp("timedstart");
+            Integer dur = res.getInt("timedduration");
+            if (res.wasNull())
+                dur = null;
+            if (start == null || dur == null)
+            {
+                start = null;
+                dur = null;
+            }
 
             //add entry
-            ValueEntry ve = new ValueEntry(value, server, world);
+            ValueEntry ve = new ValueEntry(value, server, world, start, dur);
 
             List<ValueEntry> e = data.get(key);
             if (e == null)

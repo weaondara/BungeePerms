@@ -402,4 +402,30 @@ public class Statics
             return null;
         }
     }
+
+    public static BPPermission makeBPPerm(String perm, String server, String world, PermEntity holder)
+    {
+        return new BPPermission(perm, holder.getName(), holder instanceof Group, server, world, null, null);
+    }
+
+    public static BPPermission makeBPPermTimed(TimedValue<String> perm, String server, String world, PermEntity holder)
+    {
+        return new BPPermission(perm.getValue(), holder.getName(), holder instanceof Group, server, world, perm.getStart(), perm.getDuration());
+    }
+
+    public static List<BPPermission> makeBPPerms(List<String> perms, String server, String world, PermEntity holder)
+    {
+        List<BPPermission> ret = new ArrayList();
+        for (String p : perms)
+            ret.add(makeBPPerm(p, server, world, holder));
+        return ret;
+    }
+
+    public static List<BPPermission> makeBPPermsTimed(List<TimedValue<String>> perms, String server, String world, PermEntity holder)
+    {
+        List<BPPermission> ret = new ArrayList();
+        for (TimedValue p : perms)
+            ret.add(makeBPPermTimed(p, server, world, holder));
+        return ret;
+    }
 }

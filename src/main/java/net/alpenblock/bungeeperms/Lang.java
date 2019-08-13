@@ -56,6 +56,7 @@ public class Lang
         //error msgs
         ERR_INVALID_BOOL_VALUE("error.invalid-bool-value", Color.Error.alt() + "A boolean value is required!"),
         ERR_INVALID_INT_VALUE("error.invalid-int-value", Color.Error.alt() + "An integer value greater than 0 is required!"),
+        ERR_INVALID_DURATION_VALUE("error.invalid-duration-value", Color.Error.alt() + "A duration of the form 1d1h1m1s is required!"),
         ERR_USER_NOT_EXISTING("error.user.not-existing", Color.Error.alt() + "The player " + Color.User.alt() + "{0}" + Color.Error.alt() + " does not exist!"),
         ERR_USER_ALREADY_IN_GROUP("error.user.already-in-group", Color.Error.alt() + "Player is already in group " + Color.Value.alt() + "{0}" + Color.Error.alt() + "!"),
         ERR_USER_NOT_IN_GROUP("error.user.not-in-group", Color.Error.alt() + "Player is not in group " + Color.Value.alt() + "{0}" + Color.Error.alt() + "!"),
@@ -150,7 +151,7 @@ public class Lang
         SUFFIX("common.suffix", Color.Text.alt() + "Suffix: " + ChatColor.RESET.alt() + "{0}"),
         PREFIX_FULL("common.prefix-full", Color.Text.alt() + "Full prefix: " + ChatColor.RESET.alt() + "{0}"),
         SUFFIX_FULL("common.suffix-full", Color.Text.alt() + "Full suffix: " + ChatColor.RESET.alt() + "{0}"),
-        PERMISSIONS_LIST_ITEM("common.permissions-list-item", Color.Text.alt() + "- " + Color.Value.alt() + "{0}" + Color.Text.alt() + " (" + Color.Value.alt() + "{1}" + Color.Text.alt() + "{2}{3})"),
+        PERMISSIONS_LIST_ITEM("common.permissions-list-item", Color.Text.alt() + "- " + Color.Value.alt() + "{0}" + Color.Text.alt() + " (" + Color.Value.alt() + "{1}" + Color.Text.alt() + "{2}{3}{4})"),
         PERMISSIONS_LIST_HEADER_PAGE("common.permissions-list-header-page", Color.Text.alt() + "Page " + Color.Value.alt() + "{0}" + Color.Text.alt() + "/" + Color.Value.alt() + "{1}" + Color.Text.alt() + ""),
         //util & parts
         OWN("general.own", "own"),

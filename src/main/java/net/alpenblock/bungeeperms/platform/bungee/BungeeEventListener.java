@@ -244,13 +244,9 @@ public class BungeeEventListener implements Listener, EventListener
             Group g = pm().getGroup(userorgroup);
             pm().removeGroupFromCache(g);
             for (Group gr : pm().getGroups())
-            {
-                gr.recalcPerms();
-            }
+                gr.invalidateCache();
             for (User u : pm().getUsers())
-            {
-                u.recalcPerms();
-            }
+                u.invalidateCache();
 
             //forward plugin message to network
             BungeePerms.getInstance().getNetworkNotifier().deleteGroup(g, scon.getInfo().getName());

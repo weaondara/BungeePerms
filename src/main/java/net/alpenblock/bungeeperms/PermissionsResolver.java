@@ -32,21 +32,11 @@ public class PermissionsResolver
         postprocessors.remove(processor);
     }
 
-    public List<String> preprocess(List<String> perms, Sender s)
+    public List<BPPermission> preprocess(List<BPPermission> perms, Sender s)
     {
         for (PermissionsPreProcessor p : preprocessors)
         {
             perms = p.process(perms, s);
-        }
-
-        return perms;
-    }
-
-    public List<BPPermission> preprocessWithOrigin(List<BPPermission> perms, Sender s)
-    {
-        for (PermissionsPreProcessor p : preprocessors)
-        {
-            perms = p.processWithOrigin(perms, s);
         }
 
         return perms;
@@ -66,6 +56,14 @@ public class PermissionsResolver
     @Setter
     private boolean useRegex = false;
 
+    public Boolean hasPerm(List<BPPermission> perms, String perm)
+    {
+        List<String> l = new ArrayList();
+        for (BPPermission p : perms)
+            l.add(p.getPermission());
+        return has(l, perm);
+    }
+
     public Boolean has(List<String> perms, String perm)
     {
         if (useRegex)
@@ -80,6 +78,8 @@ public class PermissionsResolver
 
     public static Boolean hasNormal(List<String> perms, String perm)
     {
+        perm = Statics.toLower(perm);
+
         Boolean has = null;
 
         List<String> lperm = Statics.toList(perm, ".");
@@ -129,6 +129,8 @@ public class PermissionsResolver
 
     public static Boolean hasRegex(List<String> perms, String perm)
     {
+        perm = Statics.toLower(perm);
+
         Boolean has = null;
 
         for (String p : perms)
@@ -157,7 +159,7 @@ public class PermissionsResolver
         return has;
     }
 
-    public List<String> simplify(List<String> perms)
+    public List<BPPermission> simplify(List<BPPermission> perms)
     {
         if (useRegex)
         {
@@ -169,7 +171,7 @@ public class PermissionsResolver
         }
     }
 
-    public static List<String> simplifyNormal(List<String> perms)
+    public static List<BPPermission> simplifyNormal(List<BPPermission> perms)
     {
 //        List<String> ret=new ArrayList<>();
 //        
@@ -206,7 +208,7 @@ public class PermissionsResolver
         return perms;
     }
 
-    public static List<String> simplifyRegex(List<String> perms)
+    public static List<BPPermission> simplifyRegex(List<BPPermission> perms)
     {
 //        List<String> ret=new ArrayList<>();
 //        

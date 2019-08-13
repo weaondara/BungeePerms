@@ -2,18 +2,19 @@ package net.alpenblock.bungeeperms.io.mysql2;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Mysql;
 
-public class MysqlPermsAdapter2
+public class MysqlPermsAdapter
 {
 
     private final Mysql mysql;
     private final String table;
 
-    public MysqlPermsAdapter2(Mysql m, String table)
+    public MysqlPermsAdapter(Mysql m, String table)
     {
         mysql = m;
         this.table = table;
@@ -21,10 +22,12 @@ public class MysqlPermsAdapter2
 
     public void createTable()
     {
-        if (!mysql.tableExists(table))
+
+        PreparedStatement stmt = null;
+        ResultSet res = null;
+        try
         {
-            PreparedStatement stmt = null;
-            try
+            if (!mysql.tableExists(table))
             {
                 String t = "CREATE TABLE `" + table + "` ("
                            + "`id` INT( 64 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,"
@@ -32,21 +35,40 @@ public class MysqlPermsAdapter2
                            + "`type` TINYINT( 2 ) NOT NULL ,"
                            + "`key` VARCHAR( 256 ) NOT NULL, "
                            + "`value` VARCHAR( 256 ) NOT NULL, "
-                           + "`server` VARCHAR( 64 ), "
-                           + "`world` VARCHAR( 64 ) "
+                           + "`server` VARCHAR( 64 ) DEFAULT NULL, "
+                           + "`world` VARCHAR( 64 ) DEFAULT NULL, "
+                           + "`timedstart` TIMESTAMP NULL DEFAULT NULL, "
+                           + "`timedduration` INT(11) DEFAULT NULL "
                            + ") ENGINE = MYISAM ;";
                 mysql.checkConnection();
                 stmt = mysql.stmt(t);
                 mysql.runQuery(stmt);
+                stmt.close();
             }
-            catch (Exception e)
+
+            stmt = mysql.stmt("SHOW FIELDS FROM `" + table + "`");
+            res = mysql.returnQuery(stmt);
+            boolean found = false;
+            while (res.next())
+                if (res.getString("Field").equals("timedstart"))
+                    found = true;
+            res.close();
+            stmt.close();
+
+            if (!found)
             {
-                BungeePerms.getInstance().getDebug().log(e);
+                stmt = mysql.stmt("ALTER TABLE `" + table + "` ADD COLUMN `timedstart` TIMESTAMP NULL DEFAULT NULL, ADD COLUMN `timedduration` INT(11) DEFAULT NULL");
+                mysql.runQuery(stmt);
             }
-            finally
-            {
-                Mysql.close(stmt);
-            }
+        }
+        catch (Exception e)
+        {
+            BungeePerms.getInstance().getDebug().log(e);
+        }
+        finally
+        {
+            Mysql.close(res);
+            Mysql.close(stmt);
         }
     }
 
@@ -119,7 +141,7 @@ public class MysqlPermsAdapter2
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT id,`name`,`type`,`key`,`value`,`server`,`world` FROM `" + table + "` "
+            stmt = mysql.stmt("SELECT id,`name`,`type`,`key`,`value`,`server`,`world`,`timedstart`,`timedduration` FROM `" + table + "` "
                               + "WHERE `type`=" + type.getCode() + " AND `name`=? ORDER BY id ASC");
             stmt.setString(1, name);
             res = mysql.returnQuery(stmt);
@@ -244,7 +266,7 @@ public class MysqlPermsAdapter2
             else
                 delq += "`server`=?";
             delq += " AND ";
-            if (world == null)
+            if (server == null || world == null)
                 delq += "`world` IS NULL";
             else
                 delq += "`world`=?";
@@ -255,7 +277,7 @@ public class MysqlPermsAdapter2
             stmt.setString(2, key);
             if (server != null)
                 stmt.setString(3, server);
-            if (world != null)
+            if (server != null && world != null)
                 stmt.setString(4, world);
 
             mysql.runQuery(stmt);
@@ -285,30 +307,21 @@ public class MysqlPermsAdapter2
                 {
                     continue;
                 }
-                String insq = "INSERT INTO `" + table + "` (`name`,`type`,`key`,`value`,`server`,`world`) VALUES (?," + type.getCode() + ",?,?,";
-                if (val.getServer() == null)
-                    insq += "null,null";
-                else
-                {
-                    insq += "?,";
-                    if (val.getWorld() == null)
-                        insq += "null";
-                    else
-                        insq += "?";
-                }
-                insq += ")";
+                String insq = "INSERT INTO `" + table + "` (`name`,`type`,`key`,`value`,`server`,`world`,`timedstart`,`timedduration`) "
+                              + "VALUES (?," + type.getCode() + ",?,?,?,?,?,?)";
 
                 mysql.checkConnection();
                 stmt = mysql.stmt(insq);
                 stmt.setString(1, name);
                 stmt.setString(2, key);
                 stmt.setString(3, val.getValue());
-                if (val.getServer() != null)
-                {
-                    stmt.setString(4, val.getServer());
-                    if (val.getWorld() != null)
-                        stmt.setString(5, val.getWorld());
-                }
+                stmt.setString(4, val.getServer());
+                stmt.setString(5, val.getWorld());
+                stmt.setTimestamp(6, val.getStart());
+                if (val.getDuration() != null)
+                    stmt.setInt(7, val.getDuration());
+                else
+                    stmt.setNull(7, Types.INTEGER);
 
                 mysql.runQuery(stmt);
             }

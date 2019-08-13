@@ -6,7 +6,5 @@ import net.alpenblock.bungeeperms.platform.Sender;
 public interface PermissionsPreProcessor
 {
 
-    public List<String> process(List<String> perms, Sender s);
-
-    public List<BPPermission> processWithOrigin(List<BPPermission> perms, Sender s);
+    public List<BPPermission> process(List<BPPermission> perms, Sender s);
 }

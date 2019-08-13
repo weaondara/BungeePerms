@@ -20,4 +20,10 @@ public interface Permable
     public List<String> getPerms();
 
     public void setPerms(List<String> perms);
+
+    public List<TimedValue<String>> getTimedPerms();
+
+    public void setTimedPerms(List<TimedValue<String>> perms);
+
+    public boolean hasTimedPermSet(String perm);
 }

@@ -323,7 +323,7 @@ public class PermissionsResolverTest
 //        
 //        List<String> s=resolver.simplify(perms);
 //        System.out.println(s);
-//        System.out.println(resolver.has(perms, "chatty.join.mb"));
+//        System.out.println(resolver.hasPerm(perms, "chatty.join.mb"));
 //        assertTrue(s.size()==2);
 //    }
 //    @Test

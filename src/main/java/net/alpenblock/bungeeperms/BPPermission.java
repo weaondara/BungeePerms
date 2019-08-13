@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,4 +20,6 @@ public class BPPermission
     private boolean isGroup;
     private String server;
     private String world;
+    private Date timedStart;
+    private Integer timedDuration;
 }
