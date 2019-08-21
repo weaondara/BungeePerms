@@ -202,7 +202,7 @@ public class Group implements Comparable<Group>, PermEntity
 
     public void invalidateCache()
     {
-        System.out.println("invalidate cache for group " + name);
+        BungeePerms.getInstance().getDebug().log("invalidate cache for group " + name);
         flushCache();
     }
 
@@ -391,7 +391,7 @@ public class Group implements Comparable<Group>, PermEntity
                 continue;
             next = next == null ? end : Math.min(next, end);
         }
-        System.out.println("getNextTimedPermission " + name + ": " + next);
+        BungeePerms.getInstance().getDebug().log("getNextTimedPermission " + name + ": " + next);
         return next;
     }
 

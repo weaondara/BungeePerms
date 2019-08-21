@@ -155,6 +155,7 @@ log:
   login: Login by {0}
   login-uuid: Login by {0} ({1})
   update-available: &6New version available. Please check at &9https://ci.wea-ondara.net/job/BungeePerms/lastSuccessfulBuild/
+  command-issued: '{0} issued bungeeperms command: /{1} {2}'
 warning:
   intrusion-detected: '&4Possible intrusion detected. Sender is {0}'
   misconfig:

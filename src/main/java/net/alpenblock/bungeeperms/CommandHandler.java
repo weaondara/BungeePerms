@@ -33,7 +33,7 @@ public class CommandHandler
 
         if (BungeePerms.getInstance().getConfig().isDebug())
         {
-            BungeePerms.getInstance().getPlugin().getLogger().info(sender.getName() + " issued bungeeperms command /" + cmd + " " + Statics.arrayToString(args, 0, args.length, " "));
+            BungeePerms.getInstance().getPlugin().getLogger().info(Lang.translate(MessageType.COMMAND_ISSUED, sender.getName(), cmd, Statics.arrayToString(args, 0, args.length, " ")));
         }
 
         //reparse command

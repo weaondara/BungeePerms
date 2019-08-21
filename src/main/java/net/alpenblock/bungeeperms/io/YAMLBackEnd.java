@@ -838,8 +838,6 @@ public class YAMLBackEnd implements BackEnd
         conf.deleteNode(key);
         for (TimedValue tv : values)
         {
-            System.out.println("tv: " + tv);
-            System.out.println(date2str(tv.getStart()));
             conf.setString(key + "." + tv.getValue() + ".start", date2str(tv.getStart()));
             conf.setInt(key + "." + tv.getValue() + ".duration", tv.getDuration());
         }

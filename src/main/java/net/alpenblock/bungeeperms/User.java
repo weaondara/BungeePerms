@@ -265,7 +265,7 @@ public class User implements PermEntity
 
     public void invalidateCache()
     {
-        System.out.println("invalidate cache for user " + name);
+        BungeePerms.getInstance().getDebug().log("invalidate cache for user " + name);
         flushCache();
         nextTimedPermissionRunOut = getNextTimedPermission();
     }
@@ -576,7 +576,7 @@ public class User implements PermEntity
     {
         if (nextTimedPermissionRunOut != null && nextTimedPermissionRunOut < System.currentTimeMillis())
         {
-            System.out.println("invalidated " + name);
+            BungeePerms.getInstance().getDebug().log("invalidated user" + name);
             flushCache();
             nextTimedPermissionRunOut = getNextTimedPermission();
         }
@@ -595,7 +595,7 @@ public class User implements PermEntity
             long end = g.getStart().getTime() + g.getDuration() * 1000;
             if (end < System.currentTimeMillis())
             {
-                System.out.println("removing timedgroup " + g.getValue() + " from user " + name);
+                BungeePerms.getInstance().getDebug().log("removing timedgroup " + g.getValue() + " from user " + name);
                 timedGroups.remove(g);
                 i--;
                 dosavegroups = true;
@@ -627,7 +627,7 @@ public class User implements PermEntity
                 if (end < System.currentTimeMillis())
                 {
                     //remove timed perm
-                    System.out.println("removing timed permission " + p.getValue() + " from user " + name);
+                    BungeePerms.getInstance().getDebug().log("removing timed permission " + p.getValue() + " from user " + name);
                     l.remove(p);
                     i--;
                     dosaveperms = true;
@@ -669,7 +669,7 @@ public class User implements PermEntity
                 continue;
             next = next == null ? end : Math.min(next, end);
         }
-        System.out.println("getNextTimedPermission " + name + ": " + next);
+        BungeePerms.getInstance().getDebug().log("getNextTimedPermission " + name + ": " + next);
         return next;
     }
 
