@@ -15,6 +15,8 @@
         <build.fullversion.resource>${build.major} ${build.type} #${build.number}</build.fullversion.resource>
         <build.name>${project.artifactId}-${build.fullversion.file}</build.name>
         <build.filename>${build.name}.${project.packaging}</build.filename>
+        <build.sources.filename>${build.name}-sources.${project.packaging}</build.sources.filename>
+        <build.javadoc.filename>${build.name}-javadoc.${project.packaging}</build.javadoc.filename>
     </properties>
     
     <distributionManagement>
@@ -183,7 +185,35 @@
                             <artifactId>${project.artifactId}</artifactId>
                             <version>${build.fullversion.file}</version>
                             <file>target/${build.filename}</file>
+                            <sources>target/${build.sources.filename}</sources>
+                            <javadoc>target/${build.javadoc.filename}</javadoc>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -226,10 +256,10 @@
             <version>2.16.1</version>
         </dependency>
         <dependency>
-         <groupId>me.clip</groupId>
-          <artifactId>placeholderapi</artifactId>
-          <version>2.10.3</version>
-         <scope>provided</scope>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.10.3</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
