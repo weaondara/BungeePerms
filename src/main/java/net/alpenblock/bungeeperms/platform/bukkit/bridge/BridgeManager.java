@@ -128,7 +128,7 @@ public class BridgeManager implements Listener
     {
         if (e.getPlugin().getName().equalsIgnoreCase("BungeePermsBukkitBridge"))
         {
-            Bukkit.getConsoleSender().sendMessage(Color.RED + "WARNING: Please remove BungeePermsBukkitBridge!!! It's now integrated in BungeePermsBukkit.");
+            Bukkit.getConsoleSender().sendMessage(Color.RED + "WARNING: Please remove BungeePermsBukkitBridge!!! It's now integrated in BungeePerms.");
         }
     }
 }
