@@ -185,12 +185,18 @@ help:
     info: Shows information about the user
     delete: Deletes the user
     display: Sets the display name for the user
-    prefiy: Sets the prefix name for the user
+    prefix: Sets the prefix name for the user
     suffix: Sets the suffix for the user
     add-perm: Adds a permission to the user
+    add-timed-perm: Adds a timed permission to the user
     remove-perm: Removes a permission from a the user
+    remove-timed-perm: Removes a timed permission from a the user
     has: Checks if the user has the permission
     list: Lists the permissions of the user
+    add-group: Add the group to the user
+    add-timed-group: Add the timed group to the user
+    remove-group: Removes the group from the user
+    remove-timed-group: Removes the timed group from the user
     set-group: Removes the old group in the group's ladder and adds the group to the user
     groups: Lists the groups the user is in
   groups: Lists the groups
@@ -200,7 +206,9 @@ help:
     create: Create a new group
     delete: Deletes the group
     add-inherit: Adds the addgroup to the group as inheritance
-    remive-inherit: Removes the removegroup from the group as inheritance
+    add-timed-inherit: Adds the addgroup to the group as timed inheritance
+    remove-inherit: Removes the removegroup from the group as inheritance
+    remove-timed-inherit: Removes the removegroup from the group as timed inheritance
     rank: Sets the rank for the group
     weight: Sets the weight for the group
     ladder: Sets the ladder for the group
@@ -209,7 +217,9 @@ help:
     prefix: Sets the prefix for the group
     suffix: Sets the suffix for the group
     add-perm: Adds a permission to the group
+    add-timed-perm: Adds a timed permission to the group
     remove-perm: Removes a permission from the group
+    remove-timed-perm: Removes a timed permission from the group
     has: Checks if the group has the permission
     list: Lists the permissions of the group
   promote: Promotes the user to the next rank

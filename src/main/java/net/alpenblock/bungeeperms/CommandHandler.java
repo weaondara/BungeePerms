@@ -265,11 +265,11 @@ public class CommandHandler
         {
             return handleUserCommandsPermRemove(sender, args);
         }
-        else if (Statics.argAlias(args[2], "timedadd", "timedaddperm"))
+        else if (Statics.argAlias(args[2], "timedadd", "addtimed", "timedaddperm", "addtimedperm", "addpermtimed"))
         {
             return handleUserCommandsTimedPermAdd(sender, args);
         }
-        else if (Statics.argAlias(args[2], "timedremove", "timedremoveperm"))
+        else if (Statics.argAlias(args[2], "timedremove", "removetimed", "timedremoveperm", "removetimedperm", "removepermtimed"))
         {
             return handleUserCommandsTimedPermRemove(sender, args);
         }
@@ -289,10 +289,6 @@ public class CommandHandler
         {
             return handleUserCommandsGroupSet(sender, args);
         }
-        else if (args[2].equalsIgnoreCase("display"))
-        {
-            return handleUserCommandsDisplay(sender, args);
-        }
         else if (args[2].equalsIgnoreCase("addtimedgroup"))
         {
             return handleUserCommandsTimedGroupAdd(sender, args);
@@ -300,6 +296,10 @@ public class CommandHandler
         else if (args[2].equalsIgnoreCase("removetimedgroup"))
         {
             return handleUserCommandsTimedGroupRemove(sender, args);
+        }
+        else if (args[2].equalsIgnoreCase("display"))
+        {
+            return handleUserCommandsDisplay(sender, args);
         }
         else if (args[2].equalsIgnoreCase("prefix"))
         {
@@ -311,7 +311,7 @@ public class CommandHandler
         }
 
         //alias handling
-        else if (Statics.argAlias(args[2], "group", "perm", "permission"))
+        else if (Statics.argAlias(args[2], "group", "perm", "permission", "timed"))
         {
             if (!Statics.matchArgs(sender, args, 5))
             {
@@ -1220,11 +1220,11 @@ public class CommandHandler
         {
             return handleGroupCommandsPermRemove(sender, args);
         }
-        else if (Statics.argAlias(args[2], "timedadd"))
+        else if (Statics.argAlias(args[2], "timedadd", "addtimed", "timedaddperm", "addtimedperm", "addpermtimed"))
         {
             return handleGroupCommandsTimedPermAdd(sender, args);
         }
-        else if (Statics.argAlias(args[2], "timedremove"))
+        else if (Statics.argAlias(args[2], "timedremove", "removetimed", "timedremoveperm", "removetimedperm", "removepermtimed"))
         {
             return handleGroupCommandsTimedPermRemove(sender, args);
         }

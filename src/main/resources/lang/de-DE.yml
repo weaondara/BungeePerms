@@ -188,9 +188,15 @@ help:
     prefix: Setzt den Prefix fuer den Spieler
     suffix: Setzt den Suffix fuer den Spieler
     add-perm: Fuegt eine Permission zum Spieler hinzu
+    add-timed-perm: Fuegt eine temporaere Permission zum Spieler hinzu
     remove-perm: Entfernt eine Permission vom Spieler
+    remove-timed-perm: Entfernt eine temporaere Permission vom Spieler
     has: Ueberprueft ob der Spieler eine Permission hat
     list: Zeigt die Permissions des Spielers an
+    add-group: Fuegt eine Gruppe zum Spieler hinzu
+    add-timed-group: Fuegt eine temporaere Gruppe zum Spieler hinzu
+    remove-group: Entfernt eine Gruppe vom Spieler
+    remove-timed-group: Entfernt eine temporaere Gruppe vom Spieler
     set-group: Entfernt die alte Gruppe in der Rangliste des Users und setzt die neue
     groups: Zeigt die Gruppen in der der User ist an
   groups: Listet die Gruppen auf
@@ -200,7 +206,9 @@ help:
     create: Erstellt eine neue Gruppe
     delete: Entfernt eine Gruppe
     add-inherit: Fuegt die Gruppe als Vererbung einer anderen Gruppe hinzu
-    remive-inherit: Entfernt die Gruppe als Vererbung einer anderen Gruppe
+    add-timed-inherit: Fuegt die Gruppe als temporaere Vererbung einer anderen Gruppe hinzu
+    remove-inherit: Entfernt die Gruppe als Vererbung einer anderen Gruppe
+    remove-timed-inherit: Entfernt die Gruppe als temporaere Vererbung einer anderen Gruppe
     rank: Setzt den Rang fuer eine Gruppe
     weight: Setzt die Gewichtung einer Gruppe
     ladder: Setzt die Rangliste einer Gruppe
@@ -209,7 +217,9 @@ help:
     prefix: Setzt den Prefix einer Gruppe
     suffix: Setzt den Suffix einer Gruppe
     add-perm: Fuegt eine Permission zu einer Gruppe hinzu
+    add-timed-perm: Fuegt eine temporaere Permission zu einer Gruppe hinzu
     remove-perm: Entfernt eine Permission von einer Gruppe
+    remove-timed-perm: Entfernt eine temporaere Permission von einer Gruppe
     has: Prueft ob eine Gruppe eine Permission hat
     list: Listet die Permission der Gruppe auf
   promote: Befoerdert den User zum naechsten Rang

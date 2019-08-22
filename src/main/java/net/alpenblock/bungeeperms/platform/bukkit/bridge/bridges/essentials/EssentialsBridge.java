@@ -11,8 +11,10 @@ import net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin;
 import net.alpenblock.bungeeperms.platform.bukkit.bridge.Bridge;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
 
 public class EssentialsBridge implements Bridge
@@ -78,6 +80,43 @@ public class EssentialsBridge implements Bridge
         uninject(e.getPlugin());
     }
 
+    @EventHandler
+    public void onEssReloadCommandConsole(ServerCommandEvent e)
+    {
+        handleEssReload(e.getCommand());
+    }
+
+    @EventHandler
+    public void onEssReloadCommandPlayer(PlayerCommandPreprocessEvent e)
+    {
+        handleEssReload(e.getMessage());
+    }
+
+    private void handleEssReload(String cmd)
+    {
+        if (cmd.startsWith("/"))
+            cmd = cmd.substring(1);
+        if (!cmd.startsWith("ess"))
+            return;
+        String[] split = cmd.split(" ");
+        if (split.length == 0 || !split[1].equalsIgnoreCase("reload"))
+            return;
+
+        // /ess reload executed
+        final Plugin plugin = Bukkit.getPluginManager().getPlugin("Essentials");
+        if (!plugin.isEnabled())
+            return;
+
+        Bukkit.getScheduler().runTaskLater(BukkitPlugin.getInstance(), new Runnable()
+                                   {
+                                       @Override
+                                       public void run()
+                                       {
+                                           inject(plugin);
+                                       }
+                                   }, 1);
+    }
+
     public void inject(Plugin plugin)
     {
         BungeePerms.getLogger().info("Injection of Bungeeperms into Essentials");
@@ -86,9 +125,7 @@ public class EssentialsBridge implements Bridge
             Essentials ess = (Essentials) plugin;
 
             if (!ess.isEnabled())
-            {
                 return;
-            }
 
             //get ess permhandler
             Field f = ess.getClass().getDeclaredField("permissionsHandler");
