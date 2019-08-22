@@ -139,7 +139,7 @@ public class BPConfig
         {
             case 0:
                 newconf = new Config(config.getPath());
-                newconf.loadWORead();
+                newconf.init();
                 migrate0to1(config, newconf);
                 newconf.setInt("version", 1);
                 newconf.save();

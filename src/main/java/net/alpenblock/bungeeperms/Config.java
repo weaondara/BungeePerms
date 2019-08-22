@@ -33,7 +33,7 @@ public class Config
         allowsave = false;
     }
     
-    public void loadWORead()
+    public void init()
     {
         createFile();
         allowsave = true;
