@@ -860,7 +860,7 @@ public class PermissionsManager
     public void removeUserGroup(User user, Group group)
     {
         //cache
-        user.getGroupsString().remove(group);
+        user.getGroupsString().remove(group.getName());
 
         //database
         backEnd.saveUserGroups(user);
@@ -1048,10 +1048,10 @@ public class PermissionsManager
     /**
      * Sets the displayname of the group
      *
-     * @param user
-     * @param display
-     * @param server
-     * @param world
+     * @param user the user
+     * @param display the display
+     * @param server the server to set the display on; may be null
+     * @param world the world to ser the display in; may be null
      */
     public void setUserDisplay(User user, String display, String server, String world)
     {
@@ -1079,10 +1079,10 @@ public class PermissionsManager
     /**
      * Sets the prefix for the group.
      *
-     * @param user
-     * @param prefix
-     * @param server
-     * @param world
+     * @param user the user
+     * @param prefix the prefix
+     * @param server the server to set the prefix on; may be null
+     * @param world the world to ser the prefix in; may be null
      */
     public void setUserPrefix(User user, String prefix, String server, String world)
     {
@@ -1110,10 +1110,10 @@ public class PermissionsManager
     /**
      * Sets the suffix for the group.
      *
-     * @param user
-     * @param suffix
-     * @param server
-     * @param world
+     * @param user the user
+     * @param suffix the suffix
+     * @param server the server to set the suffix on; may be null
+     * @param world the world to ser the suffix in; may be null
      */
     public void setUserSuffix(User user, String suffix, String server, String world)
     {
@@ -1396,8 +1396,8 @@ public class PermissionsManager
     /**
      * Set the ladder for the group.
      *
-     * @param group
-     * @param ladder
+     * @param group the group
+     * @param ladder the ladder name
      */
     public void ladderGroup(Group group, String ladder)
     {
@@ -1414,8 +1414,8 @@ public class PermissionsManager
     /**
      * Sets the rank for the group.
      *
-     * @param group
-     * @param rank
+     * @param group the group
+     * @param rank the rank
      */
     public void rankGroup(Group group, int rank)
     {
@@ -1433,8 +1433,8 @@ public class PermissionsManager
     /**
      * Sets the weight for the group.
      *
-     * @param group
-     * @param weight
+     * @param group the group
+     * @param weight the weight
      */
     public void weightGroup(Group group, int weight)
     {
@@ -1452,8 +1452,8 @@ public class PermissionsManager
     /**
      * Sets if the the group is a default group.
      *
-     * @param group
-     * @param isdefault
+     * @param group the group
+     * @param isdefault whether or not the group is aded by default to new users
      */
     public void setGroupDefault(Group group, boolean isdefault)
     {
@@ -1470,10 +1470,10 @@ public class PermissionsManager
     /**
      * Sets the displayname of the group
      *
-     * @param group
-     * @param display
-     * @param server
-     * @param world
+     * @param group the group
+     * @param display the display
+     * @param server the server to set the display on; may be null
+     * @param world the world to ser the display in; may be null
      */
     public void setGroupDisplay(Group group, String display, String server, String world)
     {
@@ -1501,10 +1501,10 @@ public class PermissionsManager
     /**
      * Sets the prefix for the group.
      *
-     * @param group
-     * @param prefix
-     * @param server
-     * @param world
+     * @param group the group
+     * @param prefix the prefix
+     * @param server the server to set the prefix on; may be null
+     * @param world the world to ser the prefix in; may be null
      */
     public void setGroupPrefix(Group group, String prefix, String server, String world)
     {
@@ -1532,10 +1532,10 @@ public class PermissionsManager
     /**
      * Sets the suffix for the group.
      *
-     * @param group
-     * @param suffix
-     * @param server
-     * @param world
+     * @param group the group
+     * @param suffix the suffix
+     * @param server the server to set the suffix on; may be null
+     * @param world the world to ser the suffix in; may be null
      */
     public void setGroupSuffix(Group group, String suffix, String server, String world)
     {
@@ -1567,7 +1567,7 @@ public class PermissionsManager
      */
     public synchronized void migrateBackEnd(BackEndType bet)
     {
-        Migrator migrator = null;
+        Migrator migrator;
         switch (bet)
         {
             case YAML:
