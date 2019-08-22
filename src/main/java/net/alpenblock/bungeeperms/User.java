@@ -141,6 +141,18 @@ public class User implements PermEntity
         return timedGroups;
     }
 
+    @Deprecated
+    public boolean hasPerm(String perm)
+    {
+        return hasPerm(perm, null);
+    }
+
+    @Deprecated
+    public boolean hasPerm(String perm, String server)
+    {
+        return hasPerm(perm, server, null);
+    }
+
     public boolean hasPerm(String perm, String server, String world)
     {
         access();

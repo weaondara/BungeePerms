@@ -899,6 +899,30 @@ public class PermissionsManager
     }
 
     /**
+     * Adds a permission to the user.
+     *
+     * @param user the user to add the permission to
+     * @param perm the permission to add to the user
+     */
+    @Deprecated
+    public void addUserPerm(User user, String perm)
+    {
+        addUserPerm(user, null, null, perm);
+    }
+
+    /**
+     * Removes a permission from the user.
+     *
+     * @param user the user to remove the permission from
+     * @param perm the permission to remove from the user
+     */
+    @Deprecated
+    public void removeUserPerm(User user, String perm)
+    {
+        removeUserPerm(user, null, null, perm);
+    }
+
+    /**
      * Adds a permission to a user.
      *
      * @param user the user
@@ -1136,6 +1160,30 @@ public class PermissionsManager
 
         //send bukkit update info & changed events
         userChanged(user);
+    }
+
+    /**
+     * Adds a permission to a group.
+     *
+     * @param group the group
+     * @param perm the permission to add
+     */
+    @Deprecated
+    public void addGroupPerm(Group group, String perm)
+    {
+        addGroupPerm(group, null, null, perm);
+    }
+
+    /**
+     * Removes a permission from a group.
+     *
+     * @param group the group
+     * @param perm the permission to remove
+     */
+    @Deprecated
+    public void removeGroupPerm(Group group, String perm)
+    {
+        removeGroupPerm(group, null, null, perm);
     }
 
     /**
