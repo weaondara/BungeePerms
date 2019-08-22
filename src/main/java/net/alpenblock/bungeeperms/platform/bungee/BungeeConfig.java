@@ -38,4 +38,13 @@ public class BungeeConfig extends BPConfig
             }
         }
     }
+
+    @Override
+    protected void migrate0to1(Config oldconf, Config newconf)
+    {
+        super.migrate0to1(oldconf, newconf);
+
+        newconf.setEnumValue("network.type", oldconf.getEnumValue("networktype", NetworkType.Global));
+        newconf.setListString("network.servers", oldconf.getListString("networkservers", new ArrayList()));
+    }
 }

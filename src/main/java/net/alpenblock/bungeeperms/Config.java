@@ -14,6 +14,7 @@ public class Config
 
     private boolean allowsave;
     private FileConfiguration fconfig;
+    @Getter
     private String path;
     @Getter
     @Setter
@@ -30,6 +31,12 @@ public class Config
         createFile();
         fconfig = new YamlConfiguration();
         allowsave = false;
+    }
+    
+    public void loadWORead()
+    {
+        createFile();
+        allowsave = true;
     }
 
     public void load()

@@ -57,6 +57,7 @@ public class BPConfig
     public BPConfig(Config config)
     {
         this.config = config;
+        migrate();
     }
 
     public void load()
@@ -121,5 +122,75 @@ public class BPConfig
         this.backendType = type;
         config.setEnumValue("backend.type", type);
         config.save();
+    }
+
+    private void migrate()
+    {
+        config.load();
+
+        //test current version
+        int version = 0;
+        if (config.keyExists("version"))
+            version = config.getInt("version", 0);
+
+        //migrate if needed
+        Config newconf;
+        switch (version)
+        {
+            case 0:
+                newconf = new Config(config.getPath());
+                newconf.loadWORead();
+                migrate0to1(config, newconf);
+                newconf.setInt("version", 1);
+                newconf.save();
+                config = newconf;
+            case 1:
+            //do nothing
+        }
+    }
+
+    protected void migrate0to1(Config oldconf, Config newconf)
+    {
+        //perms
+        newconf.setEnumValue("backend.type", oldconf.getString("backendtype", "YAML").equalsIgnoreCase("MYSQL2") ? BackEndType.MySQL : BackEndType.YAML);
+        newconf.setBool("backend.useuuids", oldconf.getBoolean("useUUIDs", false));
+        newconf.setBool("backend.saveAllUsers", oldconf.getBoolean("saveAllUsers", true));
+        newconf.setBool("backend.deleteUsersOnCleanup", oldconf.getBoolean("deleteUsersOnCleanup", false));
+        newconf.setInt("backend.uuidfetchercooldown", oldconf.getInt("uuidfetcher.cooldown", 3000));
+
+        //mysql
+        newconf.setString("mysql.user", oldconf.getString("bungeeperms.general.mysqluser", "bungeeperms"));
+        newconf.setString("mysql.password", oldconf.getString("bungeeperms.general.mysqlpw", "password"));
+        newconf.setString("mysql.tableprefix", oldconf.getString("tablePrefix", "bungeeperms_"));
+        newconf.setString("mysql.url", "jdbc:mysql://"
+                                       + oldconf.getString("bungeeperms.general.mysqlhost", "localhost") + ":"
+                                       + oldconf.getString("bungeeperms.general.mysqlport", "3306") + "/"
+                                       + oldconf.getString("bungeeperms.general.mysqldb", "bungeeperms") + "?autoReconnect=true&dontTrackOpenResources=true");
+
+        //debug
+        newconf.setString("debug.path", config.getString("debug.path", "plugins/BungeePerms/debug.log"));
+        newconf.setBool("debug.showexceptions", config.getBoolean("debug.showexceptions", true));
+        newconf.setBool("debug.showlogs", config.getBoolean("debug.showlogs", false));
+
+        //perms
+        newconf.setBool("permissions.useregexperms", oldconf.getBoolean("useregexperms", false));
+        newconf.setBool("permissions.grouppermission", oldconf.getBoolean("grouppermission", true));
+
+        //fancy ingame
+        newconf.setBool("ingame.notify.promote", oldconf.getBoolean("notify.promote", false));
+        newconf.setBool("ingame.notify.demote", oldconf.getBoolean("notify.demote", false));
+        newconf.setBool("ingame.tabcomplete", oldconf.getBoolean("tabcomplete", false));
+        newconf.setBool("ingame.terminate.prefix.reset", oldconf.getBoolean("terminate.prefix.reset", true));
+        newconf.setBool("ingame.terminate.suffix.reset", oldconf.getBoolean("terminate.suffix.reset", true));
+        newconf.setBool("ingame.terminate.prefix.space", oldconf.getBoolean("terminate.prefix.space", true));
+        newconf.setBool("ingame.terminate.suffix.space", oldconf.getBoolean("terminate.suffix.space", true));
+
+        //cleanup
+        newconf.setInt("offlinecleanup.interval", oldconf.getInt("cleanup.interval", 30 * 60));
+        newconf.setInt("offlinecleanup.threshold", oldconf.getInt("cleanup.threshold", 10 * 60));
+
+        //other
+        newconf.setBool("misc.async-commands", oldconf.getBoolean("async-commands", true));
+        newconf.setString("misc.locale", oldconf.getString("locale", Statics.localeString(new Locale("en", "GB"))));
     }
 }

@@ -41,4 +41,16 @@ public class BukkitConfig extends BPConfig
         config.save();
         BungeePerms.getInstance().reload(false);
     }
+
+    @Override
+    protected void migrate0to1(Config oldconf, Config newconf)
+    {
+        super.migrate0to1(oldconf, newconf);
+
+        newconf.setString("permissions.servername", oldconf.getString("servername", "servername"));
+        newconf.setBool("permissions.allowops", oldconf.getBoolean("allowops", true));
+        newconf.setBool("permissions.superpermscompat", oldconf.getBoolean("superpermscompat", false));
+
+        newconf.setBool("network.standalone", oldconf.getBoolean("standalone", false));
+    }
 }
