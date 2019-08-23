@@ -196,7 +196,13 @@ public class BungeeNotifier implements NetworkNotifier
             if (lastConfigUpdate + 5 * 60 * 1000 < now)
             {
                 lastConfigUpdate = now;
-                info.sendData(BungeePerms.CHANNEL, ("configcheck;" + info.getName() + ";" + config.getBackendType() + ";" + config.isUseUUIDs()).getBytes());
+                info.sendData(BungeePerms.CHANNEL, ("configcheck"
+                                                    + ";" + info.getName()
+                                                    + ";" + config.getBackendType()
+                                                    + ";" + config.isUseUUIDs()
+                                                    + ";" + config.getResolvingMode()
+                                                    + ";" + config.isGroupPermission()
+                                                    + ";" + config.isUseRegexPerms()).getBytes());
             }
         }
     }

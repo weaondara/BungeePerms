@@ -10,6 +10,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
+import net.alpenblock.bungeeperms.PermissionsResolver;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.io.BackEndType;
@@ -309,6 +310,9 @@ public class BungeeEventListener implements Listener, EventListener
             String servername = data.get(1);
             BackEndType backend = BackEndType.getByName(data.get(2));
             boolean useuuid = Boolean.parseBoolean(data.get(3));
+            PermissionsResolver.ResolvingMode resolvingmode = PermissionsResolver.ResolvingMode.valueOf(data.get(4));
+            boolean groupperm = Boolean.parseBoolean(data.get(5));
+            boolean regexperm = Boolean.parseBoolean(data.get(6));
             if (!scon.getInfo().getName().equals(servername))
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERNAME, scon.getInfo().getName()));
@@ -320,6 +324,18 @@ public class BungeeEventListener implements Listener, EventListener
             if (config.isUseUUIDs() != useuuid)
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_USEUUID, scon.getInfo().getName()));
+            }
+            if (config.getResolvingMode() != resolvingmode)
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_RESOLVINGMODE, scon.getInfo().getName()));
+            }
+            if (config.isGroupPermission() != groupperm)
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_GROUPPERMISSION, scon.getInfo().getName()));
+            }
+            if (config.isUseRegexPerms() != regexperm)
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_REGEXPERMISSIONS, scon.getInfo().getName()));
             }
         }
 

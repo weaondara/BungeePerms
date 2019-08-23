@@ -167,12 +167,18 @@ warning:
       backend: 'Server {0}: Die backend Typen der BungeePermskonfigurationen stimmen nicht überein.'
       uuidplayerdb: 'Server {0}: The uuidplayerdb Typen der BungeePermskonfigurationen stimmen nicht ueberein.'
       useuuid: 'Server {0}: Die useuuids Option der BungeePermskonfigurationen stimmen nicht ueberein.'
+      resolvingmode: 'Server {0}: Die resolving mode Option der BungeePermskonfigurationen stimmen nicht ueberein.'
+      grouppermission: 'Server {0}: Die group permission Option der BungeePermskonfigurationen stimmen nicht ueberein.'
+      regexpermissions: 'Server {0}: Die regex permission Option der BungeePermskonfigurationen stimmen nicht ueberein.'
     bukkit:
       standalone: Pluginachricht von Bungeecord erhalten aber BungeePerms ist im Standalonemodus. Ignoriere Nachricht ...
       servername: Der Servername der Bungeecordkonfiguration und der BungeePermskonfigurationen stimmen nicht ueberein.
       backend: Die backend Typen der BungeePermskonfigurationen stimmen nicht überein.
       uuidplayerdb: The uuidplayerdb Typen der BungeePermskonfigurationen stimmen nicht ueberein.
       useuuid: Die useuuids Option der BungeePermskonfigurationen stimmen nicht ueberein.
+      resolvingmode: Die resolving mode Option der BungeePermskonfigurationen stimmen nicht ueberein.
+      grouppermission: Die group permission Option der BungeePermskonfigurationen stimmen nicht ueberein.
+      regexpermissions: Die regex permission Option der BungeePermskonfigurationen stimmen nicht ueberein.
     bungee-bukkit-config: UUIDs auf Bungeecord und Bukkit/Spigot unterscheiden sich. Checke deine Spigot/Bukkit und Bungeecord Konfiguration!
     useuuid-none-uuiddb: The useUUIDs option is enabled but the uuidplayerdb is set to none!
 help:
