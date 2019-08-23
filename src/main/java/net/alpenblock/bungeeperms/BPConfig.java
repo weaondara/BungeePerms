@@ -32,6 +32,7 @@ public class BPConfig
     //perms
     private boolean useRegexPerms;
     private boolean groupPermission;
+    private PermissionsResolver.ResolvingMode resolvingMode;
 
     //ingame
     private boolean notifyPromote;
@@ -85,6 +86,7 @@ public class BPConfig
         //perms
         useRegexPerms = config.getBoolean("permissions.useregexperms", false);
         groupPermission = config.getBoolean("permissions.grouppermission", true);
+        resolvingMode = config.getEnumValue("permissions.resolvingmode", PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         //fancy ingame
         notifyPromote = config.getBoolean("ingame.notify.promote", false);
@@ -175,6 +177,7 @@ public class BPConfig
         //perms
         newconf.setBool("permissions.useregexperms", oldconf.getBoolean("useregexperms", false));
         newconf.setBool("permissions.grouppermission", oldconf.getBoolean("grouppermission", true));
+        newconf.setEnumValue("permissions.resolvingmode", PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         //fancy ingame
         newconf.setBool("ingame.notify.promote", oldconf.getBoolean("notify.promote", false));

@@ -195,8 +195,6 @@ public class Group implements Comparable<Group>, PermEntity
             }
         }
 
-        ret = BungeePerms.getInstance().getPermissionsResolver().simplify(ret);
-
         return ret;
     }
 

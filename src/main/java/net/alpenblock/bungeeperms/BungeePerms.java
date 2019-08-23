@@ -69,6 +69,7 @@ public class BungeePerms
     {
         Lang.load(plugin.getPluginFolderPath() + "/lang/" + Statics.localeString(config.getLocale()) + ".yml");
         permissionsResolver.setUseRegex(config.isUseRegexPerms());
+        permissionsResolver.setResolvingMode(config.getResolvingMode());
     }
 
     public void enable()

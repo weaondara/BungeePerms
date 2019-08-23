@@ -270,8 +270,6 @@ public class User implements PermEntity
             }
         }
 
-        ret = BungeePerms.getInstance().getPermissionsResolver().simplify(ret);
-
         return ret;
     }
 
