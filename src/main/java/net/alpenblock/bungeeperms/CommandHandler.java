@@ -241,7 +241,7 @@ public class CommandHandler
             return true;
         }
 
-        if (args[2].equalsIgnoreCase("list"))
+        if (Statics.argAlias(args[2], "list", "listonly"))
         {
             return handleUserCommandsList(sender, args);
         }
@@ -349,6 +349,7 @@ public class CommandHandler
         }
 
         String player = Statics.getFullPlayerName(args[1]);
+        boolean only = args[2].equalsIgnoreCase("listonly");
         String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;//todo tolower with config locale
         String world = args.length > (4 + (specialpage ? 1 : 0)) ? args[4].toLowerCase() : null;
 
@@ -367,19 +368,21 @@ public class CommandHandler
         {
             sender.sendMessage(Lang.translate(MessageType.USER_PERMISSIONS_LIST_HEADER, user.getName()));
         }
+
         List<BPPermission> perms = user.getPermsWithOrigin(server, world);
-        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
-        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
-        {
-            BPPermission perm = perms.get(i);
-            String dur = formatDuration(perm);
-            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
-                                              perm.getPermission(),
-                                              (!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(player) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
-                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
-                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : ""),
-                                              dur == null ? "" : ", " + Color.Value + dur + Color.Text));
-        }
+        list(sender, perms, player, page, only, server, world);
+//        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
+//        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
+//        {
+//            BPPermission perm = perms.get(i);
+//            String dur = formatDuration(perm);
+//            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
+//                                              perm.getPermission(),
+//                                              (!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(player) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
+//                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
+//                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : ""),
+//                                              dur == null ? "" : ", " + Color.Value + dur + Color.Text));
+//        }
         return true;
     }
 
@@ -1192,7 +1195,7 @@ public class CommandHandler
             return true;
         }
 
-        if (args[2].equalsIgnoreCase("list"))
+        if (Statics.argAlias(args[2], "list", "listonly"))
         {
             return handleGroupCommandsList(sender, args);
         }
@@ -1278,7 +1281,7 @@ public class CommandHandler
         }
 
         //alias handling
-        else if (Statics.argAlias(args[2], "perm", "permission"))
+        else if (Statics.argAlias(args[2], "perm", "permission", "timed"))
         {
             if (!Statics.matchArgs(sender, args, 5))
             {
@@ -1316,6 +1319,7 @@ public class CommandHandler
         }
 
         String groupname = args[1];
+        boolean only = args[2].equalsIgnoreCase("listonly");
         String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;
         String world = args.length > (4 + (specialpage ? 1 : 0)) ? args[4].toLowerCase() : null;
         Group group = pm().getGroup(groupname);
@@ -1328,18 +1332,18 @@ public class CommandHandler
 
         sender.sendMessage(Lang.translate(MessageType.GROUP_PERMISSIONS_LIST_HEADER, group.getName()));
         List<BPPermission> perms = group.getPermsWithOrigin(server, world);
-        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
-        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
-        {
-            BPPermission perm = perms.get(i);
-            String dur = formatDuration(perm);
-            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
-                                              perm.getPermission(),
-                                              (perm.getOrigin().equalsIgnoreCase(groupname) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
-                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
-                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : ""),
-                                              dur == null ? "" : ", " + Color.Value + dur + Color.Text));
-        }
+        list(sender, perms, groupname, page, only, server, world);
+//        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
+//        {
+//            BPPermission perm = perms.get(i);
+//            String dur = formatDuration(perm);
+//            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
+//                                              perm.getPermission(),
+//                                              (perm.getOrigin().equalsIgnoreCase(groupname) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
+//                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
+//                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : ""),
+//                                              dur == null ? "" : ", " + Color.Value + dur + Color.Text));
+//        }
         return true;
     }
 
@@ -2778,6 +2782,34 @@ public class CommandHandler
             }
         }
         return true;
+    }
+
+    //util  
+    private void list(Sender sender, List<BPPermission> perms, String entity, int page, boolean only, String server, String world)
+    {
+        if (only)
+        {
+            perms = new ArrayList(perms);
+            for (int i = 0; i < perms.size(); i++)
+            {
+                BPPermission perm = perms.get(i);
+                if ((server != null && !server.equalsIgnoreCase(perm.getServer()))
+                    || (server != null && world != null && !world.equalsIgnoreCase(perm.getServer())))
+                    perms.remove(i);
+            }
+        }
+        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
+        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
+        {
+            BPPermission perm = perms.get(i);
+            String dur = formatDuration(perm);
+            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
+                                              perm.getPermission(),
+                                              (!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(entity) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
+                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
+                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : ""),
+                                              dur == null ? "" : ", " + Color.Value + dur + Color.Text));
+        }
     }
 
     private PermissionsManager pm()

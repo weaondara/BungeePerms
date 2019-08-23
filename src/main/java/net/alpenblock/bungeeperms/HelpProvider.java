@@ -35,6 +35,7 @@ public class HelpProvider
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.user.perms.remove",/*        */ makeSuggestCommand("/bp user <user> removetimedperm <perm> [server [world]]", Lang.translate(MessageType.HELP_USER_REMOVETIMEDPERM))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.user.perms.has",/*           */ makeSuggestCommand("/bp user <user> has <perm> [server [world]]", Lang.translate(MessageType.HELP_USER_HAS))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.user.perms.list",/*          */ makeSuggestCommand("/bp user <user> list [server [world]]", Lang.translate(MessageType.HELP_USER_LIST))));
+        HELP_ENTRIES.add(new HelpEntry("bungeeperms.user.perms.list",/*          */ makeSuggestCommand("/bp user <user> listonly [server [world]]", Lang.translate(MessageType.HELP_USER_LIST))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.user.group.add",/*           */ makeSuggestCommand("/bp user <user> addgroup <group>", Lang.translate(MessageType.HELP_USER_ADDGROUP))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.user.group.add",/*           */ makeSuggestCommand("/bp user <user> addtimedgroup <group> <duration>", Lang.translate(MessageType.HELP_USER_ADDTIMEDGROUP))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.user.group.remove",/*        */ makeSuggestCommand("/bp user <user> removegroup <group>", Lang.translate(MessageType.HELP_USER_REMOVEGROUP))));
@@ -63,6 +64,7 @@ public class HelpProvider
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.group.perms.remove",/*       */ makeSuggestCommand("/bp group <group> removetimedperm <perm> [server [world]]", Lang.translate(MessageType.HELP_GROUP_REMOVETIMEDPERM))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.group.perms.has",/*          */ makeSuggestCommand("/bp group <group> has <perm> [server [world]]", Lang.translate(MessageType.HELP_GROUP_HAS))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.group.perms.list",/*         */ makeSuggestCommand("/bp group <group> list", Lang.translate(MessageType.HELP_GROUP_LIST))));
+        HELP_ENTRIES.add(new HelpEntry("bungeeperms.group.perms.list",/*         */ makeSuggestCommand("/bp group <group> listonly", Lang.translate(MessageType.HELP_GROUP_LIST))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.promote",/*                  */ makeSuggestCommand("/bp promote <user> [ladder]", Lang.translate(MessageType.HELP_PROMOTE))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.demote",/*                   */ makeSuggestCommand("/bp demote <user> [ladder]", Lang.translate(MessageType.HELP_DEMOTE))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.format",/*                   */ makeClickCommand("/bp format", Lang.translate(MessageType.HELP_FORMAT))));
