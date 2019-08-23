@@ -167,12 +167,18 @@ warning:
       backend: 'Server {0}: The backend types of the BungeePerms configs do not match.'
       uuidplayerdb: 'Server {0}: The uuidplayerdb types of the BungeePerms configs do not match.'
       useuuid: 'Server {0}: The useuuids options of the BungeePerms configs do not match.'
+      resolvingmode: 'Server {0}: The resolving mode options of the BungeePerms configs do not match.'
+      grouppermission: 'Server {0}: The group permission options of the BungeePerms configs do not match.'
+      regexpermissions: 'Server {0}: The regex permission options of the BungeePerms configs do not match.'
     bukkit:
       standalone: Received a plugin message from Bungeecord but BungeePerms is in standalone mode. Ignoring it ...
       servername: The server names of the Bungeecord config and BungeePerms config do not match.
       backend: The backend types of the BungeePerms configs do not match.
       uuidplayerdb: The uuidplayerdb types of the BungeePerms configs do not match.
       useuuid: The useuuids options of the BungeePerms configs do not match.
+      resolvingmode: The resolving mode options of the BungeePerms configs do not match.
+      grouppermission: The group permission options of the BungeePerms configs do not match.
+      regexpermissions: The regex permission options of the BungeePerms configs do not match.
     bungee-bukkit-config: UUIDs on Bungeecord and Bukkit/Spigot differ. Check your Spigot/Bukkit and Bungeecord config!
     useuuid-none-uuiddb: The useUUIDs option is enabled, but the uuidplayerdb is set to none!
 help:
