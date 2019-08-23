@@ -696,13 +696,14 @@ public class PermissionsManager
      */
     public Map<UUID, String> getRegisteredUsersUUID()
     {
-        Set<String> registeredUsers = new HashSet(backEnd.getRegisteredUsers());
+        List<String> registeredUsers = backEnd.getRegisteredUsers();
         Map<UUID, String> all = UUIDPlayerDB.getAll();
         Map<UUID, String> ret = new HashMap();
-        for (Map.Entry<UUID, String> e : all.entrySet())
+        for (String s : registeredUsers)
         {
-            if (registeredUsers.contains(e.getValue()))
-                ret.put(e.getKey(), e.getValue());
+            UUID u = UUID.fromString(s);
+            if (all.containsKey(u))
+                ret.put(u, all.get(u));
         }
         return ret;
     }
@@ -726,13 +727,14 @@ public class PermissionsManager
      */
     public Map<UUID, String> getGroupUsersUUID(Group group)
     {
-        Set<String> groupUsers = new HashSet(backEnd.getGroupUsers(group));
+        List<String> groupUsers = backEnd.getGroupUsers(group);
         Map<UUID, String> all = UUIDPlayerDB.getAll();
         Map<UUID, String> ret = new HashMap();
-        for (Map.Entry<UUID, String> e : all.entrySet())
+        for (String s : groupUsers)
         {
-            if (groupUsers.contains(e.getValue()))
-                ret.put(e.getKey(), e.getValue());
+            UUID u = UUID.fromString(s);
+            if (all.containsKey(u))
+                ret.put(u, all.get(u));
         }
         return ret;
     }

@@ -224,7 +224,7 @@ public class CommandHandler
                         sender.sendMessage(out);
                         out = Lang.translate(MessageType.REGISTERED_USERS);
                     }
-                    out += Color.User + l.get(i).getValue() + Color.Text + "(" + Color.User + l.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
+                    out += Color.User + l.get(i).getValue() + Color.Text + " (" + Color.User + l.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
                 }
                 sender.sendMessage(out);
                 return true;
@@ -1500,7 +1500,10 @@ public class CommandHandler
             {
                 Map<UUID, String> users = pm().getGroupUsersUUID(group);
                 if (users.isEmpty())
+                {
                     sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+                    return true;
+                }
 
                 String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
                 List<Map.Entry<UUID, String>> l = new ArrayList(users.entrySet());
@@ -1512,7 +1515,7 @@ public class CommandHandler
                         sender.sendMessage(out);
                         out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
                     }
-                    out += Color.User + l.get(i).getValue() + Color.Text + "(" + Color.User + l.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
+                    out += Color.User + l.get(i).getValue() + Color.Text + " (" + Color.User + l.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
                 }
                 sender.sendMessage(out);
                 return true;
@@ -1521,7 +1524,10 @@ public class CommandHandler
             {
                 List<String> users = pm().getGroupUsers(group);
                 if (users.isEmpty())
+                {
                     sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+                    return true;
+                }
 
                 String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
                 for (int i = 0; i < users.size(); i++)
