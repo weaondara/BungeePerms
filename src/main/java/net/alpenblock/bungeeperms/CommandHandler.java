@@ -203,22 +203,55 @@ public class CommandHandler
             return true;
         }
 
-        List<String> users = pm().getRegisteredUsers();
-        if (users.isEmpty())
-        {
-            sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
-            return true;
-        }
-
         if (args.length == 1)
         {
-            String out = Lang.translate(MessageType.REGISTERED_USERS);
-            for (int i = 0; i < users.size(); i++) //todo: translate uuids and output 1 entity per line
+            if (config.isUseUUIDs())
             {
-                out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : "");
+                Map<UUID, String> users = pm().getRegisteredUsersUUID();
+                if (users.isEmpty())
+                {
+                    sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+                    return true;
+                }
+
+                String out = Lang.translate(MessageType.REGISTERED_USERS);
+                List<Map.Entry<UUID, String>> l = new ArrayList(users.entrySet());
+                for (int i = 0; i < users.size(); i++) //todo: translate uuids and output 1 entity per line
+                {
+                    //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
+                    if (out.length() * 1.1 > Short.MAX_VALUE)
+                    {
+                        sender.sendMessage(out);
+                        out = Lang.translate(MessageType.REGISTERED_USERS);
+                    }
+                    out += Color.User + l.get(i).getValue() + Color.Text + "(" + Color.User + l.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
+                }
+                sender.sendMessage(out);
+                return true;
             }
-            sender.sendMessage(out);
-            return true;
+            else
+            {
+                List<String> users = pm().getRegisteredUsers();
+                if (users.isEmpty())
+                {
+                    sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+                    return true;
+                }
+
+                String out = Lang.translate(MessageType.REGISTERED_USERS);
+                for (int i = 0; i < users.size(); i++) //todo: translate uuids and output 1 entity per line
+                {
+                    //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
+                    if (out.length() * 1.1 > Short.MAX_VALUE)
+                    {
+                        sender.sendMessage(out);
+                        out = Lang.translate(MessageType.REGISTERED_USERS);
+                    }
+                    out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : "");
+                }
+                sender.sendMessage(out);
+                return true;
+            }
         }
         else //args count == 2
         {
@@ -1460,21 +1493,50 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-        List<String> users = pm().getGroupUsers(group);
-        if (users.isEmpty())
-        {
-            sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
-        }
 
         if (args.length == 3)
         {
-            String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
-            for (int i = 0; i < users.size(); i++)
+            if (config.isUseUUIDs())
             {
-                out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : ""); //todo: uuid
+                Map<UUID, String> users = pm().getGroupUsersUUID(group);
+                if (users.isEmpty())
+                    sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+
+                String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
+                List<Map.Entry<UUID, String>> l = new ArrayList(users.entrySet());
+                for (int i = 0; i < l.size(); i++)
+                {
+                    //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
+                    if (out.length() * 1.1 > Short.MAX_VALUE)
+                    {
+                        sender.sendMessage(out);
+                        out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
+                    }
+                    out += Color.User + l.get(i).getValue() + Color.Text + "(" + Color.User + l.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
+                }
+                sender.sendMessage(out);
+                return true;
             }
-            sender.sendMessage(out);
-            return true;
+            else
+            {
+                List<String> users = pm().getGroupUsers(group);
+                if (users.isEmpty())
+                    sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+
+                String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
+                for (int i = 0; i < users.size(); i++)
+                {
+                    //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
+                    if (out.length() * 1.1 > Short.MAX_VALUE)
+                    {
+                        sender.sendMessage(out);
+                        out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
+                    }
+                    out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : "");
+                }
+                sender.sendMessage(out);
+                return true;
+            }
         }
         else if (args.length == 4)
         {
@@ -1482,6 +1544,7 @@ public class CommandHandler
             {
                 return false;
             }
+            List<String> users = pm().getGroupUsers(group);
             sender.sendMessage(Lang.translate(MessageType.GROUP_USERS_HEADER, users.size(), group.getName()));
             return true;
         }

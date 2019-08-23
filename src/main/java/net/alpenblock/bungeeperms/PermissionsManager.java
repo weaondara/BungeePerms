@@ -3,8 +3,10 @@ package net.alpenblock.bungeeperms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -688,6 +690,24 @@ public class PermissionsManager
     }
 
     /**
+     * Gets a list of all users and their uuids
+     *
+     * @return a list of all users
+     */
+    public Map<UUID, String> getRegisteredUsersUUID()
+    {
+        Set<String> registeredUsers = new HashSet(backEnd.getRegisteredUsers());
+        Map<UUID, String> all = UUIDPlayerDB.getAll();
+        Map<UUID, String> ret = new HashMap();
+        for (Map.Entry<UUID, String> e : all.entrySet())
+        {
+            if (registeredUsers.contains(e.getValue()))
+                ret.put(e.getKey(), e.getValue());
+        }
+        return ret;
+    }
+
+    /**
      * Gets a list of all user which are in the given group
      *
      * @param group the group
@@ -696,6 +716,25 @@ public class PermissionsManager
     public List<String> getGroupUsers(Group group)
     {
         return backEnd.getGroupUsers(group);
+    }
+
+    /**
+     * Gets a list of all user and their UUIDs which are in the given group
+     *
+     * @param group the group
+     * @return a list of all user which are in the given group
+     */
+    public Map<UUID, String> getGroupUsersUUID(Group group)
+    {
+        Set<String> groupUsers = new HashSet(backEnd.getGroupUsers(group));
+        Map<UUID, String> all = UUIDPlayerDB.getAll();
+        Map<UUID, String> ret = new HashMap();
+        for (Map.Entry<UUID, String> e : all.entrySet())
+        {
+            if (groupUsers.contains(e.getValue()))
+                ret.put(e.getKey(), e.getValue());
+        }
+        return ret;
     }
 
     /**
