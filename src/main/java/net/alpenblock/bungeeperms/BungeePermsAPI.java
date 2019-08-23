@@ -32,7 +32,7 @@ public class BungeePermsAPI
      * @param world the world; may be null
      * @return whether or not the group has the permission
      */
-    public boolean groupHas(String group, String permission, String server, String world)
+    public static boolean groupHas(String group, String permission, String server, String world)
     {
         server = server(server);
         world = world(server, world);
@@ -53,7 +53,7 @@ public class BungeePermsAPI
      * @param world the world; may be null
      * @return true if the permission has been added successfully
      */
-    public boolean groupAdd(String group, String permission, String server, String world)
+    public static boolean groupAdd(String group, String permission, String server, String world)
     {
         server = server(server);
         world = world(server, world);
@@ -75,7 +75,7 @@ public class BungeePermsAPI
      * @param world the world; may be null
      * @return true if the permission has been removed successfully
      */
-    public boolean groupRemove(String group, String permission, String server, String world)
+    public static boolean groupRemove(String group, String permission, String server, String world)
     {
         server = server(server);
         world = world(server, world);
@@ -99,7 +99,7 @@ public class BungeePermsAPI
      * @param dur the duration in seconds the permission is active
      * @return true if the permission has been added successfully
      */
-    public boolean groupTimedAdd(String group, String permission, String server, String world, Date start, int dur)
+    public static boolean groupTimedAdd(String group, String permission, String server, String world, Date start, int dur)
     {
         server = server(server);
         world = world(server, world);
@@ -121,7 +121,7 @@ public class BungeePermsAPI
      * @param world the world; may be null
      * @return true if the permission has been removed successfully
      */
-    public boolean groupTimedRemove(String group, String permission, String server, String world)
+    public static boolean groupTimedRemove(String group, String permission, String server, String world)
     {
         server = server(server);
         world = world(server, world);
@@ -141,7 +141,7 @@ public class BungeePermsAPI
      * @param groupadd the group to add as inheritance
      * @return true if the inheritance has been added successfully
      */
-    public boolean groupAddInheritance(String group, String groupadd)
+    public static boolean groupAddInheritance(String group, String groupadd)
     {
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
@@ -165,7 +165,7 @@ public class BungeePermsAPI
      * @param groupremove the group to remove as inheritance
      * @return true if the inheritance has been removed successfully
      */
-    public boolean groupRemoveInheritance(String group, String groupremove)
+    public static boolean groupRemoveInheritance(String group, String groupremove)
     {
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
@@ -191,7 +191,7 @@ public class BungeePermsAPI
      * @param dur the duration in seconds the inheritance is active
      * @return true if the inheritance has been added successfully
      */
-    public boolean groupAddTimedInheritance(String group, String groupadd, Date start, int dur)
+    public static boolean groupAddTimedInheritance(String group, String groupadd, Date start, int dur)
     {
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
@@ -216,7 +216,7 @@ public class BungeePermsAPI
      * @param groupremove the group to remove as inheritance
      * @return true if the inheritance has been removed successfully
      */
-    public boolean groupRemoveTimedInheritance(String group, String groupremove)
+    public static boolean groupRemoveTimedInheritance(String group, String groupremove)
     {
         Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
         if (g == null)
@@ -413,7 +413,7 @@ public class BungeePermsAPI
      * @param world the world; may be null
      * @return true if the permission has been added successfully
      */
-    public boolean userAdd(String nameoruuid, String permission, String server, String world)
+    public static boolean userAdd(String nameoruuid, String permission, String server, String world)
     {
         server = server(server);
         world = world(server, world);
@@ -435,7 +435,7 @@ public class BungeePermsAPI
      * @param world the world; may be null
      * @return true if the permission has been removed successfully
      */
-    public boolean userRemove(String nameoruuid, String permission, String server, String world)
+    public static boolean userRemove(String nameoruuid, String permission, String server, String world)
     {
         server = server(server);
         world = world(server, world);
@@ -459,7 +459,7 @@ public class BungeePermsAPI
      * @param dur the duration in seconds the permission is active
      * @return true if the permission has been added successfully
      */
-    public boolean userTimedAdd(String nameoruuid, String permission, String server, String world, Date start, int dur)
+    public static boolean userTimedAdd(String nameoruuid, String permission, String server, String world, Date start, int dur)
     {
         server = server(server);
         world = world(server, world);
@@ -481,7 +481,7 @@ public class BungeePermsAPI
      * @param world the world; may be null
      * @return true if the permission has been removed successfully
      */
-    public boolean userTimedRemove(String nameoruuid, String permission, String server, String world)
+    public static boolean userTimedRemove(String nameoruuid, String permission, String server, String world)
     {
         server = server(server);
         world = world(server, world);
@@ -500,7 +500,7 @@ public class BungeePermsAPI
      * @param group the group
      * @return true if the group has been added successfully
      */
-    public boolean userAddGroup(String nameoruuid, String group)
+    public static boolean userAddGroup(String nameoruuid, String group)
     {
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(nameoruuid);
         if (u == null)
@@ -523,7 +523,7 @@ public class BungeePermsAPI
      * @param group the group
      * @return true if the group has been removed successfully
      */
-    public boolean userRemoveGroup(String nameoruuid, String group)
+    public static boolean userRemoveGroup(String nameoruuid, String group)
     {
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(nameoruuid);
         if (u == null)
@@ -548,7 +548,7 @@ public class BungeePermsAPI
      * @param dur the duration in seconds the group is active
      * @return true if the group has been added successfully
      */
-    public boolean userAddTimedGroup(String nameoruuid, String group, Date start, int dur)
+    public static boolean userAddTimedGroup(String nameoruuid, String group, Date start, int dur)
     {
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(nameoruuid);
         if (u == null)
@@ -572,7 +572,7 @@ public class BungeePermsAPI
      * @param group the group
      * @return true if the group has been removed successfully
      */
-    public boolean userRemoveTimedGroup(String nameoruuid, String group)
+    public static boolean userRemoveTimedGroup(String nameoruuid, String group)
     {
         User u = BungeePerms.getInstance().getPermissionsManager().getUser(nameoruuid);
         if (u == null)
