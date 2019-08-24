@@ -14,6 +14,8 @@ formatting-done: '&2Finished formatting.'
 cleaning: '&7Cleaning up permissions file/table ...'
 cleaning-done: '&2Finished cleaning. Deleted &6{0} users&2.'
 no-permission: '&cYou don''t have permission to do that!'
+overview-header: '&7Overview of groups:'
+overview-item: '&7{0} (&6{1}&7, &6{2}&7 perms, &6{3}&7 own perms, &6{4}&7 users, &6{5}&7 rank, &6{6}&7 weight)'
 error:
   invalid-bool-value: '&4A boolean value is required!'
   invalid-int-value: '&4An integer value greater than 0 is required!'
@@ -186,6 +188,7 @@ help:
   help: Shows this help
   reload: Reloads the plugin
   debug: En-/Disables the debug mode
+  overview: Shows a compact overview of all groups
   users: Lists the users [or shows the amount]
   user:
     info: Shows information about the user

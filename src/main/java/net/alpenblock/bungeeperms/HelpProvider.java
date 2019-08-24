@@ -23,6 +23,7 @@ public class HelpProvider
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.help",/*                     */ makeSuggestCommand("/bp help [page]", Lang.translate(MessageType.HELP_HELP))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.reload",/*                   */ makeClickCommand("/bp reload", Lang.translate(MessageType.HELP_RELOAD))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.debug",/*                    */ makeSuggestCommand("/bp debug <true|false>", Lang.translate(MessageType.HELP_DEBUG))));
+        HELP_ENTRIES.add(new HelpEntry("bungeeperms.overview",/*                 */ makeSuggestCommand("/bp overview", Lang.translate(MessageType.HELP_OVERVIEW))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.users",/*                    */ makeSuggestCommand("/bp users [-c]", Lang.translate(MessageType.HELP_USERS))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.user.info",/*                */ makeSuggestCommand("/bp user <user> info [server [world]]", Lang.translate(MessageType.HELP_USER_INFO))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.user.delete",/*              */ makeSuggestCommand("/bp user <user> delete", Lang.translate(MessageType.HELP_USER_DELETE))));

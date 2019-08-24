@@ -14,6 +14,8 @@ formatting-done: '&2Formatierung abgeschlossen.'
 cleaning: '&7Bereinige Permission-Datei/Tabelle ...'
 cleaning-done: '&2Bereinigung abgeschlossen. &6{0} &2User geloescht.'
 no-permission: '&cDu hast keine Rechte um das zu tun!'
+overview-header: '&7Übersicht über alle Gruppen:'
+overview-item: '&7{0} (&6{1}&7, &6{2}&7 Rechte, &6{3}&7 eigene Rechte, &6{4}&7 Spieler, &6{5}&7 Rang, &6{6}&7 Gewichtung)'
 error:
   invalid-bool-value: '&4Eine boolscher Wert ist erforderlich!'
   invalid-int-value: '&4Ein Integer-Wert groesser 0 ist erforderlich!'
@@ -186,6 +188,7 @@ help:
   help: Zeigt diese Hilfe
   reload: Laedt das Plugin neu
   debug: De-/Aktiviert den Debug-Modus
+  overview: Zeigt eine kompakte Übersicht für alle Gruppen
   users: Zeigt die User [oder zeigt die Anzahl]
   user:
     info: Zeigt Informationen ueber den User

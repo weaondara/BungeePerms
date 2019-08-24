@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,10 @@ public class CommandHandler
             else if (args[0].equalsIgnoreCase("debug"))
             {
                 return handleDebug(sender, args);
+            }
+            else if (args[0].equalsIgnoreCase("overview"))
+            {
+                return handleOverview(sender, args);
             }
             else if (args[0].equalsIgnoreCase("users"))
             {
@@ -189,6 +194,66 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.DEBUG_DISABLED));
             return true;
         }
+    }
+
+    private boolean handleOverview(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.overview", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 1))
+        {
+            return true;
+        }
+
+        List<String> msgs = new ArrayList();
+        msgs.add(Lang.translate(MessageType.OVERVIEW_HEADER));
+        Map<Group, Object> tree = new HashMap();
+        List<Group> groups = new ArrayList(BungeePerms.getInstance().getPermissionsManager().getGroups());
+        Map<Group, List<Group>> parents = new HashMap();
+        for (Group g : groups)
+            for (Group child : g.getInheritances())
+            {
+                List l = parents.getOrDefault(child, new ArrayList());
+                l.add(g);
+                parents.put(child, l);
+            }
+
+        //roots
+        for (int i = 0; i < groups.size(); i++)
+        {
+            Group g = groups.get(i);
+            if (parents.getOrDefault(g, new ArrayList()).isEmpty())
+            {
+                tree.put(g, new HashMap());
+                groups.remove(i--);
+            }
+        }
+
+        //leaves
+        boolean didsomthing;
+        do
+        {
+            didsomthing = false;
+            for (int i = 0; i < groups.size(); i++)
+            {
+                Group g = groups.get(i);
+                List<Group> pl = parents.get(g);
+                for (Group p : pl)
+                    didsomthing |= addToTree(tree, p, g);
+            }
+        }
+        while (didsomthing);
+
+        List<String> bla = treeToMsgs(tree, 0);
+        msgs.addAll(bla);
+
+        for (String msg : msgs)
+            sender.sendMessage(msg);
+
+        return true;
     }
 
     private boolean handleUsers(Sender sender, String[] args)
@@ -2853,7 +2918,7 @@ public class CommandHandler
         return true;
     }
 
-    //util  
+    //command util  
     private void list(Sender sender, List<BPPermission> perms, String entity, int page, boolean only, String server, String world)
     {
         if (only)
@@ -2881,6 +2946,74 @@ public class CommandHandler
         }
     }
 
+    private boolean addToTree(Map<Group, Object> tree, Group parent, Group child)
+    {
+        boolean didsomething = false;
+        for (Map.Entry<Group, Object> e : tree.entrySet())
+        {
+            if (e.getKey() == parent)
+            {
+                if (!((Map<Group, Object>) e.getValue()).containsKey(child))
+                {
+                    ((Map<Group, Object>) e.getValue()).put(child, new HashMap());
+                    didsomething = true;
+                }
+            }
+            else
+            {
+                didsomething |= addToTree((Map<Group, Object>) e.getValue(), parent, child);
+            }
+        }
+        return didsomething;
+    }
+
+    private List<String> treeToMsgs(Map<Group, Object> tree, int indent)
+    {
+        List<List<String>> msgs = treeToMsgs0(tree, indent);
+        List<String> ret = new ArrayList();
+
+        List<Integer> widths = new ArrayList();
+        if (!msgs.isEmpty())
+            for (String i : msgs.get(0))
+                widths.add(0);
+        for (int i = 0; i < widths.size(); i++)
+        {
+            int len = 0;
+            for (List<String> l : msgs)
+                len = Math.max(len, l.get(i).length());
+            widths.set(i, len);
+        }
+        for (List<String> l : msgs)
+        {
+            for (int i = 0; i < l.size(); i++)
+                l.set(i, String.format("%" + (i == 0 ? "-" : "") + widths.get(i) + "s", l.get(i)));
+            ret.add(Lang.translate(MessageType.OVERVIEW_ITEM, l.toArray()));
+//            ret.add(Lang.translate(MessageType.OVERVIEW_ITEM, (Object[]) l.toArray(new String[l.size()])));
+        }
+
+        return ret;
+    }
+
+    private List<List<String>> treeToMsgs0(Map<Group, Object> tree, int indent)
+    {
+        List<List<String>> msgs = new ArrayList();
+        for (Map.Entry<Group, Object> e : tree.entrySet())
+        {
+            Group g = e.getKey();
+            String space = new String(new char[indent]).replace("\0", " ");
+            msgs.add(Arrays.asList(space + "- " + Color.Value + g.getName() + Color.Text,
+                                   g.getLadder(),
+                                   "" + g.getPermissionsCount(null, null),
+                                   "" + g.getOwnPermissionsCount(null, null),
+                                   "" + BungeePerms.getInstance().getPermissionsManager().getGroupUsers(g).size(),
+                                   "" + g.getRank(),
+                                   "" + g.getWeight()));
+            msgs.addAll(treeToMsgs0((Map<Group, Object>) e.getValue(), indent + 1));
+        }
+        return msgs;
+    }
+
+    //other util
     private PermissionsManager pm()
     {
         return BungeePerms.getInstance().getPermissionsManager();

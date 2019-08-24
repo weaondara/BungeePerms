@@ -53,6 +53,8 @@ public class Lang
         CLEANING("cleaning", Color.Text.alt() + "Cleaning up permissions file/table ..."),
         CLEANING_DONE("cleaning-done", Color.Message.alt() + "Finished cleaning. Deleted " + Color.Value.alt() + "{0} users" + Color.Message.alt() + "."),
         NO_PERM("no-permission", ChatColor.RED.alt() + "You don't have permission to do that!"),
+        OVERVIEW_HEADER("overview-header", Color.Text.alt() + "Overview of groups:"),
+        OVERVIEW_ITEM("overview-item", Color.Text.alt() + "{0} (" + Color.Value.alt() + "{1}" + Color.Text.alt() + ", " + Color.Value.alt() + "{2}" + Color.Text.alt() + " perms, " + Color.Value.alt() + "{3}" + Color.Text.alt() + " own perms, " + Color.Value.alt() + "{4}" + Color.Text.alt() + " users, " + Color.Value.alt() + "{5}" + Color.Text.alt() + " rank, " + Color.Value.alt() + "{6}" + Color.Text.alt() + " weight)"),
         //error msgs
         ERR_INVALID_BOOL_VALUE("error.invalid-bool-value", Color.Error.alt() + "A boolean value is required!"),
         ERR_INVALID_INT_VALUE("error.invalid-int-value", Color.Error.alt() + "An integer value greater than 0 is required!"),
@@ -200,6 +202,7 @@ public class Lang
         HELP_HELP("help.help", "Shows this help"),
         HELP_RELOAD("help.reload", "Reloads the plugin"),
         HELP_DEBUG("help.debug", "En-/Disables the debug mode"),
+        HELP_OVERVIEW("help.overview", "Shows a compact overview of all groups"),
         HELP_USERS("help.users", "Lists the users [or shows the amount]"),
         HELP_USER_INFO("help.user.info", "Shows information about the user"),
         HELP_USER_DELETE("help.user.delete", "Deletes the user"),
