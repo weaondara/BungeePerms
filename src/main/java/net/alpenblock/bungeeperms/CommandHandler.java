@@ -518,13 +518,13 @@ public class CommandHandler
         }
 
         sender.sendMessage(Lang.translate(MessageType.USER_GROUPS_HEADER, user.getName()));
-        List<String> groups = user.getGroupsString();
+        List<String> groups = new ArrayList(user.getGroupsString());
         groups.sort(String.CASE_INSENSITIVE_ORDER);
         for (String g : groups)
         {
             sender.sendMessage(Color.Text + "- " + Color.Value + g);
         }
-        List<TimedValue<String>> tgroups = user.getTimedGroupsString();
+        List<TimedValue<String>> tgroups = new ArrayList(user.getTimedGroupsString());
         tgroups.sort(new Comparator<TimedValue<String>>()
         {
             @Override
@@ -2977,7 +2977,10 @@ public class CommandHandler
             }
         }
         if (config.getResolvingMode() == PermissionsResolver.ResolvingMode.BESTMATCH)
+        {
+            perms = new ArrayList(perms);
             Collections.sort(perms);
+        }
 
         sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
         for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
