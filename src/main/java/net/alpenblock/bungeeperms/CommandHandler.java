@@ -2,10 +2,13 @@ package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.Lang.MessageType;
@@ -272,16 +275,24 @@ public class CommandHandler
         {
             if (config.isUseUUIDs())
             {
-                Map<UUID, String> users = pm().getRegisteredUsersUUID();
-                if (users.isEmpty())
+                Map<UUID, String> usersmap = pm().getRegisteredUsersUUID();
+                if (usersmap.isEmpty())
                 {
                     sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
                     return true;
                 }
+                List<Map.Entry<UUID, String>> users = new ArrayList(usersmap.entrySet());
+                users.sort(new Comparator<Map.Entry<UUID, String>>()
+                {
+                    @Override
+                    public int compare(Map.Entry<UUID, String> o1, Map.Entry<UUID, String> o2)
+                    {
+                        return String.CASE_INSENSITIVE_ORDER.compare(o1.getValue(), o2.getValue());
+                    }
+                });
 
                 String out = Lang.translate(MessageType.REGISTERED_USERS);
-                List<Map.Entry<UUID, String>> l = new ArrayList(users.entrySet());
-                for (int i = 0; i < users.size(); i++) //todo: translate uuids and output 1 entity per line
+                for (int i = 0; i < users.size(); i++)
                 {
                     //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
                     if (out.length() * 1.1 > Short.MAX_VALUE)
@@ -289,7 +300,7 @@ public class CommandHandler
                         sender.sendMessage(out);
                         out = Lang.translate(MessageType.REGISTERED_USERS);
                     }
-                    out += Color.User + l.get(i).getValue() + Color.Text + " (" + Color.User + l.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
+                    out += Color.User + users.get(i).getValue() + Color.Text + " (" + Color.User + users.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
                 }
                 sender.sendMessage(out);
                 return true;
@@ -303,8 +314,10 @@ public class CommandHandler
                     return true;
                 }
 
+                users.sort(String.CASE_INSENSITIVE_ORDER);
+
                 String out = Lang.translate(MessageType.REGISTERED_USERS);
-                for (int i = 0; i < users.size(); i++) //todo: translate uuids and output 1 entity per line
+                for (int i = 0; i < users.size(); i++)
                 {
                     //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
                     if (out.length() * 1.1 > Short.MAX_VALUE)
@@ -505,11 +518,22 @@ public class CommandHandler
         }
 
         sender.sendMessage(Lang.translate(MessageType.USER_GROUPS_HEADER, user.getName()));
-        for (String g : user.getGroupsString())
+        List<String> groups = user.getGroupsString();
+        groups.sort(String.CASE_INSENSITIVE_ORDER);
+        for (String g : groups)
         {
             sender.sendMessage(Color.Text + "- " + Color.Value + g);
         }
-        for (TimedValue<String> g : user.getTimedGroupsString())
+        List<TimedValue<String>> tgroups = user.getTimedGroupsString();
+        tgroups.sort(new Comparator<TimedValue<String>>()
+        {
+            @Override
+            public int compare(TimedValue<String> o1, TimedValue<String> o2)
+            {
+                return String.CASE_INSENSITIVE_ORDER.compare(o1.getValue(), o2.getValue());
+            }
+        });
+        for (TimedValue<String> g : tgroups)
         {
             sender.sendMessage(Color.Text + "- " + Color.Value + g.getValue() + Color.Text + "(" + Color.Value + formatDuration(g) + Color.Text + ")");
         }
@@ -1276,7 +1300,16 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.GROUPS_LIST_HEADER));
             for (String l : pm().getLadders())
             {
-                for (Group g : pm().getLadderGroups(l))
+                List<Group> lg = pm().getLadderGroups(l);
+                lg.sort(new Comparator<Group>()
+                {
+                    @Override
+                    public int compare(Group o1, Group o2)
+                    {
+                        return String.CASE_INSENSITIVE_ORDER.compare(o1.getName(), o2.getName());
+                    }
+                });
+                for (Group g : lg)
                 {
                     sender.sendMessage(Color.Text + "- " + Color.Value + g.getName() + Color.Text + " (" + Color.Value + l + Color.Text + ")");
                 }
@@ -1563,16 +1596,25 @@ public class CommandHandler
         {
             if (config.isUseUUIDs())
             {
-                Map<UUID, String> users = pm().getGroupUsersUUID(group);
-                if (users.isEmpty())
+                Map<UUID, String> usersmap = pm().getGroupUsersUUID(group);
+                if (usersmap.isEmpty())
                 {
                     sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
                     return true;
                 }
 
+                List<Map.Entry<UUID, String>> users = new ArrayList(usersmap.entrySet());
+                users.sort(new Comparator<Map.Entry<UUID, String>>()
+                {
+                    @Override
+                    public int compare(Map.Entry<UUID, String> o1, Map.Entry<UUID, String> o2)
+                    {
+                        return String.CASE_INSENSITIVE_ORDER.compare(o1.getValue(), o2.getValue());
+                    }
+                });
+
                 String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
-                List<Map.Entry<UUID, String>> l = new ArrayList(users.entrySet());
-                for (int i = 0; i < l.size(); i++)
+                for (int i = 0; i < users.size(); i++)
                 {
                     //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
                     if (out.length() * 1.1 > Short.MAX_VALUE)
@@ -1580,7 +1622,7 @@ public class CommandHandler
                         sender.sendMessage(out);
                         out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
                     }
-                    out += Color.User + l.get(i).getValue() + Color.Text + " (" + Color.User + l.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
+                    out += Color.User + users.get(i).getValue() + Color.Text + " (" + Color.User + users.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
                 }
                 sender.sendMessage(out);
                 return true;
@@ -1593,6 +1635,8 @@ public class CommandHandler
                     sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
                     return true;
                 }
+
+                users.sort(String.CASE_INSENSITIVE_ORDER);
 
                 String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
                 for (int i = 0; i < users.size(); i++)
@@ -2932,6 +2976,9 @@ public class CommandHandler
                     perms.remove(i);
             }
         }
+        if (config.getResolvingMode() == PermissionsResolver.ResolvingMode.BESTMATCH)
+            Collections.sort(perms);
+
         sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
         for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
         {
@@ -2988,7 +3035,6 @@ public class CommandHandler
             for (int i = 0; i < l.size(); i++)
                 l.set(i, String.format("%" + (i == 0 ? "-" : "") + widths.get(i) + "s", l.get(i)));
             ret.add(Lang.translate(MessageType.OVERVIEW_ITEM, l.toArray()));
-//            ret.add(Lang.translate(MessageType.OVERVIEW_ITEM, (Object[]) l.toArray(new String[l.size()])));
         }
 
         return ret;
@@ -2997,7 +3043,16 @@ public class CommandHandler
     private List<List<String>> treeToMsgs0(Map<Group, Object> tree, int indent)
     {
         List<List<String>> msgs = new ArrayList();
-        for (Map.Entry<Group, Object> e : tree.entrySet())
+        List<Map.Entry<Group, Object>> entries = new ArrayList(tree.entrySet());
+        entries.sort(new Comparator<Map.Entry<Group, Object>>()
+        {
+            @Override
+            public int compare(Map.Entry<Group, Object> o1, Map.Entry<Group, Object> o2)
+            {
+                return String.CASE_INSENSITIVE_ORDER.compare(o1.getKey().getName(), o2.getKey().getName());
+            }
+        });
+        for (Map.Entry<Group, Object> e : entries)
         {
             Group g = e.getKey();
             String space = new String(new char[indent]).replace("\0", " ");
