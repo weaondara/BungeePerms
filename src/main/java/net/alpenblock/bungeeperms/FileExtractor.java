@@ -20,9 +20,9 @@ public class FileExtractor
             ALL_FILES.put("permissions.groups.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/permissions.groups.yml");
             ALL_FILES.put("permissions.users.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/permissions.users.yml");
         }
-        ALL_FILES.put("lang/EN-gb.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/lang/EN-gb.yml");
-        ALL_FILES.put("lang/DE-de.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/lang/DE-de.yml");
-        ALL_FILES.put("lang/BG-de.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/lang/BG-de.yml");
+        ALL_FILES.put("lang/en-GB.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/lang/en-GB.yml");
+        ALL_FILES.put("lang/de-DE.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/lang/de-DE.yml");
+        ALL_FILES.put("lang/bg-BG.yml", BungeePerms.getInstance().getPlugin().getPluginFolderPath() + "/lang/bg-BG.yml");
     }
 
     public static void extractAll()

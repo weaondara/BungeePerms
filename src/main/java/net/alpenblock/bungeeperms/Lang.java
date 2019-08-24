@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import java.io.File;
 import java.util.EnumMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,9 @@ public class Lang
 
     public static void load(String file)
     {
+        if (!new File(file).isFile())
+            return;
+        
         Config langconf = new Config(file);
         langconf.load();
 
