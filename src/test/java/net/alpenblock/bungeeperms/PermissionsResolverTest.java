@@ -705,7 +705,7 @@ public class PermissionsResolverTest
         perms.add(testperm("-test.test1.(test2|test3)"));
         perms.add(testperm("test.test1.(test2|test3)"));
 
-        assertFalse(resolver.hasPerm(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -813,7 +813,7 @@ public class PermissionsResolverTest
         perms.add(testperm("-test.#####.test*"));
         perms.add(testperm("test.#####.test2"));
 
-        assertFalse(resolver.hasPerm(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -866,7 +866,7 @@ public class PermissionsResolverTest
         perms.add(testperm("-test.test1.*"));
         perms.add(testperm("test.test1.*"));
 
-        assertFalse(resolver.hasPerm(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -936,10 +936,10 @@ public class PermissionsResolverTest
         List<BPPermission> ex = new ArrayList();
         ex.add(testperm("-test.test1.test2"));
         ex.add(testperm("test.test1.test2"));
-        ex.add(testperm("-test.test1.*"));
         ex.add(testperm("test.test1.*"));
-        ex.add(testperm("-test.test1.(test2|*)"));
+        ex.add(testperm("-test.test1.*"));
         ex.add(testperm("test.test1.(test2|*)"));
+        ex.add(testperm("-test.test1.(test2|*)"));
         List<BPPermission> res = PermissionsResolver.sortRegexBest(perms);
         assertEquals(ex, res);
     }

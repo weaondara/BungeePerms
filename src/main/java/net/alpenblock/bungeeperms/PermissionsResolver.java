@@ -144,10 +144,10 @@ public class PermissionsResolver
     {
         perm = Statics.toLower(perm);
 
-        perms = sortNormalBest(perms);
-
-        for (BPPermission p : perms)
+//        perms = sortNormalBest(perms);
+        for (int i = perms.size() - 1; i >= 0; i--)
         {
+            BPPermission p = perms.get(i);
             if (p.getPermission().equalsIgnoreCase("-" + perm))
                 return false;
             else if (p.getPermission().equalsIgnoreCase(perm))
@@ -155,11 +155,12 @@ public class PermissionsResolver
         }
 
         List<String> lperm = Statics.toList(perm, ".");
-        for (int i = lperm.size() - 1; i >= 0; i--)
+        for (int j = lperm.size() - 1; j >= 0; j--)
         {
-            String permpart = Statics.arrayToString(lperm.subList(0, i).toArray(new String[i]), 0, i, ".") + (i == 0 ? "*" : ".*");
-            for (BPPermission p : perms)
+            String permpart = Statics.arrayToString(lperm.subList(0, j).toArray(new String[j]), 0, j, ".") + (j == 0 ? "*" : ".*");
+            for (int i = perms.size() - 1; i >= 0; i--)
             {
+                BPPermission p = perms.get(i);
                 if (p.getPermission().equalsIgnoreCase("-" + permpart))
                     return false;
                 else if (p.getPermission().equalsIgnoreCase(permpart))
@@ -200,8 +201,9 @@ public class PermissionsResolver
 
         perms = sortRegexBest(perms);
 
-        for (BPPermission p : perms)
+        for (int i = perms.size() - 1; i >= 0; i--)
         {
+            BPPermission p = perms.get(i);
             String tocheck = p.getPermission();
             if (tocheck.startsWith("-"))
                 tocheck = tocheck.substring(1);
@@ -239,45 +241,77 @@ public class PermissionsResolver
 
     public static List<BPPermission> sortRegexBest(List<BPPermission> perms)
     {
-        List<BPPermission> normal = new ArrayList();
-        List<BPPermission> placeholder = new ArrayList();
-        List<BPPermission> star = new ArrayList();
-        List<BPPermission> regex = new ArrayList();
-        for (BPPermission p : perms)
-        {
-            if (p.getPermission().matches("-?[a-z0-9\\.\\#]*\\*?"))
-            {
-                if (p.getPermission().contains("#"))
-                    placeholder.add(p);
-                else if (p.getPermission().endsWith("*"))
-                    star.add(p);
-                else
-                    normal.add(p);
-            }
-            else
-                regex.add(p);
-        }
-        for (List<BPPermission> l : Arrays.asList(normal, star, placeholder, regex))
-            l.sort(new Comparator<BPPermission>()
-            {
-                @Override
-                public int compare(BPPermission o1, BPPermission o2)
-                {
-                    boolean n1 = o1.getPermission().startsWith("-");
-                    boolean n2 = o2.getPermission().startsWith("-");
+        boolean oldisGroup = false;
+        boolean oldtimed = false;
+        String oldorigin = null;
+        String oldserver = null;
+        String oldworld = null;
 
-                    if (n1 != n2)
-                        return n1 ? -1 : 1;
-                    return 0;
+        List<List<BPPermission>> gnormal = new ArrayList();
+        List<List<BPPermission>> gplaceholder = new ArrayList();
+        List<List<BPPermission>> gstar = new ArrayList();
+        List<List<BPPermission>> gregex = new ArrayList();
+
+        int i = 0;
+        while (i < perms.size())
+        {
+            List<BPPermission> normal = new ArrayList();
+            List<BPPermission> placeholder = new ArrayList();
+            List<BPPermission> star = new ArrayList();
+            List<BPPermission> regex = new ArrayList();
+
+            for (; i < perms.size(); i++)
+            {
+                BPPermission p = perms.get(i);
+
+                boolean brk = p.isGroup() != oldisGroup
+                              || oldtimed != (p.getTimedStart() != null)
+                              || ((oldorigin == null) != (p.getOrigin() == null)) || (oldorigin != null && !oldorigin.equals(p.getOrigin()))
+                              || ((oldserver == null) != (p.getServer() == null)) || (oldserver != null && !oldserver.equals(p.getServer()))
+                              || ((oldworld == null) != (p.getWorld() == null)) || (oldworld != null && !oldworld.equals(p.getWorld()));
+
+                oldisGroup = p.isGroup();
+                oldtimed = p.getTimedStart() != null;
+                oldorigin = p.getOrigin();
+                oldserver = p.getServer();
+                oldworld = p.getWorld();
+
+                if (brk)
+                    break;
+
+                if (p.getPermission().matches("-?[a-z0-9\\.\\#]*\\*?"))
+                {
+                    if (p.getPermission().contains("#"))
+                        placeholder.add(p);
+                    else if (p.getPermission().endsWith("*"))
+                        star.add(p);
+                    else
+                        normal.add(p);
                 }
-            });
+                else
+                    regex.add(p);
+            }
+
+            gnormal.add(normal);
+            gplaceholder.add(placeholder);
+            gstar.add(star);
+            gregex.add(regex);
+        }
 
         perms = new ArrayList();
-        perms.addAll(normal);
-        perms.addAll(star);
-        perms.addAll(placeholder);
-        perms.addAll(regex);
+        for (int j = 0; j < gnormal.size(); j++)
+        {
+            perms.addAll(gnormal.get(j));
+            perms.addAll(gstar.get(j));
+            perms.addAll(gplaceholder.get(j));
+            perms.addAll(gregex.get(j));
+        }
 
+//        perms = new ArrayList();
+//        perms.addAll(normal);
+//        perms.addAll(star);
+//        perms.addAll(placeholder);
+//        perms.addAll(regex);
         return perms;
     }
 
