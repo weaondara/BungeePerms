@@ -241,77 +241,33 @@ public class PermissionsResolver
 
     public static List<BPPermission> sortRegexBest(List<BPPermission> perms)
     {
-        boolean oldisGroup = false;
-        boolean oldtimed = false;
-        String oldorigin = null;
-        String oldserver = null;
-        String oldworld = null;
+        List<BPPermission> normal = new ArrayList();
+        List<BPPermission> placeholder = new ArrayList();
+        List<BPPermission> star = new ArrayList();
+        List<BPPermission> regex = new ArrayList();
 
-        List<List<BPPermission>> gnormal = new ArrayList();
-        List<List<BPPermission>> gplaceholder = new ArrayList();
-        List<List<BPPermission>> gstar = new ArrayList();
-        List<List<BPPermission>> gregex = new ArrayList();
-
-        int i = 0;
-        while (i < perms.size())
+        for (int i = 0; i < perms.size(); i++)
         {
-            List<BPPermission> normal = new ArrayList();
-            List<BPPermission> placeholder = new ArrayList();
-            List<BPPermission> star = new ArrayList();
-            List<BPPermission> regex = new ArrayList();
-
-            for (; i < perms.size(); i++)
+            BPPermission p = perms.get(i);
+            if (p.getPermission().matches("-?[a-z0-9\\.\\#]*\\*?"))
             {
-                BPPermission p = perms.get(i);
-
-                boolean brk = p.isGroup() != oldisGroup
-                              || oldtimed != (p.getTimedStart() != null)
-                              || ((oldorigin == null) != (p.getOrigin() == null)) || (oldorigin != null && !oldorigin.equals(p.getOrigin()))
-                              || ((oldserver == null) != (p.getServer() == null)) || (oldserver != null && !oldserver.equals(p.getServer()))
-                              || ((oldworld == null) != (p.getWorld() == null)) || (oldworld != null && !oldworld.equals(p.getWorld()));
-
-                oldisGroup = p.isGroup();
-                oldtimed = p.getTimedStart() != null;
-                oldorigin = p.getOrigin();
-                oldserver = p.getServer();
-                oldworld = p.getWorld();
-
-                if (brk)
-                    break;
-
-                if (p.getPermission().matches("-?[a-z0-9\\.\\#]*\\*?"))
-                {
-                    if (p.getPermission().contains("#"))
-                        placeholder.add(p);
-                    else if (p.getPermission().endsWith("*"))
-                        star.add(p);
-                    else
-                        normal.add(p);
-                }
+                if (p.getPermission().contains("*"))
+                    star.add(p);
+                else if (p.getPermission().contains("#"))
+                    placeholder.add(p);
                 else
-                    regex.add(p);
+                    normal.add(p);
             }
-
-            gnormal.add(normal);
-            gplaceholder.add(placeholder);
-            gstar.add(star);
-            gregex.add(regex);
+            else
+                regex.add(p);
         }
 
         perms = new ArrayList();
-        for (int j = 0; j < gnormal.size(); j++)
-        {
-            perms.addAll(gnormal.get(j));
-            perms.addAll(gstar.get(j));
-            perms.addAll(gplaceholder.get(j));
-            perms.addAll(gregex.get(j));
-        }
+        perms.addAll(regex);
+        perms.addAll(star);
+        perms.addAll(placeholder);
+        perms.addAll(normal);
 
-//        perms = new ArrayList();
-//        perms.addAll(normal);
-//        perms.addAll(star);
-//        perms.addAll(placeholder);
-//        perms.addAll(regex);
         return perms;
     }
 

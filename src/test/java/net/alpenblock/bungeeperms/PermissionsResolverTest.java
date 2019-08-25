@@ -484,6 +484,20 @@ public class PermissionsResolverTest
     }
 
     @Test
+    public void testHasBest19()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
     public void testHasRegex1()
     {
         resolver.setUseRegex(true);
@@ -909,6 +923,20 @@ public class PermissionsResolverTest
         assertFalse(resolver.hasPerm(perms, perm));
     }
 
+    @Test
+    public void testHasRegexBest17()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
     //sorts
     @Test
     public void testSortNormalBest()
@@ -932,15 +960,25 @@ public class PermissionsResolverTest
         perms.add(testperm("test.test1.(test2|*)"));
         perms.add(testperm("-test.test1.*"));
         perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("test.##.test2"));
         perms.add(testperm("-test.test1.(test2|*)"));
+        perms.add(testperm("-test.##.test2"));
         List<BPPermission> ex = new ArrayList();
-        ex.add(testperm("-test.test1.test2"));
-        ex.add(testperm("test.test1.test2"));
-        ex.add(testperm("test.test1.*"));
-        ex.add(testperm("-test.test1.*"));
         ex.add(testperm("test.test1.(test2|*)"));
         ex.add(testperm("-test.test1.(test2|*)"));
+        ex.add(testperm("test.test1.*"));
+        ex.add(testperm("-test.test1.*"));
+        ex.add(testperm("test.##.test2"));
+        ex.add(testperm("-test.##.test2"));
+        ex.add(testperm("-test.test1.test2"));
+        ex.add(testperm("test.test1.test2"));
         List<BPPermission> res = PermissionsResolver.sortRegexBest(perms);
+
+//        for (BPPermission e : ex)
+//            System.out.println(e.getPermission());
+//        System.out.println("---");
+//        for (BPPermission e : res)
+//            System.out.println(e.getPermission());
         assertEquals(ex, res);
     }
 
