@@ -2,6 +2,7 @@ package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
@@ -159,7 +160,7 @@ public class Group implements Comparable<Group>, PermEntity
         server = Statics.toLower(server);
         world = server == null ? null : Statics.toLower(world);
 
-        List<BPPermission> ret = new ArrayList<>();
+        LinkedHashSet<BPPermission> ret = new LinkedHashSet<>();
         for (String s : inheritances)
         {
             Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
@@ -195,7 +196,7 @@ public class Group implements Comparable<Group>, PermEntity
             }
         }
 
-        return ret;
+        return new ArrayList(ret);
     }
 
     public void invalidateCache()
