@@ -2,9 +2,11 @@ package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -660,12 +662,13 @@ public class User implements PermEntity
         }
 
         //groups
+        Set<Group> checkedgroups = new HashSet();
         for (String s : groups)
         {
             Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
             if (g == null)
                 continue;
-            Long end = g.getNextTimedPermission();
+            Long end = g.getNextTimedPermission(checkedgroups);
             if (end == null)
                 continue;
             next = next == null ? end : Math.min(next, end);
@@ -675,7 +678,7 @@ public class User implements PermEntity
             Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s.getValue());
             if (g == null)
                 continue;
-            Long end = g.getNextTimedPermission();
+            Long end = g.getNextTimedPermission(checkedgroups);
             if (end == null)
                 continue;
             next = next == null ? end : Math.min(next, end);

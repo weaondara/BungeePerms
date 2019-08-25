@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -304,8 +305,12 @@ public class Group implements Comparable<Group>, PermEntity
         return suffix.isEmpty() ? suffix : suffix.substring(0, suffix.length() - 1) + ChatColor.RESET;
     }
 
-    Long getNextTimedPermission()
+    Long getNextTimedPermission(Set<Group> checkedgroups)
     {
+        if (checkedgroups.contains(this))
+            return null;
+        checkedgroups.add(this);
+
         boolean dosavegroups = false;
         boolean dosaveperms = false;
 
@@ -375,7 +380,7 @@ public class Group implements Comparable<Group>, PermEntity
             Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
             if (g == null)
                 continue;
-            Long end = g.getNextTimedPermission();
+            Long end = g.getNextTimedPermission(checkedgroups);
             if (end == null)
                 continue;
             next = next == null ? end : Math.min(next, end);
@@ -385,7 +390,7 @@ public class Group implements Comparable<Group>, PermEntity
             Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s.getValue());
             if (g == null)
                 continue;
-            Long end = g.getNextTimedPermission();
+            Long end = g.getNextTimedPermission(checkedgroups);
             if (end == null)
                 continue;
             next = next == null ? end : Math.min(next, end);
