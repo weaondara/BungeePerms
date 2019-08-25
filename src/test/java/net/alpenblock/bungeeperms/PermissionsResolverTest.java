@@ -31,10 +31,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -44,11 +44,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -58,12 +58,12 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.test2");
-        perms.add("test.test1.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.test2"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -73,13 +73,13 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.test2");
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -89,9 +89,9 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
+        List<BPPermission> perms = new ArrayList<>();
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -101,11 +101,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -115,11 +115,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -129,12 +129,12 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.test1.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.test1.test2"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -144,12 +144,12 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.test1.*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -159,12 +159,12 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -174,13 +174,13 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
-        perms.add("-test.test1.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-test.test1.test2"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -190,13 +190,13 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
-        perms.add("-test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-test.test1.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -206,14 +206,14 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
-        perms.add("-test.test1.*");
-        perms.add("*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-test.test1.*"));
+        perms.add(testperm("*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -223,13 +223,13 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
-        perms.add("-*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -239,14 +239,14 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2.test3");
-        perms.add("test.test1.test2.*");
-        perms.add("test.test1.*");
-        perms.add("-test.*");
-        perms.add("test.test1.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2.test3"));
+        perms.add(testperm("test.test1.test2.*"));
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.test1.test2"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -256,13 +256,13 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2.test3");
-        perms.add("test.test1.test2.*");
-        perms.add("test.test1.*");
-        perms.add("-test.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2.test3"));
+        perms.add(testperm("test.test1.test2.*"));
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -272,10 +272,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -285,10 +285,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -298,11 +298,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.");
-        perms.add("-*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1."));
+        perms.add(testperm("-*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -312,11 +312,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test1.test2");
-        perms.add("-*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test1.test2"));
+        perms.add(testperm("-*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -326,10 +326,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test2"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -339,11 +339,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.test2");
-        perms.add("*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -353,11 +353,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.*");
-        perms.add("-*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -367,10 +367,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.*";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -380,11 +380,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.*");
-        perms.add("-*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -394,11 +394,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("*");
-        perms.add("-*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("*"));
+        perms.add(testperm("-*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -408,11 +408,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -422,11 +422,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.*");
-        perms.add("-test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -436,11 +436,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.*");
-        perms.add("-test.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-test.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -450,11 +450,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test1.*");
-        perms.add("-test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test1.*"));
+        perms.add(testperm("-test1.*"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -464,10 +464,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2.test3");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2.test3"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -477,10 +477,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test2.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2.*"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -490,10 +490,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.(test2|test3)");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test2|test3)"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -503,10 +503,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.(test)2|3");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test)2|3"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -516,10 +516,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.(test1|test3)");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test1|test3)"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -529,10 +529,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.(test1|*)");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test1|*)"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -542,10 +542,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.(test1|test3|*)");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.(test1|test3|*)"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -555,10 +555,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.#####.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.#####.test2"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -568,10 +568,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.####.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.####.test2"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -581,10 +581,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.####.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.####.test2"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -594,10 +594,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.#####.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.#####.test2"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -607,10 +607,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.*"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -620,10 +620,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -633,10 +633,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -646,11 +646,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.*");
-        perms.add("test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
+        perms.add(testperm("test.test1.*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -660,10 +660,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -673,10 +673,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test*.t");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test*.t"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -686,11 +686,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.*");
-        perms.add("-test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -700,12 +700,12 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1");
-        perms.add("-test.test1.(test2|test3)");
-        perms.add("test.test1.(test2|test3)");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1"));
+        perms.add(testperm("-test.test1.(test2|test3)"));
+        perms.add(testperm("test.test1.(test2|test3)"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -715,11 +715,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.(test)2|3");
-        perms.add("-test.test1.(test)2|3");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test)2|3"));
+        perms.add(testperm("-test.test1.(test)2|3"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -729,11 +729,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1");
-        perms.add("test.test1.(test1|test3)");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1"));
+        perms.add(testperm("test.test1.(test1|test3)"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -743,11 +743,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.test");
-        perms.add("test.test1.(test1|*)");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test"));
+        perms.add(testperm("test.test1.(test1|*)"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -757,10 +757,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.(test1|test3|*)");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.(test1|test3|*)"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -770,10 +770,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.#####.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.#####.test2"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -783,10 +783,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.####.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.####.test2"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -796,10 +796,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.####.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.####.test2"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -809,11 +809,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.#####.test*");
-        perms.add("test.#####.test2");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.#####.test*"));
+        perms.add(testperm("test.#####.test2"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -823,10 +823,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.*"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -836,10 +836,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -849,10 +849,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -862,11 +862,11 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("-test.test1.*");
-        perms.add("test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
+        perms.add(testperm("test.test1.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -876,10 +876,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test*"));
 
-        assertTrue(resolver.has(perms, perm));
+        assertTrue(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -889,10 +889,10 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.test*.t");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test*.t"));
 
-        assertNull(resolver.has(perms, perm));
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
     @Test
@@ -902,45 +902,50 @@ public class PermissionsResolverTest
         resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
 
         String perm = "test.test1.test2";
-        List<String> perms = new ArrayList<>();
-        perms.add("test.test1.*");
-        perms.add("-test.test1.*");
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.*"));
 
-        assertFalse(resolver.has(perms, perm));
+        assertFalse(resolver.hasPerm(perms, perm));
     }
 
     //sorts
     @Test
     public void testSortNormalBest()
     {
-        List<String> perms = new ArrayList();
-        perms.add("test.test1.*");
-        perms.add("-test.test1.*");
-        List<String> ex = new ArrayList();
-        ex.add("-test.test1.*");
-        ex.add("test.test1.*");
-        List<String> res = PermissionsResolver.sortNormalBest(perms);
+        List<BPPermission> perms = new ArrayList();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.*"));
+        List<BPPermission> ex = new ArrayList();
+        ex.add(testperm("-test.test1.*"));
+        ex.add(testperm("test.test1.*"));
+        List<BPPermission> res = PermissionsResolver.sortNormalBest(perms);
         assertEquals(ex, res);
     }
 
     @Test
     public void testSortRegexBest()
     {
-        List<String> perms = new ArrayList();
-        perms.add("test.test1.*");
-        perms.add("-test.test1.test2");
-        perms.add("test.test1.(test2|*)");
-        perms.add("-test.test1.*");
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.(test2|*)");
-        List<String> ex = new ArrayList();
-        ex.add("-test.test1.test2");
-        ex.add("test.test1.test2");
-        ex.add("-test.test1.*");
-        ex.add("test.test1.*");
-        ex.add("-test.test1.(test2|*)");
-        ex.add("test.test1.(test2|*)");
-        List<String> res = PermissionsResolver.sortRegexBest(perms);
+        List<BPPermission> perms = new ArrayList();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.(test2|*)"));
+        perms.add(testperm("-test.test1.*"));
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.(test2|*)"));
+        List<BPPermission> ex = new ArrayList();
+        ex.add(testperm("-test.test1.test2"));
+        ex.add(testperm("test.test1.test2"));
+        ex.add(testperm("-test.test1.*"));
+        ex.add(testperm("test.test1.*"));
+        ex.add(testperm("-test.test1.(test2|*)"));
+        ex.add(testperm("test.test1.(test2|*)"));
+        List<BPPermission> res = PermissionsResolver.sortRegexBest(perms);
         assertEquals(ex, res);
+    }
+
+    private BPPermission testperm(String testtest1test2)
+    {
+        return new BPPermission(testtest1test2, "", false, null, null, null, null);
     }
 }

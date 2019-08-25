@@ -63,14 +63,6 @@ public class PermissionsResolver
 
     public Boolean hasPerm(List<BPPermission> perms, String perm)
     {
-        List<String> l = new ArrayList();
-        for (BPPermission p : perms)
-            l.add(p.getPermission());
-        return has(l, perm);
-    }
-
-    public Boolean has(List<String> perms, String perm)
-    {
         if (useRegex)
         {
             switch (resolvingMode)
@@ -97,7 +89,7 @@ public class PermissionsResolver
         }
     }
 
-    public static Boolean hasNormalSequential(List<String> perms, String perm)
+    public static Boolean hasNormalSequential(List<BPPermission> perms, String perm)
     {
         perm = Statics.toLower(perm);
 
@@ -105,19 +97,19 @@ public class PermissionsResolver
 
         List<String> lperm = Statics.toList(perm, ".");
 
-        for (String p : perms)
+        for (BPPermission p : perms)
         {
-            if (p.equalsIgnoreCase(perm))
+            if (p.getPermission().equalsIgnoreCase(perm))
             {
                 has = true;
             }
-            else if (p.equalsIgnoreCase("-" + perm))
+            else if (p.getPermission().equalsIgnoreCase("-" + perm))
             {
                 has = false;
             }
-            else if (p.endsWith("*"))
+            else if (p.getPermission().endsWith("*"))
             {
-                List<String> lp = Statics.toList(p, ".");
+                List<String> lp = Statics.toList(p.getPermission(), ".");
                 int index = 0;
                 try
                 {
@@ -148,17 +140,17 @@ public class PermissionsResolver
         return has;
     }
 
-    public static Boolean hasNormalBestMatch(List<String> perms, String perm)
+    public static Boolean hasNormalBestMatch(List<BPPermission> perms, String perm)
     {
         perm = Statics.toLower(perm);
 
         perms = sortNormalBest(perms);
 
-        for (String p : perms)
+        for (BPPermission p : perms)
         {
-            if (p.equalsIgnoreCase("-" + perm))
+            if (p.getPermission().equalsIgnoreCase("-" + perm))
                 return false;
-            else if (p.equalsIgnoreCase(perm))
+            else if (p.getPermission().equalsIgnoreCase(perm))
                 return true;
         }
 
@@ -166,11 +158,11 @@ public class PermissionsResolver
         for (int i = lperm.size() - 1; i >= 0; i--)
         {
             String permpart = Statics.arrayToString(lperm.subList(0, i).toArray(new String[i]), 0, i, ".") + (i == 0 ? "*" : ".*");
-            for (String p : perms)
+            for (BPPermission p : perms)
             {
-                if (p.equalsIgnoreCase("-" + permpart))
+                if (p.getPermission().equalsIgnoreCase("-" + permpart))
                     return false;
-                else if (p.equalsIgnoreCase(permpart))
+                else if (p.getPermission().equalsIgnoreCase(permpart))
                     return true;
             }
         }
@@ -178,17 +170,17 @@ public class PermissionsResolver
         return null;
     }
 
-    public static Boolean hasRegexSequential(List<String> perms, String perm)
+    public static Boolean hasRegexSequential(List<BPPermission> perms, String perm)
     {
         perm = Statics.toLower(perm);
 
         Boolean has = null;
 
-        for (String p : perms)
+        for (BPPermission p : perms)
         {
-            String tocheck = p;
-            if (p.startsWith("-"))
-                tocheck = p.substring(1);
+            String tocheck = p.getPermission();
+            if (tocheck.startsWith("-"))
+                tocheck = tocheck.substring(1);
 
             tocheck = tocheck
                     .replaceAll("\\.", "\\\\.")
@@ -196,23 +188,23 @@ public class PermissionsResolver
                     .replaceAll("#", "\\.");
 
             if (perm.matches(tocheck))
-                has = !p.startsWith("-");
+                has = !p.getPermission().startsWith("-");
         }
 
         return has;
     }
 
-    public static Boolean hasRegexBestMatch(List<String> perms, String perm)
+    public static Boolean hasRegexBestMatch(List<BPPermission> perms, String perm)
     {
         perm = Statics.toLower(perm);
 
         perms = sortRegexBest(perms);
 
-        for (String p : perms)
+        for (BPPermission p : perms)
         {
-            String tocheck = p;
-            if (p.startsWith("-"))
-                tocheck = p.substring(1);
+            String tocheck = p.getPermission();
+            if (tocheck.startsWith("-"))
+                tocheck = tocheck.substring(1);
 
             tocheck = tocheck
                     .replaceAll("\\.", "\\\\.")
@@ -220,42 +212,23 @@ public class PermissionsResolver
                     .replaceAll("#", "[^\\\\.]");
 
             if (perm.matches(tocheck))
-                return !p.startsWith("-");
+                return !p.getPermission().startsWith("-");
         }
 
-//        List<String> lperm = Statics.toList(perm, ".");
-//        for (int i = lperm.size() - 1; i >= 0; i--)
-//        {
-//            String permpart = Statics.arrayToString(lperm.subList(0, i).toArray(new String[i]), 0, i, ".") + (i == 0 ? "*" : ".*");
-//            for (String p : perms)
-//            {
-//                String tocheck = p;
-//                if (p.startsWith("-"))
-//                    tocheck = permpart.substring(1);
-//
-//                tocheck = tocheck
-//                        .replaceAll("\\.", "\\\\.")
-//                        .replaceAll("\\*", "[^\\\\.]\\*")
-//                        .replaceAll("#", "\\.");
-//
-//                if (permpart.matches(tocheck))
-//                    return !p.startsWith("-");
-//            }
-//        }
         return null;
     }
 
-    public static List<String> sortNormalBest(List<String> perms)
+    public static List<BPPermission> sortNormalBest(List<BPPermission> perms)
     {
         perms = new ArrayList(perms);
-        perms.sort(new Comparator<String>()
+        perms.sort(new Comparator<BPPermission>()
         {
             @Override
-            public int compare(String o1, String o2)
+            public int compare(BPPermission o1, BPPermission o2)
             {
-                if (o1.startsWith("-") && !o2.startsWith("-"))
+                if (o1.getPermission().startsWith("-") && !o2.getPermission().startsWith("-"))
                     return -1;
-                else if (!o1.startsWith("-") && o2.startsWith("-"))
+                else if (!o1.getPermission().startsWith("-") && o2.getPermission().startsWith("-"))
                     return 1;
                 else
                     return 0;
@@ -264,19 +237,19 @@ public class PermissionsResolver
         return perms;
     }
 
-    public static List<String> sortRegexBest(List<String> perms)
+    public static List<BPPermission> sortRegexBest(List<BPPermission> perms)
     {
-        List<String> normal = new ArrayList();
-        List<String> placeholder = new ArrayList();
-        List<String> star = new ArrayList();
-        List<String> regex = new ArrayList();
-        for (String p : perms)
+        List<BPPermission> normal = new ArrayList();
+        List<BPPermission> placeholder = new ArrayList();
+        List<BPPermission> star = new ArrayList();
+        List<BPPermission> regex = new ArrayList();
+        for (BPPermission p : perms)
         {
-            if (p.matches("-?[a-z0-9\\.\\#]*\\*?"))
+            if (p.getPermission().matches("-?[a-z0-9\\.\\#]*\\*?"))
             {
-                if (p.contains("#"))
+                if (p.getPermission().contains("#"))
                     placeholder.add(p);
-                else if (p.endsWith("*"))
+                else if (p.getPermission().endsWith("*"))
                     star.add(p);
                 else
                     normal.add(p);
@@ -284,14 +257,14 @@ public class PermissionsResolver
             else
                 regex.add(p);
         }
-        for (List<String> l : Arrays.asList(normal, star, placeholder, regex))
-            l.sort(new Comparator<String>()
+        for (List<BPPermission> l : Arrays.asList(normal, star, placeholder, regex))
+            l.sort(new Comparator<BPPermission>()
             {
                 @Override
-                public int compare(String o1, String o2)
+                public int compare(BPPermission o1, BPPermission o2)
                 {
-                    boolean n1 = o1.startsWith("-");
-                    boolean n2 = o2.startsWith("-");
+                    boolean n1 = o1.getPermission().startsWith("-");
+                    boolean n2 = o2.getPermission().startsWith("-");
 
                     if (n1 != n2)
                         return n1 ? -1 : 1;
