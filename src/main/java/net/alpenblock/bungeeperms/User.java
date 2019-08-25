@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -238,23 +239,52 @@ public class User implements PermEntity
         world = server == null ? null : Statics.toLower(world);
 
         LinkedHashSet<BPPermission> ret = new LinkedHashSet<>();
-        for (String s : groups)
+
+        //groups
+        List<Group> groups = new ArrayList();
+        for (String name : this.groups)
         {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
-            if (g == null)
-                continue;
-            List<BPPermission> gperms = g.getEffectivePerms(server, world);
-            ret.addAll(gperms);
+            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(name);
+            if (g != null)
+                groups.add(g);
         }
-        for (TimedValue<String> tg : timedGroups)
+        groups.sort(new Comparator<Group>()
         {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(tg.getValue());
-            if (g == null)
-                continue;
+            @Override
+            public int compare(Group o1, Group o2)
+            {
+                return -Integer.compare(o1.getWeight(), o2.getWeight());
+            }
+        });
+        for (Group g : groups)
+        {
             List<BPPermission> gperms = g.getEffectivePerms(server, world);
             ret.addAll(gperms);
         }
 
+        //timed inheritances
+        List<Group> tgroups = new ArrayList();
+        for (TimedValue<String> name : this.timedGroups)
+        {
+            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(name.getValue());
+            if (g != null)
+                tgroups.add(g);
+        }
+        tgroups.sort(new Comparator<Group>()
+        {
+            @Override
+            public int compare(Group o1, Group o2)
+            {
+                return -Integer.compare(o1.getWeight(), o2.getWeight());
+            }
+        });
+        for (Group tg : tgroups)
+        {
+            List<BPPermission> gperms = tg.getEffectivePerms(server, world);
+            ret.addAll(gperms);
+        }
+
+        //perms
         ret.addAll(Statics.makeBPPerms(perms, null, null, this));
         ret.addAll(Statics.makeBPPermsTimed(timedPerms, null, null, this));
 

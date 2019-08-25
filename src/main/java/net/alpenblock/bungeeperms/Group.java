@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -162,23 +163,40 @@ public class Group implements Comparable<Group>, PermEntity
         world = server == null ? null : Statics.toLower(world);
 
         LinkedHashSet<BPPermission> ret = new LinkedHashSet<>();
-        for (String s : inheritances)
+        
+        //inheritances
+        List<Group> inherit = new ArrayList(getInheritances());
+        inherit.sort(new Comparator<Group>()
         {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
-            if (g == null)
-                continue;
+            @Override
+            public int compare(Group o1, Group o2)
+            {
+                return -Integer.compare(o1.getWeight(), o2.getWeight());
+            }
+        });
+        for (Group g : inherit)
+        {
             List<BPPermission> gperms = g.getEffectivePerms(server, world);
             ret.addAll(gperms);
         }
-        for (TimedValue<String> tg : timedInheritances)
+        
+        //timed inheritances
+        List<TimedValue<Group>> tinherit = new ArrayList(getTimedInheritances());
+        tinherit.sort(new Comparator<TimedValue<Group>>()
         {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(tg.getValue());
-            if (g == null)
-                continue;
-            List<BPPermission> gperms = g.getEffectivePerms(server, world);
+            @Override
+            public int compare(TimedValue<Group> o1, TimedValue<Group> o2)
+            {
+                return -Integer.compare(o1.getValue().getWeight(), o2.getValue().getWeight());
+            }
+        });
+        for (TimedValue<Group> tg : tinherit)
+        {
+            List<BPPermission> gperms = tg.getValue().getEffectivePerms(server, world);
             ret.addAll(gperms);
         }
 
+        //perms
         ret.addAll(Statics.makeBPPerms(perms, null, null, this));
         ret.addAll(Statics.makeBPPermsTimed(timedPerms, null, null, this));
 
