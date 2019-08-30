@@ -148,11 +148,17 @@ public class User implements PermEntity
     @Deprecated
     public boolean hasPerm(String perm)
     {
-        return hasPerm(perm, null);
+        return hasPerm(perm, null, null);
     }
 
     @Deprecated
-    public boolean hasPerm(String perm, String server)
+    public boolean hasPermOnServer(String perm, String server)
+    {
+        return hasPerm(perm, server, null);
+    }
+
+    @Deprecated
+    public boolean hasPermOnServerInWorld(String perm, String server, String world)
     {
         return hasPerm(perm, server, null);
     }

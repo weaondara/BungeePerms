@@ -129,6 +129,24 @@ public class Group implements Comparable<Group>, PermEntity
         return timedInheritances;
     }
 
+    @Deprecated
+    public boolean has(String perm)
+    {
+        return has(perm, null, null);
+    }
+
+    @Deprecated
+    public boolean hasOnServer(String perm, String server)
+    {
+        return has(perm, server, null);
+    }
+
+    @Deprecated
+    public boolean hasOnServerInWorld(String perm, String server, String world)
+    {
+        return has(perm, server, world);
+    }
+
     public boolean has(String perm, String server, String world)
     {
         List<BPPermission> perms = getEffectivePerms(server, world);
@@ -163,7 +181,7 @@ public class Group implements Comparable<Group>, PermEntity
         world = server == null ? null : Statics.toLower(world);
 
         LinkedHashSet<BPPermission> ret = new LinkedHashSet<>();
-        
+
         //inheritances
         List<Group> inherit = new ArrayList(getInheritances());
         inherit.sort(new Comparator<Group>()
@@ -179,7 +197,7 @@ public class Group implements Comparable<Group>, PermEntity
             List<BPPermission> gperms = g.getEffectivePerms(server, world);
             ret.addAll(gperms);
         }
-        
+
         //timed inheritances
         List<TimedValue<Group>> tinherit = new ArrayList(getTimedInheritances());
         tinherit.sort(new Comparator<TimedValue<Group>>()
