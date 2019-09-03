@@ -78,24 +78,38 @@ public class VaultBridge implements Bridge
             }
 
             //inject BungeePerms permissions
-            Method m = v.getClass().getDeclaredMethod("hookPermission", String.class, Class.class, ServicePriority.class, String[].class);
-            m.setAccessible(true);
-            m.invoke(v, "BungeePerms", Permission_BungeePerms.class, ServicePriority.Normal, new String[]
-             {
-                 "net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin"
-            });
+            try
+            {
+                Class.forName("net.milkbowl.vault.permission.plugins.Permission_BungeePerms");
+            }
+            catch (Exception e)
+            {
+                Method m = v.getClass().getDeclaredMethod("hookPermission", String.class, Class.class, ServicePriority.class, String[].class);
+                m.setAccessible(true);
+                m.invoke(v, "BungeePerms", Permission_BungeePerms.class, ServicePriority.Normal, new String[]
+                 {
+                     "net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin"
+                });
+            }
 
             Field f = v.getClass().getDeclaredField("perms");
             f.setAccessible(true);
             f.set(v, Bukkit.getServicesManager().getRegistration(Permission.class).getProvider());
 
             //inject BungeePerms chat
-            m = v.getClass().getDeclaredMethod("hookChat", String.class, Class.class, ServicePriority.class, String[].class);
-            m.setAccessible(true);
-            m.invoke(v, "BungeePerms", Chat_BungeePerms.class, ServicePriority.Normal, new String[]
-             {
-                 "net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin"
-            });
+            try
+            {
+                Class.forName("net.milkbowl.vault.permission.chat.Chat_BungeePerms");
+            }
+            catch (Exception e)
+            {
+                Method m = v.getClass().getDeclaredMethod("hookChat", String.class, Class.class, ServicePriority.class, String[].class);
+                m.setAccessible(true);
+                m.invoke(v, "BungeePerms", Chat_BungeePerms.class, ServicePriority.Normal, new String[]
+                 {
+                     "net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin"
+                });
+            }
         }
         catch (Exception ex)
         {
