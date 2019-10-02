@@ -1,5 +1,7 @@
 package net.alpenblock.bungeeperms.io;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +40,7 @@ public class MySQLBackEnd implements BackEnd
     private final Mysql mysql;
 
     private final MysqlPermsAdapter adapter;
-    private final String table;
+    private String table;
 
     public MySQLBackEnd()
     {
@@ -49,7 +51,35 @@ public class MySQLBackEnd implements BackEnd
         mysql = new Mysql(config, debug, "bungeeperms");
         mysql.connect();
 
-        table = config.getMysqlTablePrefix() + "permissions2";
+        table = config.getMysqlTablePrefix() + "permissions";
+
+        PreparedStatement stmt = null;
+        ResultSet res = null;
+        try
+        {
+            stmt = mysql.stmt("SHOW TABLES LIKE '" + table + "2'");
+            res = mysql.returnQuery(stmt);
+            if (res.next())
+            {
+                res.close();
+                stmt.close();
+                stmt = mysql.stmt("ALTER TABLE `" + table + "2` RENAME `" + table + "`");
+                stmt.execute();
+                BungeePerms.getLogger().info("Renamed mysql permissions table from " + table + "2 to " + table);
+            }
+        }
+        catch (Exception e)
+        {
+            if (stmt != null)
+                BungeePerms.getLogger().severe("stmt: " + stmt);
+            debug.log(e);
+            table += "2";
+        }
+        finally
+        {
+            Mysql.close(res);
+            Mysql.close(stmt);
+        }
 
         adapter = new MysqlPermsAdapter(mysql, table);
         adapter.createTable();
