@@ -99,7 +99,7 @@ public class EssentialsBridge implements Bridge
         if (!cmd.startsWith("ess"))
             return;
         String[] split = cmd.split(" ");
-        if (split.length == 0 || !split[1].equalsIgnoreCase("reload"))
+        if (split.length <= 1 || !split[1].equalsIgnoreCase("reload"))
             return;
 
         // /ess reload executed
