@@ -20,6 +20,23 @@ import lombok.ToString;
 public class Group implements Comparable<Group>, PermEntity
 {
 
+    public static final Comparator<Group> RANK_COMPARATOR = new Comparator<Group>()
+    {
+        @Override
+        public int compare(Group g1, Group g2)
+        {
+            return -Integer.compare(g1.getRank(), g2.getRank());
+        }
+    };
+    public static final Comparator<Group> WEIGHT_COMPARATOR = new Comparator<Group>()
+    {
+        @Override
+        public int compare(Group g1, Group g2)
+        {
+            return -Integer.compare(g1.getWeight(), g2.getWeight());
+        }
+    };
+
     @Getter(value = AccessLevel.PRIVATE)
     @Setter(value = AccessLevel.PRIVATE)
     private final Map<String, Map<String, List<BPPermission>>> cachedPerms = new HashMap<>();
@@ -309,12 +326,10 @@ public class Group implements Comparable<Group>, PermEntity
             //world
             World w = s.getWorld(world);
             if (w != null)
-            {
                 prefix += Statics.formatDisplay(w.getPrefix());
-            }
         }
 
-        return prefix.isEmpty() ? prefix : prefix.substring(0, prefix.length() - 1) + ChatColor.RESET;
+        return Statics.isEmpty(prefix) ? "" : prefix.substring(0, prefix.length() - 1) + ChatColor.RESET;
     }
 
     public String buildSuffix(String server, String world)
@@ -333,12 +348,10 @@ public class Group implements Comparable<Group>, PermEntity
             //world
             World w = s.getWorld(world);
             if (w != null)
-            {
                 suffix += Statics.formatDisplay(w.getSuffix());
-            }
         }
 
-        return suffix.isEmpty() ? suffix : suffix.substring(0, suffix.length() - 1) + ChatColor.RESET;
+        return Statics.isEmpty(suffix) ? "" : suffix.substring(0, suffix.length() - 1) + ChatColor.RESET;
     }
 
     Long getNextTimedPermission(Set<Group> checkedgroups)

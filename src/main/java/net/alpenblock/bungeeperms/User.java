@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -425,74 +426,63 @@ public class User implements PermEntity
     public String buildPrefix(String server, String world)
     {
         access();
+        checkTimedPermissions();
 
         String prefix = "";
 
         List<String> prefixes = new ArrayList<>();
 
-        for (Group g : getGroups())
+        //from groups
+        List<Group> groups = new ArrayList(getGroups());
+        for (TimedValue<Group> g : getTimedGroups())
+            groups.add(g.getValue());
+        Collections.sort(groups, Group.WEIGHT_COMPARATOR);
+
+        for (Group g : groups)
         {
             //global
             if (!Statics.isEmpty(g.getPrefix()))
-            {
                 prefixes.add(g.getPrefix());
-            }
 
             //server
             Server s = g.getServer(server);
             if (s != null)
             {
                 if (!Statics.isEmpty(s.getPrefix()))
-                {
                     prefixes.add(s.getPrefix());
-                }
 
                 //world
                 World w = s.getWorld(world);
                 if (w != null)
-                {
                     if (!Statics.isEmpty(w.getPrefix()))
-                    {
                         prefixes.add(w.getPrefix());
-                    }
-                }
             }
         }
 
         //global
         if (!Statics.isEmpty(this.prefix))
-        {
             prefixes.add(this.prefix);
-        }
 
         //server
         Server s = getServer(server);
         if (s != null)
         {
             if (!Statics.isEmpty(s.getPrefix()))
-            {
                 prefixes.add(s.getPrefix());
-            }
 
             //world
             World w = s.getWorld(world);
             if (w != null)
-            {
                 if (!Statics.isEmpty(w.getPrefix()))
-                {
                     prefixes.add(w.getPrefix());
-                }
-            }
         }
 
         for (String p : prefixes)
         {
-            if (!ChatColor.strip(p.replaceAll("&", ChatColor.COLOR_CHAR + "")).isEmpty()
-                && !prefix.isEmpty()
-                && !ChatColor.strip(prefix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" "))
-            {
+            if (!ChatColor.strip(p.replaceAll("&", ChatColor.COLOR_CHAR + "")).isEmpty() //current prefix empty
+                && !prefix.isEmpty() //built prefix empty
+                && !ChatColor.strip(prefix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" ")) //built prefix ends with space
                 prefix += " ";
-            }
             prefix += p;
         }
 
@@ -517,74 +507,63 @@ public class User implements PermEntity
     public String buildSuffix(String server, String world)
     {
         access();
+        checkTimedPermissions();
 
         String suffix = "";
 
         List<String> suffixes = new ArrayList<>();
 
-        for (Group g : getGroups())
+        //from groups
+        List<Group> groups = new ArrayList(getGroups());
+        for (TimedValue<Group> g : getTimedGroups())
+            groups.add(g.getValue());
+        Collections.sort(groups, Group.WEIGHT_COMPARATOR);
+
+        for (Group g : groups)
         {
             //global
             if (!Statics.isEmpty(g.getSuffix()))
-            {
                 suffixes.add(g.getSuffix());
-            }
 
             //server
             Server s = g.getServer(server);
             if (s != null)
             {
                 if (!Statics.isEmpty(s.getSuffix()))
-                {
                     suffixes.add(s.getSuffix());
-                }
 
                 //world
                 World w = s.getWorld(world);
                 if (w != null)
-                {
                     if (!Statics.isEmpty(w.getSuffix()))
-                    {
                         suffixes.add(w.getSuffix());
-                    }
-                }
             }
         }
 
         //global
         if (!Statics.isEmpty(this.suffix))
-        {
             suffixes.add(this.suffix);
-        }
 
         //server
         Server s = getServer(server);
         if (s != null)
         {
             if (!Statics.isEmpty(s.getSuffix()))
-            {
                 suffixes.add(s.getSuffix());
-            }
 
             //world
             World w = s.getWorld(world);
             if (w != null)
-            {
                 if (!Statics.isEmpty(w.getSuffix()))
-                {
                     suffixes.add(w.getSuffix());
-                }
-            }
         }
 
         for (String suf : suffixes)
         {
-            if (!ChatColor.strip(suf.replaceAll("&", ChatColor.COLOR_CHAR + "")).isEmpty()
-                && !suffix.isEmpty()
-                && !ChatColor.strip(suffix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" "))
-            {
+            if (!ChatColor.strip(suf.replaceAll("&", ChatColor.COLOR_CHAR + "")).isEmpty() //current suffix empty
+                && !suffix.isEmpty() //built suffix empty
+                && !ChatColor.strip(suffix.replaceAll("&", ChatColor.COLOR_CHAR + "")).endsWith(" ")) //built suffix ends with space
                 suffix += " ";
-            }
             suffix += suf;
         }
 
