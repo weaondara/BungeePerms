@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.Lang.MessageType;
@@ -567,22 +567,33 @@ public class CommandHandler
 
         sender.sendMessage(Lang.translate(MessageType.USER_UUID, user.getUUID()));
 
-        String groups = "";
+        List<SimpleEntry<Group, String>> groups = new ArrayList();
+        String groupstr = "";
         List<Group> glist = user.getGroups();
         List<TimedValue<Group>> tglist = user.getTimedGroups();
         for (int i = 0; i < glist.size(); i++)
-        {
-            groups += Color.Value + glist.get(i).getName() + Color.Text + " (" + Color.Value + glist.get(i).getPerms().size() + Color.Text + ")" + (i + 1 < glist.size() ? ", " : "");
-        }
-        if (!groups.isEmpty())
-            groups += ", ";
+            groups.add(new SimpleEntry(glist.get(i), Color.Value + glist.get(i).getName() + Color.Text
+                                                     + " (" + Color.Value + glist.get(i).getPerms().size() + Color.Text + ")"));
         for (int i = 0; i < tglist.size(); i++)
         {
-            groups += Color.Value + tglist.get(i).getValue().getName() + Color.Text
-                      + " (" + Color.Value + tglist.get(i).getValue().getPerms().size() + Color.Text + "|" + Color.Value + formatDuration(tglist.get(i)) + Color.Text + ")"
-                      + (i + 1 < tglist.size() ? ", " : "");
+            groups.add(new SimpleEntry(tglist.get(i).getValue(), Color.Value + tglist.get(i).getValue().getName() + Color.Text
+                                                                 + " (" + Color.Value + tglist.get(i).getValue().getPerms().size()
+                                                                 + Color.Text + "|" + Color.Value + formatDuration(tglist.get(i)) + Color.Text + ")"));
         }
-        sender.sendMessage(Lang.translate(MessageType.USER_GROUPS, groups));
+        groups.sort(new Comparator<SimpleEntry<Group, String>>()
+        {
+            @Override
+            public int compare(SimpleEntry<Group, String> o1, SimpleEntry<Group, String> o2)
+            {
+                return Group.WEIGHT_COMPARATOR.compare(o1.getKey(), o2.getKey());
+            }
+        });
+        if (groups.isEmpty())
+            groupstr = Color.Text + "(" + Lang.translate(MessageType.NONE) + ")";
+        else
+            for (int i = 0; i < groups.size(); i++)
+                groupstr += groups.get(i).getValue() + (i + 1 < groups.size() ? ", " : "");
+        sender.sendMessage(Lang.translate(MessageType.USER_GROUPS, groupstr));
 
         //user perms
         sender.sendMessage(Lang.translate(MessageType.USER_PERMISSIONS, user.getOwnPermissionsCount(server, world)));
@@ -596,27 +607,25 @@ public class CommandHandler
         {
             perm = ((User) perm).getServer(server);
             if (world != null)
-            {
                 perm = ((Server) perm).getWorld(world);
-            }
         }
 
         //display
-        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (!Statics.isEmpty(perm.getDisplay()) ? perm.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.DISPLAY, (!Statics.isEmpty(perm.getDisplay()) ? perm.getDisplay().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //prefix
-        sender.sendMessage(Lang.translate(MessageType.PREFIX, (!Statics.isEmpty(perm.getPrefix()) ? perm.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.PREFIX, (!Statics.isEmpty(perm.getPrefix()) ? perm.getPrefix().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //suffix
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (!Statics.isEmpty(perm.getSuffix()) ? perm.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.SUFFIX, (!Statics.isEmpty(perm.getSuffix()) ? perm.getSuffix().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //full prefix
         String buildPrefix = user.buildPrefix(server, world);
-        sender.sendMessage(Lang.translate(MessageType.PREFIX_FULL, (!Statics.isEmpty(buildPrefix) ? buildPrefix : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.PREFIX_FULL, (!Statics.isEmpty(buildPrefix) ? buildPrefix.replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //full suffix
         String buildSuffix = user.buildSuffix(server, world);
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX_FULL, (!Statics.isEmpty(buildSuffix) ? buildSuffix : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.SUFFIX_FULL, (!Statics.isEmpty(buildSuffix) ? buildSuffix.replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
 
@@ -1504,24 +1513,35 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.GROUP_ABOUT, group.getName()));
 
         //inheritances
-        String inheritances = "";
+        List<SimpleEntry<Group, String>> inherits = new ArrayList();
+        String inheritancesstr = "";
         List<Group> inherit = group.getInheritances();
         List<TimedValue<Group>> timedinherit = group.getTimedInheritances();
         for (int i = 0; i < inherit.size(); i++)
         {
-            inheritances += Color.Value + inherit.get(i).getName() + Color.Text + " (" + Color.Value + inherit.get(i).getPerms().size() + Color.Text + ")" + (i + 1 < inherit.size() ? ", " : "");
+            inherits.add(new SimpleEntry(inherit.get(i), Color.Value + inherit.get(i).getName() + Color.Text
+                                                         + " (" + Color.Value + inherit.get(i).getPerms().size() + Color.Text + ")"));
         }
         for (int i = 0; i < timedinherit.size(); i++)
         {
-            inheritances += Color.Value + timedinherit.get(i).getValue().getName() + Color.Text
-                            + " (" + Color.Value + timedinherit.get(i).getValue().getPerms().size() + Color.Text + "|" + Color.Value + formatDuration(timedinherit.get(i)) + Color.Text + ")"
-                            + (i + 1 < timedinherit.size() ? ", " : "");
+            inherits.add(new SimpleEntry(inherit.get(i), Color.Value + timedinherit.get(i).getValue().getName() + Color.Text
+                                                         + " (" + Color.Value + timedinherit.get(i).getValue().getPerms().size() + Color.Text + "|"
+                                                         + Color.Value + formatDuration(timedinherit.get(i)) + Color.Text + ")"));
         }
-        if (inheritances.length() == 0)
+        inherits.sort(new Comparator<SimpleEntry<Group, String>>()
         {
-            inheritances = Color.Text + "(" + Lang.translate(MessageType.NONE) + ")";
-        }
-        sender.sendMessage(Lang.translate(MessageType.GROUP_INHERITANCES, inheritances));
+            @Override
+            public int compare(SimpleEntry<Group, String> o1, SimpleEntry<Group, String> o2)
+            {
+                return Group.WEIGHT_COMPARATOR.compare(o1.getKey(), o2.getKey());
+            }
+        });
+        if (inherits.isEmpty())
+            inheritancesstr = Color.Text + "(" + Lang.translate(MessageType.NONE) + ")";
+        else
+            for (int i = 0; i < inherits.size(); i++)
+                inheritancesstr += inherits.get(i).getValue() + (i + 1 < inherits.size() ? ", " : "");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_INHERITANCES, inheritancesstr));
 
         //group perms
         sender.sendMessage(Lang.translate(MessageType.GROUP_PERMISSONS, group.getOwnPermissionsCount(server, world)));
@@ -1547,27 +1567,25 @@ public class CommandHandler
         {
             perm = ((Group) perm).getServer(server);
             if (world != null)
-            {
                 perm = ((Server) perm).getWorld(world);
-            }
         }
 
         //display
-        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (!Statics.isEmpty(perm.getDisplay()) ? perm.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.DISPLAY, (!Statics.isEmpty(perm.getDisplay()) ? perm.getDisplay().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //prefix
-        sender.sendMessage(Lang.translate(MessageType.PREFIX, (!Statics.isEmpty(perm.getPrefix()) ? perm.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.PREFIX, (!Statics.isEmpty(perm.getPrefix()) ? perm.getPrefix().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //suffix
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (!Statics.isEmpty(perm.getSuffix()) ? perm.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.SUFFIX, (!Statics.isEmpty(perm.getSuffix()) ? perm.getSuffix().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //full prefix
         String buildPrefix = group.buildPrefix(server, world);
-        sender.sendMessage(Lang.translate(MessageType.PREFIX_FULL, (!Statics.isEmpty(buildPrefix) ? buildPrefix : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.PREFIX_FULL, (!Statics.isEmpty(buildPrefix) ? buildPrefix.replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //full suffix
         String buildSuffix = group.buildSuffix(server, world);
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX_FULL, (!Statics.isEmpty(buildSuffix) ? buildSuffix : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.SUFFIX_FULL, (!Statics.isEmpty(buildSuffix) ? buildSuffix.replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
 

@@ -36,6 +36,16 @@ public class Lang
         s = Statics.format(s, vars);
         return s.replaceAll("&", ChatColor.COLOR_CHAR + "");
     }
+    public static String translatePreserveArgs(MessageType type, Object... vars)
+    {
+        String s = MAP.get(type);
+        if (s == null)
+        {
+            s = type.getDefaultValue();
+        }
+        s = s.replaceAll("&", ChatColor.COLOR_CHAR + "");
+        return Statics.format(s, vars);
+    }
 
     @AllArgsConstructor
     @Getter
