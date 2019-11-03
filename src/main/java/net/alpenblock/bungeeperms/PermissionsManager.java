@@ -3,10 +3,8 @@ package net.alpenblock.bungeeperms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -26,7 +24,6 @@ import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.Sender;
-import net.alpenblock.bungeeperms.util.ConcurrentList;
 
 public class PermissionsManager
 {
@@ -111,7 +108,7 @@ public class PermissionsManager
         userlock.writeLock().lock();
         try
         {
-            users = new ConcurrentList<>();
+            users = new ArrayList();
         }
         finally
         {
@@ -670,7 +667,7 @@ public class PermissionsManager
         userlock.readLock().lock();
         try
         {
-            l = Collections.unmodifiableList(users);
+            l = Collections.unmodifiableList(new ArrayList(users));
         }
         finally
         {
@@ -1255,8 +1252,16 @@ public class PermissionsManager
         //recalc perms
         for (Group g : groups)
             g.invalidateCache();
-        for (User u : users)
-            u.invalidateCache();
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
 
         //send bukkit update info & changed events
         groupChanged(group);
@@ -1289,8 +1294,16 @@ public class PermissionsManager
         //recalc perms
         for (Group g : groups)
             g.invalidateCache();
-        for (User u : users)
-            u.invalidateCache();
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
 
         //send bukkit update info & changed events
         groupChanged(group);
@@ -1320,8 +1333,16 @@ public class PermissionsManager
         //recalc perms
         for (Group g : groups)
             g.invalidateCache();
-        for (User u : users)
-            u.invalidateCache();
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
 
         //send bukkit update info & changed events
         groupChanged(group);
@@ -1372,8 +1393,16 @@ public class PermissionsManager
         //recalc perms
         for (Group g : groups)
             g.invalidateCache();
-        for (User u : users)
-            u.invalidateCache();
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
 
         //send bukkit update info & changed events
         groupChanged(group);
@@ -1397,8 +1426,16 @@ public class PermissionsManager
         //recalc perms
         for (Group g : groups)
             g.invalidateCache();
-        for (User u : users)
-            u.invalidateCache();
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
 
         //send bukkit update info & changed events
         groupChanged(group);
@@ -1422,8 +1459,16 @@ public class PermissionsManager
         //recalc perms
         for (Group g : groups)
             g.invalidateCache();
-        for (User u : users)
-            u.invalidateCache();
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
 
         //send bukkit update info & changed events
         groupChanged(group);
@@ -1446,8 +1491,16 @@ public class PermissionsManager
         //recalc perms
         for (Group g : groups)
             g.invalidateCache();
-        for (User u : users)
-            u.invalidateCache();
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
 
         //send bukkit update info & changed events
         groupChanged(group);
@@ -1475,8 +1528,16 @@ public class PermissionsManager
         //recalc perms
         for (Group g : groups)
             g.invalidateCache();
-        for (User u : users)
-            u.invalidateCache();
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
 
         //send bukkit update info & changed events
         groupChanged(group);
