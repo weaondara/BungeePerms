@@ -1699,7 +1699,7 @@ public class CommandHandler
         String groupname = args[1];
         if (pm().getGroup(groupname) != null)
         {
-            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_EXISTS, groupname));
             return true;
         }
         Group group = new Group(groupname, new ArrayList(), new ArrayList(), new ArrayList(), new ArrayList(), new HashMap(), 1000, 1000, "default", false, null, null, null);

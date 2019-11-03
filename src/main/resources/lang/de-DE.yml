@@ -33,6 +33,7 @@ error:
     you-cannot-demote: '&4Du kannst den Spieler &3{0}&4 nicht degradieren!'
   group:
     not-existing: '&4Die Gruppe &3{0}&4 existiert nicht!'
+    already-exists: '&4Die Gruppe &3{0}&4 existiert bereits!'
     already-inherits: '&4Die Gruppe &6{0}&7 erbt bereits Rechte von &6{1}&4!'
     does-not-inherit: '&4Die Gruppe &6{0}&4 erbt keine Rechte von &6{1}&4!'
 user:

@@ -33,6 +33,7 @@ error:
     you-cannot-demote: '&4You can''t demote the player &3{0}&4!'
   group:
     not-existing: '&4The group &3{0}&4 does not exist!'
+    already-exists: '&4The group &3{0}&4 already exists!'
     already-inherits: '&4The group &6{0}&7 already inherits from &6{1}&4!'
     does-not-inherit: '&4The group &6{0}&4 does not inherit from group &6{1}&4!'
 user:

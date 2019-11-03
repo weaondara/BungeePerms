@@ -84,6 +84,7 @@ public class Lang
         ERR_USER_YOU_CANNOT_PROMOTE("error.user.you-cannot-promote", Color.Error.alt() + "You can't promote the player " + Color.User.alt() + "{0}" + Color.Error.alt() + "!"),
         ERR_USER_YOU_CANNOT_DEMOTE("error.user.you-cannot-demote", Color.Error.alt() + "You can't demote the player " + Color.User.alt() + "{0}" + Color.Error.alt() + "!"),
         ERR_GROUP_NOT_EXISTING("error.group.not-existing", Color.Error.alt() + "The group " + Color.User.alt() + "{0}" + Color.Error.alt() + " does not exist!"),
+        ERR_GROUP_ALREADY_EXISTS("error.group.already-exists", Color.Error.alt() + "The group " + Color.User.alt() + "{0}" + Color.Error.alt() + " already exists!"),
         ERR_GROUP_ALREADY_INHERITS("error.group.already-inherits", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " already inherits from " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
         ERR_GROUP_DOES_NOT_INHERITS("error.group.does-not-inherit", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Error.alt() + " does not inherit from group " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
         //user msgs
