@@ -36,6 +36,10 @@ public class Debug
             fh.setFormatter(new DebugFormatter());
             logger.addHandler(fh);
         }
+        catch (IOException e)
+        {
+            System.err.println("Failed to create debug log file " + file + "! Cause: " + e.getMessage());
+        }
         catch (Exception e)
         {
             e.printStackTrace();
