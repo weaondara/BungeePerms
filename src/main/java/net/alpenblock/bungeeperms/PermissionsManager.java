@@ -647,7 +647,7 @@ public class PermissionsManager
         grouplock.readLock().lock();
         try
         {
-            l = Collections.unmodifiableList(groups);
+            l = Collections.unmodifiableList(new ArrayList(groups));
         }
         finally
         {
@@ -1250,8 +1250,16 @@ public class PermissionsManager
         backEnd.saveGroupPerms(group, server, world);
 
         //recalc perms
-        for (Group g : groups)
-            g.invalidateCache();
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
         userlock.readLock().lock();
         try
         {
@@ -1292,8 +1300,16 @@ public class PermissionsManager
         backEnd.saveGroupTimedPerms(group, server, world);
 
         //recalc perms
-        for (Group g : groups)
-            g.invalidateCache();
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
         userlock.readLock().lock();
         try
         {
@@ -1331,8 +1347,16 @@ public class PermissionsManager
         backEnd.saveGroupPerms(group, server, world);
 
         //recalc perms
-        for (Group g : groups)
-            g.invalidateCache();
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
         userlock.readLock().lock();
         try
         {
@@ -1391,8 +1415,16 @@ public class PermissionsManager
         backEnd.saveGroupTimedPerms(group, server, world);
 
         //recalc perms
-        for (Group g : groups)
-            g.invalidateCache();
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
         userlock.readLock().lock();
         try
         {
@@ -1424,8 +1456,16 @@ public class PermissionsManager
         backEnd.saveGroupInheritances(group);
 
         //recalc perms
-        for (Group g : groups)
-            g.invalidateCache();
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
         userlock.readLock().lock();
         try
         {
@@ -1457,8 +1497,16 @@ public class PermissionsManager
         backEnd.saveGroupTimedInheritances(group);
 
         //recalc perms
-        for (Group g : groups)
-            g.invalidateCache();
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
         userlock.readLock().lock();
         try
         {
@@ -1489,8 +1537,16 @@ public class PermissionsManager
         backEnd.saveGroupInheritances(group);
 
         //recalc perms
-        for (Group g : groups)
-            g.invalidateCache();
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
         userlock.readLock().lock();
         try
         {
@@ -1526,8 +1582,16 @@ public class PermissionsManager
         backEnd.saveGroupTimedInheritances(group);
 
         //recalc perms
-        for (Group g : groups)
-            g.invalidateCache();
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
         userlock.readLock().lock();
         try
         {
@@ -1571,7 +1635,15 @@ public class PermissionsManager
     {
         //cache
         group.setRank(rank);
-        Collections.sort(groups);
+        grouplock.writeLock().lock();
+        try
+        {
+            Collections.sort(groups);
+        }
+        finally
+        {
+            grouplock.writeLock().unlock();
+        }
 
         //database
         backEnd.saveGroupRank(group);
@@ -1590,7 +1662,15 @@ public class PermissionsManager
     {
         //cache
         group.setWeight(weight);
-        Collections.sort(groups);
+        grouplock.writeLock().lock();
+        try
+        {
+            Collections.sort(groups);
+        }
+        finally
+        {
+            grouplock.writeLock().unlock();
+        }
 
         //database
         backEnd.saveGroupWeight(group);
@@ -1853,16 +1933,12 @@ public class PermissionsManager
         try
         {
             for (Group gr : groups)
-            {
                 gr.invalidateCache();
-            }
         }
         finally
         {
             if (holdread)
-            {
                 grouplock.readLock().unlock();
-            }
         }
 
         userlock.readLock().lock();
@@ -1903,9 +1979,7 @@ public class PermissionsManager
         try
         {
             for (Group g : groups)
-            {
                 backEnd.reloadGroup(g);
-            }
             Collections.sort(groups);
 
             grouplock.readLock().lock();
@@ -1918,25 +1992,19 @@ public class PermissionsManager
         try
         {
             for (Group g : groups)
-            {
                 g.invalidateCache();
-            }
         }
         finally
         {
             if (holdread)
-            {
                 grouplock.readLock().unlock();
-            }
         }
 
         userlock.readLock().lock();
         try
         {
             for (User u : users)
-            {
                 u.invalidateCache();
-            }
         }
         finally
         {
