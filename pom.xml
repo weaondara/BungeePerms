@@ -2,19 +2,21 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.alpenblock</groupId>
     <artifactId>BungeePerms</artifactId>
-    <version>3.0</version>
+    <version>4.0</version>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <build.major>3.0</build.major>
+        <build.major>${project.version}</build.major>
         <build.type>SNAPSHOT</build.type>
         <build.number>1</build.number>
         <build.fullversion.file>${build.major}-${build.type}-${build.number}</build.fullversion.file>
         <build.fullversion.resource>${build.major} ${build.type} #${build.number}</build.fullversion.resource>
         <build.name>${project.artifactId}-${build.fullversion.file}</build.name>
         <build.filename>${build.name}.${project.packaging}</build.filename>
+        <build.sources.filename>${build.name}-sources.${project.packaging}</build.sources.filename>
+        <build.javadoc.filename>${build.name}-javadoc.${project.packaging}</build.javadoc.filename>
     </properties>
     
     <distributionManagement>
@@ -59,8 +61,16 @@
             <url>http://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
         <repository>
+            <id>placeholderapi</id>
+            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
         <repository>
             <id>repository</id>
@@ -114,8 +124,20 @@
                         <includes>
                             <include>com.mojang:AccountsClient</include>
                             <include>com.google.code.gson:gson</include>
+                            <include>org.bstats:bstats-bukkit</include>
+                            <include>org.bstats:bstats-bungeecord</include>
                         </includes>
                     </artifactSet>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.bstats.bukkit</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.metrics.bukkit</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.bstats.bungeecord</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.metrics.bungee</shadedPattern>
+                        </relocation>
+                    </relocations>
                 </configuration>
                 <executions>
                     <execution>
@@ -179,7 +201,35 @@
                             <artifactId>${project.artifactId}</artifactId>
                             <version>${build.fullversion.file}</version>
                             <file>target/${build.filename}</file>
+                            <sources>target/${build.sources.filename}</sources>
+                            <javadoc>target/${build.javadoc.filename}</javadoc>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -220,6 +270,24 @@
             <groupId>net.ess3</groupId>
             <artifactId>EssentialsX</artifactId>
             <version>2.16.1</version>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.10.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>1.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bungeecord</artifactId>
+            <version>1.5</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

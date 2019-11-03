@@ -14,9 +14,12 @@ formatting-done: '&2Finished formatting.'
 cleaning: '&7Cleaning up permissions file/table ...'
 cleaning-done: '&2Finished cleaning. Deleted &6{0} users&2.'
 no-permission: '&cYou don''t have permission to do that!'
+overview-header: '&7Overview of groups:'
+overview-item: '&7{0} (&6{1}&7, &6{2}&7 perms, &6{3}&7 own perms, &6{4}&7 users, &6{5}&7 rank, &6{6}&7 weight)'
 error:
   invalid-bool-value: '&4A boolean value is required!'
   invalid-int-value: '&4An integer value greater than 0 is required!'
+  invalid-duration-value: '&4A duration of the form 1d1h1m1s is required!'
   user:
     not-existing: '&4The player &3{0}&4 does not exist!'
     already-in-group: '&4Player is already in group &6{0}&4!'
@@ -30,6 +33,7 @@ error:
     you-cannot-demote: '&4You can''t demote the player &3{0}&4!'
   group:
     not-existing: '&4The group &3{0}&4 does not exist!'
+    already-exists: '&4The group &3{0}&4 already exists!'
     already-inherits: '&4The group &6{0}&7 already inherits from &6{1}&4!'
     does-not-inherit: '&4The group &6{0}&4 does not inherit from group &6{1}&4!'
 user:
@@ -132,7 +136,7 @@ common:
   suffix: '&7Suffix: &r{0}'
   prefix-full: '&7Full prefix: &r{0}'
   suffix-full: '&7Full suffix: &r{0}'
-  permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3})'
+  permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3}{4})'
   permissions-list-header-page: '&7Page &6{0}&7/&6{1}&7'
 general:
   own: own
@@ -153,6 +157,8 @@ log:
     adding-default-groups-uuid: Adding default groups to {0} ({1})
   login: Login by {0}
   login-uuid: Login by {0} ({1})
+  update-available: &6New version available. Please check at &9https://ci.wea-ondara.net/job/BungeePerms/lastSuccessfulBuild/
+  command-issued: '{0} issued bungeeperms command: /{1} {2}'
 warning:
   intrusion-detected: '&4Possible intrusion detected. Sender is {0}'
   misconfig:
@@ -164,12 +170,18 @@ warning:
       backend: 'Server {0}: The backend types of the BungeePerms configs do not match.'
       uuidplayerdb: 'Server {0}: The uuidplayerdb types of the BungeePerms configs do not match.'
       useuuid: 'Server {0}: The useuuids options of the BungeePerms configs do not match.'
+      resolvingmode: 'Server {0}: The resolving mode options of the BungeePerms configs do not match.'
+      grouppermission: 'Server {0}: The group permission options of the BungeePerms configs do not match.'
+      regexpermissions: 'Server {0}: The regex permission options of the BungeePerms configs do not match.'
     bukkit:
       standalone: Received a plugin message from Bungeecord but BungeePerms is in standalone mode. Ignoring it ...
       servername: The server names of the Bungeecord config and BungeePerms config do not match.
       backend: The backend types of the BungeePerms configs do not match.
       uuidplayerdb: The uuidplayerdb types of the BungeePerms configs do not match.
       useuuid: The useuuids options of the BungeePerms configs do not match.
+      resolvingmode: The resolving mode options of the BungeePerms configs do not match.
+      grouppermission: The group permission options of the BungeePerms configs do not match.
+      regexpermissions: The regex permission options of the BungeePerms configs do not match.
     bungee-bukkit-config: UUIDs on Bungeecord and Bukkit/Spigot differ. Check your Spigot/Bukkit and Bungeecord config!
     useuuid-none-uuiddb: The useUUIDs option is enabled, but the uuidplayerdb is set to none!
 help:
@@ -177,17 +189,24 @@ help:
   help: Shows this help
   reload: Reloads the plugin
   debug: En-/Disables the debug mode
+  overview: Shows a compact overview of all groups
   users: Lists the users [or shows the amount]
   user:
     info: Shows information about the user
     delete: Deletes the user
     display: Sets the display name for the user
-    prefiy: Sets the prefix name for the user
+    prefix: Sets the prefix name for the user
     suffix: Sets the suffix for the user
     add-perm: Adds a permission to the user
+    add-timed-perm: Adds a timed permission to the user
     remove-perm: Removes a permission from a the user
+    remove-timed-perm: Removes a timed permission from a the user
     has: Checks if the user has the permission
     list: Lists the permissions of the user
+    add-group: Add the group to the user
+    add-timed-group: Add the timed group to the user
+    remove-group: Removes the group from the user
+    remove-timed-group: Removes the timed group from the user
     set-group: Removes the old group in the group's ladder and adds the group to the user
     groups: Lists the groups the user is in
   groups: Lists the groups
@@ -197,7 +216,9 @@ help:
     create: Create a new group
     delete: Deletes the group
     add-inherit: Adds the addgroup to the group as inheritance
-    remive-inherit: Removes the removegroup from the group as inheritance
+    add-timed-inherit: Adds the addgroup to the group as timed inheritance
+    remove-inherit: Removes the removegroup from the group as inheritance
+    remove-timed-inherit: Removes the removegroup from the group as timed inheritance
     rank: Sets the rank for the group
     weight: Sets the weight for the group
     ladder: Sets the ladder for the group
@@ -206,7 +227,9 @@ help:
     prefix: Sets the prefix for the group
     suffix: Sets the suffix for the group
     add-perm: Adds a permission to the group
+    add-timed-perm: Adds a timed permission to the group
     remove-perm: Removes a permission from the group
+    remove-timed-perm: Removes a timed permission from the group
     has: Checks if the group has the permission
     list: Lists the permissions of the group
   promote: Promotes the user to the next rank

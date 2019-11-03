@@ -20,7 +20,7 @@ public class PermissionsChecker
         {
             return false;
         }
-        return u.hasPerm(permission);
+        return u.hasPerm(permission, null, null);
     }
 
     /**
@@ -44,7 +44,7 @@ public class PermissionsChecker
             return hasPerm(sender, permission);
         }
 
-        return u.hasPermOnServer(permission, server);
+        return u.hasPerm(permission, server, null);
     }
 
     /**
@@ -74,7 +74,7 @@ public class PermissionsChecker
             return hasPermOnServer(sender, permission, server);
         }
 
-        return u.hasPermOnServerInWorld(permission, server, world);
+        return u.hasPerm(permission, server, world);
     }
 
 //with wrapped command senders
@@ -94,7 +94,7 @@ public class PermissionsChecker
             {
                 return false;
             }
-            return u.hasPerm(sender, permission);
+            return u.hasPerm(sender, permission, null, null);
         }
         return false;
     }
@@ -119,7 +119,7 @@ public class PermissionsChecker
             {
                 return false;
             }
-            return u.hasPerm(sender, permission);
+            return u.hasPerm(sender, permission, null, null);
         }
     }
 
@@ -143,7 +143,7 @@ public class PermissionsChecker
             return hasPerm(sender, permission);
         }
 
-        return u.hasPermOnServer(sender, permission, sender.getServer());
+        return u.hasPerm(sender, permission, sender.getServer(), null);
     }
 
     /**
@@ -172,7 +172,7 @@ public class PermissionsChecker
                 return hasPerm(sender, permission);
             }
 
-            return u.hasPermOnServer(sender, permission, sender.getServer());
+            return u.hasPerm(sender, permission, sender.getServer(), null);
         }
     }
 
@@ -201,7 +201,7 @@ public class PermissionsChecker
             return hasPermOnServer(sender, permission);
         }
 
-        return u.hasPermOnServerInWorld(sender, permission, sender.getServer(), sender.getWorld());
+        return u.hasPerm(sender, permission, sender.getServer(), sender.getWorld());
     }
 
     /**
@@ -235,7 +235,7 @@ public class PermissionsChecker
                 return hasPermOnServer(sender, permission);
             }
 
-            return u.hasPermOnServerInWorld(sender, permission, sender.getServer(), sender.getWorld());
+            return u.hasPerm(sender, permission, sender.getServer(), sender.getWorld());
         }
     }
 

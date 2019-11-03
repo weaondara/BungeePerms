@@ -14,19 +14,16 @@ import lombok.Setter;
 import net.alpenblock.bungeeperms.Lang.MessageType;
 import net.alpenblock.bungeeperms.io.BackEnd;
 import net.alpenblock.bungeeperms.io.BackEndType;
-import net.alpenblock.bungeeperms.io.MySQL2BackEnd;
+import net.alpenblock.bungeeperms.io.MySQLBackEnd;
 import net.alpenblock.bungeeperms.io.MySQLUUIDPlayerDB;
-import net.alpenblock.bungeeperms.io.NoneUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDB;
-import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.io.YAMLBackEnd;
 import net.alpenblock.bungeeperms.io.YAMLUUIDPlayerDB;
-import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL2;
+import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2YAML;
 import net.alpenblock.bungeeperms.io.migrate.Migrator;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.Sender;
-import net.alpenblock.bungeeperms.util.ConcurrentList;
 
 public class PermissionsManager
 {
@@ -40,6 +37,7 @@ public class PermissionsManager
     @Setter
     private BackEnd backEnd;
     @Getter
+    @Setter
     private UUIDPlayerDB UUIDPlayerDB;
 
     private List<Group> groups;
@@ -69,33 +67,21 @@ public class PermissionsManager
     public final void loadConfig()
     {
         config.load();
-        BackEndType bet = config.getBackEndType();
+        BackEndType bet = config.getBackendType();
         switch (bet)
         {
             case YAML:
                 backEnd = new YAMLBackEnd();
-                break;
-            case MySQL2:
-                backEnd = new MySQL2BackEnd();
-                break;
-            default:
-                break;
-        }
-
-        UUIDPlayerDBType updbt = config.getUUIDPlayerDBType();
-        switch (updbt)
-        {
-            case None:
-                UUIDPlayerDB = new NoneUUIDPlayerDB();
-                break;
-            case YAML:
-                UUIDPlayerDB = new YAMLUUIDPlayerDB();
+                if (config.isUseUUIDs())
+                    UUIDPlayerDB = new YAMLUUIDPlayerDB();
                 break;
             case MySQL:
-                UUIDPlayerDB = new MySQLUUIDPlayerDB();
+                backEnd = new MySQLBackEnd();
+                if (config.isUseUUIDs())
+                    UUIDPlayerDB = new MySQLUUIDPlayerDB();
                 break;
             default:
-                break;
+                throw new IllegalStateException("This should not have happened!");
         }
     }
 
@@ -122,7 +108,7 @@ public class PermissionsManager
         userlock.writeLock().lock();
         try
         {
-            users = new ConcurrentList<>();
+            users = new ArrayList();
         }
         finally
         {
@@ -223,7 +209,7 @@ public class PermissionsManager
         {
             for (Group group : groups)
             {
-                List<String> inheritances = group.getInheritances();
+                List<String> inheritances = group.getInheritancesString();
                 for (int j = 0; j < inheritances.size(); j++)
                 {
                     if (getGroup(inheritances.get(j)) == null)
@@ -239,7 +225,7 @@ public class PermissionsManager
             //do this in 2 seperate loops to keep validation clean
             for (Group g : groups)
             {
-                g.recalcPerms();
+                g.invalidateCache();
 
                 //send bukkit update info
                 BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g, null);
@@ -255,11 +241,11 @@ public class PermissionsManager
         {
             for (User u : users)
             {
-                for (int j = 0; j < u.getGroups().size(); j++)
+                for (int j = 0; j < u.getGroupsString().size(); j++)
                 {
-                    if (getGroup(u.getGroups().get(j).getName()) == null)
+                    if (getGroup(u.getGroupsString().get(j)) == null)
                     {
-                        u.getGroups().remove(j);
+                        u.getGroupsString().remove(j);
                         j--;
                     }
                 }
@@ -270,7 +256,7 @@ public class PermissionsManager
             //do this in 2 seperate loops to keep validation clean
             for (User u : users)
             {
-                u.recalcPerms();
+                u.invalidateCache();
 
                 //send bukkit update info
                 BungeePerms.getInstance().getNetworkNotifier().reloadUser(u, null);
@@ -285,11 +271,11 @@ public class PermissionsManager
         List<User> backendusers = backEnd.loadUsers();
         for (User u : backendusers)
         {
-            for (int j = 0; j < u.getGroups().size(); j++)
+            for (int j = 0; j < u.getGroupsString().size(); j++)
             {
-                if (getGroup(u.getGroups().get(j).getName()) == null)
+                if (getGroup(u.getGroupsString().get(j)) == null)
                 {
-                    u.getGroups().remove(j);
+                    u.getGroupsString().remove(j);
                     j--;
                 }
             }
@@ -307,19 +293,17 @@ public class PermissionsManager
     public synchronized Group getMainGroup(User player)
     {
         if (player == null)
-        {
             throw new NullPointerException("player is null");
-        }
-        if (player.getGroups().isEmpty())
-        {
+        if (player.getGroupsString().isEmpty())
             return null;
-        }
-        Group ret = player.getGroups().get(0);
-        for (int i = 1; i < player.getGroups().size(); i++)
+
+        List<Group> groups = player.getGroups();
+        Group ret = groups.get(0);
+        for (int i = 1; i < groups.size(); i++)
         {
-            if (player.getGroups().get(i).getWeight() < ret.getWeight())
+            if (groups.get(i).getWeight() < ret.getWeight())
             {
-                ret = player.getGroups().get(i);
+                ret = groups.get(i);
             }
         }
         return ret;
@@ -467,6 +451,19 @@ public class PermissionsManager
     }
 
     /**
+     * Gets a list of all groups that are marked as default and given to all users by default.
+     *
+     * @return a list of default groups
+     */
+    public synchronized List<String> getDefaultGroupsString()
+    {
+        List<String> ret = new ArrayList();
+        for (Group g : getDefaultGroups())
+            ret.add(g.getName());
+        return ret;
+    }
+
+    /**
      * Gets a group by its name.
      *
      * @param groupname the name of the group to get
@@ -483,15 +480,8 @@ public class PermissionsManager
         try
         {
             for (Group g : groups)
-            {
                 if (g.getName().equalsIgnoreCase(groupname))
-                {
-                    // this is java runtime convention ...
-                    // finally will always be executed
-//                    grouplock.readLock().unlock();
                     return g;
-                }
-            }
         }
         finally
         {
@@ -535,15 +525,8 @@ public class PermissionsManager
         try
         {
             for (User u : users)
-            {
                 if (u.getName().equalsIgnoreCase(usernameoruuid))
-                {
-                    // this is java runtime convention ...
-                    // finally will always be executed
-//                    userlock.readLock().unlock();
                     return u;
-                }
-            }
         }
         finally
         {
@@ -637,10 +620,17 @@ public class PermissionsManager
         return null;
     }
 
+    /**
+     * Creates a temporary user with the given parameters and adds it to the users cache. The returned user object is no saved to the backend in this function.
+     *
+     * @param playername the name of the temporary user
+     * @param uuid the user of the temporary user
+     * @return the created user
+     */
     public User createTempUser(String playername, UUID uuid)
     {
-        List<Group> groups = getDefaultGroups();
-        User u = new User(playername, uuid, groups, new ArrayList<String>(), new HashMap<String, Server>(), null, null, null);
+        List<String> groups = getDefaultGroupsString();
+        User u = new User(playername, uuid, groups, new ArrayList(), new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
         addUserToCache(u);
 
         return u;
@@ -657,7 +647,7 @@ public class PermissionsManager
         grouplock.readLock().lock();
         try
         {
-            l = Collections.unmodifiableList(groups);
+            l = Collections.unmodifiableList(new ArrayList(groups));
         }
         finally
         {
@@ -677,7 +667,7 @@ public class PermissionsManager
         userlock.readLock().lock();
         try
         {
-            l = Collections.unmodifiableList(users);
+            l = Collections.unmodifiableList(new ArrayList(users));
         }
         finally
         {
@@ -697,6 +687,25 @@ public class PermissionsManager
     }
 
     /**
+     * Gets a list of all users and their uuids
+     *
+     * @return a list of all users
+     */
+    public Map<UUID, String> getRegisteredUsersUUID()
+    {
+        List<String> registeredUsers = backEnd.getRegisteredUsers();
+        Map<UUID, String> all = UUIDPlayerDB.getAll();
+        Map<UUID, String> ret = new HashMap();
+        for (String s : registeredUsers)
+        {
+            UUID u = UUID.fromString(s);
+            if (all.containsKey(u))
+                ret.put(u, all.get(u));
+        }
+        return ret;
+    }
+
+    /**
      * Gets a list of all user which are in the given group
      *
      * @param group the group
@@ -705,6 +714,26 @@ public class PermissionsManager
     public List<String> getGroupUsers(Group group)
     {
         return backEnd.getGroupUsers(group);
+    }
+
+    /**
+     * Gets a list of all user and their UUIDs which are in the given group
+     *
+     * @param group the group
+     * @return a list of all user which are in the given group
+     */
+    public Map<UUID, String> getGroupUsersUUID(Group group)
+    {
+        List<String> groupUsers = backEnd.getGroupUsers(group);
+        Map<UUID, String> all = UUIDPlayerDB.getAll();
+        Map<UUID, String> ret = new HashMap();
+        for (String s : groupUsers)
+        {
+            UUID u = UUID.fromString(s);
+            if (all.containsKey(u))
+                ret.put(u, all.get(u));
+        }
+        return ret;
     }
 
     /**
@@ -763,11 +792,8 @@ public class PermissionsManager
         //database
         backEnd.saveUser(user, true);
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
@@ -791,11 +817,8 @@ public class PermissionsManager
         //database
         backEnd.saveGroup(group, true);
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     //database and permission operations
@@ -831,17 +854,39 @@ public class PermissionsManager
     public void addUserGroup(User user, Group group)
     {
         //cache
-        user.getGroups().add(group);
-        Collections.sort(user.getGroups());
+        user.getGroupsString().add(group.getName());
+        Collections.sort(user.getGroupsString());
 
         //database
         backEnd.saveUserGroups(user);
 
         //recalc perms
-        user.recalcPerms();
+        user.invalidateCache();
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        //send bukkit update info & changed events
+        userChanged(user);
+    }
+
+    /**
+     * Adds the given timed group to the user.
+     *
+     * @param user the user to add the group to
+     * @param group the timed group to add to the user
+     */
+    public void addUserTimedGroup(User user, TimedValue<Group> group)
+    {
+        //cache
+        user.getTimedGroupsString().add(new TimedValue(group.getValue().getName(), group.getStart(), group.getDuration()));
+        Collections.sort(user.getTimedGroupsString());
+
+        //database
+        backEnd.saveUserTimedGroups(user);
+
+        //recalc perms
+        user.invalidateCache();
+
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
@@ -853,17 +898,42 @@ public class PermissionsManager
     public void removeUserGroup(User user, Group group)
     {
         //cache
-        user.getGroups().remove(group);
-        Collections.sort(user.getGroups());
+        user.getGroupsString().remove(group.getName());
 
         //database
         backEnd.saveUserGroups(user);
 
         //recalc perms
-        user.recalcPerms();
+        user.invalidateCache();
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        //send bukkit update info & changed events
+        userChanged(user);
+    }
+
+    /**
+     * Removes the given timed group from the user.
+     *
+     * @param user the user to remove the group from
+     * @param group the timed group to remove from the user
+     */
+    public void removeUserTimedGroup(User user, Group group)
+    {
+        //cache
+        for (TimedValue<String> t : user.getTimedGroupsString())
+            if (t.getValue().equalsIgnoreCase(group.getName()))
+            {
+                user.getTimedGroupsString().remove(t);
+                break;
+            }
+
+        //database
+        backEnd.saveUserTimedGroups(user);
+
+        //recalc perms
+        user.invalidateCache();
+
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
@@ -872,19 +942,10 @@ public class PermissionsManager
      * @param user the user to add the permission to
      * @param perm the permission to add to the user
      */
+    @Deprecated
     public void addUserPerm(User user, String perm)
     {
-        //cache
-        user.getExtraPerms().add(Statics.toLower(perm));
-
-        //database
-        backEnd.saveUserPerms(user);
-
-        //recalc perms
-        user.recalcPerms();
-
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        addUserPerm(user, null, null, perm);
     }
 
     /**
@@ -893,124 +954,166 @@ public class PermissionsManager
      * @param user the user to remove the permission from
      * @param perm the permission to remove from the user
      */
+    @Deprecated
     public void removeUserPerm(User user, String perm)
     {
-        //cache
-        user.getExtraPerms().remove(Statics.toLower(perm));
-
-        //database
-        backEnd.saveUserPerms(user);
-
-        //recalc perms
-        user.recalcPerms();
-
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        removeUserPerm(user, null, null, perm);
     }
 
     /**
-     * Adds a permission to the user on the given server.
+     * Adds a permission to a user.
      *
-     * @param user the user to add the permission to
-     * @param server the server to add the permission on
-     * @param perm the permission to add to the user
+     * @param user the user
+     * @param server optional: the server
+     * @param world optional: the world
+     * @param perm the permission to add
      */
-    public void addUserPerServerPerm(User user, String server, String perm)
+    public void addUserPerm(User user, String server, String world, String perm)
     {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+        perm = Statics.toLower(perm);
+
         //cache
-        Server srv = user.getServer(server);
-        srv.getPerms().add(Statics.toLower(perm));
+        if (server == null)
+            user.getPerms().add(perm);
+        else if (world == null)
+            user.getServer(server).getPerms().add(perm);
+        else
+            user.getServer(server).getWorld(world).getPerms().add(perm);
 
         //database
-        backEnd.saveUserPerServerPerms(user, Statics.toLower(server));
+        backEnd.saveUserPerms(user, server, world);
 
         //recalc perms
-        user.recalcPerms(Statics.toLower(server));
+        user.invalidateCache();
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
-     * Removes a permission from the user on the given server.
+     * Adds a timed permission to a user.
      *
-     * @param user the user to remove the permission from
-     * @param server the server to remove the permission from
-     * @param perm the permission to remove from the user
+     * @param user the user
+     * @param server optional: the server
+     * @param world optional: the world
+     * @param perm the timed permission to add
      */
-    public void removeUserPerServerPerm(User user, String server, String perm)
+    public void addUserTimedPerm(User user, String server, String world, TimedValue perm)
     {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
         //cache
-        Server srv = user.getServer(server);
-        srv.getPerms().remove(Statics.toLower(perm));
+        if (server == null)
+            user.getTimedPerms().add(perm);
+        else if (world == null)
+            user.getServer(server).getTimedPerms().add(perm);
+        else
+            user.getServer(server).getWorld(world).getTimedPerms().add(perm);
 
         //database
-        backEnd.saveUserPerServerPerms(user, Statics.toLower(server));
+        backEnd.saveUserTimedPerms(user, server, world);
 
         //recalc perms
-        user.recalcPerms(server);
+        user.invalidateCache();
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
-     * Adds a permission to the user on the given server in the given world.
+     * Removes a permission from a user.
      *
-     * @param user the user to add the permission to
-     * @param server the server to add the permission on
-     * @param world the world to add the permission in
-     * @param perm the permission to add to the user
+     * @param user the user
+     * @param server optional: the server
+     * @param world optional: the world
+     * @param perm the permission to remove
      */
-    public void addUserPerServerWorldPerm(User user, String server, String world, String perm)
+    public void removeUserPerm(User user, String server, String world, String perm)
     {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+        perm = Statics.toLower(perm);
+
         //cache
-        Server srv = user.getServer(server);
-        World w = srv.getWorld(world);
-        w.getPerms().add(Statics.toLower(perm));
+        if (server == null)
+            user.getPerms().remove(perm);
+        else if (world == null)
+            user.getServer(server).getPerms().remove(perm);
+        else
+            user.getServer(server).getWorld(world).getPerms().remove(perm);
 
         //database
-        backEnd.saveUserPerServerWorldPerms(user, Statics.toLower(server), Statics.toLower(world));
+        backEnd.saveUserPerms(user, server, world);
 
         //recalc perms
-        user.recalcPerms(server, world);
+        user.invalidateCache();
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
-     * Removes a permission from the user on the given server.
+     * Removes a timed permission from a user.
      *
-     * @param user the user to remove the permission from
-     * @param server the server to remove the permission from
-     * @param world the world to remove the permission from
-     * @param perm the permission to remove from the user
+     * @param user the user
+     * @param server optional: the server
+     * @param world optional: the world
+     * @param perm timed the permission to remove
      */
-    public void removeUserPerServerWorldPerm(User user, String server, String world, String perm)
+    public void removeUserTimedPerm(User user, String server, String world, String perm)
     {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
         //cache
-        Server srv = user.getServer(server);
-        World w = srv.getWorld(world);
-        w.getPerms().remove(Statics.toLower(perm));
+        if (server == null)
+        {
+            for (TimedValue<String> t : user.getTimedPerms())
+                if (t.getValue().equalsIgnoreCase(perm))
+                {
+                    user.getTimedPerms().remove(t);
+                    break;
+                }
+        }
+        else if (world == null)
+        {
+            for (TimedValue<String> t : user.getServer(server).getTimedPerms())
+                if (t.getValue().equalsIgnoreCase(perm))
+                {
+                    user.getServer(server).getTimedPerms().remove(t);
+                    break;
+                }
+        }
+        else
+        {
+            for (TimedValue<String> t : user.getServer(server).getWorld(world).getTimedPerms())
+                if (t.getValue().equalsIgnoreCase(perm))
+                {
+                    user.getServer(server).getWorld(world).getTimedPerms().remove(t);
+                    break;
+                }
+        }
 
         //database
-        backEnd.saveUserPerServerWorldPerms(user, Statics.toLower(server), Statics.toLower(world));
+        backEnd.saveUserTimedPerms(user, server, world);
 
         //recalc perms
-        user.recalcPerms(server, world);
+        user.invalidateCache();
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
      * Sets the displayname of the group
      *
-     * @param user
-     * @param display
-     * @param server
-     * @param world
+     * @param user the user
+     * @param display the display
+     * @param server the server to set the display on; may be null
+     * @param world the world to ser the display in; may be null
      */
     public void setUserDisplay(User user, String display, String server, String world)
     {
@@ -1031,20 +1134,17 @@ public class PermissionsManager
         //database
         backEnd.saveUserDisplay(user, Statics.toLower(server), Statics.toLower(world));
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
      * Sets the prefix for the group.
      *
-     * @param user
-     * @param prefix
-     * @param server
-     * @param world
+     * @param user the user
+     * @param prefix the prefix
+     * @param server the server to set the prefix on; may be null
+     * @param world the world to ser the prefix in; may be null
      */
     public void setUserPrefix(User user, String prefix, String server, String world)
     {
@@ -1065,20 +1165,17 @@ public class PermissionsManager
         //database
         backEnd.saveUserPrefix(user, Statics.toLower(server), Statics.toLower(world));
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
      * Sets the suffix for the group.
      *
-     * @param user
-     * @param suffix
-     * @param server
-     * @param world
+     * @param user the user
+     * @param suffix the suffix
+     * @param server the server to set the suffix on; may be null
+     * @param world the world to ser the suffix in; may be null
      */
     public void setUserSuffix(User user, String suffix, String server, String world)
     {
@@ -1099,192 +1196,248 @@ public class PermissionsManager
         //database
         backEnd.saveUserSuffix(user, Statics.toLower(server), Statics.toLower(world));
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadUser(user, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(user);
+        //send bukkit update info & changed events
+        userChanged(user);
     }
 
     /**
-     * Adds the permission to the group.
+     * Adds a permission to a group.
      *
      * @param group the group
      * @param perm the permission to add
      */
+    @Deprecated
     public void addGroupPerm(Group group, String perm)
     {
-        //cache
-        group.getPerms().add(Statics.toLower(perm));
-
-        //database
-        backEnd.saveGroupPerms(group);
-
-        //recalc perms
-        for (Group g : groups)
-        {
-            g.recalcPerms();
-        }
-        for (User u : users)
-        {
-            u.recalcPerms();
-        }
-
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        addGroupPerm(group, null, null, perm);
     }
 
     /**
-     * Removes the permission from the group.
+     * Removes a permission from a group.
      *
      * @param group the group
      * @param perm the permission to remove
      */
+    @Deprecated
     public void removeGroupPerm(Group group, String perm)
     {
-        //cache
-        group.getPerms().remove(Statics.toLower(perm));
-
-        //database
-        backEnd.saveGroupPerms(group);
-
-        //recalc perms
-        for (Group g : groups)
-        {
-            g.recalcPerms();
-        }
-        for (User u : users)
-        {
-            u.recalcPerms();
-        }
-
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        removeGroupPerm(group, null, null, perm);
     }
 
     /**
-     * Adds the permission to the group on the given server.
+     * Adds a permission to a group.
      *
      * @param group the group
-     * @param server the server
+     * @param server optional: the server
+     * @param world optional: the world
      * @param perm the permission to add
      */
-    public void addGroupPerServerPerm(Group group, String server, String perm)
+    public void addGroupPerm(Group group, String server, String world, String perm)
     {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+        perm = Statics.toLower(perm);
+
         //cache
-        Server srv = group.getServer(server);
-        srv.getPerms().add(Statics.toLower(perm));
+        if (server == null)
+            group.getPerms().add(perm);
+        else if (world == null)
+            group.getServer(server).getPerms().add(perm);
+        else
+            group.getServer(server).getWorld(world).getPerms().add(perm);
 
         //database
-        backEnd.saveGroupPerServerPerms(group, Statics.toLower(server));
+        backEnd.saveGroupPerms(group, server, world);
 
         //recalc perms
-        for (Group g : groups)
+        grouplock.readLock().lock();
+        try
         {
-            g.recalcPerms(server);
+            for (Group g : groups)
+                g.invalidateCache();
         }
-        for (User u : users)
+        finally
         {
-            u.recalcPerms();
+            grouplock.readLock().unlock();
+        }
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
         }
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
-     * Removes the permission from the group on the given server.
+     * Adds a timed permission to a group.
      *
      * @param group the group
-     * @param server the server
+     * @param server optional: the server
+     * @param world optional: the world
+     * @param perm the timed permission to add
+     */
+    public void addGroupTimedPerm(Group group, String server, String world, TimedValue perm)
+    {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
+        //cache
+        if (server == null)
+            group.getTimedPerms().add(perm);
+        else if (world == null)
+            group.getServer(server).getTimedPerms().add(perm);
+        else
+            group.getServer(server).getWorld(world).getTimedPerms().add(perm);
+
+        //database
+        backEnd.saveGroupTimedPerms(group, server, world);
+
+        //recalc perms
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
+
+        //send bukkit update info & changed events
+        groupChanged(group);
+    }
+
+    /**
+     * Removes a permission from a group.
+     *
+     * @param group the group
+     * @param server optional: the server
+     * @param world optional: the world
      * @param perm the permission to remove
      */
-    public void removeGroupPerServerPerm(Group group, String server, String perm)
+    public void removeGroupPerm(Group group, String server, String world, String perm)
     {
         //cache
-        Server srv = group.getServer(server);
-
-        srv.getPerms().remove(Statics.toLower(perm));
+        if (server == null)
+            group.getPerms().remove(perm);
+        else if (world == null)
+            group.getServer(server).getPerms().remove(perm);
+        else
+            group.getServer(server).getWorld(world).getPerms().remove(perm);
 
         //database
-        backEnd.saveGroupPerServerPerms(group, Statics.toLower(server));
+        backEnd.saveGroupPerms(group, server, world);
 
         //recalc perms
-        for (Group g : groups)
+        grouplock.readLock().lock();
+        try
         {
-            g.recalcPerms(server);
+            for (Group g : groups)
+                g.invalidateCache();
         }
-        for (User u : users)
+        finally
         {
-            u.recalcPerms();
+            grouplock.readLock().unlock();
+        }
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
         }
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
-     * Adds the permission to the group on the given server and world.
+     * Removes a timed permission from a group.
      *
      * @param group the group
-     * @param server the server
-     * @param world the world
-     * @param perm the permission to add
+     * @param server optional: the server
+     * @param world optional: the world
+     * @param perm the timed permission to remove
      */
-    public void addGroupPerServerWorldPerm(Group group, String server, String world, String perm)
+    public void removeGroupTimedPerm(Group group, String server, String world, String perm)
     {
         //cache
-        Server srv = group.getServer(server);
-        World w = srv.getWorld(world);
-        w.getPerms().add(Statics.toLower(perm));
+        if (server == null)
+        {
+            for (TimedValue<String> t : group.getTimedPerms())
+                if (t.getValue().equalsIgnoreCase(perm))
+                {
+                    group.getTimedPerms().remove(t);
+                    break;
+                }
+        }
+        else if (world == null)
+        {
+            for (TimedValue<String> t : group.getServer(server).getTimedPerms())
+                if (t.getValue().equalsIgnoreCase(perm))
+                {
+                    group.getServer(server).getTimedPerms().remove(t);
+                    break;
+                }
+        }
+        else
+        {
+            for (TimedValue<String> t : group.getServer(server).getWorld(world).getTimedPerms())
+                if (t.getValue().equalsIgnoreCase(perm))
+                {
+                    group.getServer(server).getWorld(world).getTimedPerms().remove(t);
+                    break;
+                }
+        }
 
         //database
-        backEnd.saveGroupPerServerWorldPerms(group, Statics.toLower(server), Statics.toLower(world));
+        backEnd.saveGroupTimedPerms(group, server, world);
 
         //recalc perms
-        for (Group g : groups)
+        grouplock.readLock().lock();
+        try
         {
-            g.recalcPerms(server, world);
+            for (Group g : groups)
+                g.invalidateCache();
         }
-        for (User u : users)
+        finally
         {
-            u.recalcPerms();
+            grouplock.readLock().unlock();
         }
-
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
-    }
-
-    /**
-     * Removes the permission from the group on the given server and world.
-     *
-     * @param group the group
-     * @param server the server
-     * @param world the world
-     * @param perm the permission to remove
-     */
-    public void removeGroupPerServerWorldPerm(Group group, String server, String world, String perm)
-    {
-        //cache
-        Server srv = group.getServer(server);
-        World w = srv.getWorld(world);
-        w.getPerms().remove(Statics.toLower(perm));
-
-        //database
-        backEnd.saveGroupPerServerWorldPerms(group, Statics.toLower(server), Statics.toLower(world));
-
-        //recalc perms
-        for (Group g : groups)
+        userlock.readLock().lock();
+        try
         {
-            g.recalcPerms(server, world);
+            for (User u : users)
+                u.invalidateCache();
         }
-        for (User u : users)
+        finally
         {
-            u.recalcPerms();
+            userlock.readLock().unlock();
         }
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
@@ -1296,24 +1449,77 @@ public class PermissionsManager
     public void addGroupInheritance(Group group, Group toadd)
     {
         //cache
-        group.getInheritances().add(toadd.getName());
-        Collections.sort(group.getInheritances());
+        group.getInheritancesString().add(toadd.getName());
+        Collections.sort(group.getInheritancesString());
 
         //database
         backEnd.saveGroupInheritances(group);
 
         //recalc perms
-        for (Group g : groups)
+        grouplock.readLock().lock();
+        try
         {
-            g.recalcPerms();
+            for (Group g : groups)
+                g.invalidateCache();
         }
-        for (User u : users)
+        finally
         {
-            u.recalcPerms();
+            grouplock.readLock().unlock();
+        }
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
         }
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        //send bukkit update info & changed events
+        groupChanged(group);
+    }
+
+    /**
+     * Adds the toadd timed group to the group as inheritance
+     *
+     * @param group the group which should inherit
+     * @param toadd the timed group which should be inherited
+     */
+    public void addGroupTimedInheritance(Group group, TimedValue<Group> toadd)
+    {
+        //cache
+        group.getTimedInheritancesString().add(new TimedValue(toadd.getValue().getName(), toadd.getStart(), toadd.getDuration()));
+        Collections.sort(group.getTimedInheritancesString());
+
+        //database
+        backEnd.saveGroupTimedInheritances(group);
+
+        //recalc perms
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
+
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
@@ -1325,31 +1531,87 @@ public class PermissionsManager
     public void removeGroupInheritance(Group group, Group toremove)
     {
         //cache
-        group.getInheritances().remove(toremove.getName());
-        Collections.sort(group.getInheritances());
+        group.getInheritancesString().remove(toremove.getName());
 
         //database
         backEnd.saveGroupInheritances(group);
 
         //recalc perms
-        for (Group g : groups)
+        grouplock.readLock().lock();
+        try
         {
-            g.recalcPerms();
+            for (Group g : groups)
+                g.invalidateCache();
         }
-        for (User u : users)
+        finally
         {
-            u.recalcPerms();
+            grouplock.readLock().unlock();
+        }
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
         }
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
+        //send bukkit update info & changed events
+        groupChanged(group);
+    }
+
+    /**
+     * Removes the toremove timed group from the group as inheritance
+     *
+     * @param group the group which should no longer inherit
+     * @param toremove the timed group which should no longer be inherited
+     */
+    public void removeGroupTimedInheritance(Group group, Group toremove)
+    {
+        //cache
+        for (TimedValue<String> t : group.getTimedInheritancesString())
+            if (t.getValue().equalsIgnoreCase(toremove.getName()))
+            {
+                group.getTimedInheritancesString().remove(t);
+                break;
+            }
+
+        //database
+        backEnd.saveGroupTimedInheritances(group);
+
+        //recalc perms
+        grouplock.readLock().lock();
+        try
+        {
+            for (Group g : groups)
+                g.invalidateCache();
+        }
+        finally
+        {
+            grouplock.readLock().unlock();
+        }
+        userlock.readLock().lock();
+        try
+        {
+            for (User u : users)
+                u.invalidateCache();
+        }
+        finally
+        {
+            userlock.readLock().unlock();
+        }
+
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
      * Set the ladder for the group.
      *
-     * @param group
-     * @param ladder
+     * @param group the group
+     * @param ladder the ladder name
      */
     public void ladderGroup(Group group, String ladder)
     {
@@ -1359,62 +1621,69 @@ public class PermissionsManager
         //database
         backEnd.saveGroupLadder(group);
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
      * Sets the rank for the group.
      *
-     * @param group
-     * @param rank
+     * @param group the group
+     * @param rank the rank
      */
     public void rankGroup(Group group, int rank)
     {
         //cache
         group.setRank(rank);
-        Collections.sort(groups);
+        grouplock.writeLock().lock();
+        try
+        {
+            Collections.sort(groups);
+        }
+        finally
+        {
+            grouplock.writeLock().unlock();
+        }
 
         //database
         backEnd.saveGroupRank(group);
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
      * Sets the weight for the group.
      *
-     * @param group
-     * @param weight
+     * @param group the group
+     * @param weight the weight
      */
     public void weightGroup(Group group, int weight)
     {
         //cache
         group.setWeight(weight);
-        Collections.sort(groups);
+        grouplock.writeLock().lock();
+        try
+        {
+            Collections.sort(groups);
+        }
+        finally
+        {
+            grouplock.writeLock().unlock();
+        }
 
         //database
         backEnd.saveGroupWeight(group);
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
      * Sets if the the group is a default group.
      *
-     * @param group
-     * @param isdefault
+     * @param group the group
+     * @param isdefault whether or not the group is aded by default to new users
      */
     public void setGroupDefault(Group group, boolean isdefault)
     {
@@ -1424,20 +1693,17 @@ public class PermissionsManager
         //database
         backEnd.saveGroupDefault(group);
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
      * Sets the displayname of the group
      *
-     * @param group
-     * @param display
-     * @param server
-     * @param world
+     * @param group the group
+     * @param display the display
+     * @param server the server to set the display on; may be null
+     * @param world the world to ser the display in; may be null
      */
     public void setGroupDisplay(Group group, String display, String server, String world)
     {
@@ -1458,20 +1724,17 @@ public class PermissionsManager
         //database
         backEnd.saveGroupDisplay(group, server, world);
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
      * Sets the prefix for the group.
      *
-     * @param group
-     * @param prefix
-     * @param server
-     * @param world
+     * @param group the group
+     * @param prefix the prefix
+     * @param server the server to set the prefix on; may be null
+     * @param world the world to ser the prefix in; may be null
      */
     public void setGroupPrefix(Group group, String prefix, String server, String world)
     {
@@ -1492,20 +1755,17 @@ public class PermissionsManager
         //database
         backEnd.saveGroupPrefix(group, server, world);
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
      * Sets the suffix for the group.
      *
-     * @param group
-     * @param suffix
-     * @param server
-     * @param world
+     * @param group the group
+     * @param suffix the suffix
+     * @param server the server to set the suffix on; may be null
+     * @param world the world to ser the suffix in; may be null
      */
     public void setGroupSuffix(Group group, String suffix, String server, String world)
     {
@@ -1526,11 +1786,8 @@ public class PermissionsManager
         //database
         backEnd.saveGroupSuffix(group, server, world);
 
-        //send bukkit update info
-        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(group, null);
-
-        //call event
-        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
+        //send bukkit update info & changed events
+        groupChanged(group);
     }
 
     /**
@@ -1540,14 +1797,14 @@ public class PermissionsManager
      */
     public synchronized void migrateBackEnd(BackEndType bet)
     {
-        Migrator migrator = null;
+        Migrator migrator;
         switch (bet)
         {
-            case MySQL2:
-                migrator = new Migrate2MySQL2(config, debug);
-                break;
             case YAML:
                 migrator = new Migrate2YAML(config);
+                break;
+            case MySQL:
+                migrator = new Migrate2MySQL(config, debug);
                 break;
             default:
                 throw new UnsupportedOperationException("bet = " + bet.name());
@@ -1558,7 +1815,11 @@ public class PermissionsManager
         debug.log("migrate backend: loaded groups");
         List<User> users = backEnd.loadUsers();
         debug.log("migrate backend: loaded users");
-        migrator.migrate(groups, users, permsversion);
+        Map<UUID, String> uuidplayer = new HashMap();
+        if (config.isUseUUIDs())
+            uuidplayer = UUIDPlayerDB.getAll();
+
+        migrator.migrate(groups, users, uuidplayer, permsversion);
 
         backEnd.load();
     }
@@ -1621,38 +1882,6 @@ public class PermissionsManager
         backEnd.saveVersion(version, true);
     }
 
-    /**
-     * Converts the backend of the database holding the UUIDs and their corresponding player names to the new backend.
-     *
-     * @param type the new backend type
-     */
-    public void migrateUUIDPlayerDB(UUIDPlayerDBType type)
-    {
-        Map<UUID, String> map = UUIDPlayerDB.getAll();
-
-        switch (type)
-        {
-            case None:
-                UUIDPlayerDB = new NoneUUIDPlayerDB();
-                break;
-            case YAML:
-                UUIDPlayerDB = new YAMLUUIDPlayerDB();
-                break;
-            case MySQL:
-                UUIDPlayerDB = new MySQLUUIDPlayerDB();
-                break;
-            default:
-                throw new UnsupportedOperationException("type = " + type);
-        }
-        BungeePerms.getInstance().getConfig().setUUIDPlayerDB(UUIDPlayerDB.getType());
-        UUIDPlayerDB.clear();
-
-        for (Map.Entry<UUID, String> e : map.entrySet())
-        {
-            UUIDPlayerDB.update(e.getKey(), e.getValue());
-        }
-    }
-
 //internal functions
     public void reloadUser(String user)
     {
@@ -1663,7 +1892,7 @@ public class PermissionsManager
             return;
         }
         backEnd.reloadUser(u);
-        u.recalcPerms();
+        u.invalidateCache();
     }
 
     public void reloadUser(UUID uuid)
@@ -1675,7 +1904,7 @@ public class PermissionsManager
             return;
         }
         backEnd.reloadUser(u);
-        u.recalcPerms();
+        u.invalidateCache();
     }
 
     public void reloadGroup(String group)
@@ -1704,16 +1933,12 @@ public class PermissionsManager
         try
         {
             for (Group gr : groups)
-            {
-                gr.recalcPerms();
-            }
+                gr.invalidateCache();
         }
         finally
         {
             if (holdread)
-            {
                 grouplock.readLock().unlock();
-            }
         }
 
         userlock.readLock().lock();
@@ -1721,7 +1946,7 @@ public class PermissionsManager
         {
             for (User u : users)
             {
-                u.recalcPerms();
+                u.invalidateCache();
             }
         }
         finally
@@ -1738,7 +1963,7 @@ public class PermissionsManager
             for (User u : users)
             {
                 backEnd.reloadUser(u);
-                u.recalcPerms();
+                u.invalidateCache();
             }
         }
         finally
@@ -1754,9 +1979,7 @@ public class PermissionsManager
         try
         {
             for (Group g : groups)
-            {
                 backEnd.reloadGroup(g);
-            }
             Collections.sort(groups);
 
             grouplock.readLock().lock();
@@ -1769,25 +1992,19 @@ public class PermissionsManager
         try
         {
             for (Group g : groups)
-            {
-                g.recalcPerms();
-            }
+                g.invalidateCache();
         }
         finally
         {
             if (holdread)
-            {
                 grouplock.readLock().unlock();
-            }
         }
 
         userlock.readLock().lock();
         try
         {
             for (User u : users)
-            {
-                u.recalcPerms();
-            }
+                u.invalidateCache();
         }
         finally
         {
@@ -1845,5 +2062,23 @@ public class PermissionsManager
         {
             grouplock.writeLock().unlock();
         }
+    }
+
+    private void userChanged(User u)
+    {
+        //send bukkit update info
+        BungeePerms.getInstance().getNetworkNotifier().reloadUser(u, null);
+
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(u);
+    }
+
+    private void groupChanged(Group g)
+    {
+        //send bukkit update info
+        BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g, null);
+
+        //call event
+        BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(g);
     }
 }

@@ -41,7 +41,7 @@ public class BungeePermsAPI
         if (g == null)
             return false;
 
-        return g.hasOnServerInWorld(permission, server, world);
+        return g.has(permission, server, world);
     }
 
     /**
@@ -62,12 +62,7 @@ public class BungeePermsAPI
         if (g == null)
             return false;
 
-        if (server == null)
-            BungeePerms.getInstance().getPermissionsManager().addGroupPerm(g, permission);
-        else if (world == null)
-            BungeePerms.getInstance().getPermissionsManager().addGroupPerServerPerm(g, server, permission);
-        else
-            BungeePerms.getInstance().getPermissionsManager().addGroupPerServerWorldPerm(g, server, world, permission);
+        BungeePerms.getInstance().getPermissionsManager().addGroupPerm(g, server, world, permission);
         return true;
     }
 
@@ -89,13 +84,7 @@ public class BungeePermsAPI
         if (g == null)
             return false;
 
-        if (server == null)
-            BungeePerms.getInstance().getPermissionsManager().removeGroupPerm(g, permission);
-        else if (world == null)
-            BungeePerms.getInstance().getPermissionsManager().removeGroupPerServerPerm(g, server, permission);
-        else
-            BungeePerms.getInstance().getPermissionsManager().removeGroupPerServerWorldPerm(g, server, world, permission);
-
+        BungeePerms.getInstance().getPermissionsManager().removeGroupPerm(g, server, world, permission);
         return true;
     }
 
@@ -112,7 +101,15 @@ public class BungeePermsAPI
      */
     public static boolean groupTimedAdd(String group, String permission, String server, String world, Date start, int dur)
     {
-        return false;
+        server = server(server);
+        world = world(server, world);
+        permission = Statics.toLower(permission);
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+            return false;
+
+        BungeePerms.getInstance().getPermissionsManager().addGroupTimedPerm(g, server, world, new TimedValue(permission, start, dur));
+        return true;
     }
 
     /**
@@ -126,7 +123,15 @@ public class BungeePermsAPI
      */
     public static boolean groupTimedRemove(String group, String permission, String server, String world)
     {
-        return false;
+        server = server(server);
+        world = world(server, world);
+        permission = Statics.toLower(permission);
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+            return false;
+
+        BungeePerms.getInstance().getPermissionsManager().removeGroupTimedPerm(g, server, world, permission);
+        return true;
     }
 
     /**
@@ -146,7 +151,7 @@ public class BungeePermsAPI
         if (add == null)
             return false;
 
-        if (g.getInheritances().contains(add.getName()))
+        if (g.getInheritances().contains(add))
             return false;
 
         BungeePerms.getInstance().getPermissionsManager().addGroupInheritance(g, add);
@@ -170,7 +175,7 @@ public class BungeePermsAPI
         if (remove == null)
             return false;
 
-        if (!g.getInheritances().contains(g.getName()))
+        if (!g.getInheritances().contains(g))
             return false;
 
         BungeePerms.getInstance().getPermissionsManager().removeGroupInheritance(g, remove);
@@ -188,7 +193,20 @@ public class BungeePermsAPI
      */
     public static boolean groupAddTimedInheritance(String group, String groupadd, Date start, int dur)
     {
-        return false;
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+            return false;
+
+        Group add = BungeePerms.getInstance().getPermissionsManager().getGroup(groupadd);
+        if (add == null)
+            return false;
+
+        for (TimedValue<String> ti : g.getTimedInheritancesString())
+            if (ti.getValue().equalsIgnoreCase(groupadd))
+                return false;
+
+        BungeePerms.getInstance().getPermissionsManager().addGroupTimedInheritance(g, new TimedValue<>(add, start, dur));
+        return true;
     }
 
     /**
@@ -200,7 +218,27 @@ public class BungeePermsAPI
      */
     public static boolean groupRemoveTimedInheritance(String group, String groupremove)
     {
-        return false;
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+            return false;
+
+        Group remove = BungeePerms.getInstance().getPermissionsManager().getGroup(groupremove);
+        if (remove == null)
+            return false;
+
+        boolean found = false;
+        for (TimedValue<String> ti : g.getTimedInheritancesString())
+            if (ti.getValue().equalsIgnoreCase(groupremove))
+            {
+                found = true;
+                break;
+            }
+
+        if (!found)
+            return false;
+
+        BungeePerms.getInstance().getPermissionsManager().removeGroupTimedInheritance(g, remove);
+        return true;
     }
 
     /**
@@ -282,7 +320,14 @@ public class BungeePermsAPI
      */
     public static List<String> userTimedGroups(String nameoruuid)
     {
-        return new ArrayList();
+        User u = BungeePerms.getInstance().getPermissionsManager().getUser(nameoruuid);
+        if (u == null)
+            return new ArrayList();
+
+        List<String> ret = new ArrayList();
+        for (TimedValue<String> tg : u.getTimedGroupsString())
+            ret.add(tg.getValue());
+        return ret;
     }
 
     /**
@@ -331,12 +376,7 @@ public class BungeePermsAPI
         if (u == null)
             return false;
 
-        if (server == null)
-            return BungeePerms.getInstance().getPermissionsChecker().hasPerm(nameoruuid, permission);
-        else if (world == null)
-            return BungeePerms.getInstance().getPermissionsChecker().hasPermOnServer(nameoruuid, permission, server);
-        else
-            return BungeePerms.getInstance().getPermissionsChecker().hasPermOnServerInWorld(nameoruuid, permission, server, world);
+        return u.hasPerm(server, world, permission);
     }
 
     /**
@@ -357,16 +397,8 @@ public class BungeePermsAPI
         if (u == null)
             return false;
 
-        List<String> ep;
-        if (server == null)
-            ep = u.getEffectivePerms();
-        else if (world == null)
-            ep = u.getEffectivePerms(server);
-        else
-            ep = u.getEffectivePerms(server, world);
-
-        for (String p : ep)
-            if (p.equalsIgnoreCase(permission))
+        for (BPPermission p : u.getEffectivePerms(server, world))
+            if (p.getPermission().equalsIgnoreCase(permission))
                 return true;
 
         return false;
@@ -390,12 +422,7 @@ public class BungeePermsAPI
         if (u == null)
             return false;
 
-        if (server == null)
-            BungeePerms.getInstance().getPermissionsManager().addUserPerm(u, permission);
-        else if (world == null)
-            BungeePerms.getInstance().getPermissionsManager().addUserPerServerPerm(u, server, permission);
-        else
-            BungeePerms.getInstance().getPermissionsManager().addUserPerServerWorldPerm(u, server, world, permission);
+        BungeePerms.getInstance().getPermissionsManager().addUserPerm(u, server, world, permission);
         return true;
     }
 
@@ -417,12 +444,7 @@ public class BungeePermsAPI
         if (u == null)
             return false;
 
-        if (server == null)
-            BungeePerms.getInstance().getPermissionsManager().removeUserPerm(u, permission);
-        else if (world == null)
-            BungeePerms.getInstance().getPermissionsManager().removeUserPerServerPerm(u, server, permission);
-        else
-            BungeePerms.getInstance().getPermissionsManager().removeUserPerServerWorldPerm(u, server, world, permission);
+        BungeePerms.getInstance().getPermissionsManager().removeUserPerm(u, server, world, permission);
         return true;
     }
 
@@ -439,7 +461,15 @@ public class BungeePermsAPI
      */
     public static boolean userTimedAdd(String nameoruuid, String permission, String server, String world, Date start, int dur)
     {
-        return false;
+        server = server(server);
+        world = world(server, world);
+        permission = Statics.toLower(permission);
+        User u = BungeePerms.getInstance().getPermissionsManager().getUser(nameoruuid);
+        if (u == null)
+            return false;
+
+        BungeePerms.getInstance().getPermissionsManager().addUserTimedPerm(u, server, world, new TimedValue(permission, start, dur));
+        return true;
     }
 
     /**
@@ -453,7 +483,15 @@ public class BungeePermsAPI
      */
     public static boolean userTimedRemove(String nameoruuid, String permission, String server, String world)
     {
-        return false;
+        server = server(server);
+        world = world(server, world);
+        permission = Statics.toLower(permission);
+        User u = BungeePerms.getInstance().getPermissionsManager().getUser(nameoruuid);
+        if (u == null)
+            return false;
+
+        BungeePerms.getInstance().getPermissionsManager().removeUserTimedPerm(u, server, world, permission);
+        return true;
     }
 
     /**
@@ -515,7 +553,20 @@ public class BungeePermsAPI
      */
     public static boolean userAddTimedGroup(String nameoruuid, String group, Date start, int dur)
     {
-       return false;
+        User u = BungeePerms.getInstance().getPermissionsManager().getUser(nameoruuid);
+        if (u == null)
+            return false;
+
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+            return false;
+
+        for (TimedValue<String> ti : u.getTimedGroupsString())
+            if (ti.getValue().equalsIgnoreCase(group))
+                return false;
+
+        BungeePerms.getInstance().getPermissionsManager().addUserTimedGroup(u, new TimedValue(g, start, dur));
+        return true;
     }
 
     /**
@@ -527,7 +578,27 @@ public class BungeePermsAPI
      */
     public static boolean userRemoveTimedGroup(String nameoruuid, String group)
     {
-        return false;
+        User u = BungeePerms.getInstance().getPermissionsManager().getUser(nameoruuid);
+        if (u == null)
+            return false;
+
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+            return false;
+
+        boolean found = false;
+        for (TimedValue<String> ti : u.getTimedGroupsString())
+            if (ti.getValue().equalsIgnoreCase(group))
+            {
+                found = true;
+                break;
+            }
+
+        if (!found)
+            return false;
+
+        BungeePerms.getInstance().getPermissionsManager().removeUserTimedGroup(u, g);
+        return true;
     }
 
     /**
@@ -582,7 +653,7 @@ public class BungeePermsAPI
         return config instanceof BukkitConfig && ((BukkitConfig) config).isSuperpermscompat();
     }
 
-    //uti
+    //util
     private static String server(String server)
     {
         if (server.equals(""))

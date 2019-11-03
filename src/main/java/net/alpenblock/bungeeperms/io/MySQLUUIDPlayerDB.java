@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import lombok.Getter;
 import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Debug;
@@ -15,6 +16,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
 
     private final BPConfig config;
     private final Debug debug;
+    @Getter
     private final Mysql mysql;
 
     private final String table;
@@ -23,10 +25,10 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     {
         this.config = BungeePerms.getInstance().getConfig();
         this.debug = BungeePerms.getInstance().getDebug();
-        mysql = new Mysql(config.getConfig(), debug, "bungeeperms");
+        mysql = new Mysql(config, debug, "bungeeperms");
         mysql.connect();
 
-        table = config.getTablePrefix() + "uuidplayer";
+        table = config.getMysqlTablePrefix() + "uuidplayer";
 
         createTable();
     }
@@ -59,9 +61,9 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     }
 
     @Override
-    public UUIDPlayerDBType getType()
+    public BackEndType getType()
     {
-        return UUIDPlayerDBType.MySQL;
+        return BackEndType.MySQL;
     }
 
     @Override

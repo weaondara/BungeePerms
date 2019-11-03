@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms.platform.bungee;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -45,6 +47,9 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     {
         //static
         instance = this;
+        
+        //metrics
+        startMetrics();
 
         //load config
         Config conf = new Config(this, "/config.yml");
@@ -223,8 +228,34 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     }
 
     @Override
+    public int runTaskLater(Runnable r, long delay)
+    {
+        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS).getId();
+    }
+
+    @Override
     public void cancelTask(int id)
     {
         ProxyServer.getInstance().getScheduler().cancel(id);
+    }
+
+    @Override
+    public Integer getBuild()
+    {
+        return Statics.getBuild(this);
+    }
+
+    private void startMetrics()
+    {
+        try
+        {
+            Class c = Class.forName("net.alpenblock.bungeeperms.metrics.bungee.Metrics");
+            Constructor cc = c.getConstructor(Plugin.class);
+            cc.newInstance(this);
+        }
+        catch (Exception ex)
+        {
+            getLogger().severe("Could not start metrics!");
+        }
     }
 }

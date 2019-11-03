@@ -1,5 +1,6 @@
 package net.alpenblock.bungeeperms;
 
+import java.io.File;
 import java.util.EnumMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,9 @@ public class Lang
 
     public static void load(String file)
     {
+        if (!new File(file).isFile())
+            return;
+        
         Config langconf = new Config(file);
         langconf.load();
 
@@ -31,6 +35,16 @@ public class Lang
         }
         s = Statics.format(s, vars);
         return s.replaceAll("&", ChatColor.COLOR_CHAR + "");
+    }
+    public static String translatePreserveArgs(MessageType type, Object... vars)
+    {
+        String s = MAP.get(type);
+        if (s == null)
+        {
+            s = type.getDefaultValue();
+        }
+        s = s.replaceAll("&", ChatColor.COLOR_CHAR + "");
+        return Statics.format(s, vars);
     }
 
     @AllArgsConstructor
@@ -53,9 +67,12 @@ public class Lang
         CLEANING("cleaning", Color.Text.alt() + "Cleaning up permissions file/table ..."),
         CLEANING_DONE("cleaning-done", Color.Message.alt() + "Finished cleaning. Deleted " + Color.Value.alt() + "{0} users" + Color.Message.alt() + "."),
         NO_PERM("no-permission", ChatColor.RED.alt() + "You don't have permission to do that!"),
+        OVERVIEW_HEADER("overview-header", Color.Text.alt() + "Overview of groups:"),
+        OVERVIEW_ITEM("overview-item", Color.Text.alt() + "{0} (" + Color.Value.alt() + "{1}" + Color.Text.alt() + ", " + Color.Value.alt() + "{2}" + Color.Text.alt() + " perms, " + Color.Value.alt() + "{3}" + Color.Text.alt() + " own perms, " + Color.Value.alt() + "{4}" + Color.Text.alt() + " users, " + Color.Value.alt() + "{5}" + Color.Text.alt() + " rank, " + Color.Value.alt() + "{6}" + Color.Text.alt() + " weight)"),
         //error msgs
         ERR_INVALID_BOOL_VALUE("error.invalid-bool-value", Color.Error.alt() + "A boolean value is required!"),
         ERR_INVALID_INT_VALUE("error.invalid-int-value", Color.Error.alt() + "An integer value greater than 0 is required!"),
+        ERR_INVALID_DURATION_VALUE("error.invalid-duration-value", Color.Error.alt() + "A duration of the form 1d1h1m1s is required!"),
         ERR_USER_NOT_EXISTING("error.user.not-existing", Color.Error.alt() + "The player " + Color.User.alt() + "{0}" + Color.Error.alt() + " does not exist!"),
         ERR_USER_ALREADY_IN_GROUP("error.user.already-in-group", Color.Error.alt() + "Player is already in group " + Color.Value.alt() + "{0}" + Color.Error.alt() + "!"),
         ERR_USER_NOT_IN_GROUP("error.user.not-in-group", Color.Error.alt() + "Player is not in group " + Color.Value.alt() + "{0}" + Color.Error.alt() + "!"),
@@ -67,6 +84,7 @@ public class Lang
         ERR_USER_YOU_CANNOT_PROMOTE("error.user.you-cannot-promote", Color.Error.alt() + "You can't promote the player " + Color.User.alt() + "{0}" + Color.Error.alt() + "!"),
         ERR_USER_YOU_CANNOT_DEMOTE("error.user.you-cannot-demote", Color.Error.alt() + "You can't demote the player " + Color.User.alt() + "{0}" + Color.Error.alt() + "!"),
         ERR_GROUP_NOT_EXISTING("error.group.not-existing", Color.Error.alt() + "The group " + Color.User.alt() + "{0}" + Color.Error.alt() + " does not exist!"),
+        ERR_GROUP_ALREADY_EXISTS("error.group.already-exists", Color.Error.alt() + "The group " + Color.User.alt() + "{0}" + Color.Error.alt() + " already exists!"),
         ERR_GROUP_ALREADY_INHERITS("error.group.already-inherits", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " already inherits from " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
         ERR_GROUP_DOES_NOT_INHERITS("error.group.does-not-inherit", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Error.alt() + " does not inherit from group " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
         //user msgs
@@ -150,7 +168,7 @@ public class Lang
         SUFFIX("common.suffix", Color.Text.alt() + "Suffix: " + ChatColor.RESET.alt() + "{0}"),
         PREFIX_FULL("common.prefix-full", Color.Text.alt() + "Full prefix: " + ChatColor.RESET.alt() + "{0}"),
         SUFFIX_FULL("common.suffix-full", Color.Text.alt() + "Full suffix: " + ChatColor.RESET.alt() + "{0}"),
-        PERMISSIONS_LIST_ITEM("common.permissions-list-item", Color.Text.alt() + "- " + Color.Value.alt() + "{0}" + Color.Text.alt() + " (" + Color.Value.alt() + "{1}" + Color.Text.alt() + "{2}{3})"),
+        PERMISSIONS_LIST_ITEM("common.permissions-list-item", Color.Text.alt() + "- " + Color.Value.alt() + "{0}" + Color.Text.alt() + " (" + Color.Value.alt() + "{1}" + Color.Text.alt() + "{2}{3}{4})"),
         PERMISSIONS_LIST_HEADER_PAGE("common.permissions-list-header-page", Color.Text.alt() + "Page " + Color.Value.alt() + "{0}" + Color.Text.alt() + "/" + Color.Value.alt() + "{1}" + Color.Text.alt() + ""),
         //util & parts
         OWN("general.own", "own"),
@@ -170,6 +188,8 @@ public class Lang
         LOGIN_UUID("log.login-uuid", "Login by {0} ({1})"),
         ADDING_DEFAULT_GROUPS("log.permissions.adding-default-groups", "Adding default groups to {0}"),
         ADDING_DEFAULT_GROUPS_UUID("log.permissions.adding-default-groups-uuid", "Adding default groups to {0} ({1})"),
+        UPDATE_AVAILABLE("log.update-available", ChatColor.GOLD.alt() + "New version available. Please check at " + ChatColor.BLUE.alt() + "https://ci.wea-ondara.net/job/BungeePerms/lastSuccessfulBuild/"),
+        COMMAND_ISSUED("log.command-issued", "{0} issued bungeeperms command: /{1} {2}"),
         //warnings
         INTRUSION_DETECTED("warning.intrusion-detected", Color.Error.alt() + "Possible intrusion detected. Sender is {0}"),
         MISCONFIG_BUNGEE_STANDALONE("warning.misconfig.bungee.standalone", "Server {0}: Received a plugin message from Bukkit/Spigot but BungeePerms is in standalone mode. Ignoring it ..."),
@@ -179,11 +199,17 @@ public class Lang
         MISCONFIG_BUNGEE_BACKEND("warning.misconfig.bungee.backend", "Server {0}: The backend types of the BungeePerms configs do not match."),
         MISCONFIG_BUNGEE_UUIDPLAYERDB("warning.misconfig.bungee.uuidplayerdb", "Server {0}: The uuidplayerdb types of the BungeePerms configs do not match."),
         MISCONFIG_BUNGEE_USEUUID("warning.misconfig.bungee.useuuid", "Server {0}: The useuuids options of the BungeePerms configs do not match."),
+        MISCONFIG_BUNGEE_RESOLVINGMODE("warning.misconfig.bungee.resolvingmode", "Server {0}: The resolving mode options of the BungeePerms configs do not match."),
+        MISCONFIG_BUNGEE_GROUPPERMISSION("warning.misconfig.bungee.grouppermission", "Server {0}: The group permission options of the BungeePerms configs do not match."),
+        MISCONFIG_BUNGEE_REGEXPERMISSIONS("warning.misconfig.bungee.regexpermissions", "Server {0}: The regex permission options of the BungeePerms configs do not match."),
         MISCONFIG_BUKKIT_STANDALONE("warning.misconfig.bukkit.standalone", "Received a plugin message from Bungeecord but BungeePerms is in standalone mode. Ignoring it ..."),
         MISCONFIG_BUKKIT_SERVERNAME("warning.misconfig.bukkit.servername", "The server names of the Bungeecord config and BungeePerms config do not match."),
         MISCONFIG_BUKKIT_BACKEND("warning.misconfig.bukkit.backend", "The backend types of the BungeePerms configs do not match."),
         MISCONFIG_BUKKIT_UUIDPLAYERDB("warning.misconfig.bukkit.uuidplayerdb", "The uuidplayerdb types of the BungeePerms configs do not match."),
         MISCONFIG_BUKKIT_USEUUID("warning.misconfig.bukkit.useuuid", "The useuuids options of the BungeePerms configs do not match."),
+        MISCONFIG_BUKKIT_RESOLVINGMODE("warning.misconfig.bukkit.resolvingmode", "The resolving mode options of the BungeePerms configs do not match."),
+        MISCONFIG_BUKKIT_GROUPPERMISSION("warning.misconfig.bukkit.grouppermission", "The group permission options of the BungeePerms configs do not match."),
+        MISCONFIG_BUKKIT_REGEXPERMISSIONS("warning.misconfig.bukkit.regexpermisions", "The regex permission options of the BungeePerms configs do not match."),
         MISCONFIG_BUNGEECORD_BUKKIT_CONFIG("warning.misconfig.bungee-bukkit-config", "UUIDs on Bungeecord and Bukkit/Spigot differ. Check your Spigot/Bukkit and Bungeecord config!"),
         MISCONFIG_USEUUID_NONE_UUID_DB("warning.misconfig.useuuid-none-uuiddb", "The useUUIDs option is enabled but the uuidplayerdb is set to none!"),
         //help
@@ -191,6 +217,7 @@ public class Lang
         HELP_HELP("help.help", "Shows this help"),
         HELP_RELOAD("help.reload", "Reloads the plugin"),
         HELP_DEBUG("help.debug", "En-/Disables the debug mode"),
+        HELP_OVERVIEW("help.overview", "Shows a compact overview of all groups"),
         HELP_USERS("help.users", "Lists the users [or shows the amount]"),
         HELP_USER_INFO("help.user.info", "Shows information about the user"),
         HELP_USER_DELETE("help.user.delete", "Deletes the user"),
@@ -198,11 +225,15 @@ public class Lang
         HELP_USER_PREFIX("help.user.prefiy", "Sets the prefix name for the user"),
         HELP_USER_SUFFIX("help.user.suffix", "Sets the suffix for the user"),
         HELP_USER_ADDPERM("help.user.add-perm", "Adds a permission to the user"),
+        HELP_USER_ADDTIMEDPERM("help.user.add-timed-perm", "Adds a timed permission to the user"),
         HELP_USER_REMOVEPERM("help.user.remove-perm", "Removes a permission from a the user"),
+        HELP_USER_REMOVETIMEDPERM("help.user.remove-timed-perm", "Removes a timed permission from a the user"),
         HELP_USER_HAS("help.user.has", "Checks if the user has the permission"),
         HELP_USER_LIST("help.user.list", "Lists the permissions of the user"),
         HELP_USER_ADDGROUP("help.user.add-group", "Add the group to the user"),
+        HELP_USER_ADDTIMEDGROUP("help.user.add-timed-group", "Add the timed group to the user"),
         HELP_USER_REMOVEGROUP("help.user.remove-group", "Removes the group from the user"),
+        HELP_USER_REMOVETIMEDGROUP("help.user.remove-timed-group", "Removes the timed group from the user"),
         HELP_USER_SETGROUP("help.user.set-group", "Removes the old group in the group's ladder and adds the group to the user"),
         HELP_USER_GROUPS("help.user.groups", "Lists the groups the user is in"),
         HELP_GROUPS("help.groups", "Lists the groups"),
@@ -211,7 +242,9 @@ public class Lang
         HELP_GROUP_CREATE("help.group.create", "Create a new group"),
         HELP_GROUP_DELETE("help.group.delete", "Deletes the group"),
         HELP_GROUP_ADDINHERIT("help.group.add-inherit", "Adds the addgroup to the group as inheritance"),
-        HELP_GROUP_REMOVEINHERIT("help.group.remive-inherit", "Removes the removegroup from the group as inheritance"),
+        HELP_GROUP_ADDTIMEDINHERIT("help.group.add-inherit", "Adds the addgroup to the group as timed inheritance"),
+        HELP_GROUP_REMOVEINHERIT("help.group.remove-timed-inherit", "Removes the removegroup from the group as inheritance"),
+        HELP_GROUP_REMOVETIMEDINHERIT("help.group.remove-timed-inherit", "Removes the removegroup from the group as timed inheritance"),
         HELP_GROUP_RANK("help.group.rank", "Sets the rank for the group"),
         HELP_GROUP_WEIGHT("help.group.weight", "Sets the weight for the group"),
         HELP_GROUP_LADDER("help.group.ladder", "Sets the ladder for the group"),
@@ -220,7 +253,9 @@ public class Lang
         HELP_GROUP_PREFIX("help.group.prefix", "Sets the prefix for the group"),
         HELP_GROUP_SUFFIX("help.group.suffix", "Sets the suffix for the group"),
         HELP_GROUP_ADDPERM("help.group.add-perm", "Adds a permission to the group"),
+        HELP_GROUP_ADDTIMEDPERM("help.group.add-timed-perm", "Adds a timed permission to the group"),
         HELP_GROUP_REMOVEPERM("help.group.remove-perm", "Removes a permission from the group"),
+        HELP_GROUP_REMOVETIMEDPERM("help.group.remove-timed-perm", "Removes a timed permission from the group"),
         HELP_GROUP_HAS("help.group.has", "Checks if the group has the permission"),
         HELP_GROUP_LIST("help.group.list", "Lists the permissions of the group"),
         HELP_PROMOTE("help.promote", "Promotes the user to the next rank"),
@@ -229,7 +264,6 @@ public class Lang
         HELP_CLEANUP("help.cleanup", "Cleans up the permission.yml or mysql table - " + ChatColor.RED.alt() + "!BE VERY CAREFUL! - removes a lot of players from the permissions db if configured"),
         HELP_MIGRATE_BACKEND("help.migrate.backend", "Migrates the backend or shows status - " + ChatColor.RED.alt() + "!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)"),
         HELP_MIGRATE_USEUUID("help.migrate.use-uuid", "Migrates backends to (not) use UUIDs or shows status - " + ChatColor.RED.alt() + "!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)"),
-        HELP_MIGRATE_UUIDPLAYERDB("help.migrate.uuid-player-db", "Migrates UUID-player-databases or shows status - " + ChatColor.RED.alt() + "!BE CAREFUL! (MAKE A BACKUP BEFORE EXECUTING)"),
         HELP_UUID("help.uuid", "Gets the UUID of a player from database (-r: reverse; -m: ask mojang)");
 
         private final String configKey;

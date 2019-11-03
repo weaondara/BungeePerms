@@ -69,7 +69,8 @@ public class BungeePermsResolver implements PermissionsResolver
     @Override
     public boolean inGroup(String player, String group)
     {
-        return manager.getUser(player).getGroups().contains(BungeePerms.getInstance().getPermissionsManager().getGroup(group));
+        User u = manager.getUser(player);
+        return u == null ? false : u.getGroups().contains(BungeePerms.getInstance().getPermissionsManager().getGroup(group));
     }
 
     @Override

@@ -4,7 +4,7 @@ public enum BackEndType
 {
 
     YAML,
-    MySQL2;
+    MySQL;
 
     public static BackEndType getByName(String name)
     {

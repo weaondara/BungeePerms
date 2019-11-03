@@ -95,12 +95,12 @@ public class BungeeNotifier implements NetworkNotifier
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                    && !Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+                && !Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
             {
                 return;
             }
             if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
-                    && Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+                && Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
             {
                 return;
             }
@@ -130,12 +130,12 @@ public class BungeeNotifier implements NetworkNotifier
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                    && !Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+                && !Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
             {
                 return;
             }
             if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
-                    && Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+                && Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
             {
                 return;
             }
@@ -164,12 +164,12 @@ public class BungeeNotifier implements NetworkNotifier
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                    && !Statics.listContains(config.getNetworkServers(), si.getName()))
+                && !Statics.listContains(config.getNetworkServers(), si.getName()))
             {
                 return;
             }
             if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
-                    && Statics.listContains(config.getNetworkServers(), si.getName()))
+                && Statics.listContains(config.getNetworkServers(), si.getName()))
             {
                 return;
             }
@@ -196,7 +196,13 @@ public class BungeeNotifier implements NetworkNotifier
             if (lastConfigUpdate + 5 * 60 * 1000 < now)
             {
                 lastConfigUpdate = now;
-                info.sendData(BungeePerms.CHANNEL, ("configcheck;" + info.getName() + ";" + config.getBackEndType() + ";" + config.getUUIDPlayerDBType() + ";" + config.isUseUUIDs()).getBytes());
+                info.sendData(BungeePerms.CHANNEL, ("configcheck"
+                                                    + ";" + info.getName()
+                                                    + ";" + config.getBackendType()
+                                                    + ";" + config.isUseUUIDs()
+                                                    + ";" + config.getResolvingMode()
+                                                    + ";" + config.isGroupPermission()
+                                                    + ";" + config.isUseRegexPerms()).getBytes());
             }
         }
     }

@@ -1,6 +1,7 @@
 package net.alpenblock.bungeeperms.platform.bukkit;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -58,6 +60,9 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         //static
         instance = this;
+
+        //metrics
+        startMetrics();
 
         //load config
         Config config = new Config(this, "/config.yml");
@@ -112,11 +117,9 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         List<String> l = new ArrayList<>();
         if (!conf.isTabComplete() || args.length == 0)
-        {
             return l;
-        }
 
-        for (Player p : BukkitPlugin.getBukkitPlayers())
+        for (Player p : getBukkitPlayers())
         {
             if (Statics.toLower(p.getName()).startsWith(Statics.toLower(args[args.length - 1])))
             {
@@ -286,6 +289,12 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     }
 
     @Override
+    public int runTaskLater(Runnable r, long delay)
+    {
+        return getServer().getScheduler().runTaskLater(this, r, (long) (delay * MILLI2TICK)).getTaskId();
+    }
+
+    @Override
     public void cancelTask(int id)
     {
         getServer().getScheduler().cancelTask(id);
@@ -301,5 +310,25 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
             return new ArrayList(Arrays.asList((Player[]) method.invoke(null)));
         else
             return new ArrayList((Collection) method.invoke(null));
+    }
+
+    @Override
+    public Integer getBuild()
+    {
+        return Statics.getBuild(this);
+    }
+
+    private void startMetrics()
+    {
+        try
+        {
+            Class c = Class.forName("net.alpenblock.bungeeperms.metrics.bukkit.Metrics");
+            Constructor cc = c.getConstructor(Plugin.class);
+            cc.newInstance(this);
+        }
+        catch (Exception ex)
+        {
+            getLogger().severe("Could not start metrics!");
+        }
     }
 }

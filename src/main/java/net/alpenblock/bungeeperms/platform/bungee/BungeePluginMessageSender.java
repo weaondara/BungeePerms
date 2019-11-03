@@ -7,7 +7,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 
 public class BungeePluginMessageSender implements PluginMessageSender
 {
-    
+
     @Override
     public void sendPluginMessage(String target, String channel, String msg)
     {
@@ -17,7 +17,7 @@ public class BungeePluginMessageSender implements PluginMessageSender
             BungeePerms.getLogger().info("No server found for " + target);
             return;
         }
-        
+
         si.sendData(channel, msg.getBytes());
     }
 }

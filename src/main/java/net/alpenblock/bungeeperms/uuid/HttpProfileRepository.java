@@ -14,17 +14,18 @@ import java.util.List;
 
 public class HttpProfileRepository
 {
+
     private static final Gson gson = new Gson();
     private final HttpClient client;
 
-    public HttpProfileRepository() 
+    public HttpProfileRepository()
     {
-        client=BasicHttpClient.getInstance();
+        client = BasicHttpClient.getInstance();
     }
 
     public Profile[] findProfilesOfUsers(String names[])
     {
-        try 
+        try
         {
             HttpBody body = new HttpBody(gson.toJson(names));
             List<HttpHeader> headers = new ArrayList<>();
@@ -33,8 +34,8 @@ public class HttpProfileRepository
             Profile[] result = post(new URL("https://api.mojang.com/profiles/minecraft"), body, headers);
 
             return result;
-        } 
-        catch (Exception e) 
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
             return new Profile[0];

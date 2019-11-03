@@ -7,7 +7,6 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
-import net.alpenblock.bungeeperms.platform.bukkit.BukkitConfig;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitSender;
 import org.bukkit.entity.Player;
 
@@ -36,20 +35,11 @@ class BungeePermsHandler implements IPermissionsHandler
     @Override
     public List<String> getGroups(Player player)
     {
-        List<String> groups = new ArrayList<>();
-
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
-            return groups;
-        }
+            return new ArrayList();
 
-        for (Group g : u.getGroups())
-        {
-            groups.add(g.getName());
-        }
-
-        return groups;
+        return new ArrayList(u.getGroupsString());
     }
 
     @Override
@@ -63,15 +53,11 @@ class BungeePermsHandler implements IPermissionsHandler
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
             return false;
-        }
-        
+
         Group g = perms.getPermissionsManager().getGroup(group);
         if (g == null)
-        {
             return false;
-        }
 
         return u.getGroups().contains(g);
     }
@@ -87,10 +73,8 @@ class BungeePermsHandler implements IPermissionsHandler
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
             return "";
-        }
-        
+
         return u.buildPrefix(new BukkitSender(player));
     }
 
@@ -99,10 +83,8 @@ class BungeePermsHandler implements IPermissionsHandler
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
             return "";
-        }
-        
+
         return u.buildSuffix(new BukkitSender(player));
     }
 
@@ -111,10 +93,8 @@ class BungeePermsHandler implements IPermissionsHandler
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
-        {
             return false;
-        }
-        
+
         BukkitSender sender = new BukkitSender(player);
         return u.getEffectivePerms(sender.getServer(), sender.getWorld()).contains(string.toLowerCase());
     }

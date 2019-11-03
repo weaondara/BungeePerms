@@ -18,7 +18,7 @@ public class BukkitCommandHandler extends CommandHandler
     public boolean onCommand(Sender sender, String cmd, String label, String[] args)
     {
         boolean b = super.onCommand(sender, cmd, label, args);
-        if(b)
+        if (b)
         {
             return b;
         }

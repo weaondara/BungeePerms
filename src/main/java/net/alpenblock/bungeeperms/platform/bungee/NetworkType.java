@@ -1,6 +1,6 @@
 package net.alpenblock.bungeeperms.platform.bungee;
 
-public enum NetworkType 
+public enum NetworkType
 {
     Standalone,
     ServerDependend,

@@ -25,7 +25,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
     {
         if (sender instanceof ProxiedPlayer)
         {
-            return (config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName())).hasPerm(permission);
+            return (config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName())).hasPerm(permission, null, null);
         }
         return false;
     }
@@ -41,7 +41,7 @@ public class BungeePermissionsChecker extends PermissionsChecker
     {
         if (sender instanceof ProxiedPlayer)
         {
-            return (config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName())).hasPerm(permission);
+            return (config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName())).hasPerm(permission, null, null);
         }
         else if (new BungeeSender(sender).isConsole())
         {
@@ -64,9 +64,9 @@ public class BungeePermissionsChecker extends PermissionsChecker
             User user = config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName());
             if (((ProxiedPlayer) sender).getServer() == null)
             {
-                return user.hasPerm(permission);
+                return user.hasPerm(permission, null, null);
             }
-            return user.hasPermOnServer(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName());
+            return user.hasPerm(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), null);
         }
         return false;
     }
@@ -85,9 +85,9 @@ public class BungeePermissionsChecker extends PermissionsChecker
             User user = config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName());
             if (((ProxiedPlayer) sender).getServer() == null)
             {
-                return user.hasPerm(permission);
+                return user.hasPerm(permission, null, null);
             }
-            return user.hasPermOnServer(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName());
+            return user.hasPerm(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), null);
         }
         else if (new BungeeSender(sender).isConsole())
         {
@@ -112,17 +112,17 @@ public class BungeePermissionsChecker extends PermissionsChecker
             //per server
             if (((ProxiedPlayer) sender).getServer() == null)
             {
-                return user.hasPerm(permission);
+                return user.hasPerm(permission, null, null);
             }
 
             //per server and world
             String world = BungeePlugin.getInstance().getListener().getPlayerWorlds().get(sender.getName());
             if (world == null)
             {
-                return user.hasPermOnServer(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName());
+                return user.hasPerm(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), null);
             }
 
-            return user.hasPermOnServerInWorld(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), world);
+            return user.hasPerm(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), world);
         }
         return false;
     }
@@ -141,17 +141,17 @@ public class BungeePermissionsChecker extends PermissionsChecker
             User user = config.isUseUUIDs() ? pm().getUser(((ProxiedPlayer) sender).getUniqueId()) : pm().getUser(sender.getName());
             if (((ProxiedPlayer) sender).getServer() == null)
             {
-                return user.hasPerm(permission);
+                return user.hasPerm(permission, null, null);
             }
 
             //per server and world
             String world = BungeePlugin.getInstance().getListener().getPlayerWorlds().get(sender.getName());
             if (world == null)
             {
-                return user.hasPermOnServer(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName());
+                return user.hasPerm(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), null);
             }
 
-            return user.hasPermOnServerInWorld(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), world);
+            return user.hasPerm(permission, ((ProxiedPlayer) sender).getServer().getInfo().getName(), world);
         }
         else if (new BungeeSender(sender).isConsole())
         {

@@ -14,6 +14,7 @@ public class Config
 
     private boolean allowsave;
     private FileConfiguration fconfig;
+    @Getter
     private String path;
     @Getter
     @Setter
@@ -30,6 +31,12 @@ public class Config
         createFile();
         fconfig = new YamlConfiguration();
         allowsave = false;
+    }
+    
+    public void init()
+    {
+        createFile();
+        allowsave = true;
     }
 
     public void load()
@@ -267,18 +274,14 @@ public class Config
 
     public List<String> getSubNodes(String node)
     {
-        List<String> ret = new ArrayList<>();
         try
         {
-            for (Object o : fconfig.getConfigurationSection(node).getKeys(false).toArray())
-            {
-                ret.add((String) o);
-            }
+            return new ArrayList(fconfig.getConfigurationSection(node).getKeys(false));
         }
         catch (Exception e)
         {
+            return new ArrayList();
         }
-        return ret;
     }
 
     public void deleteNode(String node)

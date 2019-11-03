@@ -7,29 +7,33 @@ debug:
   disabled: '&7Debug-Modus deaktiviert.'
 promote-message: '&3{0}&7 ist nun &6{1}&7!'
 demote-message: '&3{0}&7 ist nun &6{1}&7!'
-promote-message-to-user: '&7Du wurdest zu &6{0}&7 befoerdert!'
+promote-message-to-user: '&7Du wurdest zu &6{0}&7 befördert!'
 demote-message-to-user: '&7Du wurdest zu &6{0}&7 degradiert!'
 formatting: '&7Formatiere Permission-Datei/Tabelle ...'
 formatting-done: '&2Formatierung abgeschlossen.'
 cleaning: '&7Bereinige Permission-Datei/Tabelle ...'
-cleaning-done: '&2Bereinigung abgeschlossen. &6{0} &2User geloescht.'
+cleaning-done: '&2Bereinigung abgeschlossen. &6{0} &2User gelöscht.'
 no-permission: '&cDu hast keine Rechte um das zu tun!'
+overview-header: '&7Übersicht über alle Gruppen:'
+overview-item: '&7{0} (&6{1}&7, &6{2}&7 Rechte, &6{3}&7 eigene Rechte, &6{4}&7 Spieler, &6{5}&7 Rang, &6{6}&7 Gewichtung)'
 error:
   invalid-bool-value: '&4Eine boolscher Wert ist erforderlich!'
-  invalid-int-value: '&4Ein Integer-Wert groesser 0 ist erforderlich!'
+  invalid-int-value: '&4Ein Integer-Wert größer 0 ist erforderlich!'
+  invalid-duration-value: '&4Eine Zeitangabe in der Form 1d1h1m1s ist erforderlich!'
   user:
     not-existing: '&4Der Spieler &3{0}&4 existiert nicht!'
     already-in-group: '&4Der Spieler ist bereits in der Gruppe &6{0}&4!'
     not-in-group: '&4Der Spieler ist nicht in der Gruppe &6{0}&4!'
     no-groups: '&4Der Spieler &3{0}&4 ist in keiner Gruppe!'
-    cannot-be-promoted: '&4Der Spieler &3{0}&4 kann nicht befoerdert werden!'
+    cannot-be-promoted: '&4Der Spieler &3{0}&4 kann nicht befördert werden!'
     cannot-be-demoted: '&4Der Spieler &3{0}&4 kann nicht degradiert werden!'
     you-not-existing: '&4Du existierst nicht!'
     you-no-groups: '&4Du bist in keiner Gruppe!'
-    you-cannot-promote: '&4Du kannst den Spieler &3{0}&4 nicht befoerdern!'
+    you-cannot-promote: '&4Du kannst den Spieler &3{0}&4 nicht befördern!'
     you-cannot-demote: '&4Du kannst den Spieler &3{0}&4 nicht degradieren!'
   group:
     not-existing: '&4Die Gruppe &3{0}&4 existiert nicht!'
+    already-exists: '&4Die Gruppe &3{0}&4 existiert bereits!'
     already-inherits: '&4Die Gruppe &6{0}&7 erbt bereits Rechte von &6{1}&4!'
     does-not-inherit: '&4Die Gruppe &6{0}&4 erbt keine Rechte von &6{1}&4!'
 user:
@@ -39,16 +43,16 @@ user:
   permissions-list-header: '&7Rechte des Spielers &3{0}&7:'
   permissions-list-header-uuid: '&7Rechte des Spielers &3{0}&7 (&3{1}&7):'
   group-header: '&7Gruppen des Spielers &3{0}&7:'
-  about: '&7Ueber &3{0}'
+  about: '&7Über &3{0}'
   uuid: '&7UUID: &6{0}'
   groups: '&7Gruppen: {0}'
   permissions: '&7Rechte des Spielers: &6{0}'
   all-permissions: '&7Alle Rechte: &6{0}'
-  deleted: '&7Spieler geloescht'
-  added-perm: '&7Permission &6{0}&7 zu Spieler &3{1}&7 hinzugefuegt.'
-  added-perm-server: '&7Permission &6{0}&7 zu Spieler &3{1}&7 auf Server &6{2}&7 hinzugefuegt.'
+  deleted: '&7Spieler gelöscht'
+  added-perm: '&7Permission &6{0}&7 zu Spieler &3{1}&7 hinzugefügt.'
+  added-perm-server: '&7Permission &6{0}&7 zu Spieler &3{1}&7 auf Server &6{2}&7 hinzugefügt.'
   added-perm-server-world: '&7Permission &6{0}&7 zu Spieler &3{1}&7 auf Server
-    &6{2}&7 in Welt &6{3}&7 hinzugefuegt.'
+    &6{2}&7 in Welt &6{3}&7 hinzugefügt.'
   removed-perm: '&7Permission &6{0}&7 von Spieler &3{1}&7 entfernt.'
   removed-perm-server: '&7Permission &6{0}&7 von Spieler &3{1}&7 auf Server
     &6{2}&7 entfernt.'
@@ -69,17 +73,17 @@ user:
     {3}'
   has-perm-server-world: '&7Spieler &3{0}&7 hat die Permission &6{1}&7 auf Server &6{2}&7
     in Welt &6{3}&7: {4}'
-  added-group: '&7Gruppe &6{0}&7 zu Spieler &3{1}&7 hinzugefuegt.'
+  added-group: '&7Gruppe &6{0}&7 zu Spieler &3{1}&7 hinzugefügt.'
   removed-group: '&7Gruppe &6{0}&7 von Spieler &3{1}&7 entfernt.'
-  set-group: '&7Gruppe &6{0}&7 fuer Spieler &3{1}&7 gesetzt.'
-  set-display: '&7Anzeigename fuer Spieler &6{0}&7 gesetzt.'
-  set-prefix: '&7Prefix fuer Spieler &6{0}&7 gesetzt.'
-  set-suffix: '&7Suffix fuer Spieler &6{0}&7 gesetzt.'
+  set-group: '&7Gruppe &6{0}&7 für Spieler &3{1}&7 gesetzt.'
+  set-display: '&7Anzeigename für Spieler &6{0}&7 gesetzt.'
+  set-prefix: '&7Prefix für Spieler &6{0}&7 gesetzt.'
+  set-suffix: '&7Suffix für Spieler &6{0}&7 gesetzt.'
 group:
   no-groups-found: '&7Keine Gruppen gefunden!'
   groups-list-header: '&7Es gibt folgende Gruppen: '
   permissions-list-header: '&7Permissions der Gruppe &6{0}&7:'
-  about: '&7Ueber Gruppe &6{0}'
+  about: '&7Über Gruppe &6{0}'
   inheritances: '&7Vererbungen: {0}'
   permissions: '&7Permissions der Gruppe: &6{0}'
   all-permissions: '&7Alle Permissions: &6{0}'
@@ -92,11 +96,11 @@ group:
   created: '&7Gruppe {0} erstellt'
   deleted: '&7Gruppe {0} entfernt'
   deletion-in-progress: '&7Gruppe wird entfernt ... dies kann etwas dauern (Backend-
-    Integritaet wird geprueft).'
-  added-perm: '&7Permission &6{0}&7 zu Gruppe &6{1}&7 hinzugefuegt.'
-  added-perm-server: '&7Permission &6{0}&7 zu Gruppe &6{1}&7 auf Server &6{2}&7 hinzugefuegt.'
+    Integrität wird geprüft).'
+  added-perm: '&7Permission &6{0}&7 zu Gruppe &6{1}&7 hinzugefügt.'
+  added-perm-server: '&7Permission &6{0}&7 zu Gruppe &6{1}&7 auf Server &6{2}&7 hinzugefügt.'
   added-perm-server-world: '&7Permission &6{0}&7 zu Gruppe &6{1}&7 auf Server
-    &6{2}&7 in Welt &6{3}&7 hinzugefuegt.'
+    &6{2}&7 in Welt &6{3}&7 hinzugefügt.'
   removed-perm: '&7Permission &6{0}&7 von Gruppe &6{1}&7 entfernt.'
   removed-perm-server: '&7Permission &6{0}&7 von Gruppe &6{1}&7 auf Server
     &6{2}&7 entfernt.'
@@ -117,22 +121,22 @@ group:
     {3}'
   has-perm-server-world: '&7Gruppe &6{0}&7 hat die Permission &6{1}&7 auf Server &6{2}&7
     in Welt &6{3}&7: {4}'
-  added-inheritance: '&7Vererbunge &6{0}&7 zu Gruppe &6{1}&7 hinzugefuegt.'
+  added-inheritance: '&7Vererbunge &6{0}&7 zu Gruppe &6{1}&7 hinzugefügt.'
   removed-inheritance: '&7Vererbung &6{0}&7 von Gruppe &6{1}&7 entfernt.'
-  set-rank: '&7Gruppenrang fuer Gruppe &6{0}&7 gesetzt.'
-  set-weight: '&7Gruppengewichtung fuer Gruppe &6{0}&7 gesetzt.'
-  set-ladder: '&7Gruppenrangliste fuer Gruppe &6{0}&7 gesetzt.'
+  set-rank: '&7Gruppenrang für Gruppe &6{0}&7 gesetzt.'
+  set-weight: '&7Gruppengewichtung für Gruppe &6{0}&7 gesetzt.'
+  set-ladder: '&7Gruppenrangliste für Gruppe &6{0}&7 gesetzt.'
   set-default: '&7Gruppe &6{0}&7 als &6{1}&7 markiert.'
-  set-display: '&7Anzeigename fuer Gruppe &6{0}&7 gesetzt.'
-  set-prefix: '&7Prefix fuer Gruppe &6{0}&7 gesetzt.'
-  set-suffix: '&7Suffix fuer Gruppe &6{0}&7 gesetzt.'
+  set-display: '&7Anzeigename für Gruppe &6{0}&7 gesetzt.'
+  set-prefix: '&7Prefix für Gruppe &6{0}&7 gesetzt.'
+  set-suffix: '&7Suffix für Gruppe &6{0}&7 gesetzt.'
 common:
   display: '&7Anzeigename: &r{0}'
   prefix: '&7Prefix: &r{0}'
   suffix: '&7Suffix: &r{0}'
   prefix-full: '&7Ganzer Prefix: &r{0}'
   suffix-full: '&7Ganzer Suffix: &r{0}'
-  permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3})'
+  permissions-list-item: '&7- &6{0}&7 (&6{1}&7{2}{3}{4})'
   permissions-list-header-page: '&7Seite &6{0}&7/&6{1}&7'
 general:
   own: eigene
@@ -149,45 +153,60 @@ log:
     loading: Lade Permissions ...
     loaded: Permissions geladen
     no-perm-file: Keine Permission-Datei gefunden!!!
-    adding-default-groups: Standardgruppen zu {0} hinzugefuegt
-    adding-default-groups-uuid: Standardgruppen zu {0} ({1}) hinzugefuegt
+    adding-default-groups: Standardgruppen zu {0} hinzugefügt
+    adding-default-groups-uuid: Standardgruppen zu {0} ({1}) hinzugefügt
   login: Login von {0}
   login-uuid: Login von {0} ({1})
+  update-available: '&6Neue Version verfügbar: &9https://ci.wea-ondara.net/job/BungeePerms/lastSuccessfulBuild/'
+  command-issued: '{0} hat einen BungeePerms Befehl benutzt: /{1} {2}'
 warning:
-  intrusion-detected: '&4Moeglicher Angriff erkannt. Sender ist {0}'
+  intrusion-detected: '&4Möglicher Angriff erkannt. Sender ist {0}'
   misconfig:
     bungee:
       standalone: 'Server {0}: Pluginachricht von Bukkit/Spigot erhalten aber BungeePerms ist im Standalonemodus. Ignoriere Nachricht ...'
       serverdependend: 'Server {0}: Pluginachricht von Bukkit/Spigot erhalten aber BungeePerms ist im serverabhängigen Modus. Ignoriere Nachricht ...'
       serverdependend-blacklist: 'Server {0}: Pluginachricht von Bukkit/Spigot erhalten aber BungeePerms ist im serverabhängigen-blacklist Modus. Ignoriere Nachricht ...'
-      servername: 'Server {0}: Der Servername der Bungeecordkonfiguration und der BungeePermskonfigurationen stimmen nicht ueberein.'
+      servername: 'Server {0}: Der Servername der Bungeecordkonfiguration und der BungeePermskonfigurationen stimmen nicht überein.'
       backend: 'Server {0}: Die backend Typen der BungeePermskonfigurationen stimmen nicht überein.'
-      uuidplayerdb: 'Server {0}: The uuidplayerdb Typen der BungeePermskonfigurationen stimmen nicht ueberein.'
-      useuuid: 'Server {0}: Die useuuids Option der BungeePermskonfigurationen stimmen nicht ueberein.'
+      uuidplayerdb: 'Server {0}: The uuidplayerdb Typen der BungeePermskonfigurationen stimmen nicht überein.'
+      useuuid: 'Server {0}: Die useuuids Option der BungeePermskonfigurationen stimmen nicht überein.'
+      resolvingmode: 'Server {0}: Die resolving mode Option der BungeePermskonfigurationen stimmen nicht überein.'
+      grouppermission: 'Server {0}: Die group permission Option der BungeePermskonfigurationen stimmen nicht überein.'
+      regexpermissions: 'Server {0}: Die regex permission Option der BungeePermskonfigurationen stimmen nicht überein.'
     bukkit:
       standalone: Pluginachricht von Bungeecord erhalten aber BungeePerms ist im Standalonemodus. Ignoriere Nachricht ...
-      servername: Der Servername der Bungeecordkonfiguration und der BungeePermskonfigurationen stimmen nicht ueberein.
+      servername: Der Servername der Bungeecordkonfiguration und der BungeePermskonfigurationen stimmen nicht überein.
       backend: Die backend Typen der BungeePermskonfigurationen stimmen nicht überein.
-      uuidplayerdb: The uuidplayerdb Typen der BungeePermskonfigurationen stimmen nicht ueberein.
-      useuuid: Die useuuids Option der BungeePermskonfigurationen stimmen nicht ueberein.
+      uuidplayerdb: The uuidplayerdb Typen der BungeePermskonfigurationen stimmen nicht überein.
+      useuuid: Die useuuids Option der BungeePermskonfigurationen stimmen nicht überein.
+      resolvingmode: Die resolving mode Option der BungeePermskonfigurationen stimmen nicht überein.
+      grouppermission: Die group permission Option der BungeePermskonfigurationen stimmen nicht überein.
+      regexpermissions: Die regex permission Option der BungeePermskonfigurationen stimmen nicht überein.
     bungee-bukkit-config: UUIDs auf Bungeecord und Bukkit/Spigot unterscheiden sich. Checke deine Spigot/Bukkit und Bungeecord Konfiguration!
     useuuid-none-uuiddb: The useUUIDs option is enabled but the uuidplayerdb is set to none!
 help:
-  welcome: Heisst dich zu BungeePerms willkommen
+  welcome: Heißt dich zu BungeePerms willkommen
   help: Zeigt diese Hilfe
-  reload: Laedt das Plugin neu
+  reload: Lädt das Plugin neu
   debug: De-/Aktiviert den Debug-Modus
+  overview: Zeigt eine kompakte Übersicht für alle Gruppen
   users: Zeigt die User [oder zeigt die Anzahl]
   user:
-    info: Zeigt Informationen ueber den User
-    delete: Loescht den User
-    display: Setzt den Anzeigename fuer den Spieler
-    prefix: Setzt den Prefix fuer den Spieler
-    suffix: Setzt den Suffix fuer den Spieler
-    add-perm: Fuegt eine Permission zum Spieler hinzu
+    info: Zeigt Informationen über den User
+    delete: Löscht den User
+    display: Setzt den Anzeigename für den Spieler
+    prefix: Setzt den Prefix für den Spieler
+    suffix: Setzt den Suffix für den Spieler
+    add-perm: Fügt eine Permission zum Spieler hinzu
+    add-timed-perm: Fügt eine temporäre Permission zum Spieler hinzu
     remove-perm: Entfernt eine Permission vom Spieler
-    has: Ueberprueft ob der Spieler eine Permission hat
+    remove-timed-perm: Entfernt eine temporäre Permission vom Spieler
+    has: Überprüft ob der Spieler eine Permission hat
     list: Zeigt die Permissions des Spielers an
+    add-group: Fügt eine Gruppe zum Spieler hinzu
+    add-timed-group: Fügt eine temporäre Gruppe zum Spieler hinzu
+    remove-group: Entfernt eine Gruppe vom Spieler
+    remove-timed-group: Entfernt eine temporäre Gruppe vom Spieler
     set-group: Entfernt die alte Gruppe in der Rangliste des Users und setzt die neue
     groups: Zeigt die Gruppen in der der User ist an
   groups: Listet die Gruppen auf
@@ -196,20 +215,24 @@ help:
     users: Listet die User der Gruppe auf [oder zeigt die Anzahl]
     create: Erstellt eine neue Gruppe
     delete: Entfernt eine Gruppe
-    add-inherit: Fuegt die Gruppe als Vererbung einer anderen Gruppe hinzu
-    remive-inherit: Entfernt die Gruppe als Vererbung einer anderen Gruppe
-    rank: Setzt den Rang fuer eine Gruppe
+    add-inherit: Fügt die Gruppe als Vererbung einer anderen Gruppe hinzu
+    add-timed-inherit: Fügt die Gruppe als temporäre Vererbung einer anderen Gruppe hinzu
+    remove-inherit: Entfernt die Gruppe als Vererbung einer anderen Gruppe
+    remove-timed-inherit: Entfernt die Gruppe als temporäre Vererbung einer anderen Gruppe
+    rank: Setzt den Rang für eine Gruppe
     weight: Setzt die Gewichtung einer Gruppe
     ladder: Setzt die Rangliste einer Gruppe
     default: Bestimmt ob eine Gruppe die Standard-Gruppe ist
     display: Setzt den Anzeigenamen einer Gruppe
     prefix: Setzt den Prefix einer Gruppe
     suffix: Setzt den Suffix einer Gruppe
-    add-perm: Fuegt eine Permission zu einer Gruppe hinzu
+    add-perm: Fügt eine Permission zu einer Gruppe hinzu
+    add-timed-perm: Fügt eine temporäre Permission zu einer Gruppe hinzu
     remove-perm: Entfernt eine Permission von einer Gruppe
-    has: Prueft ob eine Gruppe eine Permission hat
+    remove-timed-perm: Entfernt eine temporäre Permission von einer Gruppe
+    has: Prüft ob eine Gruppe eine Permission hat
     list: Listet die Permission der Gruppe auf
-  promote: Befoerdert den User zum naechsten Rang
+  promote: Befördert den User zum nächsten Rang
   demote: Degradiert den User zum vorherigen Rang
   format: Formatiert die permission.yml oder MySQL-Tabelle neu - &cVORSICHT
   cleanup: Bereinigt die permission.yml oder MySQL-Tabelle - &c!VORSICHT! - entfernt je nach Konfiguration viele Spieler aus der Permission-Datenbank
@@ -217,4 +240,4 @@ help:
     backend: Migriert das Backend oder zeigt den Status - &c!VORSICHT! (VOR BENUTZUNG SOLLTE EIN BACKUP ERSTELLT WERDEN)
     use-uuid: Migriert das Backend um (nicht) UUIDs zu nutzen oder zeigt den Status - &c!VORSICHT! (VOR BENUTZUNG SOLLTE EIN BACKUP ERSTELLT WERDEN)
     uuid-player-db: Migriert die UUID-Spieler-Datenbank oder zeigt den Status - &c!VORSICHT! (VOR BENUTZUNG SOLLTE EIN BACKUP ERSTELLT WERDEN)
-  uuid: 'Zeigt die UUID eines Spielers in der Datenbank an (-r: rueckwaerts; -m: frage mojang)'
+  uuid: 'Zeigt die UUID eines Spielers in der Datenbank an (-r: rückwärts; -m: frage mojang)'

@@ -9,10 +9,10 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
+import net.alpenblock.bungeeperms.PermissionsResolver;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.io.BackEndType;
-import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
 import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.bukkit.event.BungeePermsUserChangedEvent;
@@ -227,13 +227,9 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             Group g = pm().getGroup(userorgroup);
             pm().removeGroupFromCache(g);
             for (Group gr : pm().getGroups())
-            {
-                gr.recalcPerms();
-            }
+                gr.invalidateCache();
             for (User u : pm().getUsers())
-            {
-                u.recalcPerms();
-            }
+                u.invalidateCache();
         }
         else if (cmd.equalsIgnoreCase("reloaduser"))
         {
@@ -267,23 +263,34 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         {
             String servername = data.get(1);
             BackEndType backend = BackEndType.getByName(data.get(2));
-            UUIDPlayerDBType uuidplayerdb = UUIDPlayerDBType.getByName(data.get(3));
-            boolean useuuid = Boolean.parseBoolean(data.get(4));
+            boolean useuuid = Boolean.parseBoolean(data.get(3));
+            PermissionsResolver.ResolvingMode resolvingmode = PermissionsResolver.ResolvingMode.valueOf(data.get(4));
+            boolean groupperm = Boolean.parseBoolean(data.get(5));
+            boolean regexperm = Boolean.parseBoolean(data.get(6));
             if (!config.getServername().equals(servername))
             {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_SERVERNAME));
+                config.setServerName(servername);
+//                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_SERVERNAME));
             }
-            if (config.getBackEndType() != backend)
+            if (config.getBackendType() != backend)
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_BACKEND));
-            }
-            if (config.getUUIDPlayerDBType() != uuidplayerdb)
-            {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_UUIDPLAYERDB));
             }
             if (config.isUseUUIDs() != useuuid)
             {
                 BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_USEUUID));
+            }
+            if (config.getResolvingMode() != resolvingmode)
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_RESOLVINGMODE));
+            }
+            if (config.isGroupPermission() != groupperm)
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_GROUPPERMISSION));
+            }
+            if (config.isUseRegexPerms() != regexperm)
+            {
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUKKIT_REGEXPERMISSIONS));
             }
         }
         else if (cmd.equalsIgnoreCase("uuidcheck"))

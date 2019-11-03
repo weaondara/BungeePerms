@@ -15,7 +15,7 @@ public class GroupProcessor implements PermissionsPreProcessor
 {
 
     @Override
-    public List<String> process(List<String> perms, Sender s)
+    public List<BPPermission> process(List<BPPermission> perms, Sender s)
     {
         if (s == null)
         {
@@ -31,35 +31,9 @@ public class GroupProcessor implements PermissionsPreProcessor
                 return perms;
             }
 
-            for (Group g : u.getGroups())
+            for (String g : u.getGroupsString())
             {
-                perms.add(0, "group." + Statics.toLower(g.getName()));
-            }
-        }
-
-        return perms;
-    }
-
-    @Override
-    public List<BPPermission> processWithOrigin(List<BPPermission> perms, Sender s)
-    {
-        if (s == null)
-        {
-            return perms;
-        }
-        BPConfig config = BungeePerms.getInstance().getConfig();
-        if (config.isGroupPermission())
-        {
-            PermissionsManager pm = BungeePerms.getInstance().getPermissionsManager();
-            User u = config.isUseUUIDs() ? pm.getUser(s.getUUID()) : pm.getUser(s.getName());
-            if (u == null)
-            {
-                return perms;
-            }
-
-            for (Group g : u.getGroups())
-            {
-                perms.add(0, new BPPermission("group." + Statics.toLower(g.getName()), "GroupProcessor", true, null, null));
+                perms.add(0, new BPPermission("group." + Statics.toLower(g), "GroupProcessor", true, null, null, null, null));
             }
         }
 

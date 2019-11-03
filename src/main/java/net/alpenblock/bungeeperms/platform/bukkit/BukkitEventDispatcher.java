@@ -31,7 +31,7 @@ public class BukkitEventDispatcher implements EventDispatcher
     {
         callSyncEvent(BukkitPlugin.getInstance(), new BungeePermsUserChangedEvent(u));
     }
-    
+
     @SneakyThrows
     private static void runSync(Plugin p, Runnable r, boolean waitfinished)
     {
@@ -51,7 +51,7 @@ public class BukkitEventDispatcher implements EventDispatcher
             }
         }
     }
-    
+
     private static void callSyncEvent(Plugin p, final Event e)
     {
         Runnable r = new Runnable()

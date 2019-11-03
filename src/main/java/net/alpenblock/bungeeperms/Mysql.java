@@ -26,13 +26,13 @@ public class Mysql
         }
     }
 
-    private final Config config;
+    private final BPConfig config;
     private final Debug debug;
     private final String configsection;
     @Getter
     private Connection connection;
 
-    public Mysql(Config c, Debug d, String configsection)
+    public Mysql(BPConfig c, Debug d, String configsection)
     {
         config = c;
         debug = d;
@@ -44,21 +44,24 @@ public class Mysql
         BungeePerms.getInstance().getPlugin().getLogger().info("Connecting to database");
         try
         {
-            //URL zusammenbasteln
-            String url = "jdbc:mysql://" + config.getString(configsection + ".general.mysqlhost", "localhost") + ":" + config.getString(configsection + ".general.mysqlport", "3306") + "/" + config.getString(configsection + ".general.mysqldb", "database") + "?autoReconnect=true&dontTrackOpenResources=true";
-            this.connection = DriverManager.getConnection(url, config.getString(configsection + ".general.mysqluser", configsection), config.getString(configsection + ".general.mysqlpw", "password"));
+            this.connection = DriverManager.getConnection(config.getMysqlURL(), config.getMysqlUser(), config.getMysqlPassword());
         }
         catch (Exception e)
         {
-            debug.log(e);
+            RuntimeException t;
+            if (e.getCause() != null && e.getCause().getMessage().startsWith("Access denied for user"))
+                t = new RuntimeException("Failed to connect to database: " + e.getCause().getMessage());
+            else
+                t = new RuntimeException(e);
+            throw t;
         }
     }
 
     public void close()
     {
-        BungeePerms.getInstance().getPlugin().getLogger().info("Disconnecting from database");
         if (this.connection != null)
         {
+            BungeePerms.getInstance().getPlugin().getLogger().info("Disconnecting from database");
             try
             {
                 if (isConnected())
@@ -99,7 +102,7 @@ public class Mysql
         }
         return connected;
     }
-    
+
     @SneakyThrows
     public PreparedStatement stmt(String template)
     {
@@ -181,7 +184,7 @@ public class Mysql
                 stmt = stmt("ALTER TABLE `" + table + "` ADD COLUMN `" + column + "` " + type + " AFTER `" + after + "`");
                 runQuery(stmt);
                 stmt.close();
-                
+
                 checkConnection();
                 stmt = stmt("UPDATE " + table + " SET " + column + "=?");
                 stmt.setString(1, value);
@@ -314,7 +317,7 @@ public class Mysql
         close();
         connect();
     }
-    
+
     //maybe for later use
 //    //transaction stuff
 //    private ReentrantLock transactionlock = new ReentrantLock();

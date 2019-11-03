@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package net.alpenblock.bungeeperms;
 
 import java.util.ArrayList;
@@ -17,404 +16,974 @@ import org.junit.Test;
  */
 public class PermissionsResolverTest
 {
+
     PermissionsResolver resolver;
+
     public PermissionsResolverTest()
     {
-        resolver=new PermissionsResolver();
-        resolver.setUseRegex(false);
+        resolver = new PermissionsResolver();
     }
 
     @Test
     public void testHas1()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        
-        assertTrue(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas2()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.test2");
-        
-        assertFalse(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas3()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.test2");
-        perms.add("test.test1.test2");
-        
-        assertTrue(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.test2"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas4()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.test2");
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.test2");
-        
-        assertFalse(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas5()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        
-        assertNull(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+
+        assertNull(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas6()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.test1.*");
-        
-        assertFalse(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas7()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        
-        assertFalse(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas8()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.test1.test2");
-        
-        assertTrue(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.test1.test2"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas9()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.test1.*");
-        
-        assertTrue(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.test1.*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas10()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
-        
-        assertTrue(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas11()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
-        perms.add("-test.test1.test2");
-        
-        assertFalse(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-test.test1.test2"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas12()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
-        perms.add("-test.test1.*");
-        
-        assertFalse(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas13()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
-        perms.add("-test.test1.*");
-        perms.add("*");
-        
-        assertTrue(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-test.test1.*"));
+        perms.add(testperm("*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHas14()
     {
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.test2");
-        perms.add("-test.*");
-        perms.add("test.*");
-        perms.add("-*");
-        
-        assertFalse(resolver.has(perms, perm));
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
     }
-    
+
+    @Test
+    public void testHasBest1()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2.test3"));
+        perms.add(testperm("test.test1.test2.*"));
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.*"));
+        perms.add(testperm("test.test1.test2"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest2()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2.test3"));
+        perms.add(testperm("test.test1.test2.*"));
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest3()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest4()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest5()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1."));
+        perms.add(testperm("-*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest6()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test1.test2"));
+        perms.add(testperm("-*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest7()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test2"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest8()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest9()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest10()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.*";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest11()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest12()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("*"));
+        perms.add(testperm("-*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest13()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("-test.test1.test2"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest14()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest15()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.*"));
+        perms.add(testperm("-test.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest16()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test1.*"));
+        perms.add(testperm("-test1.*"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest17()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2.test3"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest18()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test2.*"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasBest19()
+    {
+        resolver.setUseRegex(false);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
     @Test
     public void testHasRegex1()
     {
-        if(!resolver.isUseRegex()){return;}
-        
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.(test2|test3)");
-        
-        assertTrue(resolver.has(perms, perm));
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test2|test3)"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHasRegex2()
     {
-        if(!resolver.isUseRegex()){return;}
-        
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.(test)2|3");
-        
-        assertTrue(resolver.has(perms, perm));
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test)2|3"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHasRegex3()
     {
-        if(!resolver.isUseRegex()){return;}
-        
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.(test1|test3)");
-        
-        assertNull(resolver.has(perms, perm));
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test1|test3)"));
+
+        assertNull(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHasRegex4()
     {
-        if(!resolver.isUseRegex()){return;}
-        
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("test.test1.(test1|*)");
-        
-        assertTrue(resolver.has(perms, perm));
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test1|*)"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHasRegex5()
     {
-        if(!resolver.isUseRegex()){return;}
-        
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("-test.test1.(test1|test3|*)");
-        
-        assertFalse(resolver.has(perms, perm));
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.(test1|test3|*)"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHasRegex6()
     {
-        if(!resolver.isUseRegex()){return;}
-        
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("-test.#####.test2");
-        
-        assertFalse(resolver.has(perms, perm));
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.#####.test2"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
     }
+
     @Test
     public void testHasRegex7()
     {
-        if(!resolver.isUseRegex()){return;}
-        
-        String perm="test.test1.test2";
-        List<String> perms=new ArrayList<>();
-        perms.add("-test.####.test2");
-        
-        assertNull(resolver.has(perms, perm));
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.####.test2"));
+
+        assertNull(resolver.hasPerm(perms, perm));
     }
 
-    
-    
-    
-    
-//    @Test
-//    public void testSimplify1()
-//    {
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        assertTrue(s.size()==1);
-//    }
-//    @Test
-//    public void testSimplify2()
-//    {
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        perms.add("test.test1.test3");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        assertTrue(s.size()==2);
-//    }
-//    
-//    @Test
-//    public void testSimplify4()
-//    {
-//        List<String> perms=new ArrayList<>();
-////        perms.add("-test.test1.test2");
-////        perms.add("test.test1.*");
-////        perms.add("-test.test1.test2");
-//        
-//        
-//        perms.add("-multiverse.access.vipfarm");
-//        perms.add("multiverse.access.*");
-//        perms.add("multiverse.access.*");
-//        perms.add("-multiverse.access.vipfarm");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        System.out.println(s);
-//        assertTrue(s.size()==2);
-//    }
-    
-//    @Test
-//    public void testSimplify3()
-//    {
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        perms.add("test.test1.test3");
-//        
-//        
-//        perms.add("-chatty.join.el");
-//        perms.add("-chatty.join.mb");
-//        perms.add("chatty.join");
-//        perms.add("chatty.join.*");
-//        perms.add("-chatty.join.mb");
-//        perms.add("-chatty.join.el");
-//        perms.add("-chatty.join.mb");
-//        perms.add("-chatty.join.el");
-//        perms.add("-chatty.join.mb");
-//        perms.add("chatty.join");
-//        perms.add("chatty.join.*");
-//        perms.add("-chatty.join.mb");
-//        perms.add("-chatty.join.el");
-//
-//        
-//        List<String> s=resolver.simplify(perms);
-//        System.out.println(s);
-//        System.out.println(resolver.has(perms, "chatty.join.mb"));
-//        assertTrue(s.size()==2);
-//    }
-//    @Test
-//    public void testSimplifyRegex1()
-//    {
-//        if(!resolver.isUseRegex()){return;}
-//        
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        perms.add("test.test1.*");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        assertTrue(s.size()==1);
-//        assertTrue(s.get(0).equalsIgnoreCase("test.test1.*"));
-//    }
-//    @Test
-//    public void testSimplifyRegex2()
-//    {
-//        if(!resolver.isUseRegex()){return;}
-//        
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        perms.add("test.test1.*");
-//        perms.add("-test.test1.*");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        assertTrue(s.isEmpty());
-//    }
-//    @Test
-//    public void testSimplifyRegex3()
-//    {
-//        if(!resolver.isUseRegex()){return;}
-//        
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        perms.add("test.test1.*");
-//        perms.add("-test.*");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        assertTrue(s.isEmpty());
-//    }
-//    @Test
-//    public void testSimplifyRegex4()
-//    {
-//        if(!resolver.isUseRegex()){return;}
-//        
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        perms.add("-test.*.test2");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        assertTrue(s.isEmpty());
-//    }
-//    @Test
-//    public void testSimplifyRegex5()
-//    {
-//        if(!resolver.isUseRegex()){return;}
-//        
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        perms.add("-test.*.*");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        assertTrue(s.isEmpty());
-//    }
-//    @Test
-//    public void testSimplifyRegex6()
-//    {
-//        if(!resolver.isUseRegex()){return;}
-//        
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        perms.add("test.test1.test(2|3|4)");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        assertTrue(s.size()==1);
-//        assertTrue(s.get(0).equalsIgnoreCase("test.test1.test(2|3|4)"));
-//    }
-//    @Test
-//    public void testSimplifyRegex7()
-//    {
-//        if(!resolver.isUseRegex()){return;}
-//        
-//        List<String> perms=new ArrayList<>();
-//        perms.add("test.test1.test2");
-//        perms.add("test.test1.test(2|3|4)");
-//        perms.add("test.test1.test#");
-//        
-//        List<String> s=resolver.simplify(perms);
-//        assertTrue(s.size()==2);
-//        assertTrue(s.get(0).equalsIgnoreCase("test.test1.test(2|3|4)"));
-//        assertTrue(s.get(1).equalsIgnoreCase("test.test1.test#"));
-//    }
+    @Test
+    public void testHasRegex8()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.####.test2"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegex9()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.#####.test2"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegex10()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.*"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegex11()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegex12()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegex13()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
+        perms.add(testperm("test.test1.*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegex14()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegex15()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test*.t"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegex16()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.SEQUENTIAL);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest1()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1"));
+        perms.add(testperm("-test.test1.(test2|test3)"));
+        perms.add(testperm("test.test1.(test2|test3)"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest2()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.(test)2|3"));
+        perms.add(testperm("-test.test1.(test)2|3"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest3()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1"));
+        perms.add(testperm("test.test1.(test1|test3)"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest4()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test"));
+        perms.add(testperm("test.test1.(test1|*)"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest5()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.(test1|test3|*)"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest6()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.#####.test2"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest7()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.####.test2"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest8()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.####.test2"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest9()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.#####.test*"));
+        perms.add(testperm("test.#####.test2"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest10()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.*"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest11()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest12()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest13()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.*"));
+        perms.add(testperm("test.test1.*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest14()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test*"));
+
+        assertTrue(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest15()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.test*.t"));
+
+        assertNull(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest16()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    @Test
+    public void testHasRegexBest17()
+    {
+        resolver.setUseRegex(true);
+        resolver.setResolvingMode(PermissionsResolver.ResolvingMode.BESTMATCH);
+
+        String perm = "test.test1.test2";
+        List<BPPermission> perms = new ArrayList<>();
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.*"));
+
+        assertFalse(resolver.hasPerm(perms, perm));
+    }
+
+    //sorts
+    @Test
+    public void testSortNormalBest()
+    {
+        List<BPPermission> perms = new ArrayList();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.*"));
+        List<BPPermission> ex = new ArrayList();
+        ex.add(testperm("-test.test1.*"));
+        ex.add(testperm("test.test1.*"));
+        List<BPPermission> res = PermissionsResolver.sortNormalBest(perms);
+        assertEquals(ex, res);
+    }
+
+    @Test
+    public void testSortRegexBest()
+    {
+        List<BPPermission> perms = new ArrayList();
+        perms.add(testperm("test.test1.*"));
+        perms.add(testperm("-test.test1.test2"));
+        perms.add(testperm("test.test1.(test2|*)"));
+        perms.add(testperm("-test.test1.*"));
+        perms.add(testperm("test.test1.test2"));
+        perms.add(testperm("test.##.test2"));
+        perms.add(testperm("-test.test1.(test2|*)"));
+        perms.add(testperm("-test.##.test2"));
+        List<BPPermission> ex = new ArrayList();
+        ex.add(testperm("test.test1.(test2|*)"));
+        ex.add(testperm("-test.test1.(test2|*)"));
+        ex.add(testperm("test.test1.*"));
+        ex.add(testperm("-test.test1.*"));
+        ex.add(testperm("test.##.test2"));
+        ex.add(testperm("-test.##.test2"));
+        ex.add(testperm("-test.test1.test2"));
+        ex.add(testperm("test.test1.test2"));
+        List<BPPermission> res = PermissionsResolver.sortRegexBest(perms);
+
+//        for (BPPermission e : ex)
+//            System.out.println(e.getPermission());
+//        System.out.println("---");
+//        for (BPPermission e : res)
+//            System.out.println(e.getPermission());
+        assertEquals(ex, res);
+    }
+
+    private BPPermission testperm(String testtest1test2)
+    {
+        return new BPPermission(testtest1test2, "", false, null, null, null, null);
+    }
 }

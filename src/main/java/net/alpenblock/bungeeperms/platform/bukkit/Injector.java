@@ -28,7 +28,7 @@ public class Injector
             BungeePerms.getInstance().getDebug().log(e);
         }
     }
-    
+
     public static void uninject(CommandSender sender)
     {
         Permissible perm = getPermissible(sender);

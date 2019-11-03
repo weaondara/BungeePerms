@@ -7,6 +7,7 @@ import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.NetworkNotifier;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
+import net.alpenblock.bungeeperms.platform.independend.VersionCheck;
 
 @Getter
 public class BungeePerms
@@ -46,7 +47,7 @@ public class BungeePerms
         //basic
         this.plugin = plugin;
         this.config = config;
-        debug = new Debug(plugin, config.getConfig(), "BP");
+        debug = new Debug(plugin, config, "BP");
 
         //extract packed files
         FileExtractor.extractAll();
@@ -68,6 +69,7 @@ public class BungeePerms
     {
         Lang.load(plugin.getPluginFolderPath() + "/lang/" + Statics.localeString(config.getLocale()) + ".yml");
         permissionsResolver.setUseRegex(config.isUseRegexPerms());
+        permissionsResolver.setResolvingMode(config.getResolvingMode());
     }
 
     public void enable()
@@ -82,6 +84,14 @@ public class BungeePerms
         permissionsManager.enable();
         eventListener.enable();
         cleanupTaskId = plugin.registerRepeatingTask(cleanupTask, 0, config.getCleanupInterval() * 1000);
+        plugin.runTaskLater(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                VersionCheck.checkForUpdate();
+            }
+        }, 1000);
     }
 
     public void disable()

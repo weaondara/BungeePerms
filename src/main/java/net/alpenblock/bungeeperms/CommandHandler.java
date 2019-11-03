@@ -1,7 +1,11 @@
 package net.alpenblock.bungeeperms;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +13,9 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.Lang.MessageType;
 import net.alpenblock.bungeeperms.io.BackEndType;
-import net.alpenblock.bungeeperms.io.UUIDPlayerDBType;
+import net.alpenblock.bungeeperms.io.MySQLUUIDPlayerDB;
+import net.alpenblock.bungeeperms.io.UUIDPlayerDB;
+import net.alpenblock.bungeeperms.io.YAMLUUIDPlayerDB;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.uuid.UUIDFetcher;
@@ -31,7 +37,7 @@ public class CommandHandler
 
         if (BungeePerms.getInstance().getConfig().isDebug())
         {
-            BungeePerms.getInstance().getPlugin().getLogger().info(sender.getName() + " issued bungeeperms command /" + cmd + " " + Statics.arrayToString(args, 0, args.length, " "));
+            BungeePerms.getInstance().getPlugin().getLogger().info(Lang.translate(MessageType.COMMAND_ISSUED, sender.getName(), cmd, Statics.arrayToString(args, 0, args.length, " ")));
         }
 
         //reparse command
@@ -57,6 +63,10 @@ public class CommandHandler
             else if (args[0].equalsIgnoreCase("debug"))
             {
                 return handleDebug(sender, args);
+            }
+            else if (args[0].equalsIgnoreCase("overview"))
+            {
+                return handleOverview(sender, args);
             }
             else if (args[0].equalsIgnoreCase("users"))
             {
@@ -189,6 +199,66 @@ public class CommandHandler
         }
     }
 
+    private boolean handleOverview(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.overview", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 1))
+        {
+            return true;
+        }
+
+        List<String> msgs = new ArrayList();
+        msgs.add(Lang.translate(MessageType.OVERVIEW_HEADER));
+        Map<Group, Object> tree = new HashMap();
+        List<Group> groups = new ArrayList(BungeePerms.getInstance().getPermissionsManager().getGroups());
+        Map<Group, List<Group>> parents = new HashMap();
+        for (Group g : groups)
+            for (Group child : g.getInheritances())
+            {
+                List l = parents.getOrDefault(child, new ArrayList());
+                l.add(g);
+                parents.put(child, l);
+            }
+
+        //roots
+        for (int i = 0; i < groups.size(); i++)
+        {
+            Group g = groups.get(i);
+            if (parents.getOrDefault(g, new ArrayList()).isEmpty())
+            {
+                tree.put(g, new HashMap());
+                groups.remove(i--);
+            }
+        }
+
+        //leaves
+        boolean didsomthing;
+        do
+        {
+            didsomthing = false;
+            for (int i = 0; i < groups.size(); i++)
+            {
+                Group g = groups.get(i);
+                List<Group> pl = parents.get(g);
+                for (Group p : pl)
+                    didsomthing |= addToTree(tree, p, g);
+            }
+        }
+        while (didsomthing);
+
+        List<String> bla = treeToMsgs(tree, 0);
+        msgs.addAll(bla);
+
+        for (String msg : msgs)
+            sender.sendMessage(msg);
+
+        return true;
+    }
+
     private boolean handleUsers(Sender sender, String[] args)
     {
         if (!checker.hasOrConsole(sender, "bungeeperms.users.list", true))
@@ -201,22 +271,65 @@ public class CommandHandler
             return true;
         }
 
-        List<String> users = pm().getRegisteredUsers();
-        if (users.isEmpty())
-        {
-            sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
-            return true;
-        }
-
         if (args.length == 1)
         {
-            String out = Lang.translate(MessageType.REGISTERED_USERS);
-            for (int i = 0; i < users.size(); i++) //todo: translate uuids and output 1 entity per line
+            if (config.isUseUUIDs())
             {
-                out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : "");
+                Map<UUID, String> usersmap = pm().getRegisteredUsersUUID();
+                if (usersmap.isEmpty())
+                {
+                    sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+                    return true;
+                }
+                List<Map.Entry<UUID, String>> users = new ArrayList(usersmap.entrySet());
+                users.sort(new Comparator<Map.Entry<UUID, String>>()
+                {
+                    @Override
+                    public int compare(Map.Entry<UUID, String> o1, Map.Entry<UUID, String> o2)
+                    {
+                        return String.CASE_INSENSITIVE_ORDER.compare(o1.getValue(), o2.getValue());
+                    }
+                });
+
+                String out = Lang.translate(MessageType.REGISTERED_USERS);
+                for (int i = 0; i < users.size(); i++)
+                {
+                    //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
+                    if (out.length() * 1.1 > Short.MAX_VALUE)
+                    {
+                        sender.sendMessage(out);
+                        out = Lang.translate(MessageType.REGISTERED_USERS);
+                    }
+                    out += Color.User + users.get(i).getValue() + Color.Text + " (" + Color.User + users.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
+                }
+                sender.sendMessage(out);
+                return true;
             }
-            sender.sendMessage(out);
-            return true;
+            else
+            {
+                List<String> users = pm().getRegisteredUsers();
+                if (users.isEmpty())
+                {
+                    sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+                    return true;
+                }
+
+                users.sort(String.CASE_INSENSITIVE_ORDER);
+
+                String out = Lang.translate(MessageType.REGISTERED_USERS);
+                for (int i = 0; i < users.size(); i++)
+                {
+                    //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
+                    if (out.length() * 1.1 > Short.MAX_VALUE)
+                    {
+                        sender.sendMessage(out);
+                        out = Lang.translate(MessageType.REGISTERED_USERS);
+                    }
+                    out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : "");
+                }
+                sender.sendMessage(out);
+                return true;
+            }
         }
         else //args count == 2
         {
@@ -239,7 +352,7 @@ public class CommandHandler
             return true;
         }
 
-        if (args[2].equalsIgnoreCase("list"))
+        if (Statics.argAlias(args[2], "list", "listonly"))
         {
             return handleUserCommandsList(sender, args);
         }
@@ -263,6 +376,14 @@ public class CommandHandler
         {
             return handleUserCommandsPermRemove(sender, args);
         }
+        else if (Statics.argAlias(args[2], "timedadd", "addtimed", "timedaddperm", "addtimedperm", "addpermtimed"))
+        {
+            return handleUserCommandsTimedPermAdd(sender, args);
+        }
+        else if (Statics.argAlias(args[2], "timedremove", "removetimed", "timedremoveperm", "removetimedperm", "removepermtimed"))
+        {
+            return handleUserCommandsTimedPermRemove(sender, args);
+        }
         else if (Statics.argAlias(args[2], "has", "check"))
         {
             return handleUserCommandsHas(sender, args);
@@ -279,6 +400,14 @@ public class CommandHandler
         {
             return handleUserCommandsGroupSet(sender, args);
         }
+        else if (args[2].equalsIgnoreCase("addtimedgroup"))
+        {
+            return handleUserCommandsTimedGroupAdd(sender, args);
+        }
+        else if (args[2].equalsIgnoreCase("removetimedgroup"))
+        {
+            return handleUserCommandsTimedGroupRemove(sender, args);
+        }
         else if (args[2].equalsIgnoreCase("display"))
         {
             return handleUserCommandsDisplay(sender, args);
@@ -293,7 +422,7 @@ public class CommandHandler
         }
 
         //alias handling
-        else if (Statics.argAlias(args[2], "group", "perm", "permission"))
+        else if (Statics.argAlias(args[2], "group", "perm", "permission", "timed"))
         {
             if (!Statics.matchArgs(sender, args, 5))
             {
@@ -331,6 +460,7 @@ public class CommandHandler
         }
 
         String player = Statics.getFullPlayerName(args[1]);
+        boolean only = args[2].equalsIgnoreCase("listonly");
         String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;//todo tolower with config locale
         String world = args.length > (4 + (specialpage ? 1 : 0)) ? args[4].toLowerCase() : null;
 
@@ -349,17 +479,21 @@ public class CommandHandler
         {
             sender.sendMessage(Lang.translate(MessageType.USER_PERMISSIONS_LIST_HEADER, user.getName()));
         }
+
         List<BPPermission> perms = user.getPermsWithOrigin(server, world);
-        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
-        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
-        {
-            BPPermission perm = perms.get(i);
-            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
-                                              perm.getPermission(),
-                                              (!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(player) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
-                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
-                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : "")));
-        }
+        list(sender, perms, player, page, only, server, world);
+//        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
+//        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
+//        {
+//            BPPermission perm = perms.get(i);
+//            String dur = formatDuration(perm);
+//            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
+//                                              perm.getPermission(),
+//                                              (!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(player) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
+//                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
+//                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : ""),
+//                                              dur == null ? "" : ", " + Color.Value + dur + Color.Text));
+//        }
         return true;
     }
 
@@ -384,9 +518,24 @@ public class CommandHandler
         }
 
         sender.sendMessage(Lang.translate(MessageType.USER_GROUPS_HEADER, user.getName()));
-        for (Group g : user.getGroups())
+        List<String> groups = new ArrayList(user.getGroupsString());
+        groups.sort(String.CASE_INSENSITIVE_ORDER);
+        for (String g : groups)
         {
-            sender.sendMessage(Color.Text + "- " + Color.Value + g.getName());
+            sender.sendMessage(Color.Text + "- " + Color.Value + g);
+        }
+        List<TimedValue<String>> tgroups = new ArrayList(user.getTimedGroupsString());
+        tgroups.sort(new Comparator<TimedValue<String>>()
+        {
+            @Override
+            public int compare(TimedValue<String> o1, TimedValue<String> o2)
+            {
+                return String.CASE_INSENSITIVE_ORDER.compare(o1.getValue(), o2.getValue());
+            }
+        });
+        for (TimedValue<String> g : tgroups)
+        {
+            sender.sendMessage(Color.Text + "- " + Color.Value + g.getValue() + Color.Text + "(" + Color.Value + formatDuration(g) + Color.Text + ")");
         }
         return true;
     }
@@ -418,12 +567,33 @@ public class CommandHandler
 
         sender.sendMessage(Lang.translate(MessageType.USER_UUID, user.getUUID()));
 
-        String groups = "";
-        for (int i = 0; i < user.getGroups().size(); i++)
+        List<SimpleEntry<Group, String>> groups = new ArrayList();
+        String groupstr = "";
+        List<Group> glist = user.getGroups();
+        List<TimedValue<Group>> tglist = user.getTimedGroups();
+        for (int i = 0; i < glist.size(); i++)
+            groups.add(new SimpleEntry(glist.get(i), Color.Value + glist.get(i).getName() + Color.Text
+                                                     + " (" + Color.Value + glist.get(i).getPerms().size() + Color.Text + ")"));
+        for (int i = 0; i < tglist.size(); i++)
         {
-            groups += Color.Value + user.getGroups().get(i).getName() + Color.Text + " (" + Color.Value + user.getGroups().get(i).getPerms().size() + Color.Text + ")" + (i + 1 < user.getGroups().size() ? ", " : "");
+            groups.add(new SimpleEntry(tglist.get(i).getValue(), Color.Value + tglist.get(i).getValue().getName() + Color.Text
+                                                                 + " (" + Color.Value + tglist.get(i).getValue().getPerms().size()
+                                                                 + Color.Text + "|" + Color.Value + formatDuration(tglist.get(i)) + Color.Text + ")"));
         }
-        sender.sendMessage(Lang.translate(MessageType.USER_GROUPS, groups));
+        groups.sort(new Comparator<SimpleEntry<Group, String>>()
+        {
+            @Override
+            public int compare(SimpleEntry<Group, String> o1, SimpleEntry<Group, String> o2)
+            {
+                return Group.WEIGHT_COMPARATOR.compare(o1.getKey(), o2.getKey());
+            }
+        });
+        if (groups.isEmpty())
+            groupstr = Color.Text + "(" + Lang.translate(MessageType.NONE) + ")";
+        else
+            for (int i = 0; i < groups.size(); i++)
+                groupstr += groups.get(i).getValue() + (i + 1 < groups.size() ? ", " : "");
+        sender.sendMessage(Lang.translate(MessageType.USER_GROUPS, groupstr));
 
         //user perms
         sender.sendMessage(Lang.translate(MessageType.USER_PERMISSIONS, user.getOwnPermissionsCount(server, world)));
@@ -437,27 +607,25 @@ public class CommandHandler
         {
             perm = ((User) perm).getServer(server);
             if (world != null)
-            {
                 perm = ((Server) perm).getWorld(world);
-            }
         }
 
         //display
-        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (!Statics.isEmpty(perm.getDisplay()) ? perm.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.DISPLAY, (!Statics.isEmpty(perm.getDisplay()) ? perm.getDisplay().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //prefix
-        sender.sendMessage(Lang.translate(MessageType.PREFIX, (!Statics.isEmpty(perm.getPrefix()) ? perm.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.PREFIX, (!Statics.isEmpty(perm.getPrefix()) ? perm.getPrefix().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //suffix
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (!Statics.isEmpty(perm.getSuffix()) ? perm.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.SUFFIX, (!Statics.isEmpty(perm.getSuffix()) ? perm.getSuffix().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //full prefix
         String buildPrefix = user.buildPrefix(server, world);
-        sender.sendMessage(Lang.translate(MessageType.PREFIX_FULL, (!Statics.isEmpty(buildPrefix) ? buildPrefix : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.PREFIX_FULL, (!Statics.isEmpty(buildPrefix) ? buildPrefix.replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //full suffix
         String buildSuffix = user.buildSuffix(server, world);
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX_FULL, (!Statics.isEmpty(buildSuffix) ? buildSuffix : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.SUFFIX_FULL, (!Statics.isEmpty(buildSuffix) ? buildSuffix.replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
 
@@ -512,14 +680,9 @@ public class CommandHandler
 
         if (server == null)
         {
-            if (user.getExtraPerms().contains("-" + perm))
+            if (!user.getPerms().contains(perm))
             {
-                pm().removeUserPerm(user, "-" + perm);
-                sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM, perm, user.getName()));
-            }
-            else if (!user.getExtraPerms().contains(perm))
-            {
-                pm().addUserPerm(user, perm);
+                pm().addUserPerm(user, null, null, perm);
                 sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM, perm, user.getName()));
             }
             else
@@ -533,14 +696,9 @@ public class CommandHandler
 
             if (world == null)
             {
-                if (srv.getPerms().contains("-" + perm))
+                if (!srv.getPerms().contains(perm))
                 {
-                    pm().removeUserPerServerPerm(user, server, "-" + perm);
-                    sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER, perm, user.getName(), server));
-                }
-                else if (!srv.getPerms().contains(perm))
-                {
-                    pm().addUserPerServerPerm(user, server, perm);
+                    pm().addUserPerm(user, server, null, perm);
                     sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER, perm, user.getName(), server));
                 }
                 else
@@ -552,14 +710,9 @@ public class CommandHandler
             {
                 World w = srv.getWorld(world);
 
-                if (w.getPerms().contains("-" + perm))
+                if (!w.getPerms().contains(perm))
                 {
-                    pm().removeUserPerServerWorldPerm(user, server, world, "-" + perm);
-                    sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
-                }
-                else if (!w.getPerms().contains(perm))
-                {
-                    pm().addUserPerServerWorldPerm(user, server, world, perm);
+                    pm().addUserPerm(user, server, world, perm);
                     sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
                 }
                 else
@@ -596,14 +749,9 @@ public class CommandHandler
 
         if (server == null)
         {
-            if (user.getExtraPerms().contains(perm))
+            if (user.getPerms().contains(perm))
             {
-                pm().removeUserPerm(user, perm);
-                sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));
-            }
-            else if (!user.getExtraPerms().contains("-" + perm))
-            {
-                pm().addUserPerm(user, "-" + perm);
+                pm().removeUserPerm(user, null, null, perm);
                 sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));
             }
             else
@@ -619,12 +767,7 @@ public class CommandHandler
             {
                 if (srv.getPerms().contains(perm))
                 {
-                    pm().removeUserPerServerPerm(user, server, perm);
-                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER, perm, user.getName(), server));
-                }
-                else if (!srv.getPerms().contains("-" + perm))
-                {
-                    pm().addUserPerServerPerm(user, server, "-" + perm);
+                    pm().removeUserPerm(user, server, null, perm);
                     sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER, perm, user.getName(), server));
                 }
                 else
@@ -638,12 +781,153 @@ public class CommandHandler
 
                 if (w.getPerms().contains(perm))
                 {
-                    pm().removeUserPerServerWorldPerm(user, server, world, perm);
+                    pm().removeUserPerm(user, server, world, perm);
                     sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
                 }
-                else if (!w.getPerms().contains("-" + perm))
+                else
                 {
-                    pm().addUserPerServerWorldPerm(user, server, world, "-" + perm);
+                    sender.sendMessage(Lang.translate(MessageType.USER_NEVER_HAD_PERM_SERVER_WORLD, user.getName(), perm, server, world));
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean handleUserCommandsTimedPermAdd(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.user.perms.add", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 5, 7))
+        {
+            return true;
+        }
+
+        String player = Statics.getFullPlayerName(args[1]);
+        String perm = args[3].toLowerCase();
+        Integer duration = parseDuration(args[4]);
+        String server = args.length > 5 ? args[5].toLowerCase() : null;
+        String world = args.length > 6 ? args[6].toLowerCase() : null;
+
+        if (duration == null || duration < 0)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_DURATION_VALUE));
+            return true;
+        }
+
+        User user = pm().getUser(player);
+        if (user == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
+            return true;
+        }
+
+        if (server == null)
+        {
+            if (!user.hasTimedPermSet(perm))
+            {
+                pm().addUserTimedPerm(user, null, null, new TimedValue(perm, new Date(), duration));
+                sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM, perm, user.getName()));
+            }
+            else
+            {
+                sender.sendMessage(Lang.translate(MessageType.USER_ALREADY_HAS_PERM, user.getName(), perm));
+            }
+        }
+        else
+        {
+            Server srv = user.getServer(server);
+
+            if (world == null)
+            {
+                if (!srv.hasTimedPermSet(perm))
+                {
+                    pm().addUserTimedPerm(user, server, null, new TimedValue(perm, new Date(), duration));
+                    sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER, perm, user.getName(), server));
+                }
+                else
+                {
+                    sender.sendMessage(Lang.translate(MessageType.USER_ALREADY_HAS_PERM_SERVER, user.getName(), perm, server));
+                }
+            }
+            else
+            {
+                World w = srv.getWorld(world);
+
+                if (!w.hasTimedPermSet(perm))
+                {
+                    pm().addUserTimedPerm(user, server, world, new TimedValue(perm, new Date(), duration));
+                    sender.sendMessage(Lang.translate(MessageType.USER_ADDED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
+                }
+                else
+                {
+                    sender.sendMessage(Lang.translate(MessageType.USER_ALREADY_HAS_PERM_SERVER_WORLD, user.getName(), perm, server, world));
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean handleUserCommandsTimedPermRemove(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.user.perms.remove", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 4, 6))
+        {
+            return true;
+        }
+
+        String player = Statics.getFullPlayerName(args[1]);
+        String perm = args[3].toLowerCase();
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
+        User user = pm().getUser(player);
+        if (user == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
+            return true;
+        }
+
+        if (server == null)
+        {
+            if (user.hasTimedPermSet(perm))
+            {
+                pm().removeUserTimedPerm(user, null, null, perm);
+                sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM, perm, user.getName()));
+            }
+            else
+            {
+                sender.sendMessage(Lang.translate(MessageType.USER_NEVER_HAD_PERM, user.getName(), perm));
+            }
+        }
+        else
+        {
+            Server srv = user.getServer(server);
+
+            if (world == null)
+            {
+                if (srv.hasTimedPermSet(perm))
+                {
+                    pm().removeUserTimedPerm(user, server, null, perm);
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER, perm, user.getName(), server));
+                }
+                else
+                {
+                    sender.sendMessage(Lang.translate(MessageType.USER_NEVER_HAD_PERM_SERVER, user.getName(), perm, server));
+                }
+            }
+            else
+            {
+                World w = srv.getWorld(world);
+
+                if (w.hasTimedPermSet(perm))
+                {
+                    pm().removeUserTimedPerm(user, server, world, perm);
                     sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_PERM_SERVER_WORLD, perm, user.getName(), server, world));
                 }
                 else
@@ -729,10 +1013,9 @@ public class CommandHandler
             return true;
         }
 
-        List<Group> groups = u.getGroups();
-        for (Group g : groups)
+        for (String g : u.getGroupsString())
         {
-            if (g.getName().equalsIgnoreCase(group.getName()))
+            if (g.equalsIgnoreCase(group.getName()))
             {
                 sender.sendMessage(Lang.translate(MessageType.ERR_USER_ALREADY_IN_GROUP, groupname));
                 return true;
@@ -772,12 +1055,110 @@ public class CommandHandler
             return true;
         }
 
-        List<Group> groups = u.getGroups();
-        for (Group g : groups)
+        for (String g : u.getGroupsString())
         {
-            if (g.getName().equalsIgnoreCase(group.getName()))
+            if (g.equalsIgnoreCase(group.getName()))
             {
                 pm().removeUserGroup(u, group);
+                sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP, groupname, u.getName()));
+                return true;
+            }
+        }
+        sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_IN_GROUP, groupname));
+        return true;
+    }
+
+    private boolean handleUserCommandsTimedGroupAdd(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.user.group.add", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 5))
+        {
+            return true;
+        }
+
+        String player = Statics.getFullPlayerName(args[1]);
+        String groupname = args[3];
+        Integer duration = parseDuration(args[4]);
+
+        if (duration == null || duration < 0)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_DURATION_VALUE));
+            return true;
+        }
+
+        Group group = pm().getGroup(groupname);
+        if (group == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
+            return true;
+        }
+
+        User u = pm().getUser(player);
+        if (u == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
+            return true;
+        }
+
+        for (String g : u.getGroupsString())
+        {
+            if (g.equalsIgnoreCase(group.getName()))
+            {
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_ALREADY_IN_GROUP, groupname));
+                return true;
+            }
+        }
+        for (TimedValue<String> g : u.getTimedGroupsString())
+        {
+            if (g.getValue().equalsIgnoreCase(group.getName()))
+            {
+                sender.sendMessage(Lang.translate(MessageType.ERR_USER_ALREADY_IN_GROUP, groupname));
+                return true;
+            }
+        }
+
+        pm().addUserTimedGroup(u, new TimedValue<>(group, new Date(), duration));
+        sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP, groupname, u.getName()));
+        return true;
+    }
+
+    private boolean handleUserCommandsTimedGroupRemove(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.user.group.remove", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 4))
+        {
+            return true;
+        }
+
+        String player = Statics.getFullPlayerName(args[1]);
+        String groupname = args[3];
+        Group group = pm().getGroup(groupname);
+        if (group == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
+            return true;
+        }
+
+        User u = pm().getUser(player);
+        if (u == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
+            return true;
+        }
+
+        for (TimedValue<String> g : u.getTimedGroupsString())
+        {
+            if (g.getValue().equalsIgnoreCase(group.getName()))
+            {
+                pm().removeUserTimedGroup(u, group);
                 sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP, groupname, u.getName()));
                 return true;
             }
@@ -928,7 +1309,16 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.GROUPS_LIST_HEADER));
             for (String l : pm().getLadders())
             {
-                for (Group g : pm().getLadderGroups(l))
+                List<Group> lg = pm().getLadderGroups(l);
+                lg.sort(new Comparator<Group>()
+                {
+                    @Override
+                    public int compare(Group o1, Group o2)
+                    {
+                        return String.CASE_INSENSITIVE_ORDER.compare(o1.getName(), o2.getName());
+                    }
+                });
+                for (Group g : lg)
                 {
                     sender.sendMessage(Color.Text + "- " + Color.Value + g.getName() + Color.Text + " (" + Color.Value + l + Color.Text + ")");
                 }
@@ -945,7 +1335,7 @@ public class CommandHandler
             return true;
         }
 
-        if (args[2].equalsIgnoreCase("list"))
+        if (Statics.argAlias(args[2], "list", "listonly"))
         {
             return handleGroupCommandsList(sender, args);
         }
@@ -973,6 +1363,14 @@ public class CommandHandler
         {
             return handleGroupCommandsPermRemove(sender, args);
         }
+        else if (Statics.argAlias(args[2], "timedadd", "addtimed", "timedaddperm", "addtimedperm", "addpermtimed"))
+        {
+            return handleGroupCommandsTimedPermAdd(sender, args);
+        }
+        else if (Statics.argAlias(args[2], "timedremove", "removetimed", "timedremoveperm", "removetimedperm", "removepermtimed"))
+        {
+            return handleGroupCommandsTimedPermRemove(sender, args);
+        }
         else if (Statics.argAlias(args[2], "has", "check"))
         {
             return handleGroupCommandsHas(sender, args);
@@ -984,6 +1382,14 @@ public class CommandHandler
         else if (Statics.argAlias(args[2], "removeinherit", "removeinheritance"))
         {
             return handleGroupCommandsInheritRemove(sender, args);
+        }
+        else if (Statics.argAlias(args[2], "addtimedinherit", "addtimedinheritance"))
+        {
+            return handleGroupCommandsTimedInheritAdd(sender, args);
+        }
+        else if (Statics.argAlias(args[2], "removetimedinherit", "removetimedinheritance"))
+        {
+            return handleGroupCommandsTimedInheritRemove(sender, args);
         }
         else if (args[2].equalsIgnoreCase("rank"))
         {
@@ -1015,7 +1421,7 @@ public class CommandHandler
         }
 
         //alias handling
-        else if (Statics.argAlias(args[2], "perm", "permission"))
+        else if (Statics.argAlias(args[2], "perm", "permission", "timed"))
         {
             if (!Statics.matchArgs(sender, args, 5))
             {
@@ -1053,6 +1459,7 @@ public class CommandHandler
         }
 
         String groupname = args[1];
+        boolean only = args[2].equalsIgnoreCase("listonly");
         String server = args.length > (3 + (specialpage ? 1 : 0)) ? args[3].toLowerCase() : null;
         String world = args.length > (4 + (specialpage ? 1 : 0)) ? args[4].toLowerCase() : null;
         Group group = pm().getGroup(groupname);
@@ -1065,16 +1472,18 @@ public class CommandHandler
 
         sender.sendMessage(Lang.translate(MessageType.GROUP_PERMISSIONS_LIST_HEADER, group.getName()));
         List<BPPermission> perms = group.getPermsWithOrigin(server, world);
-        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
-        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
-        {
-            BPPermission perm = perms.get(i);
-            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
-                                              perm.getPermission(),
-                                              (!perm.getOrigin().equalsIgnoreCase(groupname) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
-                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
-                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : "")));
-        }
+        list(sender, perms, groupname, page, only, server, world);
+//        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
+//        {
+//            BPPermission perm = perms.get(i);
+//            String dur = formatDuration(perm);
+//            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
+//                                              perm.getPermission(),
+//                                              (perm.getOrigin().equalsIgnoreCase(groupname) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
+//                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
+//                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : ""),
+//                                              dur == null ? "" : ", " + Color.Value + dur + Color.Text));
+//        }
         return true;
     }
 
@@ -1104,16 +1513,35 @@ public class CommandHandler
         sender.sendMessage(Lang.translate(MessageType.GROUP_ABOUT, group.getName()));
 
         //inheritances
-        String inheritances = "";
-        for (int i = 0; i < group.getInheritances().size(); i++)
+        List<SimpleEntry<Group, String>> inherits = new ArrayList();
+        String inheritancesstr = "";
+        List<Group> inherit = group.getInheritances();
+        List<TimedValue<Group>> timedinherit = group.getTimedInheritances();
+        for (int i = 0; i < inherit.size(); i++)
         {
-            inheritances += Color.Value + group.getInheritances().get(i) + Color.Text + " (" + Color.Value + pm().getGroup(group.getInheritances().get(i)).getPerms().size() + Color.Text + ")" + (i + 1 < group.getInheritances().size() ? ", " : "");
+            inherits.add(new SimpleEntry(inherit.get(i), Color.Value + inherit.get(i).getName() + Color.Text
+                                                         + " (" + Color.Value + inherit.get(i).getPerms().size() + Color.Text + ")"));
         }
-        if (inheritances.length() == 0)
+        for (int i = 0; i < timedinherit.size(); i++)
         {
-            inheritances = Color.Text + "(" + Lang.translate(MessageType.NONE) + ")";
+            inherits.add(new SimpleEntry(inherit.get(i), Color.Value + timedinherit.get(i).getValue().getName() + Color.Text
+                                                         + " (" + Color.Value + timedinherit.get(i).getValue().getPerms().size() + Color.Text + "|"
+                                                         + Color.Value + formatDuration(timedinherit.get(i)) + Color.Text + ")"));
         }
-        sender.sendMessage(Lang.translate(MessageType.GROUP_INHERITANCES, inheritances));
+        inherits.sort(new Comparator<SimpleEntry<Group, String>>()
+        {
+            @Override
+            public int compare(SimpleEntry<Group, String> o1, SimpleEntry<Group, String> o2)
+            {
+                return Group.WEIGHT_COMPARATOR.compare(o1.getKey(), o2.getKey());
+            }
+        });
+        if (inherits.isEmpty())
+            inheritancesstr = Color.Text + "(" + Lang.translate(MessageType.NONE) + ")";
+        else
+            for (int i = 0; i < inherits.size(); i++)
+                inheritancesstr += inherits.get(i).getValue() + (i + 1 < inherits.size() ? ", " : "");
+        sender.sendMessage(Lang.translate(MessageType.GROUP_INHERITANCES, inheritancesstr));
 
         //group perms
         sender.sendMessage(Lang.translate(MessageType.GROUP_PERMISSONS, group.getOwnPermissionsCount(server, world)));
@@ -1139,27 +1567,25 @@ public class CommandHandler
         {
             perm = ((Group) perm).getServer(server);
             if (world != null)
-            {
                 perm = ((Server) perm).getWorld(world);
-            }
         }
 
         //display
-        sender.sendMessage(Lang.translate(MessageType.DISPLAY, (!Statics.isEmpty(perm.getDisplay()) ? perm.getDisplay() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.DISPLAY, (!Statics.isEmpty(perm.getDisplay()) ? perm.getDisplay().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //prefix
-        sender.sendMessage(Lang.translate(MessageType.PREFIX, (!Statics.isEmpty(perm.getPrefix()) ? perm.getPrefix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.PREFIX, (!Statics.isEmpty(perm.getPrefix()) ? perm.getPrefix().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //suffix
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX, (!Statics.isEmpty(perm.getSuffix()) ? perm.getSuffix() : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.SUFFIX, (!Statics.isEmpty(perm.getSuffix()) ? perm.getSuffix().replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //full prefix
         String buildPrefix = group.buildPrefix(server, world);
-        sender.sendMessage(Lang.translate(MessageType.PREFIX_FULL, (!Statics.isEmpty(buildPrefix) ? buildPrefix : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.PREFIX_FULL, (!Statics.isEmpty(buildPrefix) ? buildPrefix.replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
 
         //full suffix
         String buildSuffix = group.buildSuffix(server, world);
-        sender.sendMessage(Lang.translate(MessageType.SUFFIX_FULL, (!Statics.isEmpty(buildSuffix) ? buildSuffix : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
+        sender.sendMessage(Lang.translatePreserveArgs(MessageType.SUFFIX_FULL, (!Statics.isEmpty(buildSuffix) ? buildSuffix.replaceAll("" + ChatColor.COLOR_CHAR, "&") : Color.Text + "(" + Lang.translate(MessageType.NONE) + ")")));
         return true;
     }
 
@@ -1183,21 +1609,67 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
             return true;
         }
-        List<String> users = pm().getGroupUsers(group);
-        if (users.isEmpty())
-        {
-            sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
-        }
 
         if (args.length == 3)
         {
-            String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
-            for (int i = 0; i < users.size(); i++)
+            if (config.isUseUUIDs())
             {
-                out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : ""); //todo: uuid
+                Map<UUID, String> usersmap = pm().getGroupUsersUUID(group);
+                if (usersmap.isEmpty())
+                {
+                    sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+                    return true;
+                }
+
+                List<Map.Entry<UUID, String>> users = new ArrayList(usersmap.entrySet());
+                users.sort(new Comparator<Map.Entry<UUID, String>>()
+                {
+                    @Override
+                    public int compare(Map.Entry<UUID, String> o1, Map.Entry<UUID, String> o2)
+                    {
+                        return String.CASE_INSENSITIVE_ORDER.compare(o1.getValue(), o2.getValue());
+                    }
+                });
+
+                String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
+                for (int i = 0; i < users.size(); i++)
+                {
+                    //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
+                    if (out.length() * 1.1 > Short.MAX_VALUE)
+                    {
+                        sender.sendMessage(out);
+                        out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
+                    }
+                    out += Color.User + users.get(i).getValue() + Color.Text + " (" + Color.User + users.get(i).getKey() + Color.Text + ")" + (i + 1 < users.size() ? ", " : "");
+                }
+                sender.sendMessage(out);
+                return true;
             }
-            sender.sendMessage(out);
-            return true;
+            else
+            {
+                List<String> users = pm().getGroupUsers(group);
+                if (users.isEmpty())
+                {
+                    sender.sendMessage(Lang.translate(MessageType.NO_USERS_FOUND));
+                    return true;
+                }
+
+                users.sort(String.CASE_INSENSITIVE_ORDER);
+
+                String out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
+                for (int i = 0; i < users.size(); i++)
+                {
+                    //mc chat packet length; string most likely 1 byte/char so 1.1 bytes/char should be safe
+                    if (out.length() * 1.1 > Short.MAX_VALUE)
+                    {
+                        sender.sendMessage(out);
+                        out = Lang.translate(MessageType.GROUP_USERS_HEADER, group.getName());
+                    }
+                    out += Color.User + users.get(i) + Color.Text + (i + 1 < users.size() ? ", " : "");
+                }
+                sender.sendMessage(out);
+                return true;
+            }
         }
         else if (args.length == 4)
         {
@@ -1205,6 +1677,7 @@ public class CommandHandler
             {
                 return false;
             }
+            List<String> users = pm().getGroupUsers(group);
             sender.sendMessage(Lang.translate(MessageType.GROUP_USERS_HEADER, users.size(), group.getName()));
             return true;
         }
@@ -1226,10 +1699,10 @@ public class CommandHandler
         String groupname = args[1];
         if (pm().getGroup(groupname) != null)
         {
-            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_EXISTS, groupname));
             return true;
         }
-        Group group = new Group(groupname, new ArrayList<String>(), new ArrayList<String>(), new HashMap<String, Server>(), 1000, 1000, "default", false, null, null, null);
+        Group group = new Group(groupname, new ArrayList(), new ArrayList(), new ArrayList(), new ArrayList(), new HashMap(), 1000, 1000, "default", false, null, null, null);
         pm().addGroup(group);
         sender.sendMessage(Lang.translate(MessageType.GROUP_CREATED, groupname));
         return true;
@@ -1287,14 +1760,9 @@ public class CommandHandler
         //global perm
         if (server == null)
         {
-            if (group.getPerms().contains("-" + perm))
+            if (!group.getPerms().contains(perm))
             {
-                pm().removeGroupPerm(group, "-" + perm);
-                sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM, perm, group.getName()));
-            }
-            else if (!group.getPerms().contains(perm))
-            {
-                pm().addGroupPerm(group, perm);
+                pm().addGroupPerm(group, null, null, perm);
                 sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM, perm, group.getName()));
             }
             else
@@ -1310,14 +1778,9 @@ public class CommandHandler
             if (world == null)
             {
                 List<String> perserverperms = srv.getPerms();
-                if (perserverperms.contains("-" + perm))
+                if (!perserverperms.contains(perm))
                 {
-                    pm().removeGroupPerServerPerm(group, server, "-" + perm);
-                    sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER, perm, group.getName(), server));
-                }
-                else if (!perserverperms.contains(perm))
-                {
-                    pm().addGroupPerServerPerm(group, server, perm);
+                    pm().addGroupPerm(group, server, null, perm);
                     sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER, perm, group.getName(), server));
                 }
                 else
@@ -1332,14 +1795,9 @@ public class CommandHandler
                 World w = srv.getWorld(world);
 
                 List<String> perserverworldperms = w.getPerms();
-                if (perserverworldperms.contains("-" + perm))
+                if (!perserverworldperms.contains(perm))
                 {
-                    pm().removeGroupPerServerWorldPerm(group, server, world, "-" + perm);
-                    sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
-                }
-                else if (!perserverworldperms.contains(perm))
-                {
-                    pm().addGroupPerServerWorldPerm(group, server, world, perm);
+                    pm().addGroupPerm(group, server, world, perm);
                     sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
                 }
                 else
@@ -1379,12 +1837,7 @@ public class CommandHandler
         {
             if (group.getPerms().contains(perm))
             {
-                pm().removeGroupPerm(group, perm);
-                sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM, perm, group.getName()));
-            }
-            else if (!group.getPerms().contains("-" + perm))
-            {
-                pm().addGroupPerm(group, "-" + perm);
+                pm().removeGroupPerm(group, null, null, perm);
                 sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM, perm, group.getName()));
             }
             else
@@ -1399,15 +1852,9 @@ public class CommandHandler
             //per server perm
             if (world == null)
             {
-                List<String> perserverperms = srv.getPerms();
-                if (perserverperms.contains(perm))
+                if (srv.getPerms().contains(perm))
                 {
-                    pm().removeGroupPerServerPerm(group, server, perm);
-                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER, perm, group.getName(), server));
-                }
-                else if (!perserverperms.contains("-" + perm))
-                {
-                    pm().addGroupPerServerPerm(group, server, "-" + perm);
+                    pm().removeGroupPerm(group, server, null, perm);
                     sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER, perm, group.getName(), server));
                 }
                 else
@@ -1419,15 +1866,161 @@ public class CommandHandler
             {
                 World w = srv.getWorld(world);
 
-                List<String> perserverworldperms = w.getPerms();
-                if (perserverworldperms.contains(perm))
+                if (w.getPerms().contains(perm))
                 {
-                    pm().removeGroupPerServerWorldPerm(group, server, world, perm);
+                    pm().removeGroupPerm(group, server, world, perm);
                     sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
                 }
-                else if (!perserverworldperms.contains("-" + perm))
+                else
                 {
-                    pm().addGroupPerServerWorldPerm(group, server, world, "-" + perm);
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_NEVER_HAD_PERM_SERVER_WORLD, group.getName(), perm, server, world));
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean handleGroupCommandsTimedPermAdd(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.group.perms.add", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 5, 7))
+        {
+            return true;
+        }
+
+        String groupname = args[1];
+        String perm = args[3].toLowerCase();
+        Integer duration = parseDuration(args[4]);
+        String server = args.length > 5 ? args[5].toLowerCase() : null;
+        String world = args.length > 6 ? args[6].toLowerCase() : null;
+
+        if (duration == null || duration < 0)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_DURATION_VALUE));
+            return true;
+        }
+
+        Group group = pm().getGroup(groupname);
+        if (group == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
+            return true;
+        }
+
+        //global perm
+        if (server == null)
+        {
+            if (!group.hasTimedPermSet(perm))
+            {
+                pm().addGroupTimedPerm(group, null, null, new TimedValue(perm, new Date(), duration));
+                sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM, perm, group.getName()));
+            }
+            else
+            {
+                sender.sendMessage(Lang.translate(MessageType.GROUP_ALREADY_HAS_PERM, group.getName(), perm));
+            }
+        }
+        else
+        {
+            Server srv = group.getServer(server);
+
+            //per server perm
+            if (world == null)
+            {
+                if (!srv.hasTimedPermSet(perm))
+                {
+                    pm().addGroupTimedPerm(group, server, null, new TimedValue(perm, new Date(), duration));
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER, perm, group.getName(), server));
+                }
+                else
+                {
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ALREADY_HAS_PERM_SERVER, group.getName(), perm, server));
+                }
+            }
+
+            //per server world perms
+            else
+            {
+                World w = srv.getWorld(world);
+
+                if (!w.hasTimedPermSet(perm))
+                {
+                    pm().addGroupTimedPerm(group, server, world, new TimedValue(perm, new Date(), duration));
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
+                }
+                else
+                {
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_ALREADY_HAS_PERM_SERVER_WORLD, group.getName(), perm, server, world));
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean handleGroupCommandsTimedPermRemove(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.group.perms.remove", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 4, 6))
+        {
+            return true;
+        }
+
+        String groupname = args[1];
+        String perm = args[3].toLowerCase();
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
+        Group group = pm().getGroup(groupname);
+        if (group == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
+            return true;
+        }
+
+        //global perm
+        if (server == null)
+        {
+            if (group.hasTimedPermSet(perm))
+            {
+                pm().removeGroupTimedPerm(group, null, null, perm);
+                sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM, perm, group.getName()));
+            }
+            else
+            {
+                sender.sendMessage(Lang.translate(MessageType.GROUP_NEVER_HAD_PERM, group.getName(), perm));
+            }
+        }
+        else
+        {
+            Server srv = group.getServer(server);
+
+            //per server perm
+            if (world == null)
+            {
+                if (srv.hasTimedPermSet(perm))
+                {
+                    pm().removeGroupTimedPerm(group, server, null, perm);
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER, perm, group.getName(), server));
+                }
+                else
+                {
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_NEVER_HAD_PERM_SERVER, group.getName(), perm, server));
+                }
+            }
+            else
+            {
+                World w = srv.getWorld(world);
+
+                if (w.hasTimedPermSet(perm))
+                {
+                    pm().removeGroupTimedPerm(group, server, world, perm);
                     sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_PERM_SERVER_WORLD, perm, group.getName(), server, world));
                 }
                 else
@@ -1465,21 +2058,21 @@ public class CommandHandler
         //global perm
         if (server == null)
         {
-            boolean has = group.has(perm.toLowerCase());
+            boolean has = group.has(perm.toLowerCase(), null, null);
             sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM, group.getName(), perm, formatBool(has)));
         }
 
         //per server perm
         else if (world == null)
         {
-            boolean has = group.hasOnServer(perm.toLowerCase(), server);
+            boolean has = group.has(perm.toLowerCase(), server, null);
             sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER, group.getName(), perm, server, formatBool(has)));
         }
 
         //per server world perm
         else
         {
-            boolean has = group.hasOnServerInWorld(perm.toLowerCase(), server, world);
+            boolean has = group.has(perm.toLowerCase(), server, world);
             sender.sendMessage(Lang.translate(MessageType.GROUP_HAS_PERM_SERVER_WORLD, group.getName(), perm, server, world, formatBool(has)));
         }
         return true;
@@ -1515,10 +2108,8 @@ public class CommandHandler
             return true;
         }
 
-        List<String> inheritances = group.getInheritances();
-
         //check for already existing inheritance
-        for (String s : inheritances)
+        for (String s : group.getInheritancesString())
         {
             if (s.equalsIgnoreCase(toadd.getName()))
             {
@@ -1562,12 +2153,115 @@ public class CommandHandler
             return true;
         }
 
-        List<String> inheritances = group.getInheritances();
-        for (String s : inheritances)
+        for (String s : group.getInheritancesString())
         {
             if (s.equalsIgnoreCase(toremove.getName()))
             {
                 pm().removeGroupInheritance(group, toremove);
+
+                sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE, removegroup, groupname));
+                return true;
+            }
+        }
+        sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_INHERITS, groupname, removegroup));
+        return true;
+    }
+
+    private boolean handleGroupCommandsTimedInheritAdd(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.group.inheritances.add", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 5))
+        {
+            return true;
+        }
+
+        String groupname = args[1];
+        String addgroup = args[3];
+        Integer duration = parseDuration(args[4]);
+
+        if (duration == null || duration < 0)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_INVALID_DURATION_VALUE));
+            return true;
+        }
+
+        //check group existance
+        Group group = pm().getGroup(groupname);
+        if (group == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
+            return true;
+        }
+
+        Group toadd = pm().getGroup(addgroup);
+        if (toadd == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, addgroup));
+            return true;
+        }
+
+        //check for already existing inheritance
+        for (String s : group.getInheritancesString())
+        {
+            if (s.equalsIgnoreCase(toadd.getName()))
+            {
+                sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_INHERITS, groupname, addgroup));
+                return true;
+            }
+        }
+        for (TimedValue<String> s : group.getTimedInheritancesString())
+        {
+            if (s.getValue().equalsIgnoreCase(toadd.getName()))
+            {
+                sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_INHERITS, groupname, addgroup));
+                return true;
+            }
+        }
+
+        pm().addGroupTimedInheritance(group, new TimedValue(toadd, new Date(), duration));
+
+        sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE, addgroup, groupname));
+        return true;
+    }
+
+    private boolean handleGroupCommandsTimedInheritRemove(Sender sender, String[] args)
+    {
+        if (!checker.hasOrConsole(sender, "bungeeperms.group.inheritances.remove", true))
+        {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 4))
+        {
+            return true;
+        }
+
+        String groupname = args[1];
+        String removegroup = args[3];
+
+        Group group = pm().getGroup(groupname);
+        if (group == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, groupname));
+            return true;
+        }
+
+        Group toremove = pm().getGroup(removegroup);
+        if (toremove == null)
+        {
+            sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_NOT_EXISTING, removegroup));
+            return true;
+        }
+
+        for (TimedValue<String> s : group.getTimedInheritancesString())
+        {
+            if (s.getValue().equalsIgnoreCase(toremove.getName()))
+            {
+                pm().removeGroupTimedInheritance(group, toremove);
 
                 sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE, removegroup, groupname));
                 return true;
@@ -2066,10 +2760,6 @@ public class CommandHandler
         {
             return handleMigrateUseUUID(sender, args);
         }
-        else if (migratetype.equalsIgnoreCase("uuidplayerdb"))
-        {
-            return handleMigrateUUIDPlayerDB(sender, args);
-        }
         else
         {
             return false;
@@ -2089,8 +2779,8 @@ public class CommandHandler
             if (type == null)
             {
                 sender.sendMessage(Color.Error + "Invalid backend type! "
-                        + Color.Value + BackEndType.YAML.name() + Color.Error + " or "
-                        + Color.Value + BackEndType.MySQL2.name() + Color.Error + " is required!");
+                                   + Color.Value + BackEndType.YAML.name() + Color.Error + " or "
+                                   + Color.Value + BackEndType.MySQL.name() + Color.Error + " is required!");
                 return true;
             }
 
@@ -2131,8 +2821,8 @@ public class CommandHandler
             if (type == null)
             {
                 sender.sendMessage(Color.Error + "Invalid use-uuid type! "
-                        + Color.Value + "true" + Color.Error + " or "
-                        + Color.Value + "false" + Color.Error + " is required!");
+                                   + Color.Value + "true" + Color.Error + " or "
+                                   + Color.Value + "false" + Color.Error + " is required!");
                 return true;
             }
 
@@ -2160,10 +2850,13 @@ public class CommandHandler
 
                 //add fetched uuids to uuidplayerdb
                 sender.sendMessage(Color.Text + "Applying fetched data to player-uuid-database ...");
+                UUIDPlayerDB updb = config.getBackendType() == BackEndType.YAML ? new YAMLUUIDPlayerDB() : new MySQLUUIDPlayerDB();
+                updb.clear();
                 for (Map.Entry<String, UUID> e : uuids.entrySet())
                 {
-                    pm().getUUIDPlayerDB().update(e.getValue(), e.getKey());
+                    updb.update(e.getValue(), e.getKey());
                 }
+                pm().setUUIDPlayerDB(updb);
                 sender.sendMessage(Color.Message + "Finished applying of fetched data to player-uuid-database.");
             }
             else
@@ -2184,49 +2877,14 @@ public class CommandHandler
 
                 //add fetched playername to uuidplayerdb
                 sender.sendMessage(Color.Text + "Applying fetched data to player-uuid-database ...");
-                for (Map.Entry<UUID, String> e : playernames.entrySet())
+                if (pm().getUUIDPlayerDB() != null)
                 {
-                    pm().getUUIDPlayerDB().update(e.getKey(), e.getValue());
+                    pm().getUUIDPlayerDB().clear();
+                    pm().setUUIDPlayerDB(null);
                 }
                 sender.sendMessage(Color.Message + "Finished applying of fetched data to player-uuid-database.");
             }
 
-            sender.sendMessage(Color.Message + "Finished migration.");
-        }
-        else
-        {
-            Messages.sendTooManyArgsMessage(sender);
-        }
-        return true;
-    }
-
-    private boolean handleMigrateUUIDPlayerDB(Sender sender, String[] args)
-    {
-        if (args.length == 2)
-        {
-            sender.sendMessage(Color.Text + "Currently using " + Color.Value + pm().getUUIDPlayerDB().getType().name() + Color.Text + " as uuid player database");
-        }
-        else if (args.length == 3)
-        {
-            String stype = args[2];
-            UUIDPlayerDBType type = UUIDPlayerDBType.getByName(stype);
-            if (type == null)
-            {
-                sender.sendMessage(Color.Error + "Invalid backend type! "
-                        + Color.Value + UUIDPlayerDBType.None.name() + Color.Error + ", "
-                        + Color.Value + UUIDPlayerDBType.YAML.name() + Color.Error + " or "
-                        + Color.Value + UUIDPlayerDBType.MySQL.name() + Color.Error + " is required!");
-                return true;
-            }
-
-            if (type == pm().getUUIDPlayerDB().getType())
-            {
-                sender.sendMessage(Color.Error + "Invalid uuid-player-database type! You can't migrate to same type!");
-                return true;
-            }
-
-            sender.sendMessage(Color.Text + "Migrating uuid-player-database to " + Color.Value + type.name() + Color.Text + " ...");
-            pm().migrateUUIDPlayerDB(type);
             sender.sendMessage(Color.Message + "Finished migration.");
         }
         else
@@ -2322,6 +2980,116 @@ public class CommandHandler
         return true;
     }
 
+    //command util  
+    private void list(Sender sender, List<BPPermission> perms, String entity, int page, boolean only, String server, String world)
+    {
+        if (only)
+        {
+            perms = new ArrayList(perms);
+            for (int i = 0; i < perms.size(); i++)
+            {
+                BPPermission perm = perms.get(i);
+                if ((server != null && !server.equalsIgnoreCase(perm.getServer()))
+                    || (server != null && world != null && !world.equalsIgnoreCase(perm.getWorld())))
+                    perms.remove(i);
+            }
+        }
+        if (config.getResolvingMode() == PermissionsResolver.ResolvingMode.BESTMATCH)
+        {
+            perms = new ArrayList(perms);
+            Collections.sort(perms);
+        }
+
+        sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, perms.size() / 20 + (perms.size() % 20 > 0 ? 1 : 0)));
+        for (int i = (page - 1) * 20; i < page * 20 && i < perms.size(); i++)
+        {
+            BPPermission perm = perms.get(i);
+            String dur = formatDuration(perm);
+            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_ITEM,
+                                              perm.getPermission(),
+                                              (!perm.isGroup() && perm.getOrigin().equalsIgnoreCase(entity) ? Lang.translate(MessageType.OWN) : perm.getOrigin()),
+                                              (perm.getServer() != null ? " | " + Color.Value + perm.getServer() + Color.Text : ""),
+                                              (perm.getWorld() != null ? " | " + Color.Value + perm.getWorld() + Color.Text : ""),
+                                              dur == null ? "" : ", " + Color.Value + dur + Color.Text));
+        }
+    }
+
+    private boolean addToTree(Map<Group, Object> tree, Group parent, Group child)
+    {
+        boolean didsomething = false;
+        for (Map.Entry<Group, Object> e : tree.entrySet())
+        {
+            if (e.getKey() == parent)
+            {
+                if (!((Map<Group, Object>) e.getValue()).containsKey(child))
+                {
+                    ((Map<Group, Object>) e.getValue()).put(child, new HashMap());
+                    didsomething = true;
+                }
+            }
+            else
+            {
+                didsomething |= addToTree((Map<Group, Object>) e.getValue(), parent, child);
+            }
+        }
+        return didsomething;
+    }
+
+    private List<String> treeToMsgs(Map<Group, Object> tree, int indent)
+    {
+        List<List<String>> msgs = treeToMsgs0(tree, indent);
+        List<String> ret = new ArrayList();
+
+        List<Integer> widths = new ArrayList();
+        if (!msgs.isEmpty())
+            for (String i : msgs.get(0))
+                widths.add(0);
+        for (int i = 0; i < widths.size(); i++)
+        {
+            int len = 0;
+            for (List<String> l : msgs)
+                len = Math.max(len, l.get(i).length());
+            widths.set(i, len);
+        }
+        for (List<String> l : msgs)
+        {
+            for (int i = 0; i < l.size(); i++)
+                l.set(i, String.format("%" + (i == 0 ? "-" : "") + widths.get(i) + "s", l.get(i)));
+            ret.add(Lang.translate(MessageType.OVERVIEW_ITEM, l.toArray()));
+        }
+
+        return ret;
+    }
+
+    private List<List<String>> treeToMsgs0(Map<Group, Object> tree, int indent)
+    {
+        List<List<String>> msgs = new ArrayList();
+        List<Map.Entry<Group, Object>> entries = new ArrayList(tree.entrySet());
+        entries.sort(new Comparator<Map.Entry<Group, Object>>()
+        {
+            @Override
+            public int compare(Map.Entry<Group, Object> o1, Map.Entry<Group, Object> o2)
+            {
+                return String.CASE_INSENSITIVE_ORDER.compare(o1.getKey().getName(), o2.getKey().getName());
+            }
+        });
+        for (Map.Entry<Group, Object> e : entries)
+        {
+            Group g = e.getKey();
+            String space = new String(new char[indent]).replace("\0", " ");
+            msgs.add(Arrays.asList(space + "- " + Color.Value + g.getName() + Color.Text,
+                                   g.getLadder(),
+                                   "" + g.getPermissionsCount(null, null),
+                                   "" + g.getOwnPermissionsCount(null, null),
+                                   "" + BungeePerms.getInstance().getPermissionsManager().getGroupUsers(g).size(),
+                                   "" + g.getRank(),
+                                   "" + g.getWeight()));
+            msgs.addAll(treeToMsgs0((Map<Group, Object>) e.getValue(), indent + 1));
+        }
+        return msgs;
+    }
+
+    //other util
     private PermissionsManager pm()
     {
         return BungeePerms.getInstance().getPermissionsManager();
@@ -2340,8 +3108,80 @@ public class CommandHandler
         throw new IllegalArgumentException("truefalse does not represent a boolean value");
     }
 
+    private Integer parseDuration(String str)
+    {
+        if (Statics.isEmpty(str) || !str.matches("([0-9]+d)?([0-9]+h)?([0-9]+m)?([0-9]+s)?"))
+            return null;
+
+        int dur = 0;
+        int index = str.indexOf("d");
+        if (index >= 0)
+        {
+            dur += Integer.parseInt(str.substring(0, index)) * 24 * 60 * 60;
+            str = str.substring(index + 1);
+        }
+        index = str.indexOf("h");
+        if (index >= 0)
+        {
+            dur += Integer.parseInt(str.substring(0, index)) * 60 * 60;
+            str = str.substring(index + 1);
+        }
+        index = str.indexOf("m");
+        if (index >= 0)
+        {
+            dur += Integer.parseInt(str.substring(0, index)) * 60;
+            str = str.substring(index + 1);
+        }
+        index = str.indexOf("s");
+        if (index >= 0)
+        {
+            dur += Integer.parseInt(str.substring(0, index));
+            str = str.substring(index + 1);
+        }
+
+        return dur;
+    }
+
     private String formatBool(boolean b)
     {
         return (b ? ChatColor.GREEN : ChatColor.RED) + String.valueOf(b).toUpperCase();
+    }
+
+    private String formatDuration(BPPermission perm)
+    {
+        return perm.getTimedStart() == null ? null : formatDuration(perm.getTimedStart(), perm.getTimedDuration());
+    }
+
+    private String formatDuration(TimedValue val)
+    {
+        return val.getStart() == null ? null : formatDuration(val.getStart(), val.getDuration());
+    }
+
+    private String formatDuration(Date start, int duration)
+    {
+        String dur = "";
+        long end = start.getTime() + duration * 1000;
+        long d = end - System.currentTimeMillis();
+        d /= 1000;
+        if (d > 24 * 60 * 60)
+        {
+            dur += (d / (24 * 60 * 60)) + "d";
+            d %= 24 * 60 * 60;
+        }
+        if (d > 60 * 60)
+        {
+            dur += (d / (60 * 60)) + "h";
+            d %= 60 * 60;
+        }
+        if (d > 60)
+        {
+            dur += (d / (60)) + "m";
+            d %= 60;
+        }
+        if (d > 0)
+            dur += d + "s";
+        else if (dur.length() == 0)
+            dur += "0s";
+        return dur;
     }
 }
