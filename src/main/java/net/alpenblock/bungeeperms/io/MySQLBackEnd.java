@@ -164,7 +164,7 @@ public class MySQLBackEnd implements BackEnd
         List<String> groups = getValues(mpe.getData("groups"));
         List<TimedValue<String>> timedgroups = getValuesTimed(mpe.getData("timedgroups"));
 
-        UUID uuid = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(mpe.getName());
+        UUID uuid = BungeePerms.getInstance().getConfig().isUseUUIDs() ? BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(mpe.getName()) : null;
         User u = new User(mpe.getName(), uuid, groups, timedgroups, new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
         loadServerWorlds(mpe, u);
         u.invalidateCache();

@@ -167,9 +167,12 @@ public class YAMLBackEnd implements BackEnd
         User u = loadUser0(user);
         if (u == null)
             return null;
-        UUID uuid = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(user);
+        if (BungeePerms.getInstance().getConfig().isUseUUIDs())
+        {
+            UUID uuid = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(user);
+            u.setUUID(uuid);
+        }
         u.setName(user);
-        u.setUUID(uuid);
         u.invalidateCache();
         return u;
     }
