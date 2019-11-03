@@ -32,7 +32,7 @@ For BungeePerms 3 use
 </dependencies>
 ```
 
-For BungeePerms 4 user
+For BungeePerms 4 use
 ```xml
 <repositories>
     <repository>
