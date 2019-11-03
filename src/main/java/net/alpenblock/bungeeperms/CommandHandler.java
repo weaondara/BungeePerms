@@ -2990,7 +2990,7 @@ public class CommandHandler
             {
                 BPPermission perm = perms.get(i);
                 if ((server != null && !server.equalsIgnoreCase(perm.getServer()))
-                    || (server != null && world != null && !world.equalsIgnoreCase(perm.getServer())))
+                    || (server != null && world != null && !world.equalsIgnoreCase(perm.getWorld())))
                     perms.remove(i);
             }
         }
