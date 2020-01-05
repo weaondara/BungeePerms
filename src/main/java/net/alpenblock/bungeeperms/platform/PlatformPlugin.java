@@ -38,6 +38,8 @@ public interface PlatformPlugin
 
     public int runTaskLater(Runnable r, long delay);
 
+    public int runTaskLaterAsync(Runnable r, long delay);
+
     public void cancelTask(int id);
 
     public Integer getBuild();

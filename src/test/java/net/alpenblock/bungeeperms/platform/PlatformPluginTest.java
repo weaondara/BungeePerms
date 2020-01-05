@@ -12,31 +12,30 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-
-public class PlatformPluginTest 
+public class PlatformPluginTest
 {
-    
-    public PlatformPluginTest() 
+
+    public PlatformPluginTest()
     {
     }
-    
+
     @BeforeClass
-    public static void setUpClass() 
+    public static void setUpClass()
     {
     }
-    
+
     @AfterClass
-    public static void tearDownClass() 
+    public static void tearDownClass()
     {
     }
-    
+
     @Before
-    public void setUp() 
+    public void setUp()
     {
     }
-    
+
     @After
-    public void tearDown() 
+    public void tearDown()
     {
     }
 
@@ -44,7 +43,7 @@ public class PlatformPluginTest
      * Test of getBuild method, of class PlatformPlugin.
      */
     @Test
-    public void testGetBuild() 
+    public void testGetBuild()
     {
         System.out.println("getBuild");
         PlatformPlugin instance = new PlatformPluginImpl();
@@ -55,91 +54,98 @@ public class PlatformPluginTest
         //fail("The test case is a prototype.");
     }
 
-    public class PlatformPluginImpl implements PlatformPlugin 
+    public class PlatformPluginImpl implements PlatformPlugin
     {
 
-        public String getPluginName() 
+        public String getPluginName()
         {
             return "";
         }
 
-        public String getVersion() {
+        public String getVersion()
+        {
             return "3.0 dev #70";
         }
 
-        public String getAuthor() 
+        public String getAuthor()
         {
             return "";
         }
 
-        public String getPluginFolderPath() 
+        public String getPluginFolderPath()
         {
             return "";
         }
 
-        public File getPluginFolder() 
+        public File getPluginFolder()
         {
             return null;
         }
 
-        public Sender getPlayer(String name) 
+        public Sender getPlayer(String name)
         {
             return null;
         }
 
-        public Sender getPlayer(UUID uuid) 
+        public Sender getPlayer(UUID uuid)
         {
             return null;
         }
 
-        public Sender getConsole() 
+        public Sender getConsole()
         {
             return null;
         }
 
-        public List<Sender> getPlayers() 
+        public List<Sender> getPlayers()
         {
             return null;
         }
 
-        public Logger getLogger() 
+        public Logger getLogger()
         {
             return null;
         }
 
-        public PlatformType getPlatformType() 
+        public PlatformType getPlatformType()
         {
             return null;
         }
 
-        public boolean isChatApiPresent() 
+        public boolean isChatApiPresent()
         {
             return false;
         }
 
-        public MessageEncoder newMessageEncoder() 
+        public MessageEncoder newMessageEncoder()
         {
             return null;
         }
 
-        public int registerRepeatingTask(Runnable r, long delay, long interval) 
+        public int registerRepeatingTask(Runnable r, long delay, long interval)
         {
             return 0;
         }
-        
+
         @Override
-        public int runTaskLater(Runnable r, long delay) 
+        public int runTaskLater(Runnable r, long delay)
         {
             return 0;
         }
 
-        public void cancelTask(int id) 
+        @Override
+        public int runTaskLaterAsync(Runnable r, long delay)
+        {
+            return 0;
+        }
+
+        public void cancelTask(int id)
         {
         }
 
-        public Integer getBuild() 
+        public Integer getBuild()
         {
             return Statics.getBuild(this);
         }
-    } 
+    }
 }

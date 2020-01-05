@@ -293,6 +293,12 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         return getServer().getScheduler().runTaskLater(this, r, (long) (delay * MILLI2TICK)).getTaskId();
     }
+    
+    @Override
+    public int runTaskLaterAsync(Runnable r, long delay)
+    {
+        return getServer().getScheduler().runTaskLaterAsynchronously(this, r, (long) (delay * MILLI2TICK)).getTaskId();
+    }
 
     @Override
     public void cancelTask(int id)

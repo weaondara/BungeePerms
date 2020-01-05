@@ -47,7 +47,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     {
         //static
         instance = this;
-        
+
         //metrics
         startMetrics();
 
@@ -229,6 +229,12 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
 
     @Override
     public int runTaskLater(Runnable r, long delay)
+    {
+        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS).getId();
+    }
+
+    @Override
+    public int runTaskLaterAsync(Runnable r, long delay)
     {
         return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS).getId();
     }

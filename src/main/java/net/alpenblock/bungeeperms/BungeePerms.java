@@ -84,7 +84,7 @@ public class BungeePerms
         permissionsManager.enable();
         eventListener.enable();
         cleanupTaskId = plugin.registerRepeatingTask(cleanupTask, 0, config.getCleanupInterval() * 1000);
-        plugin.runTaskLater(new Runnable()
+        plugin.runTaskLaterAsync(new Runnable()
         {
             @Override
             public void run()
