@@ -618,7 +618,7 @@ public class BungeePermsAPI
         if (u == null)
             return null;
 
-        return u.buildSuffix(server, world);
+        return u.buildPrefix(server, world);
     }
 
     /**
