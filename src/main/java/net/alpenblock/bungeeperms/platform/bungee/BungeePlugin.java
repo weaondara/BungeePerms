@@ -91,7 +91,10 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
 
     private void loadcmds()
     {
-        Command cmd = new Command("bungeeperms", null, "bp")
+        Command cmd = new Command("bungeeperms", null, config.isAliasCommand() ? new String[]
+                          {
+                              "bp"
+        } : new String[0])
         {
             @Override
             public void execute(final CommandSender sender, final String[] args)
@@ -109,13 +112,9 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
                     }
                 };
                 if (config.isAsyncCommands())
-                {
                     ProxyServer.getInstance().getScheduler().runAsync(instance, r);
-                }
                 else
-                {
                     r.run();
-                }
             }
         };
         ProxyServer.getInstance().getPluginManager().registerCommand(this, cmd);

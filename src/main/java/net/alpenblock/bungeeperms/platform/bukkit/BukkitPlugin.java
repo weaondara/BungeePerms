@@ -161,7 +161,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
             }
         };
 
-        command.setAliases(Arrays.asList("bp"));
+        command.setAliases(conf.isAliasCommand() ? Arrays.asList("bp") : new ArrayList());
         command.setPermission(null);
 
         getCommandMap().register("bungeeperms", command);
@@ -293,7 +293,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     {
         return getServer().getScheduler().runTaskLater(this, r, (long) (delay * MILLI2TICK)).getTaskId();
     }
-    
+
     @Override
     public int runTaskLaterAsync(Runnable r, long delay)
     {

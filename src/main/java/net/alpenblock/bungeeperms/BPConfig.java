@@ -50,6 +50,7 @@ public class BPConfig
     //misc
     private boolean asyncCommands;
     private Locale locale;
+    private boolean aliasCommand;
 
     //tmp at runtime
     @Setter
@@ -104,6 +105,7 @@ public class BPConfig
         //misc
         asyncCommands = config.getBoolean("misc.async-commands", true);
         locale = Locale.forLanguageTag(config.getString("misc.locale", Statics.localeString(new Locale("en", "GB"))));
+        aliasCommand = config.getBoolean("misc.alias-command", true);
 
         validate();
     }
