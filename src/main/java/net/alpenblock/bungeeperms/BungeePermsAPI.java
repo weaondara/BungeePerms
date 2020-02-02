@@ -656,7 +656,7 @@ public class BungeePermsAPI
     //util
     private static String server(String server)
     {
-        if (server.equals(""))
+        if (server != null && server.equals(""))
         {
             if (BungeePerms.getInstance().getPlugin().getPlatformType() == PlatformType.Bukkit)
                 server = Statics.toLower(((BukkitConfig) BungeePerms.getInstance().getConfig()).getServername());
