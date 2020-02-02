@@ -376,7 +376,7 @@ public class BungeePermsAPI
         if (u == null)
             return false;
 
-        return u.hasPerm(server, world, permission);
+        return u.hasPerm(permission, server, world);
     }
 
     /**
