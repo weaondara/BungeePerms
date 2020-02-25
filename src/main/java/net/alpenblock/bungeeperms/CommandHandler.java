@@ -2884,6 +2884,7 @@ public class CommandHandler
                 }
                 sender.sendMessage(Color.Message + "Finished applying of fetched data to player-uuid-database.");
             }
+            BungeePerms.getInstance().getPermissionsManager().reload();
 
             sender.sendMessage(Color.Message + "Finished migration.");
         }
