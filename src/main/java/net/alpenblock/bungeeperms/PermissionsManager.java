@@ -592,7 +592,7 @@ public class PermissionsManager
         {
             for (User u : users)
             {
-                if (u.getUUID().equals(uuid))
+                if ((u != null) && uuid.equals(u.getUUID()))
                 {
                     // this is java runtime convention ...
                     // finally will always be executed
