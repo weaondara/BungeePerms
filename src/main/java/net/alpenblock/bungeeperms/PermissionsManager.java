@@ -610,7 +610,7 @@ public class PermissionsManager
         try
         {
             for (User u : users)
-                if (u.getUUID().equals(uuid))
+                if ((u != null) && uuid.equals(u.getUUID()))
                     return u;
         }
         finally
