@@ -571,6 +571,16 @@ public class CommandHandler
         String groupstr = "";
         List<Group> glist = user.getGroups();
         List<TimedValue<Group>> tglist = user.getTimedGroups();
+        if (server != null)
+        {
+            glist.addAll(user.getServer(server).getGroups());
+            tglist.addAll(user.getServer(server).getTimedGroups());
+            if (world != null)
+            {
+                glist.addAll(user.getServer(server).getWorld(world).getGroups());
+                tglist.addAll(user.getServer(server).getWorld(world).getTimedGroups());
+            }
+        }
         for (int i = 0; i < glist.size(); i++)
             groups.add(new SimpleEntry(glist.get(i), Color.Value + glist.get(i).getName() + Color.Text
                                                      + " (" + Color.Value + glist.get(i).getPerms().size() + Color.Text + ")"));
@@ -992,13 +1002,15 @@ public class CommandHandler
             return true;
         }
 
-        if (!Statics.matchArgs(sender, args, 4))
+        if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
 
         String player = Statics.getFullPlayerName(args[1]);
         String groupname = args[3];
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
@@ -1012,8 +1024,17 @@ public class CommandHandler
             sender.sendMessage(Lang.translate(MessageType.ERR_USER_NOT_EXISTING, player));
             return true;
         }
+        Permable permable = u;
+        if (server != null)
+        {
+            permable = u.getServer(server);
+            if (world != null)
+            {
+                permable = u.getServer(server).getWorld(world);
+            }
+        }
 
-        for (String g : u.getGroupsString())
+        for (String g : permable.getGroupsString())
         {
             if (g.equalsIgnoreCase(group.getName()))
             {
@@ -1022,8 +1043,13 @@ public class CommandHandler
             }
         }
 
-        pm().addUserGroup(u, group);
-        sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP, groupname, u.getName()));
+        pm().addUserGroup(u, group, server, world);
+        if (server == null)
+            sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP, groupname, u.getName()));
+        else if (world == null)
+            sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP_SERVER, groupname, u.getName(), server));
+        else
+            sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP_SERVER_WORLD, groupname, u.getName(), server, world));
         return true;
     }
 
@@ -1034,13 +1060,15 @@ public class CommandHandler
             return true;
         }
 
-        if (!Statics.matchArgs(sender, args, 4))
+        if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
 
         String player = Statics.getFullPlayerName(args[1]);
         String groupname = args[3];
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
@@ -1055,12 +1083,27 @@ public class CommandHandler
             return true;
         }
 
-        for (String g : u.getGroupsString())
+        Permable permable = u;
+        if (server != null)
+        {
+            permable = u.getServer(server);
+            if (world != null)
+            {
+                permable = u.getServer(server).getWorld(world);
+            }
+        }
+
+        for (String g : permable.getGroupsString())
         {
             if (g.equalsIgnoreCase(group.getName()))
             {
-                pm().removeUserGroup(u, group);
-                sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP, groupname, u.getName()));
+                pm().removeUserGroup(u, group, server, world);
+                if (server == null)
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP, groupname, u.getName()));
+                else if (world == null)
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP_SERVER, groupname, u.getName(), server));
+                else
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP_SERVER_WORLD, groupname, u.getName(), server, world));
                 return true;
             }
         }
@@ -1075,7 +1118,7 @@ public class CommandHandler
             return true;
         }
 
-        if (!Statics.matchArgs(sender, args, 5))
+        if (!Statics.matchArgs(sender, args, 5, 7))
         {
             return true;
         }
@@ -1083,6 +1126,8 @@ public class CommandHandler
         String player = Statics.getFullPlayerName(args[1]);
         String groupname = args[3];
         Integer duration = parseDuration(args[4]);
+        String server = args.length > 5 ? args[5].toLowerCase() : null;
+        String world = args.length > 6 ? args[6].toLowerCase() : null;
 
         if (duration == null || duration < 0)
         {
@@ -1104,7 +1149,17 @@ public class CommandHandler
             return true;
         }
 
-        for (String g : u.getGroupsString())
+        Permable permable = u;
+        if (server != null)
+        {
+            permable = u.getServer(server);
+            if (world != null)
+            {
+                permable = u.getServer(server).getWorld(world);
+            }
+        }
+
+        for (String g : permable.getGroupsString())
         {
             if (g.equalsIgnoreCase(group.getName()))
             {
@@ -1112,7 +1167,7 @@ public class CommandHandler
                 return true;
             }
         }
-        for (TimedValue<String> g : u.getTimedGroupsString())
+        for (TimedValue<String> g : permable.getTimedGroupsString())
         {
             if (g.getValue().equalsIgnoreCase(group.getName()))
             {
@@ -1121,8 +1176,13 @@ public class CommandHandler
             }
         }
 
-        pm().addUserTimedGroup(u, new TimedValue<>(group, new Date(), duration));
-        sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP, groupname, u.getName()));
+        pm().addUserTimedGroup(u, new TimedValue<>(group, new Date(), duration), server, world);
+        if (server == null)
+            sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP, groupname, u.getName()));
+        else if (world == null)
+            sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP_SERVER, groupname, u.getName(), server));
+        else
+            sender.sendMessage(Lang.translate(MessageType.USER_ADDED_GROUP_SERVER_WORLD, groupname, u.getName(), server, world));
         return true;
     }
 
@@ -1133,13 +1193,15 @@ public class CommandHandler
             return true;
         }
 
-        if (!Statics.matchArgs(sender, args, 4))
+        if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
 
         String player = Statics.getFullPlayerName(args[1]);
         String groupname = args[3];
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
         Group group = pm().getGroup(groupname);
         if (group == null)
         {
@@ -1154,12 +1216,27 @@ public class CommandHandler
             return true;
         }
 
-        for (TimedValue<String> g : u.getTimedGroupsString())
+        Permable permable = u;
+        if (server != null)
+        {
+            permable = u.getServer(server);
+            if (world != null)
+            {
+                permable = u.getServer(server).getWorld(world);
+            }
+        }
+
+        for (TimedValue<String> g : permable.getTimedGroupsString())
         {
             if (g.getValue().equalsIgnoreCase(group.getName()))
             {
-                pm().removeUserTimedGroup(u, group);
-                sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP, groupname, u.getName()));
+                pm().removeUserTimedGroup(u, group, server, world);
+                if (server == null)
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP, groupname, u.getName()));
+                else if (world == null)
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP_SERVER, groupname, u.getName(), server));
+                else
+                    sender.sendMessage(Lang.translate(MessageType.USER_REMOVED_GROUP_SERVER_WORLD, groupname, u.getName(), server, world));
                 return true;
             }
         }
@@ -1517,6 +1594,16 @@ public class CommandHandler
         String inheritancesstr = "";
         List<Group> inherit = group.getInheritances();
         List<TimedValue<Group>> timedinherit = group.getTimedInheritances();
+        if (server != null)
+        {
+            inherit.addAll(group.getServer(server).getGroups());
+            timedinherit.addAll(group.getServer(server).getTimedGroups());
+            if (world != null)
+            {
+                inherit.addAll(group.getServer(server).getWorld(world).getGroups());
+                timedinherit.addAll(group.getServer(server).getWorld(world).getTimedGroups());
+            }
+        }
         for (int i = 0; i < inherit.size(); i++)
         {
             inherits.add(new SimpleEntry(inherit.get(i), Color.Value + inherit.get(i).getName() + Color.Text
@@ -2085,13 +2172,15 @@ public class CommandHandler
             return true;
         }
 
-        if (!Statics.matchArgs(sender, args, 4))
+        if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
 
         String groupname = args[1];
         String addgroup = args[3];
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
 
         //check group existance
         Group group = pm().getGroup(groupname);
@@ -2108,8 +2197,18 @@ public class CommandHandler
             return true;
         }
 
+        Permable permable = group;
+        if (server != null)
+        {
+            permable = group.getServer(server);
+            if (world != null)
+            {
+                permable = group.getServer(server).getWorld(world);
+            }
+        }
+
         //check for already existing inheritance
-        for (String s : group.getInheritancesString())
+        for (String s : permable.getGroupsString())
         {
             if (s.equalsIgnoreCase(toadd.getName()))
             {
@@ -2118,9 +2217,14 @@ public class CommandHandler
             }
         }
 
-        pm().addGroupInheritance(group, toadd);
+        pm().addGroupInheritance(group, toadd, server, world);
 
-        sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE, addgroup, groupname));
+        if (server == null)
+            sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE, addgroup, groupname));
+        else if (world == null)
+            sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE_SERVER, addgroup, groupname, server));
+        else
+            sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE_SERVER_WORLD, addgroup, groupname, server, world));
         return true;
     }
 
@@ -2131,13 +2235,15 @@ public class CommandHandler
             return true;
         }
 
-        if (!Statics.matchArgs(sender, args, 4))
+        if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
 
         String groupname = args[1];
         String removegroup = args[3];
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
 
         Group group = pm().getGroup(groupname);
         if (group == null)
@@ -2153,17 +2259,32 @@ public class CommandHandler
             return true;
         }
 
-        for (String s : group.getInheritancesString())
+        Permable permable = group;
+        if (server != null)
+        {
+            permable = group.getServer(server);
+            if (world != null)
+            {
+                permable = group.getServer(server).getWorld(world);
+            }
+        }
+
+        for (String s : permable.getGroupsString())
         {
             if (s.equalsIgnoreCase(toremove.getName()))
             {
-                pm().removeGroupInheritance(group, toremove);
+                pm().removeGroupInheritance(group, toremove, server, world);
 
-                sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE, removegroup, groupname));
+                if (server == null)
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE, removegroup, groupname));
+                else if (world == null)
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE_SERVER, removegroup, groupname, server));
+                else
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE_SERVER_WORLD, removegroup, groupname, server, world));
                 return true;
             }
         }
-        sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_INHERITS, groupname, removegroup));
+        sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_DOES_NOT_INHERIT, groupname, removegroup));
         return true;
     }
 
@@ -2174,7 +2295,7 @@ public class CommandHandler
             return true;
         }
 
-        if (!Statics.matchArgs(sender, args, 5))
+        if (!Statics.matchArgs(sender, args, 5, 7))
         {
             return true;
         }
@@ -2182,6 +2303,8 @@ public class CommandHandler
         String groupname = args[1];
         String addgroup = args[3];
         Integer duration = parseDuration(args[4]);
+        String server = args.length > 5 ? args[5].toLowerCase() : null;
+        String world = args.length > 6 ? args[6].toLowerCase() : null;
 
         if (duration == null || duration < 0)
         {
@@ -2204,8 +2327,18 @@ public class CommandHandler
             return true;
         }
 
+        Permable permable = group;
+        if (server != null)
+        {
+            permable = group.getServer(server);
+            if (world != null)
+            {
+                permable = group.getServer(server).getWorld(world);
+            }
+        }
+
         //check for already existing inheritance
-        for (String s : group.getInheritancesString())
+        for (String s : permable.getGroupsString())
         {
             if (s.equalsIgnoreCase(toadd.getName()))
             {
@@ -2213,7 +2346,7 @@ public class CommandHandler
                 return true;
             }
         }
-        for (TimedValue<String> s : group.getTimedInheritancesString())
+        for (TimedValue<String> s : permable.getTimedGroupsString())
         {
             if (s.getValue().equalsIgnoreCase(toadd.getName()))
             {
@@ -2222,9 +2355,14 @@ public class CommandHandler
             }
         }
 
-        pm().addGroupTimedInheritance(group, new TimedValue(toadd, new Date(), duration));
+        pm().addGroupTimedInheritance(group, new TimedValue(toadd, new Date(), duration), server, world);
 
-        sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE, addgroup, groupname));
+        if (server == null)
+            sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE, addgroup, groupname));
+        else if (world == null)
+            sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE_SERVER, addgroup, groupname, server));
+        else
+            sender.sendMessage(Lang.translate(MessageType.GROUP_ADDED_INHERITANCE_SERVER_WORLD, addgroup, groupname, server, world));
         return true;
     }
 
@@ -2235,13 +2373,15 @@ public class CommandHandler
             return true;
         }
 
-        if (!Statics.matchArgs(sender, args, 4))
+        if (!Statics.matchArgs(sender, args, 4, 6))
         {
             return true;
         }
 
         String groupname = args[1];
         String removegroup = args[3];
+        String server = args.length > 4 ? args[4].toLowerCase() : null;
+        String world = args.length > 5 ? args[5].toLowerCase() : null;
 
         Group group = pm().getGroup(groupname);
         if (group == null)
@@ -2257,17 +2397,32 @@ public class CommandHandler
             return true;
         }
 
-        for (TimedValue<String> s : group.getTimedInheritancesString())
+        Permable permable = group;
+        if (server != null)
+        {
+            permable = group.getServer(server);
+            if (world != null)
+            {
+                permable = group.getServer(server).getWorld(world);
+            }
+        }
+
+        for (TimedValue<String> s : permable.getTimedGroupsString())
         {
             if (s.getValue().equalsIgnoreCase(toremove.getName()))
             {
-                pm().removeGroupTimedInheritance(group, toremove);
+                pm().removeGroupTimedInheritance(group, toremove, server, world);
 
-                sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE, removegroup, groupname));
+                if (server == null)
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE, removegroup, groupname));
+                else if (world == null)
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE_SERVER, removegroup, groupname, server));
+                else
+                    sender.sendMessage(Lang.translate(MessageType.GROUP_REMOVED_INHERITANCE_SERVER_WORLD, removegroup, groupname, server, world));
                 return true;
             }
         }
-        sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_ALREADY_INHERITS, groupname, removegroup));
+        sender.sendMessage(Lang.translate(MessageType.ERR_GROUP_DOES_NOT_INHERIT, groupname, removegroup));
         return true;
     }
 

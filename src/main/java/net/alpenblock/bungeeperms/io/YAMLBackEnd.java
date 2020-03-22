@@ -131,6 +131,8 @@ public class YAMLBackEnd implements BackEnd
         Map<String, Server> servers = new HashMap<>();
         for (String server : permsconfgroups.getSubNodes("groups." + group + ".servers"))
         {
+            List<String> serverinheritances = permsconfgroups.getListString("groups." + group + ".servers." + server + ".inheritances", new ArrayList<String>());
+            List<TimedValue<String>> stimedinheritances = getTimed(permsconfgroups, "groups." + group + ".servers." + server + ".timedinheritances");
             List<String> serverperms = permsconfgroups.getListString("groups." + group + ".servers." + server + ".permissions", new ArrayList<String>());
             List<TimedValue<String>> stimedperms = getTimed(permsconfgroups, "groups." + group + ".servers." + server + ".timedpermissions");
             String sdisplay = permsconfgroups.getString("groups." + group + ".servers." + server + ".display", null);
@@ -141,17 +143,19 @@ public class YAMLBackEnd implements BackEnd
             Map<String, World> worlds = new HashMap<>();
             for (String world : permsconfgroups.getSubNodes("groups." + group + ".servers." + server + ".worlds"))
             {
+                List<String> worldinheritances = permsconfgroups.getListString("groups." + group + ".servers." + server + ".worlds." + world + ".inheritances", new ArrayList<String>());
+                List<TimedValue<String>> wtimedinheritances = getTimed(permsconfgroups, "groups." + group + ".servers." + server + ".worlds." + world + ".timedinheritances");
                 List<String> worldperms = permsconfgroups.getListString("groups." + group + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
                 List<TimedValue<String>> wtimedperms = getTimed(permsconfgroups, "groups." + group + ".servers." + server + ".worlds." + world + ".timedpermissions");
                 String wdisplay = permsconfgroups.getString("groups." + group + ".servers." + server + ".worlds." + world + ".display", null);
                 String wprefix = permsconfgroups.getString("groups." + group + ".servers." + server + ".worlds." + world + ".prefix", null);
                 String wsuffix = permsconfgroups.getString("groups." + group + ".servers." + server + ".worlds." + world + ".suffix", null);
 
-                World w = new World(Statics.toLower(world), worldperms, wtimedperms, wdisplay, wprefix, wsuffix);
+                World w = new World(Statics.toLower(world), worldinheritances, wtimedinheritances, worldperms, wtimedperms, wdisplay, wprefix, wsuffix);
                 worlds.put(Statics.toLower(world), w);
             }
 
-            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, stimedperms, worlds, sdisplay, sprefix, ssuffix));
+            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverinheritances, stimedinheritances, serverperms, stimedperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         permsconfgroups.setAutoSavingEnabled(true);
@@ -210,6 +214,8 @@ public class YAMLBackEnd implements BackEnd
         Map<String, Server> servers = new HashMap<>();
         for (String server : permsconfusers.getSubNodes("users." + user + ".servers"))
         {
+            List<String> servergroups = permsconfusers.getListString("users." + user + ".servers." + server + ".groups", new ArrayList<String>());
+            List<TimedValue<String>> stimedgroups = getTimed(permsconfusers, "users." + user + ".servers." + server + ".timedgroups");
             List<String> serverperms = permsconfusers.getListString("users." + user + ".servers." + server + ".permissions", new ArrayList<String>());
             List<TimedValue<String>> stimedperms = getTimed(permsconfusers, "users." + user + ".servers." + server + ".timedpermissions");
             String sdisplay = permsconfusers.getString("users." + user + ".servers." + server + ".display", null);
@@ -220,17 +226,19 @@ public class YAMLBackEnd implements BackEnd
             Map<String, World> worlds = new HashMap<>();
             for (String world : permsconfusers.getSubNodes("users." + user + ".servers." + server + ".worlds"))
             {
+                List<String> worldgroups = permsconfusers.getListString("users." + user + ".servers." + server + ".worlds." + world + ".groups", new ArrayList<String>());
+                List<TimedValue<String>> wtimedgroups = getTimed(permsconfusers, "users." + user + ".servers." + server + ".worlds." + world + ".timedgroups");
                 List<String> worldperms = permsconfusers.getListString("users." + user + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
                 List<TimedValue<String>> wtimedperms = getTimed(permsconfusers, "users." + user + ".servers." + server + ".worlds." + world + ".timedpermissions");
                 String wdisplay = permsconfusers.getString("users." + user + ".servers." + server + ".worlds." + world + ".display", null);
                 String wprefix = permsconfusers.getString("users." + user + ".servers." + server + ".worlds." + world + ".prefix", null);
                 String wsuffix = permsconfusers.getString("users." + user + ".servers." + server + ".worlds." + world + ".suffix", null);
 
-                World w = new World(Statics.toLower(world), worldperms, wtimedperms, wdisplay, wprefix, wsuffix);
+                World w = new World(Statics.toLower(world), worldgroups, wtimedgroups, worldperms, wtimedperms, wdisplay, wprefix, wsuffix);
                 worlds.put(Statics.toLower(world), w);
             }
 
-            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, stimedperms, worlds, sdisplay, sprefix, ssuffix));
+            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), servergroups, stimedgroups, serverperms, stimedperms, worlds, sdisplay, sprefix, ssuffix));
         }
         permsconfusers.setAutoSavingEnabled(true);
 
@@ -309,6 +317,8 @@ public class YAMLBackEnd implements BackEnd
 
             for (Map.Entry<String, Server> se : user.getServers().entrySet())
             {
+                permsconfusers.setListString("users." + uname + ".servers." + se.getKey() + ".groups", se.getValue().getGroupsString());
+                setTimed(permsconfusers, "users." + uname + ".servers." + se.getKey() + ".timedgroups", se.getValue().getTimedGroupsString());
                 permsconfusers.setListString("users." + uname + ".servers." + se.getKey() + ".permissions", se.getValue().getPerms());
                 setTimed(permsconfusers, "users." + uname + ".servers." + se.getKey() + ".timedpermissions", se.getValue().getTimedPerms());
                 permsconfusers.setString("users." + uname + ".servers." + se.getKey() + ".display", se.getValue().getDisplay());
@@ -317,6 +327,8 @@ public class YAMLBackEnd implements BackEnd
 
                 for (Map.Entry<String, World> we : se.getValue().getWorlds().entrySet())
                 {
+                    permsconfusers.setListString("users." + uname + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".groups", we.getValue().getGroupsString());
+                    setTimed(permsconfusers, "users." + uname + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".timedgroups", we.getValue().getTimedGroupsString());
                     permsconfusers.setListString("users." + uname + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".permissions", we.getValue().getPerms());
                     setTimed(permsconfusers, "users." + uname + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".timedpermissions", we.getValue().getTimedPerms());
                     permsconfusers.setString("users." + uname + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".display", we.getValue().getDisplay());
@@ -343,6 +355,8 @@ public class YAMLBackEnd implements BackEnd
 
         for (Map.Entry<String, Server> se : group.getServers().entrySet())
         {
+            permsconfgroups.setListString("groups." + group.getName() + ".servers." + se.getKey() + ".inheritances", se.getValue().getGroupsString());
+            setTimed(permsconfgroups, "groups." + group.getName() + ".servers." + se.getKey() + ".timedinheritances", se.getValue().getTimedGroupsString());
             permsconfgroups.setListString("groups." + group.getName() + ".servers." + se.getKey() + ".permissions", se.getValue().getPerms());
             setTimed(permsconfgroups, "groups." + group.getName() + ".servers." + se.getKey() + ".timedpermissions", se.getValue().getTimedPerms());
             permsconfgroups.setString("groups." + group.getName() + ".servers." + se.getKey() + ".display", se.getValue().getDisplay());
@@ -351,6 +365,8 @@ public class YAMLBackEnd implements BackEnd
 
             for (Map.Entry<String, World> we : se.getValue().getWorlds().entrySet())
             {
+                permsconfgroups.setListString("groups." + group.getName() + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".inheritances", we.getValue().getGroupsString());
+                setTimed(permsconfgroups, "groups." + group.getName() + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".timedinheritances", we.getValue().getTimedGroupsString());
                 permsconfgroups.setListString("groups." + group.getName() + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".permissions", we.getValue().getPerms());
                 setTimed(permsconfgroups, "groups." + group.getName() + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".timedpermissions", we.getValue().getTimedPerms());
                 permsconfgroups.setString("groups." + group.getName() + ".servers." + se.getKey() + ".worlds." + we.getKey() + ".display", we.getValue().getDisplay());
@@ -378,18 +394,54 @@ public class YAMLBackEnd implements BackEnd
     }
 
     @Override
-    public synchronized void saveUserGroups(User user)
+    public synchronized void saveUserGroups(User user, String server, String world)
     {
-        permsconfusers.setListStringAndSave("users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".groups",
-                                            user.getGroupsString());
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
+        List<String> groups;
+        String key = "users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName());
+        if (server == null)
+        {
+            groups = user.getGroupsString();
+        }
+        else if (world == null)
+        {
+            groups = user.getServer(server).getGroupsString();
+            key += ".servers." + server;
+        }
+        else
+        {
+            groups = user.getServer(server).getWorld(world).getGroupsString();
+            key += ".servers." + server + ".worlds." + world;
+        }
+        permsconfusers.setListStringAndSave(key + ".groups", groups);
     }
 
     @Override
-    public synchronized void saveUserTimedGroups(User user)
+    public synchronized void saveUserTimedGroups(User user, String server, String world)
     {
-        setTimed(permsconfusers,
-                 "users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName()) + ".timedgroups",
-                 user.getTimedGroupsString());
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
+        List<TimedValue<String>> timedgroups;
+        String key = "users." + (BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName());
+        if (server == null)
+        {
+            timedgroups = user.getTimedGroupsString();
+        }
+        else if (world == null)
+        {
+            timedgroups = user.getServer(server).getTimedGroupsString();
+            key += ".servers." + server;
+        }
+        else
+        {
+            timedgroups = user.getServer(server).getWorld(world).getTimedGroupsString();
+            key += ".servers." + server + ".worlds." + world;
+        }
+
+        setTimed(permsconfusers, key + ".timedgroups", timedgroups);
         permsconfusers.save();
     }
 
@@ -554,15 +606,55 @@ public class YAMLBackEnd implements BackEnd
     }
 
     @Override
-    public synchronized void saveGroupInheritances(Group group)
+    public synchronized void saveGroupInheritances(Group group, String server, String world)
     {
-        permsconfgroups.setListStringAndSave("groups." + group.getName() + ".inheritances", group.getInheritancesString());
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
+        List<String> inheritances;
+        String key = "groups." + group.getName();
+        if (server == null)
+        {
+            inheritances = group.getInheritancesString();
+        }
+        else if (world == null)
+        {
+            inheritances = group.getServer(server).getGroupsString();
+            key += ".servers." + server;
+        }
+        else
+        {
+            inheritances = group.getServer(server).getWorld(world).getGroupsString();
+            key += ".servers." + server + ".worlds." + world;
+        }
+
+        permsconfgroups.setListStringAndSave(key + ".inheritances", inheritances);
     }
 
     @Override
-    public synchronized void saveGroupTimedInheritances(Group group)
+    public synchronized void saveGroupTimedInheritances(Group group, String server, String world)
     {
-        setTimed(permsconfgroups, "groups." + group.getName() + ".timedinheritances", group.getTimedInheritancesString());
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
+        List<TimedValue<String>> timedinheritances;
+        String key = "groups." + group.getName();
+        if (server == null)
+        {
+            timedinheritances = group.getTimedInheritancesString();
+        }
+        else if (world == null)
+        {
+            timedinheritances = group.getServer(server).getTimedGroupsString();
+            key += ".servers." + server;
+        }
+        else
+        {
+            timedinheritances = group.getServer(server).getWorld(world).getTimedGroupsString();
+            key += ".servers." + server + ".worlds." + world;
+        }
+
+        setTimed(permsconfgroups, key + ".timedinheritances", timedinheritances);
         permsconfgroups.save();
     }
 
@@ -730,6 +822,8 @@ public class YAMLBackEnd implements BackEnd
         Map<String, Server> servers = new HashMap<>();
         for (String server : permsconfgroups.getSubNodes("groups." + group.getName() + ".servers"))
         {
+            List<String> servergroups = permsconfgroups.getListString("groups." + group + ".servers." + server + ".inheritances", new ArrayList<String>());
+            List<TimedValue<String>> stimedgroups = getTimed(permsconfgroups, "groups." + group + ".servers." + server + ".timedinheritances");
             List<String> serverperms = permsconfgroups.getListString("groups." + group.getName() + ".servers." + server + ".permissions", new ArrayList<String>());
             List<TimedValue<String>> stimedperms = getTimed(permsconfgroups, "groups." + group.getName() + ".servers." + server + ".timedpermissions");
             String sdisplay = permsconfgroups.getString("groups." + group.getName() + ".servers." + server + ".display", null);
@@ -740,17 +834,19 @@ public class YAMLBackEnd implements BackEnd
             Map<String, World> worlds = new HashMap<>();
             for (String world : permsconfgroups.getSubNodes("groups." + group.getName() + ".servers." + server + ".worlds"))
             {
+                List<String> worldgroups = permsconfgroups.getListString("groups." + group + ".servers." + server + ".worlds." + world + ".inheritances", new ArrayList<String>());
+                List<TimedValue<String>> wtimedgroups = getTimed(permsconfgroups, "groups." + group + ".servers." + server + ".worlds." + world + ".timedinheritances");
                 List<String> worldperms = permsconfgroups.getListString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
                 List<TimedValue<String>> wtimedperms = getTimed(permsconfgroups, "groups." + group.getName() + ".servers." + server + ".worlds." + world + ".timedpermissions");
                 String wdisplay = permsconfgroups.getString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".display", null);
                 String wprefix = permsconfgroups.getString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".prefix", null);
                 String wsuffix = permsconfgroups.getString("groups." + group.getName() + ".servers." + server + ".worlds." + world + ".suffix", null);
 
-                World w = new World(Statics.toLower(world), worldperms, wtimedperms, wdisplay, wprefix, wsuffix);
+                World w = new World(Statics.toLower(world), worldgroups, wtimedgroups, worldperms, wtimedperms, wdisplay, wprefix, wsuffix);
                 worlds.put(Statics.toLower(world), w);
             }
 
-            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, stimedperms, worlds, sdisplay, sprefix, ssuffix));
+            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), servergroups, stimedgroups, serverperms, stimedperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         group.setInheritances(inheritances);
@@ -788,6 +884,8 @@ public class YAMLBackEnd implements BackEnd
         Map<String, Server> servers = new HashMap<>();
         for (String server : permsconfusers.getSubNodes("users." + uname + ".servers"))
         {
+            List<String> servergroups = permsconfusers.getListString("users." + uname + ".servers." + server + ".groups", new ArrayList<String>());
+            List<TimedValue<String>> stimedgroups = getTimed(permsconfusers, "users." + uname + ".servers." + server + ".timedgroups");
             List<String> serverperms = permsconfusers.getListString("users." + uname + ".servers." + server + ".permissions", new ArrayList<String>());
             List<TimedValue<String>> stimedperms = getTimed(permsconfusers, "users." + uname + ".servers." + server + ".timedpermissions");
             String sdisplay = permsconfusers.getString("users." + uname + ".servers." + server + ".display", null);
@@ -798,17 +896,19 @@ public class YAMLBackEnd implements BackEnd
             Map<String, World> worlds = new HashMap<>();
             for (String world : permsconfusers.getSubNodes("users." + uname + ".servers." + server + ".worlds"))
             {
+                List<String> worldgroups = permsconfusers.getListString("users." + uname + ".servers." + server + ".worlds." + world + ".groups", new ArrayList<String>());
+                List<TimedValue<String>> wtimedgroups = getTimed(permsconfusers, "users." + uname + ".servers." + server + ".worlds." + world + ".timedgroups");
                 List<String> worldperms = permsconfusers.getListString("users." + uname + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<String>());
                 List<TimedValue<String>> wtimedperms = getTimed(permsconfusers, "users." + uname + ".servers." + server + ".worlds." + world + ".timedpermissions");
                 String wdisplay = permsconfusers.getString("users." + uname + ".servers." + server + ".worlds." + world + ".display", null);
                 String wprefix = permsconfusers.getString("users." + uname + ".servers." + server + ".worlds." + world + ".prefix", null);
                 String wsuffix = permsconfusers.getString("users." + uname + ".servers." + server + ".worlds." + world + ".suffix", null);
 
-                World w = new World(Statics.toLower(world), worldperms, wtimedperms, wdisplay, wprefix, wsuffix);
+                World w = new World(Statics.toLower(world), worldgroups, wtimedgroups, worldperms, wtimedperms, wdisplay, wprefix, wsuffix);
                 worlds.put(Statics.toLower(world), w);
             }
 
-            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), serverperms, stimedperms, worlds, sdisplay, sprefix, ssuffix));
+            servers.put(Statics.toLower(server), new Server(Statics.toLower(server), servergroups, stimedgroups, serverperms, stimedperms, worlds, sdisplay, sprefix, ssuffix));
         }
 
         user.setGroups(groups);
@@ -861,5 +961,61 @@ public class YAMLBackEnd implements BackEnd
         {
             return null;
         }
+    }
+
+    @Override
+    public void removeGroupReferences(Group group)
+    {
+        permsconfgroups.setAutoSavingEnabled(false);
+        for (String g : permsconfgroups.getSubNodes("groups"))
+        {
+            removeGroupRef(permsconfgroups, group.getName(), "groups." + g + ".inheritances");
+            removeGroupRefTimed(permsconfgroups, group.getName(), "groups." + g + ".timedinheritances");
+            for (String server : permsconfgroups.getSubNodes("groups." + g + ".servers"))
+            {
+                removeGroupRef(permsconfgroups, group.getName(), "groups." + g + ".servers." + server + ".inheritances");
+                removeGroupRefTimed(permsconfgroups, group.getName(), "groups." + g + ".servers." + server + ".timedinheritances");
+                for (String world : permsconfgroups.getSubNodes("groups." + g + ".servers"))
+                {
+                    removeGroupRef(permsconfgroups, group.getName(), "groups." + g + ".servers." + server + ".worlds." + world + ".inheritances");
+                    removeGroupRefTimed(permsconfgroups, group.getName(), "groups." + g + ".servers." + server + ".worlds." + world + ".timedinheritances");
+                }
+            }
+        }
+        permsconfgroups.setAutoSavingEnabled(true);
+        permsconfgroups.save();
+
+        permsconfusers.setAutoSavingEnabled(false);
+        for (String u : permsconfusers.getSubNodes("users"))
+        {
+            removeGroupRef(permsconfusers, group.getName(), "users." + u + ".groups");
+            removeGroupRefTimed(permsconfusers, group.getName(), "users." + u + ".timedgroups");
+            for (String server : permsconfusers.getSubNodes("users." + u + ".servers"))
+            {
+                removeGroupRef(permsconfusers, group.getName(), "users." + u + ".servers." + server + ".groups");
+                removeGroupRefTimed(permsconfusers, group.getName(), "users." + u + ".servers." + server + ".timedgroups");
+                for (String world : permsconfusers.getSubNodes("users." + u + ".servers"))
+                {
+                    removeGroupRef(permsconfusers, group.getName(), "users." + u + ".servers." + server + ".worlds." + world + ".groups");
+                    removeGroupRefTimed(permsconfusers, group.getName(), "users." + u + ".servers." + server + ".worlds." + world + ".timedgroups");
+                }
+            }
+        }
+        permsconfusers.setAutoSavingEnabled(true);
+        permsconfusers.save();
+    }
+
+    private void removeGroupRef(Config c, String group, String key)
+    {
+        List<String> l = c.getListString(key, new ArrayList<String>());
+        l.remove(group);
+        c.setListString(key, l);
+    }
+
+    private void removeGroupRefTimed(Config c, String group, String key)
+    {
+        for (String timedref : c.getSubNodes(key))
+            if (timedref.equalsIgnoreCase(group))
+                c.deleteNode(key + "." + timedref);
     }
 }

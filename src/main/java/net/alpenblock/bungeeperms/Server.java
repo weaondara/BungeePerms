@@ -18,12 +18,26 @@ public class Server implements Permable
 {
 
     private String server;
+    private List<String> groups;
+    private List<TimedValue<String>> timedGroups;
     private List<String> perms;
     private List<TimedValue<String>> timedPerms;
     private Map<String, World> worlds;
     private String display;
     private String prefix;
     private String suffix;
+
+    @Override
+    public List<String> getGroupsString()
+    {
+        return groups;
+    }
+
+    @Override
+    public List<TimedValue<String>> getTimedGroupsString()
+    {
+        return timedGroups;
+    }
 
     @Override
     public boolean hasTimedPermSet(String perm)
@@ -36,6 +50,32 @@ public class Server implements Permable
         return false;
     }
 
+    public List<Group> getGroups()
+    {
+        List<Group> ret = new ArrayList<>();
+        for (String name : groups)
+        {
+            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(name);
+            if (g != null)
+                ret.add(g);
+        }
+
+        return ret;
+    }
+
+    public List<TimedValue<Group>> getTimedGroups()
+    {
+        List<TimedValue<Group>> ret = new ArrayList<>();
+        for (TimedValue<String> name : timedGroups)
+        {
+            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(name.getValue());
+            if (g != null)
+                ret.add(new TimedValue(g, name.getStart(), name.getDuration()));
+        }
+
+        return ret;
+    }
+
     public World getWorld(String name)
     {
         if (name == null)
@@ -45,7 +85,7 @@ public class Server implements Permable
         World w = worlds.get(name);
         if (w == null)
         {
-            w = new World(name, new ArrayList(), new ArrayList(), null, null, null);
+            w = new World(name, new ArrayList(), new ArrayList(), new ArrayList(), new ArrayList(), null, null, null);
             worlds.put(name, w);
         }
 

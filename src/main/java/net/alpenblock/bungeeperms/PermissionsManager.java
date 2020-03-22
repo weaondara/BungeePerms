@@ -127,9 +127,7 @@ public class PermissionsManager
     public void enable()
     {
         if (enabled)
-        {
             return;
-        }
 
         //load online players; allows reload
         for (Sender s : BungeePerms.getInstance().getPlugin().getPlayers())
@@ -185,15 +183,37 @@ public class PermissionsManager
      */
     public void reload()
     {
-        disable();
+        //lock write locks and prevent cross deadlocks with other possible threads. 
+        //This is mainly for BungeeCord where there are multiple processing threads.
+        //But this may also be neccessary on Spigot when aysnc threads check permissions, etc..
+        do
+        {
+            grouplock.writeLock().lock();
+            if (userlock.writeLock().tryLock())
+                break;
+            grouplock.writeLock().unlock();
+            Thread.yield(); //allow other threads to release locks. No busy waits!
+        }
+        while (true);
 
-        //config
-        loadConfig();
+        //ok both locks aquired, do reload now
+        try
+        {
+            disable();
 
-        //perms
-        loadPerms();
+            //config
+            loadConfig();
 
-        enable();
+            //perms
+            loadPerms();
+
+            enable();
+        }
+        finally
+        {
+            grouplock.writeLock().unlock();
+            userlock.writeLock().unlock();
+        }
 
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchReloadedEvent();
@@ -202,85 +222,86 @@ public class PermissionsManager
     /**
      * Validates all loaded groups and users and fixes invalid objects.
      */
+    @Deprecated
     public synchronized void validateUsersGroups()
     {
-        grouplock.readLock().lock();
-        try
-        {
-            for (Group group : groups)
-            {
-                List<String> inheritances = group.getInheritancesString();
-                for (int j = 0; j < inheritances.size(); j++)
-                {
-                    if (getGroup(inheritances.get(j)) == null)
-                    {
-                        inheritances.remove(j);
-                        j--;
-                    }
-                }
-                backEnd.saveGroupInheritances(group);
-            }
-
-            //perms recalc and bukkit perms update
-            //do this in 2 seperate loops to keep validation clean
-            for (Group g : groups)
-            {
-                g.invalidateCache();
-
-                //send bukkit update info
-                BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g, null);
-            }
-        }
-        finally
-        {
-            grouplock.readLock().unlock();
-        }
-
-        userlock.readLock().lock();
-        try
-        {
-            for (User u : users)
-            {
-                for (int j = 0; j < u.getGroupsString().size(); j++)
-                {
-                    if (getGroup(u.getGroupsString().get(j)) == null)
-                    {
-                        u.getGroupsString().remove(j);
-                        j--;
-                    }
-                }
-                backEnd.saveUserGroups(u);
-            }
-
-            //perms recalc and bukkit perms update
-            //do this in 2 seperate loops to keep validation clean
-            for (User u : users)
-            {
-                u.invalidateCache();
-
-                //send bukkit update info
-                BungeePerms.getInstance().getNetworkNotifier().reloadUser(u, null);
-            }
-        }
-        finally
-        {
-            userlock.readLock().unlock();
-        }
-
-        //user groups check - backEnd
-        List<User> backendusers = backEnd.loadUsers();
-        for (User u : backendusers)
-        {
-            for (int j = 0; j < u.getGroupsString().size(); j++)
-            {
-                if (getGroup(u.getGroupsString().get(j)) == null)
-                {
-                    u.getGroupsString().remove(j);
-                    j--;
-                }
-            }
-            backEnd.saveUserGroups(u);
-        }
+//        grouplock.readLock().lock();
+//        try
+//        {
+//            for (Group group : groups)
+//            {
+//                List<String> inheritances = group.getInheritancesString();
+//                for (int j = 0; j < inheritances.size(); j++)
+//                {
+//                    if (getGroup(inheritances.get(j)) == null)
+//                    {
+//                        inheritances.remove(j);
+//                        j--;
+//                    }
+//                }
+//                backEnd.saveGroupInheritances(group);
+//            }
+//
+//            //perms recalc and bukkit perms update
+//            //do this in 2 seperate loops to keep validation clean
+//            for (Group g : groups)
+//            {
+//                g.invalidateCache();
+//
+//                //send bukkit update info
+//                BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g, null);
+//            }
+//        }
+//        finally
+//        {
+//            grouplock.readLock().unlock();
+//        }
+//
+//        userlock.readLock().lock();
+//        try
+//        {
+//            for (User u : users)
+//            {
+//                for (int j = 0; j < u.getGroupsString().size(); j++)
+//                {
+//                    if (getGroup(u.getGroupsString().get(j)) == null)
+//                    {
+//                        u.getGroupsString().remove(j);
+//                        j--;
+//                    }
+//                }
+//                backEnd.saveUserGroups(u);
+//            }
+//
+//            //perms recalc and bukkit perms update
+//            //do this in 2 seperate loops to keep validation clean
+//            for (User u : users)
+//            {
+//                u.invalidateCache();
+//
+//                //send bukkit update info
+//                BungeePerms.getInstance().getNetworkNotifier().reloadUser(u, null);
+//            }
+//        }
+//        finally
+//        {
+//            userlock.readLock().unlock();
+//        }
+//
+//        //user groups check - backEnd
+//        List<User> backendusers = backEnd.loadUsers();
+//        for (User u : backendusers)
+//        {
+//            for (int j = 0; j < u.getGroupsString().size(); j++)
+//            {
+//                if (getGroup(u.getGroupsString().get(j)) == null)
+//                {
+//                    u.getGroupsString().remove(j);
+//                    j--;
+//                }
+//            }
+//            backEnd.saveUserGroups(u);
+//        }
     }
 
     /**
@@ -583,23 +604,14 @@ public class PermissionsManager
     public synchronized User getUser(UUID uuid, boolean loadfromdb)
     {
         if (uuid == null)
-        {
             return null;
-        }
 
         userlock.readLock().lock();
         try
         {
             for (User u : users)
-            {
                 if (u.getUUID().equals(uuid))
-                {
-                    // this is java runtime convention ...
-                    // finally will always be executed
-//                    userlock.readLock().unlock();
                     return u;
-                }
-            }
         }
         finally
         {
@@ -770,13 +782,16 @@ public class PermissionsManager
         backEnd.deleteGroup(group);
 
         //group validation
-        validateUsersGroups();
+        backEnd.removeGroupReferences(group);
 
         //send bukkit update info
         BungeePerms.getInstance().getNetworkNotifier().deleteGroup(group, null);
 
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(group);
+
+        //do reload due to possible changes in backend via removeGroupReferences()
+        reload();
     }
 
     /**
@@ -851,14 +866,44 @@ public class PermissionsManager
      * @param user the user to add the group to
      * @param group the group to add to the user
      */
+    @Deprecated
     public void addUserGroup(User user, Group group)
     {
+        addUserGroup(user, group, null, null);
+    }
+
+    /**
+     * Adds the given group to the user.
+     *
+     * @param user the user to add the group to
+     * @param group the group to add to the user
+     * @param server optional: the server
+     * @param world optional: the world
+     */
+    public void addUserGroup(User user, Group group, String server, String world)
+    {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
         //cache
-        user.getGroupsString().add(group.getName());
-        Collections.sort(user.getGroupsString());
+        if (server == null)
+        {
+            user.getGroupsString().add(group.getName());
+            Collections.sort(user.getGroupsString());
+        }
+        else if (world == null)
+        {
+            user.getServer(server).getGroupsString().add(group.getName());
+            Collections.sort(user.getServer(server).getGroupsString());
+        }
+        else
+        {
+            user.getServer(server).getWorld(world).getGroupsString().add(group.getName());
+            Collections.sort(user.getServer(server).getWorld(world).getGroupsString());
+        }
 
         //database
-        backEnd.saveUserGroups(user);
+        backEnd.saveUserGroups(user, server, world);
 
         //recalc perms
         user.invalidateCache();
@@ -873,14 +918,44 @@ public class PermissionsManager
      * @param user the user to add the group to
      * @param group the timed group to add to the user
      */
+    @Deprecated
     public void addUserTimedGroup(User user, TimedValue<Group> group)
     {
+        addUserTimedGroup(user, group, null, null);
+    }
+
+    /**
+     * Adds the given timed group to the user.
+     *
+     * @param user the user to add the group to
+     * @param group the timed group to add to the user
+     * @param server optional: the server
+     * @param world optional: the world
+     */
+    public void addUserTimedGroup(User user, TimedValue<Group> group, String server, String world)
+    {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
         //cache
-        user.getTimedGroupsString().add(new TimedValue(group.getValue().getName(), group.getStart(), group.getDuration()));
-        Collections.sort(user.getTimedGroupsString());
+        if (server == null)
+        {
+            user.getTimedGroupsString().add(new TimedValue(group.getValue().getName(), group.getStart(), group.getDuration()));
+            Collections.sort(user.getTimedGroupsString());
+        }
+        else if (world == null)
+        {
+            user.getServer(server).getTimedGroupsString().add(new TimedValue(group.getValue().getName(), group.getStart(), group.getDuration()));
+            Collections.sort(user.getServer(server).getTimedGroupsString());
+        }
+        else
+        {
+            user.getServer(server).getWorld(world).getTimedGroupsString().add(new TimedValue(group.getValue().getName(), group.getStart(), group.getDuration()));
+            Collections.sort(user.getServer(server).getWorld(world).getTimedGroupsString());
+        }
 
         //database
-        backEnd.saveUserTimedGroups(user);
+        backEnd.saveUserTimedGroups(user, server, world);
 
         //recalc perms
         user.invalidateCache();
@@ -895,13 +970,35 @@ public class PermissionsManager
      * @param user the user to remove the group from
      * @param group the group to remove from the user
      */
+    @Deprecated
     public void removeUserGroup(User user, Group group)
     {
+        removeUserGroup(user, group, null, null);
+    }
+
+    /**
+     * Removes the given group from the user.
+     *
+     * @param user the user to remove the group from
+     * @param group the group to remove from the user
+     * @param server optional: the server
+     * @param world optional: the world
+     */
+    public void removeUserGroup(User user, Group group, String server, String world)
+    {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
         //cache
-        user.getGroupsString().remove(group.getName());
+        if (server == null)
+            user.getGroupsString().remove(group.getName());
+        else if (world == null)
+            user.getServer(server).getGroupsString().remove(group.getName());
+        else
+            user.getServer(server).getWorld(world).getGroupsString().remove(group.getName());
 
         //database
-        backEnd.saveUserGroups(user);
+        backEnd.saveUserGroups(user, server, world);
 
         //recalc perms
         user.invalidateCache();
@@ -916,18 +1013,56 @@ public class PermissionsManager
      * @param user the user to remove the group from
      * @param group the timed group to remove from the user
      */
+    @Deprecated
     public void removeUserTimedGroup(User user, Group group)
     {
+        removeUserTimedGroup(user, group, null, null);
+    }
+
+    /**
+     * Removes the given timed group from the user.
+     *
+     * @param user the user to remove the group from
+     * @param group the timed group to remove from the user
+     * @param server optional: the server
+     * @param world optional: the world
+     */
+    public void removeUserTimedGroup(User user, Group group, String server, String world)
+    {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
         //cache
-        for (TimedValue<String> t : user.getTimedGroupsString())
-            if (t.getValue().equalsIgnoreCase(group.getName()))
-            {
-                user.getTimedGroupsString().remove(t);
-                break;
-            }
+        if (server == null)
+        {
+            for (TimedValue<String> t : user.getTimedGroupsString())
+                if (t.getValue().equalsIgnoreCase(group.getName()))
+                {
+                    user.getTimedGroupsString().remove(t);
+                    break;
+                }
+        }
+        else if (world == null)
+        {
+            for (TimedValue<String> t : user.getServer(server).getTimedGroupsString())
+                if (t.getValue().equalsIgnoreCase(group.getName()))
+                {
+                    user.getServer(server).getTimedGroupsString().remove(t);
+                    break;
+                }
+        }
+        else
+        {
+            for (TimedValue<String> t : user.getServer(server).getWorld(world).getTimedGroupsString())
+                if (t.getValue().equalsIgnoreCase(group.getName()))
+                {
+                    user.getServer(server).getWorld(world).getTimedGroupsString().remove(t);
+                    break;
+                }
+        }
 
         //database
-        backEnd.saveUserTimedGroups(user);
+        backEnd.saveUserTimedGroups(user, server, world);
 
         //recalc perms
         user.invalidateCache();
@@ -1446,14 +1581,44 @@ public class PermissionsManager
      * @param group the group which should inherit
      * @param toadd the group which should be inherited
      */
+    @Deprecated
     public void addGroupInheritance(Group group, Group toadd)
     {
+        addGroupInheritance(group, toadd, null, null);
+    }
+
+    /**
+     * Adds the toadd group to the group as inheritance
+     *
+     * @param group the group which should inherit
+     * @param toadd the group which should be inherited
+     * @param server optional: the server
+     * @param world optional: the world
+     */
+    public void addGroupInheritance(Group group, Group toadd, String server, String world)
+    {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
         //cache
-        group.getInheritancesString().add(toadd.getName());
-        Collections.sort(group.getInheritancesString());
+        if (server == null)
+        {
+            group.getInheritancesString().add(toadd.getName());
+            Collections.sort(group.getInheritancesString());
+        }
+        else if (world == null)
+        {
+            group.getServer(server).getGroupsString().add(toadd.getName());
+            Collections.sort(group.getServer(server).getGroupsString());
+        }
+        else
+        {
+            group.getServer(server).getWorld(world).getGroupsString().add(toadd.getName());
+            Collections.sort(group.getServer(server).getWorld(world).getGroupsString());
+        }
 
         //database
-        backEnd.saveGroupInheritances(group);
+        backEnd.saveGroupInheritances(group, server, world);
 
         //recalc perms
         grouplock.readLock().lock();
@@ -1487,14 +1652,44 @@ public class PermissionsManager
      * @param group the group which should inherit
      * @param toadd the timed group which should be inherited
      */
+    @Deprecated
     public void addGroupTimedInheritance(Group group, TimedValue<Group> toadd)
     {
+        addGroupTimedInheritance(group, toadd, null, null);
+    }
+
+    /**
+     * Adds the toadd timed group to the group as inheritance
+     *
+     * @param group the group which should inherit
+     * @param toadd the timed group which should be inherited
+     * @param server optional: the server
+     * @param world optional: the world
+     */
+    public void addGroupTimedInheritance(Group group, TimedValue<Group> toadd, String server, String world)
+    {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
         //cache
-        group.getTimedInheritancesString().add(new TimedValue(toadd.getValue().getName(), toadd.getStart(), toadd.getDuration()));
-        Collections.sort(group.getTimedInheritancesString());
+        if (server == null)
+        {
+            group.getTimedInheritancesString().add(new TimedValue(toadd.getValue().getName(), toadd.getStart(), toadd.getDuration()));
+            Collections.sort(group.getTimedInheritancesString());
+        }
+        else if (world == null)
+        {
+            group.getServer(server).getTimedGroupsString().add(new TimedValue(toadd.getValue().getName(), toadd.getStart(), toadd.getDuration()));
+            Collections.sort(group.getServer(server).getTimedGroupsString());
+        }
+        else
+        {
+            group.getServer(server).getWorld(world).getTimedGroupsString().add(new TimedValue(toadd.getValue().getName(), toadd.getStart(), toadd.getDuration()));
+            Collections.sort(group.getServer(server).getWorld(world).getTimedGroupsString());
+        }
 
         //database
-        backEnd.saveGroupTimedInheritances(group);
+        backEnd.saveGroupTimedInheritances(group, server, world);
 
         //recalc perms
         grouplock.readLock().lock();
@@ -1528,13 +1723,35 @@ public class PermissionsManager
      * @param group the group which should no longer inherit
      * @param toremove the group which should no longer be inherited
      */
+    @Deprecated
     public void removeGroupInheritance(Group group, Group toremove)
     {
+        removeGroupInheritance(group, toremove, null, null);
+    }
+
+    /**
+     * Removes the toremove group from the group as inheritance
+     *
+     * @param group the group which should no longer inherit
+     * @param toremove the group which should no longer be inherited
+     * @param server optional: the server
+     * @param world optional: the world
+     */
+    public void removeGroupInheritance(Group group, Group toremove, String server, String world)
+    {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
         //cache
-        group.getInheritancesString().remove(toremove.getName());
+        if (server == null)
+            group.getInheritancesString().remove(toremove.getName());
+        else if (world == null)
+            group.getServer(server).getGroupsString().remove(toremove.getName());
+        else
+            group.getServer(server).getWorld(world).getGroupsString().remove(toremove.getName());
 
         //database
-        backEnd.saveGroupInheritances(group);
+        backEnd.saveGroupInheritances(group, server, world);
 
         //recalc perms
         grouplock.readLock().lock();
@@ -1568,18 +1785,52 @@ public class PermissionsManager
      * @param group the group which should no longer inherit
      * @param toremove the timed group which should no longer be inherited
      */
+    @Deprecated
     public void removeGroupTimedInheritance(Group group, Group toremove)
     {
-        //cache
-        for (TimedValue<String> t : group.getTimedInheritancesString())
-            if (t.getValue().equalsIgnoreCase(toremove.getName()))
-            {
-                group.getTimedInheritancesString().remove(t);
-                break;
-            }
+        removeGroupTimedInheritance(group, toremove, null, null);
+    }
+
+    /**
+     * Removes the toremove timed group from the group as inheritance
+     *
+     * @param group the group which should no longer inherit
+     * @param toremove the timed group which should no longer be inherited
+     * @param server
+     * @param world
+     */
+    public void removeGroupTimedInheritance(Group group, Group toremove, String server, String world)
+    {
+        if (server == null)
+        {
+            for (TimedValue<String> t : group.getTimedInheritancesString())
+                if (t.getValue().equalsIgnoreCase(toremove.getName()))
+                {
+                    group.getTimedInheritancesString().remove(t);
+                    break;
+                }
+        }
+        else if (world == null)
+        {
+            for (TimedValue<String> t : group.getServer(server).getTimedGroupsString())
+                if (t.getValue().equalsIgnoreCase(toremove.getName()))
+                {
+                    group.getServer(server).getTimedGroupsString().remove(t);
+                    break;
+                }
+        }
+        else
+        {
+            for (TimedValue<String> t : group.getServer(server).getWorld(world).getTimedGroupsString())
+                if (t.getValue().equalsIgnoreCase(toremove.getName()))
+                {
+                    group.getServer(server).getWorld(world).getTimedGroupsString().remove(t);
+                    break;
+                }
+        }
 
         //database
-        backEnd.saveGroupTimedInheritances(group);
+        backEnd.saveGroupTimedInheritances(group, server, world);
 
         //recalc perms
         grouplock.readLock().lock();

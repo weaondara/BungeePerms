@@ -139,14 +139,12 @@ public class MySQLBackEnd implements BackEnd
         if (mpe.getName() == null)
             return null;
 
-        List<String> inheritances = getValues(mpe.getData("inheritances"));
-        List<TimedValue<String>> timedinheritances = getValuesTimed(mpe.getData("timedinheritances"));
         boolean isdefault = getFirstValue(mpe.getData("default"), false);
         int rank = getFirstValue(mpe.getData("rank"), 1000);
         int weight = getFirstValue(mpe.getData("weight"), 1000);
         String ladder = getFirstValue(mpe.getData("ladder"), null, null, "default");
 
-        Group g = new Group(mpe.getName(), inheritances, timedinheritances, new ArrayList(), new ArrayList(), new HashMap(), rank, weight, ladder, isdefault, null, null, null);
+        Group g = new Group(mpe.getName(), new ArrayList(), new ArrayList(), new ArrayList(), new ArrayList(), new HashMap(), rank, weight, ladder, isdefault, null, null, null);
         loadServerWorlds(mpe, g);
         g.invalidateCache();
 
@@ -160,12 +158,8 @@ public class MySQLBackEnd implements BackEnd
         if (mpe.getName() == null)
             return null;
 
-        //groups
-        List<String> groups = getValues(mpe.getData("groups"));
-        List<TimedValue<String>> timedgroups = getValuesTimed(mpe.getData("timedgroups"));
-
         UUID uuid = BungeePerms.getInstance().getConfig().isUseUUIDs() ? BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getUUID(mpe.getName()) : null;
-        User u = new User(mpe.getName(), uuid, groups, timedgroups, new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
+        User u = new User(mpe.getName(), uuid, new ArrayList(), new ArrayList(), new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
         loadServerWorlds(mpe, u);
         u.invalidateCache();
 
@@ -177,15 +171,10 @@ public class MySQLBackEnd implements BackEnd
     {
         MysqlPermEntity mpe = adapter.getUser(user.toString());
         if (mpe.getName() == null)
-        {
             return null;
-        }
 
-        //groups
-        List<String> groups = getValues(mpe.getData("groups"));
-        List<TimedValue<String>> timedgroups = getValuesTimed(mpe.getData("timedgroups"));
         String username = BungeePerms.getInstance().getPermissionsManager().getUUIDPlayerDB().getPlayerName(user);
-        User u = new User(username, user, groups, timedgroups, new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
+        User u = new User(username, user, new ArrayList(), new ArrayList(), new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
         loadServerWorlds(mpe, u);
         u.invalidateCache();
 
@@ -229,8 +218,8 @@ public class MySQLBackEnd implements BackEnd
     {
         if (BungeePerms.getInstance().getConfig().isSaveAllUsers() || !user.isNothingSpecial())
         {
-            saveUserGroups(user);
-            saveUserTimedGroups(user);
+            saveUserGroups(user, null, null);
+            saveUserTimedGroups(user, null, null);
             saveUserPerms(user, null, null);
             saveUserTimedPerms(user, null, null);
             saveUserDisplay(user, null, null);
@@ -239,6 +228,8 @@ public class MySQLBackEnd implements BackEnd
 
             for (Map.Entry<String, Server> se : user.getServers().entrySet())
             {
+                saveUserGroups(user, se.getKey(), null);
+                saveUserTimedGroups(user, se.getKey(), null);
                 saveUserPerms(user, se.getKey(), null);
                 saveUserTimedPerms(user, se.getKey(), null);
                 saveUserDisplay(user, se.getKey(), null);
@@ -247,6 +238,8 @@ public class MySQLBackEnd implements BackEnd
 
                 for (Map.Entry<String, World> we : se.getValue().getWorlds().entrySet())
                 {
+                    saveUserGroups(user, se.getKey(), we.getKey());
+                    saveUserTimedGroups(user, se.getKey(), we.getKey());
                     saveUserPerms(user, se.getKey(), we.getKey());
                     saveUserTimedPerms(user, se.getKey(), we.getKey());
                     saveUserDisplay(user, se.getKey(), we.getKey());
@@ -260,8 +253,8 @@ public class MySQLBackEnd implements BackEnd
     @Override
     public synchronized void saveGroup(Group group, boolean savetodisk)
     {
-        saveGroupInheritances(group);
-        saveGroupTimedInheritances(group);
+        saveGroupInheritances(group, null, null);
+        saveGroupTimedInheritances(group, null, null);
         saveGroupPerms(group, null, null);
         saveGroupTimedPerms(group, null, null);
         saveGroupRank(group);
@@ -273,6 +266,8 @@ public class MySQLBackEnd implements BackEnd
 
         for (Map.Entry<String, Server> se : group.getServers().entrySet())
         {
+            saveGroupInheritances(group, se.getKey(), null);
+            saveGroupTimedInheritances(group, se.getKey(), null);
             saveGroupPerms(group, se.getKey(), null);
             saveGroupTimedPerms(group, se.getKey(), null);
             saveGroupDisplay(group, se.getKey(), null);
@@ -281,6 +276,8 @@ public class MySQLBackEnd implements BackEnd
 
             for (Map.Entry<String, World> we : se.getValue().getWorlds().entrySet())
             {
+                saveGroupInheritances(group, se.getKey(), we.getKey());
+                saveGroupTimedInheritances(group, se.getKey(), we.getKey());
                 saveGroupPerms(group, se.getKey(), we.getKey());
                 saveGroupTimedPerms(group, se.getKey(), we.getKey());
                 saveGroupDisplay(group, se.getKey(), we.getKey());
@@ -303,17 +300,45 @@ public class MySQLBackEnd implements BackEnd
     }
 
     @Override
-    public synchronized void saveUserGroups(User user)
+    public synchronized void saveUserGroups(User user, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
+        List<String> groups = user.getGroupsString();
+        if (server != null)
+        {
+            groups = user.getServer(server).getGroupsString();
+            if (world != null)
+            {
+                groups = user.getServer(server).getWorld(world).getGroupsString();
+            }
+        }
+
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
-                         EntityType.User, "groups", mkValueList(user.getGroupsString(), null, null));
+                         EntityType.User, "groups",
+                         mkValueList(groups, server, world), server, world);
     }
 
     @Override
-    public synchronized void saveUserTimedGroups(User user)
+    public synchronized void saveUserTimedGroups(User user, String server, String world)
     {
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
+        List<TimedValue<String>> groups = user.getTimedGroupsString();
+        if (server != null)
+        {
+            groups = user.getServer(server).getTimedGroupsString();
+            if (world != null)
+            {
+                groups = user.getServer(server).getWorld(world).getTimedGroupsString();
+            }
+        }
+
         adapter.saveData(BungeePerms.getInstance().getConfig().isUseUUIDs() ? user.getUUID().toString() : user.getName(),
-                         EntityType.User, "timedgroups", mkValueListTimed(user.getTimedGroupsString(), null, null));
+                         EntityType.User, "timedgroups",
+                         mkValueListTimed(groups, server, world), server, world);
     }
 
     @Override
@@ -454,15 +479,41 @@ public class MySQLBackEnd implements BackEnd
     }
 
     @Override
-    public synchronized void saveGroupInheritances(Group group)
+    public synchronized void saveGroupInheritances(Group group, String server, String world)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "inheritances", mkValueList(group.getInheritancesString(), null, null));
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
+        List<String> inheritances = group.getInheritancesString();
+        if (server != null)
+        {
+            inheritances = group.getServer(server).getGroupsString();
+            if (world != null)
+            {
+                inheritances = group.getServer(server).getWorld(world).getGroupsString();
+            }
+        }
+
+        adapter.saveData(group.getName(), EntityType.Group, "inheritances", mkValueList(inheritances, server, world), server, world);
     }
 
     @Override
-    public synchronized void saveGroupTimedInheritances(Group group)
+    public synchronized void saveGroupTimedInheritances(Group group, String server, String world)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "timedinheritances", mkValueListTimed(group.getTimedInheritancesString(), null, null));
+        server = Statics.toLower(server);
+        world = server == null ? null : Statics.toLower(world);
+
+        List<TimedValue<String>> inheritances = group.getTimedInheritancesString();
+        if (server != null)
+        {
+            inheritances = group.getServer(server).getTimedGroupsString();
+            if (world != null)
+            {
+                inheritances = group.getServer(server).getWorld(world).getTimedGroupsString();
+            }
+        }
+
+        adapter.saveData(group.getName(), EntityType.Group, "timedinheritances", mkValueListTimed(inheritances, server, world), server, world);
     }
 
     @Override
@@ -602,22 +653,20 @@ public class MySQLBackEnd implements BackEnd
     public void reloadGroup(Group group)
     {
         MysqlPermEntity mpe = adapter.getGroup(group.getName());
-        List<String> inheritances = getValues(mpe.getData("inheritances"));
-        List<TimedValue<String>> timedinheritances = getValuesTimed(mpe.getData("timedinheritances"));
         boolean isdefault = getFirstValue(mpe.getData("default"), false);
         int rank = getFirstValue(mpe.getData("rank"), 1000);
         int weight = getFirstValue(mpe.getData("weight"), 1000);
         String ladder = getFirstValue(mpe.getData("ladder"), null, null, "default");
 
         //set
-        group.setInheritances(inheritances);
-        group.setTimedInheritances(timedinheritances);
         group.setIsdefault(isdefault);
         group.setRank(rank);
         group.setWeight(weight);
         group.setLadder(ladder);
 
         //reset & load
+        group.setInheritances(new ArrayList());
+        group.setTimedInheritances(new ArrayList());
         group.setPerms(new ArrayList());
         group.setTimedPerms(new ArrayList());
         group.setServers(new HashMap());
@@ -633,15 +682,9 @@ public class MySQLBackEnd implements BackEnd
     {
         MysqlPermEntity mpe = adapter.getUser(config.isUseUUIDs() ? user.getUUID().toString() : user.getName());
 
-        //groups
-        List<String> groups = getValues(mpe.getData("groups"));
-        List<TimedValue<String>> timedgroups = getValuesTimed(mpe.getData("timedgroups"));
-
-        //set
-        user.setGroups(groups);
-        user.setTimedGroups(timedgroups);
-
         //reset & load
+        user.setGroups(new ArrayList());
+        user.setTimedGroups(new ArrayList());
         user.setPerms(new ArrayList());
         user.setTimedPerms(new ArrayList());
         user.setServers(new HashMap());
@@ -794,6 +837,14 @@ public class MySQLBackEnd implements BackEnd
                         case "timedpermissions":
                             permable.setTimedPerms(getValuesTimed(worldlvl.getValue()));
                             break;
+                        case "inheritances":
+                        case "groups":
+                            permable.setGroups(getValues(worldlvl.getValue()));
+                            break;
+                        case "timedinheritances":
+                        case "timedgroups":
+                            permable.setTimedGroups(getValuesTimed(worldlvl.getValue()));
+                            break;
                         case "prefix":
                             permable.setPrefix(getFirstValue(worldlvl.getValue(), serverlvl.getKey(), worldlvl.getKey(), null));
                             break;
@@ -864,5 +915,11 @@ public class MySQLBackEnd implements BackEnd
         }
 
         return map;
+    }
+
+    @Override
+    public void removeGroupReferences(Group g)
+    {
+        adapter.removeGroupReferences(g.getName());
     }
 }

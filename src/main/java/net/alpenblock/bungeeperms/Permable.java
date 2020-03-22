@@ -17,6 +17,14 @@ public interface Permable
 
     public void setDisplay(String display);
 
+    public List<String> getGroupsString();
+
+    public void setGroups(List<String> groups);
+
+    public List<TimedValue<String>> getTimedGroupsString();
+
+    public void setTimedGroups(List<TimedValue<String>> groups);
+
     public List<String> getPerms();
 
     public void setPerms(List<String> perms);

@@ -385,4 +385,24 @@ public class MysqlPermsAdapter
             Mysql.close(stmt);
         }
     }
+
+    public void removeGroupReferences(String group)
+    {
+        PreparedStatement stmt = null;
+        try
+        {
+            mysql.checkConnection();
+            stmt = mysql.stmt("DELETE FROM `" + table + "` WHERE `value` = ? AND `key` IN ('groups', 'timedgroups', 'inheritances', 'timedinheritances')");
+            stmt.setString(1, group);
+            mysql.runQuery(stmt);
+        }
+        catch (Exception e)
+        {
+            BungeePerms.getInstance().getDebug().log(e);
+        }
+        finally
+        {
+            Mysql.close(stmt);
+        }
+    }
 }

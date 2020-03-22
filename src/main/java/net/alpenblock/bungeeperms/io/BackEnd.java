@@ -44,9 +44,9 @@ public interface BackEnd
 
     public void deleteGroup(Group group);
 
-    public void saveUserGroups(User user);
+    public void saveUserGroups(User user, String server, String world);
 
-    public void saveUserTimedGroups(User user);
+    public void saveUserTimedGroups(User user, String server, String world);
 
     public void saveUserPerms(User user, String server, String world);
 
@@ -62,9 +62,9 @@ public interface BackEnd
 
     public void saveGroupTimedPerms(Group group, String server, String world);
 
-    public void saveGroupInheritances(Group group);
+    public void saveGroupInheritances(Group group, String server, String world);
 
-    public void saveGroupTimedInheritances(Group group);
+    public void saveGroupTimedInheritances(Group group, String server, String world);
 
     public void saveGroupRank(Group group);
 
@@ -85,4 +85,6 @@ public interface BackEnd
     public void format(List<Group> groups, List<User> users, int version);
 
     public void clearDatabase();
+    
+    public void removeGroupReferences(Group g);
 }

@@ -47,4 +47,9 @@ public class BPPermission implements Comparable<BPPermission>
         ret = timedDuration == null && o.timedDuration == null ? 0 : (timedDuration == null ? -1 : (o.timedDuration == null ? 1 :Integer.compare(timedDuration, o.timedDuration)));
         return ret;
     }
+    
+    public BPPermission clone()
+    {
+        return new BPPermission(permission, origin, isGroup, server, world, timedStart, timedDuration);
+    }
 }

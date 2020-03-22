@@ -44,7 +44,7 @@ public class User implements PermEntity
     private String suffix;
 
     private long lastAccess;
-    private Long nextTimedPermissionRunOut;
+    private Long nextTimedEntryRunOut;
 
     public User(String name, UUID UUID, List<String> groups, List<TimedValue<String>> timedgroups, List<String> perms, List<TimedValue<String>> timedperms, Map<String, Server> servers, String display, String prefix, String suffix)
     {
@@ -70,7 +70,7 @@ public class User implements PermEntity
     public Server getServer(String name)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         if (name == null)
             return null;
@@ -79,7 +79,7 @@ public class User implements PermEntity
         Server s = servers.get(name);
         if (s == null)
         {
-            s = new Server(name, new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
+            s = new Server(name, new ArrayList(), new ArrayList(), new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
             servers.put(name, s);
         }
 
@@ -90,7 +90,7 @@ public class User implements PermEntity
     public boolean hasTimedPermSet(String perm)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         perm = Statics.toLower(perm);
 
@@ -115,6 +115,7 @@ public class User implements PermEntity
         return ret;
     }
 
+    @Override
     public List<String> getGroupsString()
     {
         access();
@@ -125,7 +126,7 @@ public class User implements PermEntity
     public List<TimedValue<Group>> getTimedGroups()
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         List<TimedValue<Group>> ret = new ArrayList<>();
         for (TimedValue<String> name : timedGroups)
@@ -138,10 +139,11 @@ public class User implements PermEntity
         return ret;
     }
 
+    @Override
     public List<TimedValue<String>> getTimedGroupsString()
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         return timedGroups;
     }
@@ -167,7 +169,7 @@ public class User implements PermEntity
     public boolean hasPerm(String perm, String server, String world)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         Sender s = getSender();
         return hasPerm(s, perm, server, world);
@@ -176,7 +178,7 @@ public class User implements PermEntity
     public boolean hasPerm(Sender s, String perm, String server, String world)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         perm = Statics.toLower(perm);
         server = Statics.toLower(server);
@@ -218,7 +220,7 @@ public class User implements PermEntity
     public List<BPPermission> getEffectivePerms(String server, String world)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         server = Statics.toLower(server);
         world = server == null ? null : Statics.toLower(world);
@@ -240,7 +242,7 @@ public class User implements PermEntity
     public List<BPPermission> calcEffectivePerms(String server, String world)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         server = Statics.toLower(server);
         world = server == null ? null : Statics.toLower(world);
@@ -248,13 +250,7 @@ public class User implements PermEntity
         LinkedHashSet<BPPermission> ret = new LinkedHashSet<>();
 
         //groups
-        List<Group> groups = new ArrayList();
-        for (String name : this.groups)
-        {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(name);
-            if (g != null)
-                groups.add(g);
-        }
+        List<Group> groups = getGroups();
         groups.sort(new Comparator<Group>()
         {
             @Override
@@ -269,25 +265,29 @@ public class User implements PermEntity
             ret.addAll(gperms);
         }
 
-        //timed inheritances
-        List<Group> tgroups = new ArrayList();
-        for (TimedValue<String> name : this.timedGroups)
-        {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(name.getValue());
-            if (g != null)
-                tgroups.add(g);
-        }
-        tgroups.sort(new Comparator<Group>()
+        //timed groups
+        List<TimedValue<Group>> tgroups = getTimedGroups();
+        tgroups.sort(new Comparator<TimedValue<Group>>()
         {
             @Override
-            public int compare(Group o1, Group o2)
+            public int compare(TimedValue<Group> o1, TimedValue<Group> o2)
             {
-                return -Integer.compare(o1.getWeight(), o2.getWeight());
+                return -Integer.compare(o1.getValue().getWeight(), o2.getValue().getWeight());
             }
         });
-        for (Group tg : tgroups)
+        for (TimedValue<Group> tg : tgroups)
         {
-            List<BPPermission> gperms = tg.getEffectivePerms(server, world);
+            List<BPPermission> gperms = tg.getValue().getEffectivePerms(server, world);
+            for (int i = 0; i < gperms.size(); i++)
+            {
+                BPPermission p = gperms.get(i).clone();
+                if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                {
+                    p.setTimedStart(tg.getStart());
+                    p.setTimedDuration(tg.getDuration());
+                }
+                gperms.set(i, p);
+            }
             ret.addAll(gperms);
         }
 
@@ -299,12 +299,96 @@ public class User implements PermEntity
         Server srv = getServer(server);
         if (srv != null)
         {
+            //groups
+            groups = srv.getGroups();
+            groups.sort(new Comparator<Group>()
+            {
+                @Override
+                public int compare(Group o1, Group o2)
+                {
+                    return -Integer.compare(o1.getWeight(), o2.getWeight());
+                }
+            });
+            for (Group g : groups)
+            {
+                List<BPPermission> gperms = g.getEffectivePerms(server, world);
+                ret.addAll(gperms);
+            }
+
+            //timed groups
+            tgroups = srv.getTimedGroups();
+            tgroups.sort(new Comparator<TimedValue<Group>>()
+            {
+                @Override
+                public int compare(TimedValue<Group> o1, TimedValue<Group> o2)
+                {
+                    return -Integer.compare(o1.getValue().getWeight(), o2.getValue().getWeight());
+                }
+            });
+            for (TimedValue<Group> tg : tgroups)
+            {
+                List<BPPermission> gperms = tg.getValue().getEffectivePerms(server, world);
+                for (int i = 0; i < gperms.size(); i++)
+                {
+                    BPPermission p = gperms.get(i).clone();
+                    if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                    {
+                        p.setTimedStart(tg.getStart());
+                        p.setTimedDuration(tg.getDuration());
+                    }
+                    gperms.set(i, p);
+                }
+                ret.addAll(gperms);
+            }
+
             ret.addAll(Statics.makeBPPerms(srv.getPerms(), server, null, this));
             ret.addAll(Statics.makeBPPermsTimed(srv.getTimedPerms(), server, null, this));
 
             World w = srv.getWorld(world);
             if (w != null)
             {
+                //groups
+                groups = w.getGroups();
+                groups.sort(new Comparator<Group>()
+                {
+                    @Override
+                    public int compare(Group o1, Group o2)
+                    {
+                        return -Integer.compare(o1.getWeight(), o2.getWeight());
+                    }
+                });
+                for (Group g : groups)
+                {
+                    List<BPPermission> gperms = g.getEffectivePerms(server, world);
+                    ret.addAll(gperms);
+                }
+
+                //timed groups
+                tgroups = w.getTimedGroups();
+                tgroups.sort(new Comparator<TimedValue<Group>>()
+                {
+                    @Override
+                    public int compare(TimedValue<Group> o1, TimedValue<Group> o2)
+                    {
+                        return -Integer.compare(o1.getValue().getWeight(), o2.getValue().getWeight());
+                    }
+                });
+                for (TimedValue<Group> tg : tgroups)
+                {
+                    List<BPPermission> gperms = tg.getValue().getEffectivePerms(server, world);
+                    for (int i = 0; i < gperms.size(); i++)
+                    {
+                        BPPermission p = gperms.get(i).clone();
+                        if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                        {
+                            p.setTimedStart(tg.getStart());
+                            p.setTimedDuration(tg.getDuration());
+                        }
+                        gperms.set(i, p);
+                    }
+                    ret.addAll(gperms);
+                }
+
                 ret.addAll(Statics.makeBPPerms(w.getPerms(), server, world, this));
                 ret.addAll(Statics.makeBPPermsTimed(w.getTimedPerms(), server, world, this));
             }
@@ -317,7 +401,7 @@ public class User implements PermEntity
     {
         BungeePerms.getInstance().getDebug().log("invalidate cache for user " + name);
         flushCache();
-        nextTimedPermissionRunOut = getNextTimedPermission();
+        nextTimedEntryRunOut = getNextTimedEntry();
     }
 
     public boolean isNothingSpecial()
@@ -332,14 +416,18 @@ public class User implements PermEntity
 
         for (Server s : servers.values())
         {
-            if (!s.getPerms().isEmpty()
+            if (!s.getGroups().isEmpty()
+                || !s.getTimedGroups().isEmpty()
+                || !s.getPerms().isEmpty()
                 || !s.getTimedPerms().isEmpty()
                 || !Statics.isEmpty(s.getDisplay())
                 || !Statics.isEmpty(s.getPrefix())
                 || !Statics.isEmpty(s.getSuffix()))
                 return false;
             for (World w : s.getWorlds().values())
-                if (!w.getPerms().isEmpty()
+                if (!w.getGroups().isEmpty()
+                    || !w.getTimedGroups().isEmpty()
+                    || !w.getPerms().isEmpty()
                     || w.getTimedPerms().isEmpty()
                     || !Statics.isEmpty(w.getDisplay())
                     || !Statics.isEmpty(w.getPrefix())
@@ -362,7 +450,7 @@ public class User implements PermEntity
     public List<BPPermission> getPermsWithOrigin(String server, String world)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         List<BPPermission> ret = getEffectivePerms(server, world);
 
@@ -375,7 +463,7 @@ public class User implements PermEntity
     public int getOwnPermissionsCount(String server, String world)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         int count = perms.size();
         count += timedPerms.size();
@@ -400,12 +488,32 @@ public class User implements PermEntity
     public int getPermissionsCount(String server, String world)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         int count = getOwnPermissionsCount(server, world);
 
         for (Group g : getGroups())
             count += g.getPermissionsCount(server, world);
+        for (TimedValue<Group> g : getTimedGroups())
+            count += g.getValue().getPermissionsCount(server, world);
+
+        Server s = getServer(server);
+        if (s == null)
+            return count;
+
+        for (Group g : s.getGroups())
+            count += g.getPermissionsCount(server, world);
+        for (TimedValue<Group> g : s.getTimedGroups())
+            count += g.getValue().getPermissionsCount(server, world);
+
+        World w = s.getWorld(world);
+        if (world == null)
+            return count;
+
+        for (Group g : w.getGroups())
+            count += g.getPermissionsCount(server, world);
+        for (TimedValue<Group> g : w.getTimedGroups())
+            count += g.getValue().getPermissionsCount(server, world);
 
         return count;
     }
@@ -426,16 +534,30 @@ public class User implements PermEntity
     public String buildPrefix(String server, String world)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         String prefix = "";
 
         List<String> prefixes = new ArrayList<>();
 
         //from groups
-        List<Group> groups = new ArrayList(getGroups());
+        Set<Group> groupset = new LinkedHashSet<>(getGroups());
         for (TimedValue<Group> g : getTimedGroups())
-            groups.add(g.getValue());
+            groupset.add(g.getValue());
+        for (Server s : servers.values())
+        {
+            groupset.addAll(s.getGroups());
+            for (TimedValue<Group> g : s.getTimedGroups())
+                groupset.add(g.getValue());
+
+            for (World w : s.getWorlds().values())
+            {
+                groupset.addAll(w.getGroups());
+                for (TimedValue<Group> g : w.getTimedGroups())
+                    groupset.add(g.getValue());
+            }
+        }
+        List<Group> groups = new ArrayList(groupset);
         Collections.sort(groups, Group.WEIGHT_COMPARATOR);
 
         for (Group g : groups)
@@ -507,16 +629,30 @@ public class User implements PermEntity
     public String buildSuffix(String server, String world)
     {
         access();
-        checkTimedPermissions();
+        checkTimedEntries();
 
         String suffix = "";
 
         List<String> suffixes = new ArrayList<>();
 
         //from groups
-        List<Group> groups = new ArrayList(getGroups());
+        Set<Group> groupset = new LinkedHashSet<>(getGroups());
         for (TimedValue<Group> g : getTimedGroups())
-            groups.add(g.getValue());
+            groupset.add(g.getValue());
+        for (Server s : servers.values())
+        {
+            groupset.addAll(s.getGroups());
+            for (TimedValue<Group> g : s.getTimedGroups())
+                groupset.add(g.getValue());
+
+            for (World w : s.getWorlds().values())
+            {
+                groupset.addAll(w.getGroups());
+                for (TimedValue<Group> g : w.getTimedGroups())
+                    groupset.add(g.getValue());
+            }
+        }
+        List<Group> groups = new ArrayList(groupset);
         Collections.sort(groups, Group.WEIGHT_COMPARATOR);
 
         for (Group g : groups)
@@ -600,44 +736,53 @@ public class User implements PermEntity
         lastAccess = System.currentTimeMillis();
     }
 
-    private void checkTimedPermissions()
+    private void checkTimedEntries()
     {
-        if (nextTimedPermissionRunOut != null && nextTimedPermissionRunOut < System.currentTimeMillis())
+        if (nextTimedEntryRunOut != null && nextTimedEntryRunOut < System.currentTimeMillis())
         {
-            BungeePerms.getInstance().getDebug().log("invalidated user" + name);
+            BungeePerms.getInstance().getDebug().log("invalidated user " + name);
             flushCache();
-            nextTimedPermissionRunOut = getNextTimedPermission();
+            nextTimedEntryRunOut = getNextTimedEntry();
         }
     }
 
-    private Long getNextTimedPermission()
+    private Long getNextTimedEntry()
     {
-        boolean dosavegroups = false;
-        boolean dosaveperms = false;
+        boolean dosave = false;
         Long next = null;
 
         //timed groups
-        for (int i = 0; i < timedGroups.size(); i++)
+        List<List<TimedValue<String>>> ll = new ArrayList();
+        ll.add(timedGroups);
+        for (Server s : servers.values())
         {
-            TimedValue<String> g = timedGroups.get(i);
-            long end = g.getStart().getTime() + g.getDuration() * 1000;
-            if (end < System.currentTimeMillis())
+            ll.add(s.getTimedGroupsString());
+            for (World w : s.getWorlds().values())
+                ll.add(w.getTimedGroupsString());
+        }
+
+        for (List<TimedValue<String>> l : ll)
+        {
+            for (int i = 0; i < l.size(); i++)
             {
-                BungeePerms.getInstance().getDebug().log("removing timedgroup " + g.getValue() + " from user " + name);
-                timedGroups.remove(g);
-                i--;
-                dosavegroups = true;
-            }
-            else
-            {
-                next = next == null ? end : Math.min(next, end);
+                TimedValue<String> g = l.get(i);
+                long end = g.getStart().getTime() + g.getDuration() * 1000;
+                if (end < System.currentTimeMillis())
+                {
+                    BungeePerms.getInstance().getDebug().log("removing timedgroup " + g.getValue() + " from user " + name);
+                    l.remove(g);
+                    i--;
+                    dosave = true;
+                }
+                else
+                {
+                    next = next == null ? end : Math.min(next, end);
+                }
             }
         }
-        if (dosavegroups)
-            BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveUserTimedGroups(this);
 
         //timed perms
-        List<List<TimedValue<String>>> ll = new ArrayList();
+        ll = new ArrayList();
         ll.add(timedPerms);
         for (Server s : servers.values())
         {
@@ -658,7 +803,7 @@ public class User implements PermEntity
                     BungeePerms.getInstance().getDebug().log("removing timed permission " + p.getValue() + " from user " + name);
                     l.remove(p);
                     i--;
-                    dosaveperms = true;
+                    dosave = true;
                 }
                 else
                 {
@@ -666,34 +811,39 @@ public class User implements PermEntity
                 }
             }
         }
-        if (dosaveperms)
-            BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveUser(this, true);
 
-        if (dosavegroups || dosaveperms)
+        if (dosave)
         {
+            BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveUser(this, true);
             flushCache();
             BungeePerms.getInstance().getNetworkNotifier().reloadUser(this, null);
             BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
         }
 
-        //groups
+        //groups recursive
+        List<String> allgroups = new ArrayList();
+        allgroups.addAll(groups);
+        for (TimedValue<String> tgroup : timedGroups)
+            allgroups.add(tgroup.getValue());
+        for (Server srv : servers.values())
+        {
+            allgroups.addAll(srv.getGroupsString());
+            for (TimedValue<String> tgroup : srv.getTimedGroupsString())
+                allgroups.add(tgroup.getValue());
+            for (World w : srv.getWorlds().values())
+            {
+                allgroups.addAll(w.getGroupsString());
+                for (TimedValue<String> tgroup : w.getTimedGroupsString())
+                    allgroups.add(tgroup.getValue());
+            }
+        }
         Set<Group> checkedgroups = new HashSet();
-        for (String s : groups)
+        for (String s : allgroups)
         {
             Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
             if (g == null)
                 continue;
-            Long end = g.getNextTimedPermission(checkedgroups);
-            if (end == null)
-                continue;
-            next = next == null ? end : Math.min(next, end);
-        }
-        for (TimedValue<String> s : timedGroups)
-        {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s.getValue());
-            if (g == null)
-                continue;
-            Long end = g.getNextTimedPermission(checkedgroups);
+            Long end = g.getNextTimedEntry(checkedgroups);
             if (end == null)
                 continue;
             next = next == null ? end : Math.min(next, end);
@@ -704,7 +854,7 @@ public class User implements PermEntity
 
     private Boolean getCachedResult(String permission, String server, String world)
     {
-        checkTimedPermissions();
+        checkTimedEntries();
         return getPermMap(server, world).get(permission);
     }
 

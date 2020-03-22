@@ -3,6 +3,7 @@ package net.alpenblock.bungeeperms;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +83,7 @@ public class Group implements Comparable<Group>, PermEntity
         Server s = servers.get(name);
         if (s == null)
         {
-            s = new Server(name, new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
+            s = new Server(name, new ArrayList(), new ArrayList(), new ArrayList(), new ArrayList(), new HashMap(), null, null, null);
             servers.put(name, s);
         }
 
@@ -144,6 +145,34 @@ public class Group implements Comparable<Group>, PermEntity
     public List<TimedValue<String>> getTimedInheritancesString()
     {
         return timedInheritances;
+    }
+
+    @Override
+    @Deprecated
+    public List<String> getGroupsString()
+    {
+        return getInheritancesString();
+    }
+
+    @Override
+    @Deprecated
+    public List<TimedValue<String>> getTimedGroupsString()
+    {
+        return getTimedInheritancesString();
+    }
+
+    @Override
+    @Deprecated
+    public void setGroups(List<String> groups)
+    {
+        setInheritances(groups);
+    }
+
+    @Override
+    @Deprecated
+    public void setTimedGroups(List<TimedValue<String>> groups)
+    {
+        setTimedInheritances(groups);
     }
 
     @Deprecated
@@ -228,6 +257,16 @@ public class Group implements Comparable<Group>, PermEntity
         for (TimedValue<Group> tg : tinherit)
         {
             List<BPPermission> gperms = tg.getValue().getEffectivePerms(server, world);
+            for (int i = 0; i < gperms.size(); i++)
+            {
+                BPPermission p = gperms.get(i).clone();
+                if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                {
+                    p.setTimedStart(tg.getStart());
+                    p.setTimedDuration(tg.getDuration());
+                }
+                gperms.set(i, p);
+            }
             ret.addAll(gperms);
         }
 
@@ -239,12 +278,96 @@ public class Group implements Comparable<Group>, PermEntity
         Server srv = servers.get(server);
         if (srv != null)
         {
+            //inheritances
+            inherit = new ArrayList(srv.getGroups());
+            inherit.sort(new Comparator<Group>()
+            {
+                @Override
+                public int compare(Group o1, Group o2)
+                {
+                    return -Integer.compare(o1.getWeight(), o2.getWeight());
+                }
+            });
+            for (Group g : inherit)
+            {
+                List<BPPermission> gperms = g.getEffectivePerms(server, world);
+                ret.addAll(gperms);
+            }
+
+            //timed inheritances
+            tinherit = new ArrayList(srv.getTimedGroups());
+            tinherit.sort(new Comparator<TimedValue<Group>>()
+            {
+                @Override
+                public int compare(TimedValue<Group> o1, TimedValue<Group> o2)
+                {
+                    return -Integer.compare(o1.getValue().getWeight(), o2.getValue().getWeight());
+                }
+            });
+            for (TimedValue<Group> tg : tinherit)
+            {
+                List<BPPermission> gperms = tg.getValue().getEffectivePerms(server, world);
+                for (int i = 0; i < gperms.size(); i++)
+                {
+                    BPPermission p = gperms.get(i).clone();
+                    if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                    {
+                        p.setTimedStart(tg.getStart());
+                        p.setTimedDuration(tg.getDuration());
+                    }
+                    gperms.set(i, p);
+                }
+                ret.addAll(gperms);
+            }
+
             ret.addAll(Statics.makeBPPerms(srv.getPerms(), server, null, this));
             ret.addAll(Statics.makeBPPermsTimed(srv.getTimedPerms(), server, null, this));
 
             World w = srv.getWorld(world);
             if (w != null)
             {
+                //inheritances
+                inherit = new ArrayList(w.getGroups());
+                inherit.sort(new Comparator<Group>()
+                {
+                    @Override
+                    public int compare(Group o1, Group o2)
+                    {
+                        return -Integer.compare(o1.getWeight(), o2.getWeight());
+                    }
+                });
+                for (Group g : inherit)
+                {
+                    List<BPPermission> gperms = g.getEffectivePerms(server, world);
+                    ret.addAll(gperms);
+                }
+
+                //timed inheritances
+                tinherit = new ArrayList(w.getTimedGroups());
+                tinherit.sort(new Comparator<TimedValue<Group>>()
+                {
+                    @Override
+                    public int compare(TimedValue<Group> o1, TimedValue<Group> o2)
+                    {
+                        return -Integer.compare(o1.getValue().getWeight(), o2.getValue().getWeight());
+                    }
+                });
+                for (TimedValue<Group> tg : tinherit)
+                {
+                    List<BPPermission> gperms = tg.getValue().getEffectivePerms(server, world);
+                    for (int i = 0; i < gperms.size(); i++)
+                    {
+                        BPPermission p = gperms.get(i).clone();
+                        if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                        {
+                            p.setTimedStart(tg.getStart());
+                            p.setTimedDuration(tg.getDuration());
+                        }
+                        gperms.set(i, p);
+                    }
+                    ret.addAll(gperms);
+                }
+
                 ret.addAll(Statics.makeBPPerms(w.getPerms(), server, world, this));
                 ret.addAll(Statics.makeBPPermsTimed(w.getTimedPerms(), server, world, this));
             }
@@ -299,13 +422,28 @@ public class Group implements Comparable<Group>, PermEntity
     {
         int count = getOwnPermissionsCount(server, world);
 
-        for (String group : inheritances)
-        {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
-            if (g == null)
-                continue;
+        for (Group g : getInheritances())
             count += g.getPermissionsCount(server, world);
-        }
+        for (TimedValue<Group> g : getTimedInheritances())
+            count += g.getValue().getPermissionsCount(server, world);
+
+        Server s = getServer(server);
+        if (s == null)
+            return count;
+
+        for (Group g : s.getGroups())
+            count += g.getPermissionsCount(server, world);
+        for (TimedValue<Group> g : s.getTimedGroups())
+            count += g.getValue().getPermissionsCount(server, world);
+
+        World w = s.getWorld(world);
+        if (world == null)
+            return count;
+
+        for (Group g : w.getGroups())
+            count += g.getPermissionsCount(server, world);
+        for (TimedValue<Group> g : w.getTimedGroups())
+            count += g.getValue().getPermissionsCount(server, world);
 
         return count;
     }
@@ -354,38 +492,48 @@ public class Group implements Comparable<Group>, PermEntity
         return Statics.isEmpty(suffix) ? "" : suffix.substring(0, suffix.length() - 1) + ChatColor.RESET;
     }
 
-    Long getNextTimedPermission(Set<Group> checkedgroups)
+    Long getNextTimedEntry(Set<Group> checkedgroups)
     {
         if (checkedgroups.contains(this))
             return null;
         checkedgroups.add(this);
 
-        boolean dosavegroups = false;
-        boolean dosaveperms = false;
+        boolean dosave = false;
 
         Long next = null;
 
         //timed inheritances
-        for (int i = 0; i < timedInheritances.size(); i++)
+        List<List<TimedValue<String>>> ll = new ArrayList();
+        ll.add(timedInheritances);
+        for (Server s : servers.values())
         {
-            TimedValue g = timedInheritances.get(i);
-            long end = g.getStart().getTime() + g.getDuration() * 1000;
-            if (end < System.currentTimeMillis())
+            ll.add(s.getTimedGroupsString());
+            for (World w : s.getWorlds().values())
+                ll.add(w.getTimedGroupsString());
+        }
+
+        for (List<TimedValue<String>> l : ll)
+        {
+            for (int i = 0; i < l.size(); i++)
             {
-                timedInheritances.remove(g);
-                i--;
-                dosavegroups = true;
-            }
-            else
-            {
-                next = next == null ? end : Math.min(next, end);
+                TimedValue g = l.get(i);
+                long end = g.getStart().getTime() + g.getDuration() * 1000;
+                if (end < System.currentTimeMillis())
+                {
+                    //remove timed group
+                    l.remove(g);
+                    i--;
+                    dosave = true;
+                }
+                else
+                {
+                    next = next == null ? end : Math.min(next, end);
+                }
             }
         }
-        if (dosavegroups)
-            BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveGroupTimedInheritances(this);
 
         //timed perms
-        List<List<TimedValue<String>>> ll = new ArrayList();
+        ll = new ArrayList();
         ll.add(timedPerms);
         for (Server s : servers.values())
         {
@@ -405,7 +553,7 @@ public class Group implements Comparable<Group>, PermEntity
                     //remove timed perm
                     l.remove(p);
                     i--;
-                    dosaveperms = true;
+                    dosave = true;
                 }
                 else
                 {
@@ -413,33 +561,38 @@ public class Group implements Comparable<Group>, PermEntity
                 }
             }
         }
-        if (dosaveperms)
-            BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveGroup(this, true);
 
-        if (dosavegroups || dosaveperms)
+        if (dosave)
         {
+            BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveGroup(this, true);
             flushCache();
             BungeePerms.getInstance().getNetworkNotifier().reloadGroup(this, null);
             BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
         }
 
-        //inheritances
-        for (String s : inheritances)
+        //inheritances recursive
+        List<String> allgroups = new ArrayList();
+        allgroups.addAll(inheritances);
+        for (TimedValue<String> tgroup : timedInheritances)
+            allgroups.add(tgroup.getValue());
+        for (Server srv : servers.values())
+        {
+            allgroups.addAll(srv.getGroupsString());
+            for (TimedValue<String> tgroup : srv.getTimedGroupsString())
+                allgroups.add(tgroup.getValue());
+            for (World w : srv.getWorlds().values())
+            {
+                allgroups.addAll(w.getGroupsString());
+                for (TimedValue<String> tgroup : w.getTimedGroupsString())
+                    allgroups.add(tgroup.getValue());
+            }
+        }
+        for (String s : allgroups)
         {
             Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s);
             if (g == null)
                 continue;
-            Long end = g.getNextTimedPermission(checkedgroups);
-            if (end == null)
-                continue;
-            next = next == null ? end : Math.min(next, end);
-        }
-        for (TimedValue<String> s : timedInheritances)
-        {
-            Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(s.getValue());
-            if (g == null)
-                continue;
-            Long end = g.getNextTimedPermission(checkedgroups);
+            Long end = g.getNextTimedEntry(checkedgroups);
             if (end == null)
                 continue;
             next = next == null ? end : Math.min(next, end);

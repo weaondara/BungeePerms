@@ -15,7 +15,7 @@ public class Lang
     {
         if (!new File(file).isFile())
             return;
-        
+
         Config langconf = new Config(file);
         langconf.load();
 
@@ -36,6 +36,7 @@ public class Lang
         s = Statics.format(s, vars);
         return s.replaceAll("&", ChatColor.COLOR_CHAR + "");
     }
+
     public static String translatePreserveArgs(MessageType type, Object... vars)
     {
         String s = MAP.get(type);
@@ -85,8 +86,8 @@ public class Lang
         ERR_USER_YOU_CANNOT_DEMOTE("error.user.you-cannot-demote", Color.Error.alt() + "You can't demote the player " + Color.User.alt() + "{0}" + Color.Error.alt() + "!"),
         ERR_GROUP_NOT_EXISTING("error.group.not-existing", Color.Error.alt() + "The group " + Color.User.alt() + "{0}" + Color.Error.alt() + " does not exist!"),
         ERR_GROUP_ALREADY_EXISTS("error.group.already-exists", Color.Error.alt() + "The group " + Color.User.alt() + "{0}" + Color.Error.alt() + " already exists!"),
-        ERR_GROUP_ALREADY_INHERITS("error.group.already-inherits", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " already inherits from " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
-        ERR_GROUP_DOES_NOT_INHERITS("error.group.does-not-inherit", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Error.alt() + " does not inherit from group " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
+        ERR_GROUP_ALREADY_INHERITS("error.group.already-inherits", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Error.alt() + " already inherits from " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
+        ERR_GROUP_DOES_NOT_INHERIT("error.group.does-not-inherit", Color.Error.alt() + "The group " + Color.Value.alt() + "{0}" + Color.Error.alt() + " does not inherit from group " + Color.Value.alt() + "{1}" + Color.Error.alt() + "!"),
         //user msgs
         NO_USERS_FOUND("user.no-users-found", Color.Text.alt() + "No players found!"),
         REGISTERED_USERS("user.registered-users", Color.Text.alt() + "Following players are registered: "),
@@ -116,7 +117,11 @@ public class Lang
         USER_HAS_PERM_SERVER("user.has-perm-server", Color.Text.alt() + "Player " + Color.User.alt() + "{0}" + Color.Text.alt() + " has the permission " + Color.Value.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + ": {3}"),
         USER_HAS_PERM_SERVER_WORLD("user.has-perm-server-world", Color.Text.alt() + "Player " + Color.User.alt() + "{0}" + Color.Text.alt() + " has the permission " + Color.Value.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + " in world " + Color.Value.alt() + "{3}" + Color.Text.alt() + ": {4}"),
         USER_ADDED_GROUP("user.added-group", Color.Text.alt() + "Added group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " to player " + Color.User.alt() + "{1}" + Color.Text.alt() + "."),
+        USER_ADDED_GROUP_SERVER("user.added-group-server", Color.Text.alt() + "Added group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " to player " + Color.User.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + "."),
+        USER_ADDED_GROUP_SERVER_WORLD("user.added-group-server-world", Color.Text.alt() + "Added group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " to player " + Color.User.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + " in world " + Color.Value.alt() + "{3}" + Color.Text.alt() + "."),
         USER_REMOVED_GROUP("user.removed-group", Color.Text.alt() + "Removed group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " from player " + Color.User.alt() + "{1}" + Color.Text.alt() + "."),
+        USER_REMOVED_GROUP_SERVER("user.removed-group-server", Color.Text.alt() + "Removed group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " from player " + Color.User.alt() + "{1}" + Color.Text.alt() + "."),
+        USER_REMOVED_GROUP_SERVER_WORLD("user.removed-group-server-world", Color.Text.alt() + "Removed group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " from player " + Color.User.alt() + "{1}" + Color.Text.alt() + "."),
         USER_SET_GROUP("user.set-group", Color.Text.alt() + "Set group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " for player " + Color.User.alt() + "{1}" + Color.Text.alt() + "."),
         USER_SET_DISPLAY("user.set-display", Color.Text.alt() + "Set display name for user " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
         USER_SET_PREFIX("user.set-prefix", Color.Text.alt() + "Set prefix for user " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
@@ -154,7 +159,11 @@ public class Lang
         GROUP_HAS_PERM_SERVER("group.has-perm-server", Color.Text.alt() + "Group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " has the permission " + Color.Value.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + ": {3}"),
         GROUP_HAS_PERM_SERVER_WORLD("group.has-perm-server-world", Color.Text.alt() + "Group " + Color.Value.alt() + "{0}" + Color.Text.alt() + " has the permission " + Color.Value.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + " in world " + Color.Value.alt() + "{3}" + Color.Text.alt() + ": {4}"),
         GROUP_ADDED_INHERITANCE("group.added-inheritance", Color.Text.alt() + "Added inheritance " + Color.Value.alt() + "{0}" + Color.Text.alt() + " to group " + Color.Value.alt() + "{1}" + Color.Text.alt() + "."),
+        GROUP_ADDED_INHERITANCE_SERVER("group.added-inheritance-server", Color.Text.alt() + "Added inheritance " + Color.Value.alt() + "{0}" + Color.Text.alt() + " to group " + Color.Value.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + "."),
+        GROUP_ADDED_INHERITANCE_SERVER_WORLD("group.added-inheritance-server-world", Color.Text.alt() + "Added inheritance " + Color.Value.alt() + "{0}" + Color.Text.alt() + " to group " + Color.Value.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + " in world " + Color.Value.alt() + "{3}" + Color.Text.alt() + "."),
         GROUP_REMOVED_INHERITANCE("group.removed-inheritance", Color.Text.alt() + "Removed inheritance " + Color.Value.alt() + "{0}" + Color.Text.alt() + " from group " + Color.Value.alt() + "{1}" + Color.Text.alt() + "."),
+        GROUP_REMOVED_INHERITANCE_SERVER("group.removed-inheritance-server", Color.Text.alt() + "Removed inheritance " + Color.Value.alt() + "{0}" + Color.Text.alt() + " from group " + Color.Value.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + "."),
+        GROUP_REMOVED_INHERITANCE_SERVER_WORLD("group.removed-inheritance-server-world", Color.Text.alt() + "Removed inheritance " + Color.Value.alt() + "{0}" + Color.Text.alt() + " from group " + Color.Value.alt() + "{1}" + Color.Text.alt() + " on server " + Color.Value.alt() + "{2}" + Color.Text.alt() + " in world " + Color.Value.alt() + "{3}" + Color.Text.alt() + "."),
         GROUP_SET_RANK("group.set-rank", Color.Text.alt() + "Group rank set for group " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
         GROUP_SET_WEIGHT("group.set-weight", Color.Text.alt() + "Group weight set for group " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
         GROUP_SET_LADDER("group.set-ladder", Color.Text.alt() + "Group ladder set for group " + Color.Value.alt() + "{0}" + Color.Text.alt() + "."),
