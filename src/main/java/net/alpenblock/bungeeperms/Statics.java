@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -387,6 +388,11 @@ public class Statics
     public static String[] array(String... elements)
     {
         return elements;
+    }
+
+    public static <T> List<T> list(T... elements)
+    {
+        return new ArrayList(Arrays.asList(elements));
     }
 
     public static Integer getBuild(PlatformPlugin p)

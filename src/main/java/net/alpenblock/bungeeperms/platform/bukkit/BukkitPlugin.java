@@ -15,6 +15,7 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Statics;
+import net.alpenblock.bungeeperms.TabCompleter;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.bukkit.bridge.BridgeManager;
 import net.alpenblock.bungeeperms.platform.Sender;
@@ -24,8 +25,10 @@ import net.alpenblock.bungeeperms.platform.PluginMessageSender;
 import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -115,57 +118,42 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args)
     {
-        List<String> l = new ArrayList<>();
-        if (!conf.isTabComplete() || args.length == 0)
-            return l;
-
-        for (Player p : getBukkitPlayers())
-        {
-            if (Statics.toLower(p.getName()).startsWith(Statics.toLower(args[args.length - 1])))
-            {
-                l.add(p.getName());
-            }
-        }
-
-        return l;
+        return TabCompleter.tabComplete(new BukkitSender(sender), args);
+//        List<String> l = new ArrayList<>();
+//        if (!conf.isTabComplete() || args.length == 0)
+//            return l;
+//
+//        for (Player p : getBukkitPlayers())
+//        {
+//            if (Statics.toLower(p.getName()).startsWith(Statics.toLower(args[args.length - 1])))
+//            {
+//                l.add(p.getName());
+//            }
+//        }
+//
+//        return l;
     }
 
     private void loadcmds()
     {
-        Command command = new Command("bungeeperms")
+        PluginCommand command;
+        try
         {
-            @Override
-            public boolean execute(final CommandSender sender, final String alias, final String[] args)
-            {
-                final Command cmd = this;
-                Runnable r = new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (!BukkitPlugin.this.onCommand(sender, cmd, alias, args))
-                        {
-                            sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
-                        }
-                    }
-                };
-                if (conf.isAsyncCommands())
-                {
-                    Bukkit.getScheduler().runTaskAsynchronously(instance, r);
-                }
-                else
-                {
-                    r.run();
-                }
-                return true;
-            }
-        };
-
+            Constructor<PluginCommand> ctor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+            ctor.setAccessible(true);
+            command = ctor.newInstance("bungeeperms", this);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Failed to register BungeePerms command!");
+            e.printStackTrace();
+            return;
+        }
+        command.setExecutor(new CmdExec());
         command.setAliases(conf.isAliasCommand() ? Arrays.asList("bp") : new ArrayList());
         command.setPermission(null);
 
         getCommandMap().register("bungeeperms", command);
-
     }
 
     private CommandMap getCommandMap()
@@ -335,6 +323,35 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
         catch (Exception ex)
         {
             getLogger().severe("Could not start metrics!");
+        }
+    }
+
+    private class CmdExec implements CommandExecutor, org.bukkit.command.TabCompleter
+    {
+
+        @Override
+        public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args)
+        {
+            Runnable r = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (!BukkitPlugin.this.onCommand(sender, cmd, label, args))
+                        sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
+                }
+            };
+            if (conf.isAsyncCommands())
+                Bukkit.getScheduler().runTaskAsynchronously(instance, r);
+            else
+                r.run();
+            return true;
+        }
+
+        @Override
+        public List<String> onTabComplete(CommandSender cs, Command cmd, String label, String[] args)
+        {
+            return BukkitPlugin.this.onTabComplete(cs, cmd, label, args);
         }
     }
 }

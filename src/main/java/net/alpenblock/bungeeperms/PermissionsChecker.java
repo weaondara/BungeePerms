@@ -261,7 +261,8 @@ public class PermissionsChecker
         }
         else
         {
-            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
+            if (msg)
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -305,7 +306,8 @@ public class PermissionsChecker
         }
         else
         {
-            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
+            if (msg)
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }
@@ -349,7 +351,8 @@ public class PermissionsChecker
         }
         else
         {
-            sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
+            if (msg)
+                sender.sendMessage(Lang.translate(Lang.MessageType.NO_PERM));
             return false;
         }
     }

@@ -134,20 +134,29 @@ public class BungeeEventListener implements Listener, EventListener
     @EventHandler(priority = Byte.MIN_VALUE)
     public void onTabcomplete(TabCompleteEvent e)
     {
-        if (!config.isTabComplete())
-        {
+        if(!(e.getSender() instanceof ProxiedPlayer))
             return;
-        }
-        if (e.getSuggestions().isEmpty())
+        if ((e.getCursor().startsWith("/bp") && config.isAliasCommand())
+            || e.getCursor().startsWith("/bungeeperms"))
         {
-            for (ProxiedPlayer pp : ProxyServer.getInstance().getPlayers())
-            {
-                if (Statics.toLower(pp.getName()).startsWith(Statics.toLower(e.getCursor())))
-                {
-                    e.getSuggestions().add(pp.getName());
-                }
-            }
+            String[] s = e.getCursor().split(" ", 2);
+            String[] args = s.length == 2 ? s[1].split(" ") : new String[0];
+            e.getSuggestions().addAll(BungeePlugin.getInstance().onTabComplete((ProxiedPlayer)e.getSender(), null, null, args));
         }
+//        if (!config.isTabComplete())
+//        {
+//            return;
+//        }
+//        if (e.getSuggestions().isEmpty())
+//        {
+//            for (ProxiedPlayer pp : ProxyServer.getInstance().getPlayers())
+//            {
+//                if (Statics.toLower(pp.getName()).startsWith(Statics.toLower(e.getCursor())))
+//                {
+//                    e.getSuggestions().add(pp.getName());
+//                }
+//            }
+//        }
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

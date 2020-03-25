@@ -3,6 +3,7 @@ package net.alpenblock.bungeeperms.platform.bungee;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -11,6 +12,7 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Statics;
+import net.alpenblock.bungeeperms.TabCompleter;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -22,6 +24,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
 @Getter
 public class BungeePlugin extends Plugin implements PlatformPlugin
@@ -89,34 +92,27 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
         return bungeeperms.getCommandHandler().onCommand(new BungeeSender(sender), cmd.getName(), label, args);
     }
 
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args)
+    {
+        return TabCompleter.tabComplete(new BungeeSender(sender), args);
+//        List<String> l = new ArrayList<>();
+//        if (!conf.isTabComplete() || args.length == 0)
+//            return l;
+//
+//        for (Player p : getBukkitPlayers())
+//        {
+//            if (Statics.toLower(p.getName()).startsWith(Statics.toLower(args[args.length - 1])))
+//            {
+//                l.add(p.getName());
+//            }
+//        }
+//
+//        return l;
+    }
+
     private void loadcmds()
     {
-        Command cmd = new Command("bungeeperms", null, config.isAliasCommand() ? new String[]
-                          {
-                              "bp"
-        } : new String[0])
-        {
-            @Override
-            public void execute(final CommandSender sender, final String[] args)
-            {
-                final Command cmd = this;
-                Runnable r = new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (!BungeePlugin.this.onCommand(sender, cmd, "", args))
-                        {
-                            sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
-                        }
-                    }
-                };
-                if (config.isAsyncCommands())
-                    ProxyServer.getInstance().getScheduler().runAsync(instance, r);
-                else
-                    r.run();
-            }
-        };
+        CmdExec cmd = new CmdExec("bungeeperms", null, config.isAliasCommand() ? Statics.array("bp") : new String[0]);
         ProxyServer.getInstance().getPluginManager().registerCommand(this, cmd);
     }
 
@@ -261,6 +257,40 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
         catch (Exception ex)
         {
             getLogger().severe("Could not start metrics!");
+        }
+    }
+
+    private class CmdExec extends Command implements TabExecutor
+    {
+
+        public CmdExec(String name, String permission, String... aliases)
+        {
+            super(name, permission, aliases);
+        }
+
+        @Override
+        public void execute(final CommandSender sender, final String[] args)
+        {
+            final Command cmd = this;
+            Runnable r = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (!BungeePlugin.this.onCommand(sender, cmd, "", args))
+                        sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
+                }
+            };
+            if (config.isAsyncCommands())
+                ProxyServer.getInstance().getScheduler().runAsync(instance, r);
+            else
+                r.run();
+        }
+
+        @Override
+        public Iterable<String> onTabComplete(CommandSender sender, String[] args)
+        {
+            return BungeePlugin.this.onTabComplete(sender, this, "", args);
         }
     }
 }
