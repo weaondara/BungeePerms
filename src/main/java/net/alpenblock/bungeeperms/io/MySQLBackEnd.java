@@ -806,7 +806,7 @@ public class MySQLBackEnd implements BackEnd
 
     static void loadServerWorlds(MysqlPermEntity mpe, PermEntity p)
     {
-        Map<String, Map<String, Map<String, List<ValueEntry>>>> map = mapServerWorlds(mpe, "permissions", "timedpermissions", "prefix", "suffix", "display");
+        Map<String, Map<String, Map<String, List<ValueEntry>>>> map = mapServerWorlds(mpe, "permissions", "timedpermissions", "inheritances", "groups", "timedinheritances", "timedgroups", "prefix", "suffix", "display");
 
         //transfer
         for (Map.Entry<String, Map<String, Map<String, List<ValueEntry>>>> keylvl : map.entrySet())
