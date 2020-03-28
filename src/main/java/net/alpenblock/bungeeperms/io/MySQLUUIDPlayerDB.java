@@ -76,7 +76,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT id, uuid FROM " + table + " WHERE player=? ORDER BY id ASC LIMIT 1");
+            stmt = mysql.stmt("SELECT id, uuid FROM `" + table + "` WHERE player=? ORDER BY id ASC LIMIT 1");
             stmt.setString(1, player);
             res = mysql.returnQuery(stmt);
             if (res.last())
@@ -107,7 +107,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT player FROM " + table + " WHERE uuid=?");
+            stmt = mysql.stmt("SELECT player FROM `" + table + "` WHERE uuid=?");
             stmt.setString(1, uuid.toString());
             res = mysql.returnQuery(stmt);
             if (res.last())
@@ -135,14 +135,14 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("DELETE FROM " + table + " WHERE uuid=? OR player=?");
+            stmt = mysql.stmt("DELETE FROM `" + table + "` WHERE uuid=? OR player=?");
             stmt.setString(1, uuid.toString());
             stmt.setString(2, player);
             mysql.runQuery(stmt);
             Mysql.close(stmt);
 
             mysql.checkConnection();
-            stmt = mysql.stmt("INSERT IGNORE INTO " + table + " (uuid, player) VALUES (?, ?)");
+            stmt = mysql.stmt("INSERT IGNORE INTO `" + table + "` (uuid, player) VALUES (?, ?)");
             stmt.setString(1, uuid.toString());
             stmt.setString(2, player);
             mysql.runQuery(stmt);
@@ -167,7 +167,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
         try
         {
             mysql.checkConnection();
-            stmt = mysql.stmt("SELECT uuid, player FROM " + table);
+            stmt = mysql.stmt("SELECT uuid, player FROM `" + table + "`");
             res = mysql.returnQuery(stmt);
             while (res.next())
             {
