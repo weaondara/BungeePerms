@@ -88,7 +88,7 @@ public class TabCompleter
         List<Entry> ret = new ArrayList();
         for (Entry e : entries)
         {
-            if (BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(sender, e.getPermission()))
+            if (e.getPermission() == null || BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(sender, e.getPermission()))
                 ret.add(e);
         }
         return ret;
