@@ -546,7 +546,7 @@ public class PermissionsManager
         try
         {
             for (User u : users)
-                if (u.getName().equalsIgnoreCase(usernameoruuid))
+                if (u != null && u.getName().equalsIgnoreCase(usernameoruuid))
                     return u;
         }
         finally
@@ -610,7 +610,7 @@ public class PermissionsManager
         try
         {
             for (User u : users)
-                if ((u != null) && uuid.equals(u.getUUID()))
+                if (u != null && uuid.equals(u.getUUID()))
                     return u;
         }
         finally
@@ -2265,6 +2265,8 @@ public class PermissionsManager
 
     public void addUserToCache(User u)
     {
+        if (u == null)
+            throw new IllegalArgumentException("[BungeePerms] Null user passed to PermissionsManager::addUserToCache!");
         userlock.writeLock().lock();
         try
         {
