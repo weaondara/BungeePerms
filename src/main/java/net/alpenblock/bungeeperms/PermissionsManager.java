@@ -546,7 +546,7 @@ public class PermissionsManager
         try
         {
             for (User u : users)
-                if (u != null && u.getName().equalsIgnoreCase(usernameoruuid))
+                if (u != null && u.getName() != null && u.getName().equalsIgnoreCase(usernameoruuid))
                     return u;
         }
         finally
