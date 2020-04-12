@@ -1,11 +1,9 @@
 package net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.placeholderapi;
 
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.BungeePermsAPI;
-import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.PermissionsManager;
 import org.bukkit.entity.Player;
 
@@ -51,6 +49,10 @@ public class PlaceholderProvider extends PlaceholderExpansion {
         
         if(identifier.equals("primary_group_name")){
             return BungeePermsAPI.userMainGroup(player.getName());
+        }
+        
+        if(identifier.equals("display_primary_group")){
+            return p.getMainGroup(p.getUser(player.getName())).getDisplay();
         }
         
         if(identifier.equals("prefix")){

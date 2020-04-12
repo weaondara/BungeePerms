@@ -492,6 +492,28 @@ public class Group implements Comparable<Group>, PermEntity
         return Statics.isEmpty(suffix) ? "" : suffix.substring(0, suffix.length() - 1) + ChatColor.RESET;
     }
 
+    public String buildDisplay(String server, String world)
+    {
+        String display = "";
+
+        //global
+        display += Statics.formatDisplay(this.display);
+
+        //server
+        Server s = getServer(server);
+        if (s != null)
+        {
+            display += Statics.formatDisplay(s.getDisplay());
+
+            //world
+            World w = s.getWorld(world);
+            if (w != null)
+                display += Statics.formatDisplay(w.getDisplay());
+        }
+
+        return Statics.isEmpty(display) ? "" : display.substring(0, display.length() - 1) + ChatColor.RESET;
+    }
+    
     Long getNextTimedEntry(Set<Group> checkedgroups)
     {
         if (checkedgroups.contains(this))

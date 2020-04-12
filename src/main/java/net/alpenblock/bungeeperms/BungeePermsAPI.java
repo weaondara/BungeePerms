@@ -281,6 +281,26 @@ public class BungeePermsAPI
         return g.buildSuffix(server, world);
     }
 
+     /**
+     * Gets the display of the given group
+     *
+     * @param group the group
+     * @param server the server; may be null; if server == "" then the current server is used or null if BungeeCord
+     * @param world the world; may be null
+     * @return the display; may be null
+     */
+    public static String groupDisplay(String group, String server, String world)
+    {
+        server = server(server);
+        world = world(server, world);
+
+        Group g = BungeePerms.getInstance().getPermissionsManager().getGroup(group);
+        if (g == null)
+            return null;
+
+        return g.buildDisplay(server, world);
+    }
+    
     //user
     /**
      * Gets the primary/main group to the given users
