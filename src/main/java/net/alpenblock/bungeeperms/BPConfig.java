@@ -9,6 +9,8 @@ import net.alpenblock.bungeeperms.io.BackEndType;
 public class BPConfig
 {
 
+    protected static final int CURRENT_VERSION = 1;
+    
     protected Config config;
 
     //backend
@@ -132,6 +134,13 @@ public class BPConfig
     {
         config.load();
 
+        //check for empty config
+        if (config.getSubNodes(null).isEmpty())
+        {
+            config.setInt("version", CURRENT_VERSION);
+            return;
+        }
+
         //test current version
         int version = 0;
         if (config.keyExists("version"))
@@ -157,7 +166,7 @@ public class BPConfig
     {
         //perms
         newconf.setEnumValue("backend.type", oldconf.getString("backendtype", "YAML").equalsIgnoreCase("MYSQL2") ? BackEndType.MySQL : BackEndType.YAML);
-        newconf.setBool("backend.useuuids", oldconf.getBoolean("useUUIDs", false));
+        newconf.setBool("backend.useuuids", oldconf.getBoolean("useUUIDs", true));
         newconf.setBool("backend.saveAllUsers", oldconf.getBoolean("saveAllUsers", true));
         newconf.setBool("backend.deleteUsersOnCleanup", oldconf.getBoolean("deleteUsersOnCleanup", false));
         newconf.setInt("backend.uuidfetchercooldown", oldconf.getInt("uuidfetcher.cooldown", 3000));

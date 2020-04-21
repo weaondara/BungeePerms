@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import net.alpenblock.bungeeperms.config.ConfigurationSection;
 import net.alpenblock.bungeeperms.config.FileConfiguration;
 import net.alpenblock.bungeeperms.config.YamlConfiguration;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -276,7 +277,10 @@ public class Config
     {
         try
         {
-            return new ArrayList(fconfig.getConfigurationSection(node).getKeys(false));
+            ConfigurationSection cs = fconfig;
+            if (node != null)
+                cs = cs.getConfigurationSection(node);
+            return new ArrayList(cs.getKeys(false));
         }
         catch (Exception e)
         {
