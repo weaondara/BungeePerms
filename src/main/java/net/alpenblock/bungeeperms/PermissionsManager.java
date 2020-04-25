@@ -239,7 +239,7 @@ public class PermissionsManager
      * Validates all loaded groups and users and fixes invalid objects.
      */
     @Deprecated
-    public synchronized void validateUsersGroups()
+    public void validateUsersGroups()
     {
 //        grouplock.readLock().lock();
 //        try
@@ -327,7 +327,7 @@ public class PermissionsManager
      * @return the main group of the user (highest rank)
      * @throws NullPointerException if player is null
      */
-    public synchronized Group getMainGroup(User player)
+    public Group getMainGroup(User player)
     {
         if (player == null)
             throw new NullPointerException("player is null");
@@ -353,7 +353,7 @@ public class PermissionsManager
      * @return the next group in the same ladder or null if the group has no next group
      * @throws IllegalArgumentException if the group ladder does not exist (anymore)
      */
-    public synchronized Group getNextGroup(Group group)
+    public Group getNextGroup(Group group)
     {
         List<Group> laddergroups = getLadderGroups(group.getLadder());
 
@@ -381,7 +381,7 @@ public class PermissionsManager
      * @return the previous group in the same ladder or null if the group has no previous group
      * @throws IllegalArgumentException if the group ladder does not exist (anymore)
      */
-    public synchronized Group getPreviousGroup(Group group)
+    public Group getPreviousGroup(Group group)
     {
         List<Group> laddergroups = getLadderGroups(group.getLadder());
 
@@ -408,7 +408,7 @@ public class PermissionsManager
      * @param ladder the ladder of the groups to get
      * @return a sorted list of all matched groups
      */
-    public synchronized List<Group> getLadderGroups(String ladder)
+    public List<Group> getLadderGroups(String ladder)
     {
         List<Group> ret = new ArrayList<>();
 
@@ -438,7 +438,7 @@ public class PermissionsManager
      *
      * @return a list of all ladders
      */
-    public synchronized List<String> getLadders()
+    public List<String> getLadders()
     {
         List<String> ret = new ArrayList<>();
 
@@ -466,7 +466,7 @@ public class PermissionsManager
      *
      * @return a list of default groups
      */
-    public synchronized List<Group> getDefaultGroups()
+    public List<Group> getDefaultGroups()
     {
         List<Group> ret = new ArrayList<>();
         grouplock.readLock().lock();
@@ -492,7 +492,7 @@ public class PermissionsManager
      *
      * @return a list of default groups
      */
-    public synchronized List<String> getDefaultGroupsString()
+    public List<String> getDefaultGroupsString()
     {
         List<String> ret = new ArrayList();
         for (Group g : getDefaultGroups())
@@ -506,7 +506,7 @@ public class PermissionsManager
      * @param groupname the name of the group to get
      * @return the found group if any or null
      */
-    public synchronized Group getGroup(String groupname)
+    public Group getGroup(String groupname)
     {
         if (groupname == null)
         {
@@ -533,7 +533,7 @@ public class PermissionsManager
      * @param usernameoruuid the name or the UUID of the user to get
      * @return the found user or null if it does not exist
      */
-    public synchronized User getUser(String usernameoruuid)
+    public User getUser(String usernameoruuid)
     {
         return getUser(usernameoruuid, true);
     }
@@ -545,7 +545,7 @@ public class PermissionsManager
      * @param loadfromdb whether or not to load the user from the database if not already loaded
      * @return the found user or null if it does not exist
      */
-    public synchronized User getUser(String usernameoruuid, boolean loadfromdb)
+    public User getUser(String usernameoruuid, boolean loadfromdb)
     {
         if (usernameoruuid == null)
         {
@@ -605,7 +605,7 @@ public class PermissionsManager
      * @param uuid the uuid of the user to get
      * @return the found user or null if it does not exist
      */
-    public synchronized User getUser(UUID uuid)
+    public User getUser(UUID uuid)
     {
         return getUser(uuid, true);
     }
@@ -617,7 +617,7 @@ public class PermissionsManager
      * @param loadfromdb whether or not to load the user from the database if not already loaded
      * @return the found user or null if it does not exist
      */
-    public synchronized User getUser(UUID uuid, boolean loadfromdb)
+    public User getUser(UUID uuid, boolean loadfromdb)
     {
         if (uuid == null)
             return null;
@@ -769,7 +769,7 @@ public class PermissionsManager
      *
      * @param user the user to delete
      */
-    public synchronized void deleteUser(User user)
+    public void deleteUser(User user)
     {
         //cache
         removeUserFromCache(user);
@@ -789,7 +789,7 @@ public class PermissionsManager
      *
      * @param group the group the remove
      */
-    public synchronized void deleteGroup(Group group)
+    public void deleteGroup(Group group)
     {
         //cache
         removeGroupFromCache(group);
@@ -815,7 +815,7 @@ public class PermissionsManager
      *
      * @param user the user to add
      */
-    public synchronized void addUser(User user)
+    public void addUser(User user)
     {
         //cache
         addUserToCache(user);
@@ -832,7 +832,7 @@ public class PermissionsManager
      *
      * @param group the group to add
      */
-    public synchronized void addGroup(Group group)
+    public void addGroup(Group group)
     {
         grouplock.writeLock().lock();
         try
@@ -2062,7 +2062,7 @@ public class PermissionsManager
      *
      * @param bet the backEnd type to migrate to
      */
-    public synchronized void migrateBackEnd(BackEndType bet)
+    public void migrateBackEnd(BackEndType bet)
     {
         Migrator migrator;
         switch (bet)
