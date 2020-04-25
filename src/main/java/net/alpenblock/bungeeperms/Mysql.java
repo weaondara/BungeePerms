@@ -21,6 +21,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.locks.ReentrantLock;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -127,17 +128,35 @@ public class Mysql
 
     public ResultSet returnQuery(PreparedStatement stmt)
     {
-        return returnQuery(stmt, true);
+        return returnQuery(stmt, true); //no transaction as no data modification only querying
     }
 
-    public boolean runQuery(PreparedStatement stmt)
+    public boolean runQuery(final PreparedStatement stmt)
     {
-        return runQuery(stmt, true);
+        final boolean[] b = new boolean[1];
+        transaction(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                b[0] = runQuery(stmt, true);
+            }
+        });
+        return b[0];
     }
 
-    public long runQueryGetId(PreparedStatement stmt)
+    public long runQueryGetId(final PreparedStatement stmt)
     {
-        return runQueryGetId(stmt, true);
+        final long[] l = new long[1];
+        transaction(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                l[0] = runQueryGetId(stmt, true);
+            }
+        });
+        return l[0];
     }
 
     public boolean tableExists(String table)
@@ -334,105 +353,96 @@ public class Mysql
         connect();
     }
 
-    //maybe for later use
-//    //transaction stuff
-//    private ReentrantLock transactionlock = new ReentrantLock();
-//    private Condition transactioncond = transactionlock.newCondition();
-//    private Thread transactionthread;
-//    private int nestedtranactions;
-//    
-//    @SneakyThrows
-//    public void startTransaction()
-//    {
-//        transactionlock.lock();
-//        try
-//        {
-//            while (transactionthread != null && transactionthread != Thread.currentThread())
-//            {
-//                System.out.println("st: wait on cond; thread = " + Thread.currentThread().getName());
-//                transactioncond.await();
-//            }
-//            System.out.println("start transaction " + Thread.currentThread().getName());
-//
-//            transactionthread = Thread.currentThread();
-//            nestedtranactions++;
-//
-//            connection.setAutoCommit(false);
-//        }
-//        catch (Throwable t)
-//        {
-//            nestedtranactions = 0;
-//            connection.setAutoCommit(true);
-//            transactionthread = null;
-//            transactioncond.signal();
-//        }
-//        finally
-//        {
-//            transactionlock.unlock();
-//        }
-//    }
-//
-//    @SneakyThrows
-//    public void commit()
-//    {
-//        transactionlock.lock();
-//        try
-//        {
-//            System.out.println("commit " + Thread.currentThread().getName());
-//            if (transactionthread != Thread.currentThread())
-//                throw new IllegalStateException("transactionthread != Thread.currentThread()");
-//
-//            nestedtranactions--;
-//            if (nestedtranactions < 0)
-//                throw new IllegalStateException("nestedtranactions < 0");
-//            if (nestedtranactions == 0)
-//                connection.commit();
-//        }
-//        catch (Throwable t)
-//        {
-//            nestedtranactions = 0;
-//        }
-//        finally
-//        {
-//            if (nestedtranactions == 0)
-//            {
-//                connection.setAutoCommit(true);
-//                transactionthread = null;
-//                transactioncond.signal();
-//            }
-//            transactionlock.unlock();
-//        }
-//    }
-//
-//    @SneakyThrows
-//    public void rollback()
-//    {
-//        transactionlock.lock();
-//        try
-//        {
-//            System.out.println("rollback " + Thread.currentThread().getName());
-//            if (transactionthread != Thread.currentThread())
-//                throw new IllegalStateException("transactionthread != Thread.currentThread()");
-//
-//            nestedtranactions--;
-//            if (nestedtranactions < 0)
-//                throw new IllegalStateException("nestedtranactions < 0");
-//            if (nestedtranactions == 0)
-//                connection.rollback();
-//        }
-//        catch (Throwable t)
-//        {
-//            nestedtranactions = 0;
-//        }
-//        finally
-//        {
-//            if (nestedtranactions == 0)
-//            {
-//                connection.setAutoCommit(true);
-//                transactionthread = null;
-//                transactioncond.signal();
-//            }
-//            transactionlock.unlock();
-//        }
-//    }
+    //transaction stuff
+    private final ReentrantLock transactionlock = new ReentrantLock();
+
+    public void transaction(Runnable r)
+    {
+        startTransaction();
+        try
+        {
+            r.run();
+            commit();
+        }
+        catch (Throwable t)
+        {
+            rollback();
+            throw t;
+        }
+    }
+
+    @SneakyThrows
+    public void startTransaction()
+    {
+        transactionlock.lock();
+        try
+        {
+//            System.out.println("start " + transactionlock.getHoldCount() + " " + Thread.currentThread().getName());
+            if (transactionlock.getHoldCount() == 1)
+                connection.setAutoCommit(false);
+        }
+        catch (Throwable t)
+        {
+            connection.setAutoCommit(true);
+            transactionlock.unlock();
+        }
+    }
+
+    @SneakyThrows
+    public void commit()
+    {
+        try
+        {
+//            System.out.println("commit " + transactionlock.getHoldCount() + " " + Thread.currentThread().getName());
+            if (transactionlock.getHoldCount() < 1)
+                throw new IllegalStateException("lock holdcount < 1");
+            if (transactionlock.getHoldCount() == 1)
+                connection.commit();
+        }
+        catch (Throwable t)
+        {
+            throw t;
+        }
+        finally
+        {
+            if (transactionlock.getHoldCount() == 1)
+            {
+                connection.setAutoCommit(true);
+                transactionlock.unlock();
+            }
+            else
+            {
+                transactionlock.unlock();
+            }
+        }
+    }
+
+    @SneakyThrows
+    public void rollback()
+    {
+        try
+        {
+//            System.out.println("rollback " + transactionlock.getHoldCount() + " " + Thread.currentThread().getName());
+            if (transactionlock.getHoldCount() < 1)
+                throw new IllegalStateException("lock holdcount < 1");
+            if (transactionlock.getHoldCount() == 1)
+                connection.rollback();
+        }
+        catch (Throwable t)
+        {
+            throw t;
+        }
+        finally
+        {
+            if (transactionlock.getHoldCount() == 1)
+            {
+                connection.setAutoCommit(true);
+                transactionlock.unlock();
+            }
+            else
+            {
+                transactionlock.unlock();
+            }
+        }
+    }
 }

@@ -208,7 +208,7 @@ public class MySQLBackEnd implements BackEnd
     @Override
     public void saveVersion(int version, boolean savetodisk)
     {
-        adapter.saveData("version", EntityType.Version, "version", mkValueList(mkList(String.valueOf(version)), null, null));
+        adapter.saveData("version", EntityType.Version, "version", mkValueList(mkList(String.valueOf(version)), null, null), null, null);
     }
 
     @Override
@@ -535,25 +535,25 @@ public class MySQLBackEnd implements BackEnd
     @Override
     public synchronized void saveGroupLadder(Group group)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "ladder", mkList(new ValueEntry(group.getLadder(), null, null)));
+        adapter.saveData(group.getName(), EntityType.Group, "ladder", mkList(new ValueEntry(group.getLadder(), null, null)), null, null);
     }
 
     @Override
     public synchronized void saveGroupRank(Group group)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "rank", mkList(new ValueEntry(String.valueOf(group.getRank()), null, null)));
+        adapter.saveData(group.getName(), EntityType.Group, "rank", mkList(new ValueEntry(String.valueOf(group.getRank()), null, null)), null, null);
     }
 
     @Override
     public synchronized void saveGroupWeight(Group group)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "weight", mkList(new ValueEntry(String.valueOf(group.getWeight()), null, null)));
+        adapter.saveData(group.getName(), EntityType.Group, "weight", mkList(new ValueEntry(String.valueOf(group.getWeight()), null, null)), null, null);
     }
 
     @Override
     public synchronized void saveGroupDefault(Group group)
     {
-        adapter.saveData(group.getName(), EntityType.Group, "default", mkList(new ValueEntry(String.valueOf(group.isDefault()), null, null)));
+        adapter.saveData(group.getName(), EntityType.Group, "default", mkList(new ValueEntry(String.valueOf(group.isDefault()), null, null)), null, null);
     }
 
     @Override

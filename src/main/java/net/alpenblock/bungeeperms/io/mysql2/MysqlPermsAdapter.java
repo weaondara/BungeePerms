@@ -244,50 +244,25 @@ public class MysqlPermsAdapter
         }
     }
 
-    public void saveData(String name, EntityType type, String key, List<ValueEntry> values)
-    {
-        PreparedStatement stmt = null;
-        try
-        {
-            //delete entries
-            mysql.checkConnection();
-            stmt = mysql.stmt("DELETE FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode() + " AND `key`=?");
-            stmt.setString(1, name);
-            stmt.setString(2, key);
-            mysql.runQuery(stmt);
-        }
-        catch (Exception e)
-        {
-            BungeePerms.getInstance().getDebug().log(e);
-            return;
-        }
-        finally
-        {
-            Mysql.close(stmt);
-        }
-
-        //add values
-        doSaveData(name, type, key, values);
-    }
-
     public void saveData(String name, EntityType type, String key, List<ValueEntry> values, String server, String world)
     {
+        String delq = "DELETE FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode() + " AND `key`=? AND ";
+        if (server == null)
+            delq += "`server` IS NULL";
+        else
+            delq += "`server`=?";
+        delq += " AND ";
+        if (server == null || world == null)
+            delq += "`world` IS NULL";
+        else
+            delq += "`world`=?";
+
+        mysql.checkConnection();
+        mysql.startTransaction();
         PreparedStatement stmt = null;
         try
         {
             //delete entries
-            String delq = "DELETE FROM `" + table + "` WHERE `name`=? AND `type`=" + type.getCode() + " AND `key`=? AND ";
-            if (server == null)
-                delq += "`server` IS NULL";
-            else
-                delq += "`server`=?";
-            delq += " AND ";
-            if (server == null || world == null)
-                delq += "`world` IS NULL";
-            else
-                delq += "`world`=?";
-
-            mysql.checkConnection();
             stmt = mysql.stmt(delq);
             stmt.setString(1, name);
             stmt.setString(2, key);
@@ -297,58 +272,69 @@ public class MysqlPermsAdapter
                 stmt.setString(4, world);
 
             mysql.runQuery(stmt);
+
+            //add values
+            doSaveData(name, type, key, values);
+
+            mysql.commit();
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
-            BungeePerms.getInstance().getDebug().log(e);
-            return;
+            mysql.rollback();
+            BungeePerms.getInstance().getDebug().log(t);
         }
         finally
         {
             Mysql.close(stmt);
         }
-
-        //add values
-        doSaveData(name, type, key, values);
     }
 
     private void doSaveData(String name, EntityType type, String key, List<ValueEntry> values)
     {
-        for (ValueEntry val : values)
+        mysql.checkConnection();
+        mysql.startTransaction();
+        PreparedStatement stmt = null;
+        try
         {
-            PreparedStatement stmt = null;
-            try
+            String insq = "INSERT INTO `" + table + "` (`name`,`type`,`key`,`value`,`server`,`world`,`timedstart`,`timedduration`) "
+                          + "VALUES (?," + type.getCode() + ",?,?,?,?,?,?)";
+            stmt = mysql.stmt(insq);
+            for (ValueEntry val : values)
             {
                 if (val.getValue() == null)
-                {
                     continue;
+
+                try
+                {
+                    stmt.setString(1, name);
+                    stmt.setString(2, key);
+                    stmt.setString(3, val.getValue());
+                    stmt.setString(4, val.getServer());
+                    stmt.setString(5, val.getWorld());
+                    stmt.setTimestamp(6, val.getStart());
+                    if (val.getDuration() != null)
+                        stmt.setInt(7, val.getDuration());
+                    else
+                        stmt.setNull(7, Types.INTEGER);
+
+                    mysql.runQuery(stmt);
                 }
-                String insq = "INSERT INTO `" + table + "` (`name`,`type`,`key`,`value`,`server`,`world`,`timedstart`,`timedduration`) "
-                              + "VALUES (?," + type.getCode() + ",?,?,?,?,?,?)";
+                catch (Exception e)
+                {
+                    BungeePerms.getInstance().getDebug().log(e);
+                }
+            }
 
-                mysql.checkConnection();
-                stmt = mysql.stmt(insq);
-                stmt.setString(1, name);
-                stmt.setString(2, key);
-                stmt.setString(3, val.getValue());
-                stmt.setString(4, val.getServer());
-                stmt.setString(5, val.getWorld());
-                stmt.setTimestamp(6, val.getStart());
-                if (val.getDuration() != null)
-                    stmt.setInt(7, val.getDuration());
-                else
-                    stmt.setNull(7, Types.INTEGER);
-
-                mysql.runQuery(stmt);
-            }
-            catch (Exception e)
-            {
-                BungeePerms.getInstance().getDebug().log(e);
-            }
-            finally
-            {
-                Mysql.close(stmt);
-            }
+            mysql.commit();
+        }
+        catch (Throwable t)
+        {
+            mysql.rollback();
+            throw t;
+        }
+        finally
+        {
+            Mysql.close(stmt);
         }
     }
 
