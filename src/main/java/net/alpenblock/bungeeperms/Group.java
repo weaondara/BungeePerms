@@ -529,7 +529,7 @@ public class Group implements Comparable<Group>, PermEntity
 
         return Statics.isEmpty(display) ? "" : display.substring(0, display.length() - 1) + ChatColor.RESET;
     }
-    
+
     Long getNextTimedEntry(Set<Group> checkedgroups)
     {
         if (checkedgroups.contains(this))
@@ -604,7 +604,7 @@ public class Group implements Comparable<Group>, PermEntity
         {
             BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveGroup(this, true);
             flushCache();
-            BungeePerms.getInstance().getNetworkNotifier().reloadGroup(this, null);
+//            BungeePerms.getInstance().getNetworkNotifier().reloadGroup(this, null);
             BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
         }
 

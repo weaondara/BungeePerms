@@ -832,7 +832,7 @@ public class User implements PermEntity
         {
             BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveUser(this, true);
             flushCache();
-            BungeePerms.getInstance().getNetworkNotifier().reloadUser(this, null);
+//            BungeePerms.getInstance().getNetworkNotifier().reloadUser(this, null);
             BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);
         }
 
