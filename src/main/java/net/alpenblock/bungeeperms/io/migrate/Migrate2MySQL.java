@@ -47,8 +47,8 @@ public class Migrate2MySQL implements Migrator
     {
         debug.log("migrate backend: migrating " + groups.size() + " groups and " + users.size() + " users");
         MySQLBackEnd be = new MySQLBackEnd();
+        be.getMysql().startTransaction();
         be.clearDatabase();
-        be.getMysql().getConnection().setAutoCommit(false);
         try
         {
             for (Group group : groups)
@@ -68,19 +68,19 @@ public class Migrate2MySQL implements Migrator
             debug.log("migrate backend: " + users.size() + " users migrated");
 
             be.saveVersion(permsversion, true);
-            be.getMysql().getConnection().commit();
+            be.getMysql().commit();
         }
-        finally
+        catch (Throwable t)
         {
-            be.getMysql().getConnection().setAutoCommit(true);
+            be.getMysql().rollback();
         }
         BungeePerms.getInstance().getPermissionsManager().setBackEnd(be);
 
         if (config.isUseUUIDs())
         {
             MySQLUUIDPlayerDB updb = new MySQLUUIDPlayerDB();
+            updb.getMysql().startTransaction();
             updb.clear();
-            updb.getMysql().getConnection().setAutoCommit(false);
             try
             {
                 int um = 0;
@@ -92,10 +92,11 @@ public class Migrate2MySQL implements Migrator
                         debug.log("migrate backend: " + um + "/" + uuidplayer.size() + " uuid/player entries migrated");
                 }
                 debug.log("migrate backend: " + users.size() + " uuid/player entries migrated");
+                updb.getMysql().commit();
             }
-            finally
+            catch (Throwable t)
             {
-                updb.getMysql().getConnection().setAutoCommit(true);
+                updb.getMysql().rollback();
             }
             BungeePerms.getInstance().getPermissionsManager().setUUIDPlayerDB(updb);
         }
