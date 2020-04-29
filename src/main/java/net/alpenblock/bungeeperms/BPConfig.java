@@ -95,7 +95,7 @@ public class BPConfig
         mysqlUser = config.getString("mysql.user", "bungeeperms");
         mysqlPassword = config.getString("mysql.password", "password");
         mysqlTablePrefix = config.getString("mysql.tableprefix", "bungeeperms_");
-        mysqlURL = config.getString("mysql.url", "jdbc:mysql://localhost:3306/bungeperms?autoReconnect=true&dontTrackOpenResources=true");
+        mysqlURL = config.getString("mysql.url", "jdbc:mysql://localhost:3306/DATABASENAME?autoReconnect=true&dontTrackOpenResources=true");
 
         //debug
         debugPath = config.getString("debug.path", "plugins/BungeePerms/debug.log");
