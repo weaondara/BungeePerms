@@ -222,14 +222,14 @@ public class PermissionsManager
 
             //perms
             loadPerms();
-
-            enable();
         }
         finally
         {
             grouplock.writeLock().unlock();
             userlock.writeLock().unlock();
         }
+        
+        enable(); //called events would cause deadlock
 
         //call event
         BungeePerms.getInstance().getEventDispatcher().dispatchReloadedEvent();
