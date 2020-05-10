@@ -16,6 +16,7 @@
  */
 package net.alpenblock.bungeeperms;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -205,7 +206,7 @@ public class User implements PermEntity
         if (cached != null)
         {
             //debug mode
-            debug(perm, cached);
+            debug("cache: " + perm, cached);
             return cached;
         }
 
@@ -228,7 +229,7 @@ public class User implements PermEntity
         setCachedResult(perm, has, server, world);
 
         //debug mode
-        debug(perm, has);
+        debug("resolve: " + perm, has);
 
         return has;
     }
@@ -756,9 +757,7 @@ public class User implements PermEntity
     {
         if (nextTimedEntryRunOut != null && nextTimedEntryRunOut < System.currentTimeMillis())
         {
-            BungeePerms.getInstance().getDebug().log("invalidated user " + name);
-            flushCache();
-            nextTimedEntryRunOut = getNextTimedEntry();
+            invalidateCache();
         }
     }
 
@@ -768,27 +767,29 @@ public class User implements PermEntity
         Long next = null;
 
         //timed groups
-        List<List<TimedValue<String>>> ll = new ArrayList();
-        ll.add(timedGroups);
+        List<SimpleEntry<SimpleEntry<String, String>, List<TimedValue<String>>>> ll = new ArrayList();
+        List<SimpleEntry<String, String>> tosavegroups = new ArrayList();
+        ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(null, null), timedGroups));
         for (Server s : servers.values())
         {
-            ll.add(s.getTimedGroupsString());
+            ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(s.getServer(), null), s.getTimedGroupsString()));
             for (World w : s.getWorlds().values())
-                ll.add(w.getTimedGroupsString());
+                ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(s.getServer(), w.getWorld()), w.getTimedGroupsString()));
         }
 
-        for (List<TimedValue<String>> l : ll)
+        for (SimpleEntry<SimpleEntry<String, String>, List<TimedValue<String>>> l : ll)
         {
-            for (int i = 0; i < l.size(); i++)
+            for (int i = 0; i < l.getValue().size(); i++)
             {
-                TimedValue<String> g = l.get(i);
+                TimedValue<String> g = l.getValue().get(i);
                 long end = g.getStart().getTime() + g.getDuration() * 1000;
                 if (end < System.currentTimeMillis())
                 {
-                    BungeePerms.getInstance().getDebug().log("removing timedgroup " + g.getValue() + " from user " + name);
-                    l.remove(g);
+                    BungeePerms.getInstance().getDebug().log("removing timed group " + g.getValue() + " from user " + name + " (" + l.getKey().getKey() + "," + l.getKey().getValue() + ")");
+                    l.getValue().remove(g);
                     i--;
                     dosave = true;
+                    tosavegroups.add(l.getKey());
                 }
                 else
                 {
@@ -799,27 +800,29 @@ public class User implements PermEntity
 
         //timed perms
         ll = new ArrayList();
-        ll.add(timedPerms);
+        List<SimpleEntry<String, String>> tosaveperms = new ArrayList();
+        ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(null, null), timedPerms));
         for (Server s : servers.values())
         {
-            ll.add(s.getTimedPerms());
+            ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(s.getServer(), null), s.getTimedPerms()));
             for (World w : s.getWorlds().values())
-                ll.add(w.getTimedPerms());
+                ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(s.getServer(), w.getWorld()), w.getTimedPerms()));
         }
 
-        for (List<TimedValue<String>> l : ll)
+        for (SimpleEntry<SimpleEntry<String, String>, List<TimedValue<String>>> l : ll)
         {
-            for (int i = 0; i < l.size(); i++)
+            for (int i = 0; i < l.getValue().size(); i++)
             {
-                TimedValue<String> p = l.get(i);
+                TimedValue<String> p = l.getValue().get(i);
                 long end = p.getStart().getTime() + p.getDuration() * 1000;
                 if (end < System.currentTimeMillis())
                 {
                     //remove timed perm
-                    BungeePerms.getInstance().getDebug().log("removing timed permission " + p.getValue() + " from user " + name);
-                    l.remove(p);
+                    BungeePerms.getInstance().getDebug().log("removing timed permission " + p.getValue() + " from user " + name + " (" + l.getKey().getKey() + "," + l.getKey().getValue() + ")");
+                    l.getValue().remove(p);
                     i--;
                     dosave = true;
+                    tosaveperms.add(l.getKey());
                 }
                 else
                 {
@@ -830,7 +833,18 @@ public class User implements PermEntity
 
         if (dosave)
         {
-            BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveUser(this, true);
+            //save
+            for (SimpleEntry<String, String> sw : tosavegroups)
+            {
+                BungeePerms.getInstance().getDebug().log("saving timed groups for user " + name + " (" + sw.getKey() + "," + sw.getValue() + ")");
+                BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveUserTimedGroups(this, sw.getKey(), sw.getValue());
+            }
+            for (SimpleEntry<String, String> sw : tosaveperms)
+            {
+                BungeePerms.getInstance().getDebug().log("saving timed permissions for user " + name + " (" + sw.getKey() + "," + sw.getValue() + ")");
+                BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveUserTimedPerms(this, sw.getKey(), sw.getValue());
+            }
+
             flushCache();
 //            BungeePerms.getInstance().getNetworkNotifier().reloadUser(this, null);
             BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(this);

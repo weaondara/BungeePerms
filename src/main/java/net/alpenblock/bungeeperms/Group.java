@@ -16,10 +16,10 @@
  */
 package net.alpenblock.bungeeperms;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -541,27 +541,30 @@ public class Group implements Comparable<Group>, PermEntity
         Long next = null;
 
         //timed inheritances
-        List<List<TimedValue<String>>> ll = new ArrayList();
-        ll.add(timedInheritances);
+        List<SimpleEntry<SimpleEntry<String, String>, List<TimedValue<String>>>> ll = new ArrayList();
+        List<SimpleEntry<String, String>> tosaveinherit = new ArrayList();
+        ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(null, null), timedInheritances));
         for (Server s : servers.values())
         {
-            ll.add(s.getTimedGroupsString());
+            ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(s.getServer(), null), s.getTimedGroupsString()));
             for (World w : s.getWorlds().values())
-                ll.add(w.getTimedGroupsString());
+                ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(s.getServer(), w.getWorld()), w.getTimedGroupsString()));
         }
 
-        for (List<TimedValue<String>> l : ll)
+        for (SimpleEntry<SimpleEntry<String, String>, List<TimedValue<String>>> l : ll)
         {
-            for (int i = 0; i < l.size(); i++)
+            for (int i = 0; i < l.getValue().size(); i++)
             {
-                TimedValue g = l.get(i);
+                TimedValue<String> g = l.getValue().get(i);
                 long end = g.getStart().getTime() + g.getDuration() * 1000;
                 if (end < System.currentTimeMillis())
                 {
-                    //remove timed group
-                    l.remove(g);
+                    //remove timed inheritance
+                    BungeePerms.getInstance().getDebug().log("removing timed inheritance " + g.getValue() + " from group " + name + " (" + l.getKey().getKey() + "," + l.getKey().getValue() + ")");
+                    l.getValue().remove(g);
                     i--;
                     dosave = true;
+                    tosaveinherit.add(l.getKey());
                 }
                 else
                 {
@@ -572,26 +575,29 @@ public class Group implements Comparable<Group>, PermEntity
 
         //timed perms
         ll = new ArrayList();
-        ll.add(timedPerms);
+        List<SimpleEntry<String, String>> tosaveperms = new ArrayList();
+        ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(null, null), timedPerms));
         for (Server s : servers.values())
         {
-            ll.add(s.getTimedPerms());
+            ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(s.getServer(), null), s.getTimedPerms()));
             for (World w : s.getWorlds().values())
-                ll.add(w.getTimedPerms());
+                ll.add(new SimpleEntry<>(new SimpleEntry<String, String>(s.getServer(), w.getWorld()), w.getTimedPerms()));
         }
 
-        for (List<TimedValue<String>> l : ll)
+        for (SimpleEntry<SimpleEntry<String, String>, List<TimedValue<String>>> l : ll)
         {
-            for (int i = 0; i < l.size(); i++)
+            for (int i = 0; i < l.getValue().size(); i++)
             {
-                TimedValue p = l.get(i);
+                TimedValue<String> p = l.getValue().get(i);
                 long end = p.getStart().getTime() + p.getDuration() * 1000;
                 if (end < System.currentTimeMillis())
                 {
                     //remove timed perm
-                    l.remove(p);
+                    BungeePerms.getInstance().getDebug().log("removing timed permission " + p.getValue() + " from group " + name + " (" + l.getKey().getKey() + "," + l.getKey().getValue() + ")");
+                    l.getValue().remove(p);
                     i--;
                     dosave = true;
+                    tosaveperms.add(l.getKey());
                 }
                 else
                 {
@@ -602,8 +608,23 @@ public class Group implements Comparable<Group>, PermEntity
 
         if (dosave)
         {
-            BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveGroup(this, true);
-            flushCache();
+            //save
+            for (SimpleEntry<String, String> sw : tosaveinherit)
+            {
+                BungeePerms.getInstance().getDebug().log("saving timed inherits for group " + name + " (" + sw.getKey() + "," + sw.getValue() + ")");
+                BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveGroupTimedInheritances(this, sw.getKey(), sw.getValue());
+            }
+            for (SimpleEntry<String, String> sw : tosaveperms)
+            {
+                BungeePerms.getInstance().getDebug().log("saving timed permissions for group " + name + " (" + sw.getKey() + "," + sw.getValue() + ")");
+                BungeePerms.getInstance().getPermissionsManager().getBackEnd().saveGroupTimedPerms(this, sw.getKey(), sw.getValue());
+            }
+
+            //invalidate everything
+            for (Group g : BungeePerms.getInstance().getPermissionsManager().getGroups())
+                g.invalidateCache();
+            for (User u : BungeePerms.getInstance().getPermissionsManager().getUsers())
+                u.invalidateCache();
 //            BungeePerms.getInstance().getNetworkNotifier().reloadGroup(this, null);
             BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(this);
         }
