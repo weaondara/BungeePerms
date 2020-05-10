@@ -4,7 +4,7 @@ version: '${build.fullversion.resource}'
 author: [wea_ondara, AuroraRainbow]
 load: startup
 
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI, Vault, WorldEdit, AsyncWorldEdit, FastAsyncWorldEdit, Essentials]
 
 commands:
     bungeepermsbukkitbridge:
