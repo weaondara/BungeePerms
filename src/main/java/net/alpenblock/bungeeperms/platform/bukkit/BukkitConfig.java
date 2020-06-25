@@ -20,6 +20,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.io.BackEndType;
 
 @Getter
 public class BukkitConfig extends BPConfig
@@ -68,5 +69,16 @@ public class BukkitConfig extends BPConfig
         newconf.setBool("permissions.superpermscompat", oldconf.getBoolean("superpermscompat", false));
 
         newconf.setBool("network.standalone", oldconf.getBoolean("standalone", false));
+    }
+
+    @Override
+    public void validate()
+    {
+        super.validate();
+        if (standalone && getBackendType() == BackEndType.UPSTREAM)
+        {
+            BukkitPlugin.getInstance().getLogger().severe("[Config] Invalid backend type " + getBackendType() + " for standalone mode! Falling back to YAML backend!");
+            setBackendType(BackEndType.YAML);
+        }
     }
 }

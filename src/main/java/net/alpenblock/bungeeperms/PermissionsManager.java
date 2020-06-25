@@ -33,6 +33,8 @@ import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.io.MySQLBackEnd;
 import net.alpenblock.bungeeperms.io.MySQLUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.UUIDPlayerDB;
+import net.alpenblock.bungeeperms.io.UpstreamBackEnd;
+import net.alpenblock.bungeeperms.io.UpstreamUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.YAMLBackEnd;
 import net.alpenblock.bungeeperms.io.YAMLUUIDPlayerDB;
 import net.alpenblock.bungeeperms.io.migrate.Migrate2MySQL;
@@ -95,6 +97,11 @@ public class PermissionsManager
                 backEnd = new MySQLBackEnd();
                 if (config.isUseUUIDs())
                     UUIDPlayerDB = new MySQLUUIDPlayerDB();
+                break;
+            case UPSTREAM:
+                backEnd = new UpstreamBackEnd();
+                if (config.isUseUUIDs())
+                    UUIDPlayerDB = new UpstreamUUIDPlayerDB();
                 break;
             default:
                 throw new IllegalStateException("This should not have happened!");
