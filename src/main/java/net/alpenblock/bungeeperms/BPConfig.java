@@ -69,6 +69,10 @@ public class BPConfig
     private boolean asyncCommands;
     private Locale locale;
     private boolean aliasCommand;
+    
+    //upstream
+    private String upstreamhost;
+    private int upstreamport;
 
     //tmp at runtime
     @Setter
@@ -124,7 +128,11 @@ public class BPConfig
         asyncCommands = config.getBoolean("misc.async-commands", true);
         locale = Locale.forLanguageTag(config.getString("misc.locale", Statics.localeString(new Locale("en", "GB"))));
         aliasCommand = config.getBoolean("misc.alias-command", true);
-
+        
+        //upstream
+        upstreamhost = config.getString("upstream.host", "localhost");
+        upstreamport = config.getInt("upstream.port", 5678);
+        
         validate();
     }
 

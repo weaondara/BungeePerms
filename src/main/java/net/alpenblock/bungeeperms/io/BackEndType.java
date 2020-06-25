@@ -20,7 +20,8 @@ public enum BackEndType
 {
 
     YAML,
-    MySQL;
+    MySQL,
+    UPSTREAM;
 
     public static BackEndType getByName(String name)
     {

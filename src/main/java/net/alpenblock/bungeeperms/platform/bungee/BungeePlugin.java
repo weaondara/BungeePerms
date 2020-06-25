@@ -19,7 +19,6 @@ package net.alpenblock.bungeeperms.platform.bungee;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +28,7 @@ import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.TabCompleter;
+import net.alpenblock.bungeeperms.UpstreamServer;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
@@ -56,6 +56,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     private BungeeEventDispatcher dispatcher;
     private BungeeNotifier notifier;
     private PluginMessageSender pmsender;
+    private UpstreamServer upstreamServer;
 
     private BungeePerms bungeeperms;
 
@@ -94,11 +95,18 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     {
         ProxyServer.getInstance().registerChannel(BungeePerms.CHANNEL);
         bungeeperms.enable();
+        
+        //start upstream server
+        upstreamServer = new UpstreamServer();
+        upstreamServer.start();
     }
 
     @Override
     public void onDisable()
     {
+        //stop upstream server
+        upstreamServer.stop();
+        
         bungeeperms.disable();
         ProxyServer.getInstance().unregisterChannel(BungeePerms.CHANNEL);
     }

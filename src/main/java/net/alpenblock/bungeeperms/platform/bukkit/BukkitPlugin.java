@@ -32,6 +32,7 @@ import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.TabCompleter;
+import net.alpenblock.bungeeperms.io.upstream.UpstreamIO;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.bukkit.bridge.BridgeManager;
 import net.alpenblock.bungeeperms.platform.Sender;
@@ -65,6 +66,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     private BukkitEventDispatcher dispatcher;
     private BukkitNotifier notifier;
     private PluginMessageSender pmsender;
+    private UpstreamIO upstreamio;
 
     private BungeePerms bungeeperms;
 
@@ -88,6 +90,10 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
         config.load();
         conf = new BukkitConfig(config);
         conf.load();
+        
+        //init upstream util
+        upstreamio = new UpstreamIO();
+        upstreamio.start();
 
         //register commands
         loadcmds();
