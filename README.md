@@ -1,3 +1,5 @@
+![Logo](https://drop.cutiepie.at/d/ou923gv3vjkal7er)
+
 # BungeePerms
 a permissions plugin for BungeeCord and Spigot/PaperSpigot
 
@@ -15,22 +17,6 @@ Dev builds of this project are available at http://ci.wea-ondara.net/job/BungeeP
 
 **Maven Repo**
 
-For BungeePerms 3 use
-```xml
-<repositories>
-    <repository>
-        <id>bungeeperms-repo</id>
-        <url>http://repo.wea-ondara.net/repository/public/</url>
-    </repository>
-</repositories>
-<dependencies>
-    <dependency>
-        <groupId>net.alpenblock</groupId>
-        <artifactId>BungeePerms</artifactId>
-        <version>3.0-dev-80</version>
-    </dependency>
-</dependencies>
-```
 
 For BungeePerms 4 use
 ```xml
@@ -49,6 +35,22 @@ For BungeePerms 4 use
 </dependencies>
 ```
 
+For BungeePerms 3 (outdated) use
+```xml
+<repositories>
+    <repository>
+        <id>bungeeperms-repo</id>
+        <url>http://repo.wea-ondara.net/repository/public/</url>
+    </repository>
+</repositories>
+<dependencies>
+    <dependency>
+        <groupId>net.alpenblock</groupId>
+        <artifactId>BungeePerms</artifactId>
+        <version>3.0-dev-80</version>
+    </dependency>
+</dependencies>
+```
 
 **Functionality:**
 
