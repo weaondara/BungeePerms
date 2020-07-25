@@ -1812,8 +1812,8 @@ public class PermissionsManager
      *
      * @param group the group which should no longer inherit
      * @param toremove the timed group which should no longer be inherited
-     * @param server
-     * @param world
+     * @param server optional: the server
+     * @param world optional: the world
      */
     public void removeGroupTimedInheritance(Group group, Group toremove, String server, String world)
     {
