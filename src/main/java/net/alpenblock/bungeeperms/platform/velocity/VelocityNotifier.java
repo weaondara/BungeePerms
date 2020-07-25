@@ -16,6 +16,7 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
+import net.alpenblock.bungeeperms.platform.proxy.NetworkType;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import net.alpenblock.bungeeperms.BungeePerms;

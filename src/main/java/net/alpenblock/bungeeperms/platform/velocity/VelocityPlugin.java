@@ -16,10 +16,10 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
+import com.velocitypowered.api.command.Command;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.plugin.Plugin;
 import lombok.Getter;
-import net.alpenblock.bungeeperms.*;
-import net.alpenblock.bungeeperms.platform.*;
 import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
 
 import java.io.File;
@@ -29,6 +29,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.TabCompleter;
+import net.alpenblock.bungeeperms.platform.PlatformPlugin;
+import net.alpenblock.bungeeperms.platform.PlatformType;
+import net.alpenblock.bungeeperms.platform.PluginMessageSender;
+import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 
 @Plugin(id = "BungeePerms", name = "BungeePerms", version = "1", authors = {"wea_ondara", "AuroraRainbow"})
 @Getter
@@ -38,7 +44,7 @@ public class VelocityPlugin implements PlatformPlugin
     @Getter
     private static VelocityPlugin instance;
 
-    private VelocityConfig config;
+    private ProxyConfig config;
 
     //platform dependend parts
     private VelocityEventListener listener;
@@ -92,12 +98,12 @@ public class VelocityPlugin implements PlatformPlugin
         ProxyServer.getInstance().unregisterChannel(BungeePerms.CHANNEL);
     }
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
+    public boolean onCommand(CommandSource sender, Command cmd, String label, String[] args)
     {
-        return bungeeperms.getCommandHandler().onCommand(new VelocitySender(sender), cmd.getName(), label, args);
+        return bungeeperms.getCommandHandler().onCommand(new VelocitySender(sender), "bungeeperms", label, args);
     }
 
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args)
+    public List<String> onTabComplete(CommandSource sender, CommandSource cmd, String label, String[] args)
     {
         return TabCompleter.tabComplete(new VelocitySender(sender), args);
 //        List<String> l = new ArrayList<>();
@@ -202,27 +208,9 @@ public class VelocityPlugin implements PlatformPlugin
     }
 
     @Override
-    public Logger getLogger() {
-        return;
-    }
-
-    @Override
-    public PlatformType getPlatformType() {
-        return null;
-    }
-
-    @Override
     public boolean isChatApiPresent()
     {
-        try
-        {
-            Class.forName("net.md_5.bungee.api.chat.BaseComponent");
-            return true;
-        }
-        catch (Throwable t)
-        {
-            return false;
-        }
+        return true;
     }
 
     @Override
@@ -284,7 +272,7 @@ public class VelocityPlugin implements PlatformPlugin
         }
 
         @Override
-        public void execute(final CommandSender sender, final String[] args)
+        public void execute(final CommandSource sender, final String[] args)
         {
             final Command cmd = this;
             Runnable r = new Runnable()
@@ -303,7 +291,7 @@ public class VelocityPlugin implements PlatformPlugin
         }
 
         @Override
-        public Iterable<String> onTabComplete(CommandSender sender, String[] args)
+        public Iterable<String> onTabComplete(CommandSource sender, String[] args)
         {
             return VelocityPlugin.this.onTabComplete(sender, this, "", args);
         }

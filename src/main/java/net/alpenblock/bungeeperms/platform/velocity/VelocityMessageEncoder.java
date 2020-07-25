@@ -21,12 +21,13 @@ import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
+import net.kyori.text.Component;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class VelocityMessageEncoder extends MessageEncoder
 {
 
-    public static BaseComponent[] convert(net.md_5.bungee.api.chat.BaseComponent[] components)
+    public static BaseComponent[] convert(Component components)
     {
         BaseComponent[] ret = new BaseComponent[components.length];
         for (int i = 0; i < components.length; i++)
@@ -36,7 +37,7 @@ public class VelocityMessageEncoder extends MessageEncoder
         return ret;
     }
 
-    public static net.md_5.bungee.api.chat.BaseComponent[] convert(BaseComponent[] components)
+    public static Component convert(BaseComponent[] components)
     {
         net.md_5.bungee.api.chat.BaseComponent[] ret = new net.md_5.bungee.api.chat.BaseComponent[components.length];
         for (int i = 0; i < components.length; i++)
@@ -47,7 +48,7 @@ public class VelocityMessageEncoder extends MessageEncoder
     }
 
     private ComponentBuilder builder;
-    net.md_5.bungee.api.chat.BaseComponent[] cache;
+    Component[] cache;
 
     private List<String> list;
     private String current;

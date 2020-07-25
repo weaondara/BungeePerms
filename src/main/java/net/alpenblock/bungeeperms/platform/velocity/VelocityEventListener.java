@@ -16,6 +16,8 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
+import com.velocitypowered.api.proxy.ProxyServer;
+import net.alpenblock.bungeeperms.platform.proxy.NetworkType;
 import net.alpenblock.bungeeperms.BungeePerms;
 import java.util.HashMap;
 import java.util.List;
@@ -31,17 +33,7 @@ import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.platform.EventListener;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.LoginEvent;
-import net.md_5.bungee.api.event.PermissionCheckEvent;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.PluginMessageEvent;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
-import net.md_5.bungee.api.event.TabCompleteEvent;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.event.EventHandler;
+import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 
 public class VelocityEventListener implements Listener, EventListener
 {
@@ -51,9 +43,9 @@ public class VelocityEventListener implements Listener, EventListener
 
     private boolean enabled = false;
 
-    private final VelocityConfig config;
+    private final ProxyConfig config;
 
-    public VelocityEventListener(VelocityConfig config)
+    public VelocityEventListener(ProxyConfig config)
     {
         this.config = config;
     }

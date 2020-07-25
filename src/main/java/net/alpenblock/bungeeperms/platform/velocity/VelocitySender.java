@@ -16,22 +16,23 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.ConsoleCommandSource;
+import com.velocitypowered.api.proxy.Player;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.kyori.text.Component;
 
 @Getter
 @AllArgsConstructor
 public class VelocitySender implements Sender
 {
 
-    private CommandSender sender;
+    private CommandSource sender;
 
     @Override
     public void sendMessage(String message)
@@ -43,22 +44,18 @@ public class VelocitySender implements Sender
     public void sendMessage(MessageEncoder encoder)
     {
         VelocityMessageEncoder e = (VelocityMessageEncoder) encoder;
-        if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
-        {
-
-            BaseComponent[] converted = VelocityMessageEncoder.convert(e.create());
-            sender.sendMessage(converted);
-        }
-        else
-        {
-            sender.sendMessage(e.toString());
-        }
+        Component converted = VelocityMessageEncoder.convert(e.create());
+        sender.sendMessage(converted);
     }
 
     @Override
     public String getName()
     {
-        return sender.getName();
+        if(sender instanceof Player)
+            return ((Player)sender).getUsername();
+        else if(sender instanceof ConsoleCommandSource)
+            return "CONSOLE";
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -68,24 +65,23 @@ public class VelocitySender implements Sender
         {
             return UUID.fromString("00000000-0000-0000-0000-000000000000");
         }
-        else if (sender instanceof ProxiedPlayer)
+        else if (sender instanceof Player)
         {
-            return ((ProxiedPlayer) sender).getUniqueId();
+            return ((Player) sender).getUniqueId();
         }
         else
         {
             return null;
-//            throw new UnsupportedOperationException("CommandSender derivative " + sender.getClass().getName() + " is unknown!");
         }
     }
 
     @Override
     public String getServer()
     {
-        if (sender instanceof ProxiedPlayer)
+        if (sender instanceof Player)
         {
-            ProxiedPlayer pp = (ProxiedPlayer) sender;
-            return pp.getServer() != null ? pp.getServer().getInfo().getName() : null;
+            Player pp = (Player) sender;
+            return pp.getCurrentServer().isPresent() ? pp.getCurrentServer().get().getServerInfo().getName() : null;
         }
         else
         {
@@ -103,13 +99,13 @@ public class VelocitySender implements Sender
     @Override
     public boolean isConsole()
     {
-        return sender.getClass().getName().equals("net.md_5.bungee.command.ConsoleCommandSender");
+        return sender instanceof ConsoleCommandSource;
     }
 
     @Override
     public boolean isPlayer()
     {
-        return sender instanceof ProxiedPlayer;
+        return sender instanceof Player;
     }
 
     @Override
@@ -117,5 +113,4 @@ public class VelocitySender implements Sender
     {
         return false;
     }
-
 }

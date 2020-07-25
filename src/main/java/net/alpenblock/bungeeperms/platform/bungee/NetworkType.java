@@ -16,6 +16,7 @@
  */
 package net.alpenblock.bungeeperms.platform.bungee;
 
+@Deprecated
 public enum NetworkType
 {
     Standalone,

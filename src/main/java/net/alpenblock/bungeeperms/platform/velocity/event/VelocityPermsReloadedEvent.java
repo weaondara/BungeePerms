@@ -14,14 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.alpenblock.bungeeperms.platform.velocity;
+package net.alpenblock.bungeeperms.platform.velocity.event;
 
-import net.alpenblock.bungeeperms.platform.bungee.*;
-
-public enum NetworkType
+public class VelocityPermsReloadedEvent extends Event
 {
-    Standalone,
-    ServerDependend,
-    ServerDependendBlacklist,
-    Global;
+    
 }

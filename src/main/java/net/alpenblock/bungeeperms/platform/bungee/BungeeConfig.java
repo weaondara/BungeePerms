@@ -24,6 +24,7 @@ import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.Config;
 
 @Getter
+@Deprecated
 public class BungeeConfig extends BPConfig
 {
 

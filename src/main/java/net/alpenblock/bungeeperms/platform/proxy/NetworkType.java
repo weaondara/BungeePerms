@@ -14,26 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.alpenblock.bungeeperms.platform.velocity;
+package net.alpenblock.bungeeperms.platform.proxy;
 
-import net.alpenblock.bungeeperms.BungeePerms;
-import net.alpenblock.bungeeperms.platform.PluginMessageSender;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
+import net.alpenblock.bungeeperms.platform.bungee.*;
 
-public class VelocityPluginMessageSender implements PluginMessageSender
+public enum NetworkType
 {
-
-    @Override
-    public void sendPluginMessage(String target, String channel, String msg)
-    {
-        ServerInfo si = ProxyServer.getInstance().getServerInfo(target);
-        if (si == null)
-        {
-            BungeePerms.getLogger().info("No server found for " + target);
-            return;
-        }
-
-        si.sendData(channel, msg.getBytes());
-    }
+    Standalone,
+    ServerDependend,
+    ServerDependendBlacklist,
+    Global;
 }
