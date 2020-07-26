@@ -22,7 +22,8 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.kyori.text.Component;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.kyori.text.ComponentBuilder;
+
 
 public class VelocityMessageEncoder extends MessageEncoder
 {

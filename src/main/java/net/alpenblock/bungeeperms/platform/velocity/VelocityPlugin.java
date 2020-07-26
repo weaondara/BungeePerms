@@ -16,9 +16,14 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
+import com.google.inject.Inject;
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
 
@@ -30,10 +35,14 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.TabCompleter;
+import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PlatformType;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
+import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 
 @Plugin(id = "BungeePerms", name = "BungeePerms", version = "1", authors = {"wea_ondara", "AuroraRainbow"})
@@ -43,6 +52,16 @@ public class VelocityPlugin implements PlatformPlugin
 
     @Getter
     private static VelocityPlugin instance;
+   
+    @Getter
+    private static final ChannelIdentifier ci;
+    static{
+        String[] split = BungeePerms.CHANNEL.split(":");
+        ci = MinecraftChannelIdentifier.create(split[0], split[1]);
+    }
+    
+    @Inject
+    private ProxyServer proxyServer;
 
     private ProxyConfig config;
 
@@ -68,7 +87,7 @@ public class VelocityPlugin implements PlatformPlugin
         //load config
         Config conf = new Config(this, "/config.yml");
         conf.load();
-        config = new VelocityConfig(conf);
+        config = new ProxyConfig(conf);
         config.load();
 
         //register commands
@@ -87,7 +106,7 @@ public class VelocityPlugin implements PlatformPlugin
     @Override
     public void onEnable()
     {
-        ProxyServer.getInstance().registerChannel(BungeePerms.CHANNEL);
+        proxyServer.getChannelRegistrar().register(ci);
         bungeeperms.enable();
     }
 
@@ -95,7 +114,7 @@ public class VelocityPlugin implements PlatformPlugin
     public void onDisable()
     {
         bungeeperms.disable();
-        ProxyServer.getInstance().unregisterChannel(BungeePerms.CHANNEL);
+        proxyServer.getChannelRegistrar().unregister(ci);
     }
 
     public boolean onCommand(CommandSource sender, Command cmd, String label, String[] args)
@@ -124,46 +143,46 @@ public class VelocityPlugin implements PlatformPlugin
     private void loadcmds()
     {
         CmdExec cmd = new CmdExec("bungeeperms", null, config.isAliasCommand() ? Statics.array("bp") : new String[0]);
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, cmd);
+        proxyServer.getCommandManager().register(cmd, config.isAliasCommand() ? Statics.array("bp") : new String[0]);
     }
 
 //plugin info
     @Override
     public String getPluginName()
     {
-        return this.getDescription().getName();
+        return this.getPluginName();
     }
 
     @Override
     public String getVersion()
     {
-        return this.getDescription().getVersion();
+        return this.getVersion();
     }
 
     @Override
     public String getAuthor()
     {
-        return this.getDescription().getAuthor();
+        return this.getAuthor();
     }
 
     @Override
     public String getPluginFolderPath()
     {
-        return this.getDataFolder().getAbsolutePath();
+        return this.getPluginFolderPath();
     }
 
     @Override
     public File getPluginFolder()
     {
-        return this.getDataFolder();
+        return this.getPluginFolder();
     }
 
     @Override
-    public Sender getPlayer(String name)
+    public VelocitySender getPlayer(String name)
     {
-        CommandSender sender = ProxyServer.getInstance().getPlayer(name);
+        CommandSource sender = proxyServer.getPlayer(name).get();
 
-        Sender s = null;
+        VelocitySender s = null;
 
         if (sender != null)
         {
@@ -174,11 +193,11 @@ public class VelocityPlugin implements PlatformPlugin
     }
 
     @Override
-    public Sender getPlayer(UUID uuid)
+    public VelocitySender getPlayer(UUID uuid)
     {
-        CommandSender sender = ProxyServer.getInstance().getPlayer(uuid);
+        CommandSource sender = proxyServer.getPlayer(uuid).get();
 
-        Sender s = null;
+        VelocitySender s = null;
 
         if (sender != null)
         {
@@ -189,9 +208,9 @@ public class VelocityPlugin implements PlatformPlugin
     }
 
     @Override
-    public Sender getConsole()
+    public VelocitySender getConsole()
     {
-        return new VelocitySender(ProxyServer.getInstance().getConsole());
+        return new VelocitySender(proxyServer.getConsoleCommandSource());
     }
 
     @Override
@@ -199,7 +218,7 @@ public class VelocityPlugin implements PlatformPlugin
     {
         List<Sender> senders = new ArrayList<>();
 
-        for (ProxiedPlayer pp : ProxyServer.getInstance().getPlayers())
+        for (Player pp : proxyServer.getAllPlayers())
         {
             senders.add(new VelocitySender(pp));
         }
@@ -222,25 +241,25 @@ public class VelocityPlugin implements PlatformPlugin
     @Override
     public int registerRepeatingTask(Runnable r, long delay, long interval)
     {
-        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, interval, TimeUnit.MILLISECONDS).getId();
+        return proxyServer.getScheduler().buildTask(this, r).repeat(interval, TimeUnit.MILLISECONDS).delay(delay, TimeUnit.MILLISECONDS).schedule();
     }
 
     @Override
     public int runTaskLater(Runnable r, long delay)
     {
-        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS).getId();
+        return proxyServer.getScheduler().buildTask(this, r).delay(delay, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public int runTaskLaterAsync(Runnable r, long delay)
     {
-        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS).getId();
+        return proxyServer.getScheduler().buildTask(this, r).delay(delay, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void cancelTask(int id)
     {
-        ProxyServer.getInstance().getScheduler().cancel(id);
+        proxyServer.getScheduler().cancel(id);
     }
 
     @Override
@@ -261,6 +280,11 @@ public class VelocityPlugin implements PlatformPlugin
         {
             getLogger().severe("Could not start metrics!");
         }
+    }
+
+    @Override
+    public Logger getLogger() {
+        return this.getLogger();
     }
 
     private class CmdExec extends Command implements TabExecutor
@@ -285,7 +309,7 @@ public class VelocityPlugin implements PlatformPlugin
                 }
             };
             if (config.isAsyncCommands())
-                ProxyServer.getInstance().getScheduler().runAsync(instance, r);
+                proxyServer.getScheduler().runAsync(instance, r);
             else
                 r.run();
         }

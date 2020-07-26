@@ -21,7 +21,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.User;
 
 @AllArgsConstructor
-public class VelocityPermsUserChangedEvent extends Event
+public class VelocityPermsUserChangedEvent
 {
 
     @Getter

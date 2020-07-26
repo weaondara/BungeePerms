@@ -16,33 +16,36 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
+import com.google.inject.Inject;
+import com.velocitypowered.api.proxy.ProxyServer;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.EventDispatcher;
 import net.alpenblock.bungeeperms.platform.velocity.event.VelocityPermsGroupChangedEvent;
 import net.alpenblock.bungeeperms.platform.velocity.event.VelocityPermsReloadedEvent;
 import net.alpenblock.bungeeperms.platform.velocity.event.VelocityPermsUserChangedEvent;
-import net.md_5.bungee.api.ProxyServer;
 
 public class VelocityEventDispatcher implements EventDispatcher
 {
-
+    @Inject
+    private ProxyServer proxyServer;
+    
     @Override
     public void dispatchReloadedEvent()
     {
-        ProxyServer.getInstance().getPluginManager().callEvent(new VelocityPermsReloadedEvent());
+        proxyServer.getEventManager().fireAndForget(new VelocityPermsReloadedEvent());
     }
 
     @Override
     public void dispatchGroupChangeEvent(Group g)
     {
-        ProxyServer.getInstance().getPluginManager().callEvent(new VelocityPermsGroupChangedEvent(g));
+        proxyServer.getEventManager().fireAndForget(new VelocityPermsGroupChangedEvent(g));
     }
 
     @Override
     public void dispatchUserChangeEvent(User u)
     {
-        ProxyServer.getInstance().getPluginManager().callEvent(new VelocityPermsUserChangedEvent(u));
+        proxyServer.getEventManager().fireAndForget(new VelocityPermsUserChangedEvent(u));
     }
 
 }

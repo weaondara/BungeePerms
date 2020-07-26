@@ -26,6 +26,7 @@ import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.kyori.text.Component;
+import net.kyori.text.TextComponent;
 
 @Getter
 @AllArgsConstructor
@@ -37,7 +38,8 @@ public class VelocitySender implements Sender
     @Override
     public void sendMessage(String message)
     {
-        sender.sendMessage(message);
+        TextComponent t = TextComponent.builder().content(message).build();
+        sender.sendMessage(t);
     }
 
     @Override
@@ -92,8 +94,15 @@ public class VelocitySender implements Sender
     @Override
     public String getWorld()
     {
-        VelocityEventListener l = (VelocityEventListener) BungeePerms.getInstance().getEventListener();
-        return l.getPlayerWorlds().get(sender.getName());
+        if (sender instanceof Player)
+        {
+            VelocityEventListener l = (VelocityEventListener) BungeePerms.getInstance().getEventListener();
+            return l.getPlayerWorlds().get(((Player) sender).getUsername());
+        } 
+        else 
+        {
+            return null;
+        }
     }
 
     @Override

@@ -16,24 +16,31 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
+import com.google.inject.Inject;
+import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 
 public class VelocityPluginMessageSender implements PluginMessageSender
 {
 
+    @Inject
+    private ProxyServer proxyServer;
+    
     @Override
     public void sendPluginMessage(String target, String channel, String msg)
     {
-        ServerInfo si = ProxyServer.getInstance().getServerInfo(target);
+        RegisteredServer si = proxyServer.getServer(target).get();
+        String[] split = channel.split(":");
+        MinecraftChannelIdentifier i = MinecraftChannelIdentifier.create(split[0], split[1]);
         if (si == null)
         {
             BungeePerms.getLogger().info("No server found for " + target);
             return;
         }
 
-        si.sendData(channel, msg.getBytes());
+        proxyServer.getServer(target).get().sendPluginMessage(i, msg.getBytes());
     }
 }

@@ -16,7 +16,7 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity.event;
 
-public class VelocityPermsReloadedEvent extends Event
+public class VelocityPermsReloadedEvent
 {
-    
+
 }

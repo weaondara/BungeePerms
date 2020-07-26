@@ -16,6 +16,12 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
+import com.google.inject.Inject;
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.alpenblock.bungeeperms.platform.proxy.NetworkType;
 import net.alpenblock.bungeeperms.BungeePerms;
@@ -35,9 +41,12 @@ import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 
-public class VelocityEventListener implements Listener, EventListener
-{
 
+public class VelocityEventListener implements EventListener
+{
+    @Inject
+    private ProxyServer proxyServer;
+    
     @Getter
     private final Map<String, String> playerWorlds = new HashMap<>();
 
@@ -58,7 +67,7 @@ public class VelocityEventListener implements Listener, EventListener
             return;
         }
         enabled = true;
-        ProxyServer.getInstance().getPluginManager().registerListener(VelocityPlugin.getInstance(), this);
+        proxyServer.getEventManager().register(VelocityPlugin.getInstance(), this);
     }
 
     @Override
@@ -69,7 +78,7 @@ public class VelocityEventListener implements Listener, EventListener
             return;
         }
         enabled = false;
-        ProxyServer.getInstance().getPluginManager().unregisterListener(this);
+        proxyServer.getEventManager().unregisterListeners(this);
     }
 
     @EventHandler(priority = Byte.MIN_VALUE + 1)
@@ -81,11 +90,11 @@ public class VelocityEventListener implements Listener, EventListener
             return;
         }
 
-        String playername = e.getConnection().getName();
+        String playername = e.getPlayer().getUsername();
         UUID uuid = null;
         if (config.isUseUUIDs())
         {
-            uuid = e.getConnection().getUniqueId();
+            uuid = e.getPlayer().getUniqueId();
             BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN_UUID, playername, uuid));
 
             //update uuid player db
@@ -123,9 +132,9 @@ public class VelocityEventListener implements Listener, EventListener
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
-    public void onDisconnect(PlayerDisconnectEvent e)
+    public void onDisconnect(DisconnectEvent e)
     {
-        String playername = e.getPlayer().getName();
+        String playername = e.getPlayer().getUsername();
         UUID uuid = e.getPlayer().getUniqueId();
 
         User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
@@ -135,21 +144,21 @@ public class VelocityEventListener implements Listener, EventListener
     @EventHandler(priority = Byte.MIN_VALUE)
     public void onPermissionCheck(PermissionCheckEvent e)
     {
-        CommandSender s = e.getSender();
+        CommandSource s = e.getSender();
         e.setHasPermission(BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new VelocitySender(s), e.getPermission()));
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void onTabcomplete(TabCompleteEvent e)
     {
-        if(!(e.getSender() instanceof ProxiedPlayer))
+        if(!(e.getSender() instanceof Player))
             return;
         if ((e.getCursor().startsWith("/bp") && config.isAliasCommand())
             || e.getCursor().startsWith("/bungeeperms"))
         {
             String[] s = e.getCursor().split(" ", 2);
             String[] args = s.length == 2 ? s[1].split(" ") : new String[0];
-            e.getSuggestions().addAll(VelocityPlugin.getInstance().onTabComplete((ProxiedPlayer)e.getSender(), null, null, args));
+            e.getSuggestions().addAll(VelocityPlugin.getInstance().onTabComplete((Player)e.getSender(), null, null, args));
         }
 //        if (!config.isTabComplete())
 //        {
@@ -184,7 +193,7 @@ public class VelocityEventListener implements Listener, EventListener
                     VelocityPlugin.getInstance().getNotifier().sendUUIDAndPlayer(e.getPlayer().getName(), e.getPlayer().getUniqueId());
                 }
             };
-            ProxyServer.getInstance().getScheduler().schedule(VelocityPlugin.getInstance(), r, 1, TimeUnit.SECONDS);
+            proxyServer.getScheduler().buildTask(VelocityPlugin.getInstance(), r).delay(l, TimeUnit.SECONDS);
         }
     }
 
@@ -196,15 +205,15 @@ public class VelocityEventListener implements Listener, EventListener
             return;
         }
 
-        if (!(e.getReceiver() instanceof ProxiedPlayer))
+        if (!(e.getTarget() instanceof Player))
         {
             //lock out silly hackers
-            BungeePerms.getLogger().severe(Lang.translate(Lang.MessageType.INTRUSION_DETECTED, e.getSender()));
+            BungeePerms.getLogger().severe(Lang.translate(Lang.MessageType.INTRUSION_DETECTED, e.getSource()));
             e.setCancelled(true);
             return;
         }
 
-        net.md_5.bungee.api.connection.Server scon = (net.md_5.bungee.api.connection.Server) e.getSender();
+        Server scon = e.getSource();
 
         //check network type // ignore if standalone or not registered server
         if (config.getNetworkType() == NetworkType.Standalone)

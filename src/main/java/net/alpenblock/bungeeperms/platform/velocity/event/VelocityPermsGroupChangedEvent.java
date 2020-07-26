@@ -21,7 +21,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.Group;
 
 @AllArgsConstructor
-public class VelocityPermsGroupChangedEvent extends Event
+public class VelocityPermsGroupChangedEvent
 {
     @Getter                                                                                                                                                                                                 
     private final Group group;
