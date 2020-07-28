@@ -50,13 +50,11 @@ public interface PlatformPlugin
 
     public MessageEncoder newMessageEncoder();
 
-    public int registerRepeatingTask(Runnable r, long delay, long interval);
+    public ScheduledTask registerRepeatingTask(Runnable r, long delay, long interval);
 
-    public int runTaskLater(Runnable r, long delay);
+    public ScheduledTask runTaskLater(Runnable r, long delay);
 
-    public int runTaskLaterAsync(Runnable r, long delay);
-
-    public void cancelTask(int id);
+    public ScheduledTask runTaskLaterAsync(Runnable r, long delay);
 
     public Integer getBuild();
 }

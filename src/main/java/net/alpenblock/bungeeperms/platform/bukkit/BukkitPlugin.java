@@ -38,6 +38,7 @@ import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PlatformType;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
+import net.alpenblock.bungeeperms.platform.ScheduledTask;
 import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -287,27 +288,21 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
     }
 
     @Override
-    public int registerRepeatingTask(Runnable r, long delay, long interval)
+    public ScheduledTask registerRepeatingTask(Runnable r, long delay, long interval)
     {
-        return getServer().getScheduler().runTaskTimer(this, r, (long) (delay * MILLI2TICK), (long) (interval * MILLI2TICK)).getTaskId();
+        return new BukkitScheduledTask(getServer().getScheduler().runTaskTimer(this, r, (long) (delay * MILLI2TICK), (long) (interval * MILLI2TICK)));
     }
 
     @Override
-    public int runTaskLater(Runnable r, long delay)
+    public ScheduledTask runTaskLater(Runnable r, long delay)
     {
-        return getServer().getScheduler().runTaskLater(this, r, (long) (delay * MILLI2TICK)).getTaskId();
+        return new BukkitScheduledTask(getServer().getScheduler().runTaskLater(this, r, (long) (delay * MILLI2TICK)));
     }
 
     @Override
-    public int runTaskLaterAsync(Runnable r, long delay)
+    public ScheduledTask runTaskLaterAsync(Runnable r, long delay)
     {
-        return getServer().getScheduler().runTaskLaterAsynchronously(this, r, (long) (delay * MILLI2TICK)).getTaskId();
-    }
-
-    @Override
-    public void cancelTask(int id)
-    {
-        getServer().getScheduler().cancelTask(id);
+        return new BukkitScheduledTask(getServer().getScheduler().runTaskLaterAsynchronously(this, r, (long) (delay * MILLI2TICK)));
     }
 
     //for compat

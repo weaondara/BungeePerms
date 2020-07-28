@@ -33,9 +33,10 @@ import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 @RequiredArgsConstructor
 public class VelocityNotifier implements NetworkNotifier
 {
+
     @Inject
     private ProxyServer proxyServer;
-    
+
     private final ProxyConfig config;
 
     @Override
@@ -133,7 +134,7 @@ public class VelocityNotifier implements NetworkNotifier
             }
 
             //send message
-            pp.getCurrentServer().get().sendPluginMessage(VelocityPlugin.getCi(), msg.getBytes());
+            pp.getCurrentServer().get().sendPluginMessage(VelocityPlugin.CHANNEL_ID, msg.getBytes());
             sendConfig(pp.getCurrentServer().get().getServerInfo());
         }
     }
@@ -168,7 +169,7 @@ public class VelocityNotifier implements NetworkNotifier
             }
 
             //send message
-            pp.getCurrentServer().get().sendPluginMessage(VelocityPlugin.getCi(), msg.getBytes());
+            pp.getCurrentServer().get().sendPluginMessage(VelocityPlugin.CHANNEL_ID, msg.getBytes());
             sendConfig(pp.getCurrentServer().get().getServerInfo());
         }
     }
@@ -202,7 +203,7 @@ public class VelocityNotifier implements NetworkNotifier
             }
 
             //send message
-            proxyServer.getServer(si).get().sendPluginMessage(VelocityPlugin.getCi(), msg.getBytes());
+            proxyServer.getServer(si).get().sendPluginMessage(VelocityPlugin.CHANNEL_ID, msg.getBytes());
             sendConfig(proxyServer.getServer(si).get().getServerInfo());
         }
     }
@@ -218,13 +219,13 @@ public class VelocityNotifier implements NetworkNotifier
             if (lastConfigUpdate + 5 * 60 * 1000 < now)
             {
                 lastConfigUpdate = now;
-                rs.sendPluginMessage(VelocityPlugin.getCi(), ("configcheck"
-                                                    + ";" + info.getName()
-                                                    + ";" + config.getBackendType()
-                                                    + ";" + config.isUseUUIDs()
-                                                    + ";" + config.getResolvingMode()
-                                                    + ";" + config.isGroupPermission()
-                                                    + ";" + config.isUseRegexPerms()).getBytes());
+                rs.sendPluginMessage(VelocityPlugin.CHANNEL_ID, ("configcheck"
+                                                                 + ";" + info.getName()
+                                                                 + ";" + config.getBackendType()
+                                                                 + ";" + config.isUseUUIDs()
+                                                                 + ";" + config.getResolvingMode()
+                                                                 + ";" + config.isGroupPermission()
+                                                                 + ";" + config.isUseRegexPerms()).getBytes());
             }
         }
     }

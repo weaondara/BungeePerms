@@ -138,21 +138,19 @@ public class PlatformPluginTest
             return null;
         }
 
-        public int registerRepeatingTask(Runnable r, long delay, long interval)
+        public ScheduledTask registerRepeatingTask(Runnable r, long delay, long interval)
         {
-            return 0;
+            return null;
         }
 
-        @Override
-        public int runTaskLater(Runnable r, long delay)
+        public ScheduledTask runTaskLater(Runnable r, long delay)
         {
-            return 0;
+            return null;
         }
 
-        @Override
-        public int runTaskLaterAsync(Runnable r, long delay)
+        public ScheduledTask runTaskLaterAsync(Runnable r, long delay)
         {
-            return 0;
+            return null;
         }
 
         public void cancelTask(int id)

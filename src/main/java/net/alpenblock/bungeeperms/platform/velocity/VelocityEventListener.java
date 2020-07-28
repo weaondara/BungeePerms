@@ -18,11 +18,21 @@ package net.alpenblock.bungeeperms.platform.velocity;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.event.PostOrder;
+import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.permission.PermissionFunction;
+import com.velocitypowered.api.permission.PermissionProvider;
+import com.velocitypowered.api.permission.PermissionSubject;
+import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.ServerConnection;
 import net.alpenblock.bungeeperms.platform.proxy.NetworkType;
 import net.alpenblock.bungeeperms.BungeePerms;
 import java.util.HashMap;
@@ -41,12 +51,12 @@ import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 
-
 public class VelocityEventListener implements EventListener
 {
+
     @Inject
     private ProxyServer proxyServer;
-    
+
     @Getter
     private final Map<String, String> playerWorlds = new HashMap<>();
 
@@ -81,20 +91,48 @@ public class VelocityEventListener implements EventListener
         proxyServer.getEventManager().unregisterListeners(this);
     }
 
-    @EventHandler(priority = Byte.MIN_VALUE + 1)
-    public void onLogin(LoginEvent e)
+    @Subscribe(order = PostOrder.FIRST)
+    public void onPermSetup(PermissionsSetupEvent e)
+    {
+        //load perms
+        if(e.getSubject() instanceof Player)
+            onLogin((Player)e.getSubject());
+        
+        //set up perm provider
+        e.setProvider(new PermissionProvider()
+        {
+            @Override
+            public PermissionFunction createFunction(PermissionSubject subject)
+            {
+                return new PermissionFunction()
+                {
+                    @Override
+                    public Tristate getPermissionValue(String permission)
+                    {
+                        if (!(subject instanceof CommandSource))
+                            return Tristate.fromBoolean(false);
+                        CommandSource s = (CommandSource) subject;
+                        boolean res = BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new VelocitySender(s), permission);
+                        return Tristate.fromBoolean(res);
+                    }
+                };
+            }
+        });
+    }
+
+    public void onLogin(Player p)
     {
         //don't load if cancelled
-        if (e.isCancelled())
-        {
-            return;
-        }
+//        if (!e.getResult().isAllowed()) //not applicable
+//        {
+//            return;
+//        }
 
-        String playername = e.getPlayer().getUsername();
+        String playername = p.getUsername();
         UUID uuid = null;
         if (config.isUseUUIDs())
         {
-            uuid = e.getPlayer().getUniqueId();
+            uuid = p.getUniqueId();
             BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN_UUID, playername, uuid));
 
             //update uuid player db
@@ -131,7 +169,7 @@ public class VelocityEventListener implements EventListener
         }
     }
 
-    @EventHandler(priority = Byte.MAX_VALUE)
+    @Subscribe(order = PostOrder.LAST)
     public void onDisconnect(DisconnectEvent e)
     {
         String playername = e.getPlayer().getUsername();
@@ -141,46 +179,11 @@ public class VelocityEventListener implements EventListener
         pm().removeUserFromCache(u);
     }
 
-    @EventHandler(priority = Byte.MIN_VALUE)
-    public void onPermissionCheck(PermissionCheckEvent e)
-    {
-        CommandSource s = e.getSender();
-        e.setHasPermission(BungeePerms.getInstance().getPermissionsChecker().hasPermOrConsoleOnServerInWorld(new VelocitySender(s), e.getPermission()));
-    }
-
-    @EventHandler(priority = Byte.MIN_VALUE)
-    public void onTabcomplete(TabCompleteEvent e)
-    {
-        if(!(e.getSender() instanceof Player))
-            return;
-        if ((e.getCursor().startsWith("/bp") && config.isAliasCommand())
-            || e.getCursor().startsWith("/bungeeperms"))
-        {
-            String[] s = e.getCursor().split(" ", 2);
-            String[] args = s.length == 2 ? s[1].split(" ") : new String[0];
-            e.getSuggestions().addAll(VelocityPlugin.getInstance().onTabComplete((Player)e.getSender(), null, null, args));
-        }
-//        if (!config.isTabComplete())
-//        {
-//            return;
-//        }
-//        if (e.getSuggestions().isEmpty())
-//        {
-//            for (ProxiedPlayer pp : ProxyServer.getInstance().getPlayers())
-//            {
-//                if (Statics.toLower(pp.getName()).startsWith(Statics.toLower(e.getCursor())))
-//                {
-//                    e.getSuggestions().add(pp.getName());
-//                }
-//            }
-//        }
-    }
-
-    @EventHandler(priority = Byte.MIN_VALUE)
+    @Subscribe(order = PostOrder.FIRST)
     public void onServerConnected(final ServerConnectedEvent e)
     {
         //plugin messages will arrive later because plugin channels are not registered at this very moment
-        playerWorlds.put(e.getPlayer().getName(), null);
+        playerWorlds.put(e.getPlayer().getUsername(), null);
 
         //send delayed uuid message to bukkit
         if (config.isUseUUIDs())
@@ -190,53 +193,53 @@ public class VelocityEventListener implements EventListener
                 @Override
                 public void run()
                 {
-                    VelocityPlugin.getInstance().getNotifier().sendUUIDAndPlayer(e.getPlayer().getName(), e.getPlayer().getUniqueId());
+                    VelocityPlugin.getInstance().getNotifier().sendUUIDAndPlayer(e.getPlayer().getUsername(), e.getPlayer().getUniqueId());
                 }
             };
-            proxyServer.getScheduler().buildTask(VelocityPlugin.getInstance(), r).delay(l, TimeUnit.SECONDS);
+            proxyServer.getScheduler().buildTask(VelocityPlugin.getInstance(), r).delay(1, TimeUnit.SECONDS);
         }
     }
 
-    @EventHandler(priority = Byte.MIN_VALUE)
+    @Subscribe(order = PostOrder.FIRST)
     public void onMessage(PluginMessageEvent e)
     {
-        if (!e.getTag().equalsIgnoreCase(BungeePerms.CHANNEL))
-        {
-            return;
-        }
+//        if (!e.getTag().equalsIgnoreCase(BungeePerms.CHANNEL))
+//        {
+//            return;
+//        }
 
         if (!(e.getTarget() instanceof Player))
         {
             //lock out silly hackers
             BungeePerms.getLogger().severe(Lang.translate(Lang.MessageType.INTRUSION_DETECTED, e.getSource()));
-            e.setCancelled(true);
+            e.setResult(PluginMessageEvent.ForwardResult.handled());
             return;
         }
 
-        Server scon = e.getSource();
+        ServerConnection scon = (ServerConnection) e.getSource();
 
         //check network type // ignore if standalone or not registered server
         if (config.getNetworkType() == NetworkType.Standalone)
         {
-            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_STANDALONE, scon.getInfo().getName()));
-            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_STANDALONE, scon.getInfo().getName()));
-            BungeePerms.getInstance().getDebug().log("sender = " + scon.getInfo().getName());
+            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_STANDALONE, scon.getServerInfo().getName()));
+            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_STANDALONE, scon.getServerInfo().getName()));
+            BungeePerms.getInstance().getDebug().log("sender = " + scon.getServerInfo().getName());
             BungeePerms.getInstance().getDebug().log("msg = " + new String(e.getData()));
             return;
         }
-        if (config.getNetworkType() == NetworkType.ServerDependend && !config.getNetworkServers().contains(scon.getInfo().getName()))
+        if (config.getNetworkType() == NetworkType.ServerDependend && !config.getNetworkServers().contains(scon.getServerInfo().getName()))
         {
-            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDEND, scon.getInfo().getName()));
-            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDEND, scon.getInfo().getName()));
-            BungeePerms.getInstance().getDebug().log("sender = " + scon.getInfo().getName());
+            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDEND, scon.getServerInfo().getName()));
+            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDEND, scon.getServerInfo().getName()));
+            BungeePerms.getInstance().getDebug().log("sender = " + scon.getServerInfo().getName());
             BungeePerms.getInstance().getDebug().log("msg = " + new String(e.getData()));
             return;
         }
-        if (config.getNetworkType() == NetworkType.ServerDependendBlacklist && config.getNetworkServers().contains(scon.getInfo().getName()))
+        if (config.getNetworkType() == NetworkType.ServerDependendBlacklist && config.getNetworkServers().contains(scon.getServerInfo().getName()))
         {
-            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDENDBLACKLIST, scon.getInfo().getName()));
-            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDENDBLACKLIST, scon.getInfo().getName()));
-            BungeePerms.getInstance().getDebug().log("sender = " + scon.getInfo().getName());
+            BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDENDBLACKLIST, scon.getServerInfo().getName()));
+            BungeePerms.getInstance().getDebug().log(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERDEPENDENDBLACKLIST, scon.getServerInfo().getName()));
+            BungeePerms.getInstance().getDebug().log("sender = " + scon.getServerInfo().getName());
             BungeePerms.getInstance().getDebug().log("msg = " + new String(e.getData()));
             return;
         }
@@ -264,7 +267,7 @@ public class VelocityEventListener implements EventListener
             pm().removeUserFromCache(u);
 
             //forward plugin message to network
-            BungeePerms.getInstance().getNetworkNotifier().deleteUser(u, scon.getInfo().getName());
+            BungeePerms.getInstance().getNetworkNotifier().deleteUser(u, scon.getServerInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("deletegroup"))
         {
@@ -276,7 +279,7 @@ public class VelocityEventListener implements EventListener
                 u.invalidateCache();
 
             //forward plugin message to network
-            BungeePerms.getInstance().getNetworkNotifier().deleteGroup(g, scon.getInfo().getName());
+            BungeePerms.getInstance().getNetworkNotifier().deleteGroup(g, scon.getServerInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloaduser"))
         {
@@ -288,7 +291,7 @@ public class VelocityEventListener implements EventListener
             {
                 return;
             }
-            BungeePerms.getInstance().getNetworkNotifier().reloadUser(u, scon.getInfo().getName());
+            BungeePerms.getInstance().getNetworkNotifier().reloadUser(u, scon.getServerInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloadgroup"))
         {
@@ -300,21 +303,21 @@ public class VelocityEventListener implements EventListener
             {
                 return;
             }
-            BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g, scon.getInfo().getName());
+            BungeePerms.getInstance().getNetworkNotifier().reloadGroup(g, scon.getServerInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloadusers"))
         {
             pm().reloadUsers();
 
             //forward plugin message to network
-            BungeePerms.getInstance().getNetworkNotifier().reloadUsers(scon.getInfo().getName());
+            BungeePerms.getInstance().getNetworkNotifier().reloadUsers(scon.getServerInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloadgroups"))
         {
             pm().reloadGroups();
 
             //forward plugin message to network
-            BungeePerms.getInstance().getNetworkNotifier().reloadGroups(scon.getInfo().getName());
+            BungeePerms.getInstance().getNetworkNotifier().reloadGroups(scon.getServerInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("reloadall"))
         {
@@ -326,10 +329,10 @@ public class VelocityEventListener implements EventListener
                     BungeePerms.getInstance().reload(false);
                 }
             };
-            ProxyServer.getInstance().getScheduler().runAsync(VelocityPlugin.getInstance(), r);
+            proxyServer.getScheduler().buildTask(VelocityPlugin.getInstance(), r).schedule();
 
             //forward plugin message to network except to server which issued the reload
-            BungeePerms.getInstance().getNetworkNotifier().reloadAll(scon.getInfo().getName());
+            BungeePerms.getInstance().getNetworkNotifier().reloadAll(scon.getServerInfo().getName());
         }
         else if (cmd.equalsIgnoreCase("configcheck"))
         {
@@ -339,33 +342,33 @@ public class VelocityEventListener implements EventListener
             PermissionsResolver.ResolvingMode resolvingmode = PermissionsResolver.ResolvingMode.valueOf(data.get(4));
             boolean groupperm = Boolean.parseBoolean(data.get(5));
             boolean regexperm = Boolean.parseBoolean(data.get(6));
-            if (!scon.getInfo().getName().equals(servername))
+            if (!scon.getServerInfo().getName().equals(servername))
             {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERNAME, scon.getInfo().getName()));
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_SERVERNAME, scon.getServerInfo().getName()));
             }
             if (config.getBackendType() != backend)
             {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_BACKEND, scon.getInfo().getName()));
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_BACKEND, scon.getServerInfo().getName()));
             }
             if (config.isUseUUIDs() != useuuid)
             {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_USEUUID, scon.getInfo().getName()));
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_USEUUID, scon.getServerInfo().getName()));
             }
             if (config.getResolvingMode() != resolvingmode)
             {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_RESOLVINGMODE, scon.getInfo().getName()));
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_RESOLVINGMODE, scon.getServerInfo().getName()));
             }
             if (config.isGroupPermission() != groupperm)
             {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_GROUPPERMISSION, scon.getInfo().getName()));
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_GROUPPERMISSION, scon.getServerInfo().getName()));
             }
             if (config.isUseRegexPerms() != regexperm)
             {
-                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_REGEXPERMISSIONS, scon.getInfo().getName()));
+                BungeePerms.getLogger().warning(Lang.translate(Lang.MessageType.MISCONFIGURATION) + ": " + Lang.translate(Lang.MessageType.MISCONFIG_BUNGEE_REGEXPERMISSIONS, scon.getServerInfo().getName()));
             }
         }
 
-        e.setCancelled(true);
+        e.setResult(PluginMessageEvent.ForwardResult.handled());
     }
 
     private PermissionsManager pm()
