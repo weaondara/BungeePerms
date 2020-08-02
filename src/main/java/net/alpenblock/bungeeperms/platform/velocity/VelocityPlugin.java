@@ -19,6 +19,7 @@ package net.alpenblock.bungeeperms.platform.velocity;
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -119,14 +120,14 @@ public class VelocityPlugin implements PlatformPlugin
         bungeeperms.getPermissionsResolver().registerProcessor(new GroupProcessor());
     }
 
-    @Subscribe
+    @Subscribe(order = PostOrder.FIRST)
     public void onEnable(ProxyInitializeEvent event) //onEnable
     {
         proxyServer.getChannelRegistrar().register(CHANNEL_ID);
         bungeeperms.enable();
     }
 
-    @Subscribe
+    @Subscribe(order = PostOrder.LAST)
     public void onDisable(ProxyShutdownEvent event) //onDisable
     {
         bungeeperms.disable();
