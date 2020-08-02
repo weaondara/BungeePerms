@@ -99,7 +99,7 @@ public class VelocityPlugin implements PlatformPlugin
 
         //metrics
         //startMetrics();
-
+        
         //load config
         Config conf = new Config(this, "/config.yml");
         conf.load();
@@ -109,10 +109,10 @@ public class VelocityPlugin implements PlatformPlugin
         //register commands
         loadcmds();
 
-        listener = new VelocityEventListener(config, proxyServer);
-        dispatcher = new VelocityEventDispatcher();
-        notifier = new VelocityNotifier(config);
-        pmsender = new VelocityPluginMessageSender();
+        listener = new VelocityEventListener(proxyServer, config);
+        dispatcher = new VelocityEventDispatcher(proxyServer);
+        notifier = new VelocityNotifier(proxyServer, config);
+        pmsender = new VelocityPluginMessageSender(proxyServer);
 
         bungeeperms = new BungeePerms(this, config, pmsender, notifier, listener, dispatcher);
         bungeeperms.load();
@@ -327,9 +327,10 @@ public class VelocityPlugin implements PlatformPlugin
             return VelocityPlugin.this.onTabComplete(sender, this, "", args);
         }
     }
-    
+
     private static class L4JWrapper extends Logger
     {
+
         private final org.slf4j.Logger parent;
 
         public L4JWrapper(org.slf4j.Logger parent)

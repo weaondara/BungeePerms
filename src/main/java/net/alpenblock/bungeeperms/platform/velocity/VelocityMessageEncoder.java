@@ -53,7 +53,7 @@ public class VelocityMessageEncoder extends MessageEncoder
     }
 
     private ComponentBuilder builder;
-    Component cache;
+    private Component cache;
 
     private List<String> list;
     private String current;

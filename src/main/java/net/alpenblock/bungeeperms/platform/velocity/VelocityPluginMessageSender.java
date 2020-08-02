@@ -16,18 +16,18 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
-import com.google.inject.Inject;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import lombok.RequiredArgsConstructor;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
 
+@RequiredArgsConstructor
 public class VelocityPluginMessageSender implements PluginMessageSender
 {
 
-    @Inject
-    private ProxyServer proxyServer;
+    private final ProxyServer proxyServer;
     
     @Override
     public void sendPluginMessage(String target, String channel, String msg)

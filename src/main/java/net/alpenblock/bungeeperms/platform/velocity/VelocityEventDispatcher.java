@@ -16,8 +16,8 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
-import com.google.inject.Inject;
 import com.velocitypowered.api.proxy.ProxyServer;
+import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.EventDispatcher;
@@ -25,10 +25,10 @@ import net.alpenblock.bungeeperms.platform.velocity.event.VelocityPermsGroupChan
 import net.alpenblock.bungeeperms.platform.velocity.event.VelocityPermsReloadedEvent;
 import net.alpenblock.bungeeperms.platform.velocity.event.VelocityPermsUserChangedEvent;
 
+@AllArgsConstructor
 public class VelocityEventDispatcher implements EventDispatcher
 {
-    @Inject
-    private ProxyServer proxyServer;
+    private final ProxyServer proxyServer;
     
     @Override
     public void dispatchReloadedEvent()

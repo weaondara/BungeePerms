@@ -40,7 +40,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import javax.rmi.CORBA.Util;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsManager;
@@ -51,10 +53,11 @@ import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 
+@RequiredArgsConstructor
 public class VelocityEventListener implements EventListener
 {
 
-    private ProxyServer proxyServer;
+    private final ProxyServer proxyServer;
 
     @Getter
     private final Map<String, String> playerWorlds = new HashMap<>();
@@ -62,13 +65,6 @@ public class VelocityEventListener implements EventListener
     private boolean enabled = false;
 
     private final ProxyConfig config;
-
-    @Inject
-    public VelocityEventListener(ProxyConfig config, ProxyServer proxyserver)
-    {
-        this.config = config;
-        this.proxyServer = proxyserver;
-    }
 
     @Override
     public void enable()
@@ -89,7 +85,13 @@ public class VelocityEventListener implements EventListener
             return;
         }
         enabled = false;
-        proxyServer.getEventManager().unregisterListeners(this);
+        try
+        {
+            proxyServer.getEventManager().unregisterListeners(this);
+        }
+        catch (Exception ignore)
+        {
+        }
     }
 
     @Subscribe(order = PostOrder.FIRST)

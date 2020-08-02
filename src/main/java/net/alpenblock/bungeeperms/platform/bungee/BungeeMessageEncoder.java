@@ -47,7 +47,7 @@ public class BungeeMessageEncoder extends MessageEncoder
     }
 
     private ComponentBuilder builder;
-    net.md_5.bungee.api.chat.BaseComponent[] cache;
+    private net.md_5.bungee.api.chat.BaseComponent[] cache;
 
     private List<String> list;
     private String current;

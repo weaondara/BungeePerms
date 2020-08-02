@@ -16,7 +16,6 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
-import com.google.inject.Inject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -34,9 +33,7 @@ import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 public class VelocityNotifier implements NetworkNotifier
 {
 
-    @Inject
-    private ProxyServer proxyServer;
-
+    private final ProxyServer proxyServer;
     private final ProxyConfig config;
 
     @Override

@@ -33,7 +33,7 @@ import net.kyori.text.TextComponent;
 public class VelocitySender implements Sender
 {
 
-    private CommandSource sender;
+    private final CommandSource sender;
 
     @Override
     public void sendMessage(String message)
@@ -53,9 +53,9 @@ public class VelocitySender implements Sender
     @Override
     public String getName()
     {
-        if(sender instanceof Player)
-            return ((Player)sender).getUsername();
-        else if(sender instanceof ConsoleCommandSource)
+        if (sender instanceof Player)
+            return ((Player) sender).getUsername();
+        else if (sender instanceof ConsoleCommandSource)
             return "CONSOLE";
         throw new UnsupportedOperationException();
     }
@@ -98,8 +98,8 @@ public class VelocitySender implements Sender
         {
             VelocityEventListener l = (VelocityEventListener) BungeePerms.getInstance().getEventListener();
             return l.getPlayerWorlds().get(((Player) sender).getUsername());
-        } 
-        else 
+        }
+        else
         {
             return null;
         }
