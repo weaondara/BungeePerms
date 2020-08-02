@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsChecker;
 import net.alpenblock.bungeeperms.User;
+import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -27,7 +28,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public class BungeePermissionsChecker extends PermissionsChecker
 {
 
-    private final BungeeConfig config;
+    private final ProxyConfig config;
 
 //with messageout
     /**

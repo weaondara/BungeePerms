@@ -19,7 +19,6 @@ package net.alpenblock.bungeeperms.platform.bungee;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +35,7 @@ import net.alpenblock.bungeeperms.platform.PlatformType;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
 import net.alpenblock.bungeeperms.platform.ScheduledTask;
 import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
+import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -50,7 +50,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     @Getter
     private static BungeePlugin instance;
 
-    private BungeeConfig config;
+    private ProxyConfig config;
 
     //platform dependend parts
     private BungeeEventListener listener;
@@ -74,7 +74,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
         //load config
         Config conf = new Config(this, "/config.yml");
         conf.load();
-        config = new BungeeConfig(conf);
+        config = new ProxyConfig(conf);
         config.load();
 
         //register commands

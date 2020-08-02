@@ -23,6 +23,8 @@ import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.NetworkNotifier;
+import net.alpenblock.bungeeperms.platform.proxy.NetworkType;
+import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -31,7 +33,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public class BungeeNotifier implements NetworkNotifier
 {
 
-    private final BungeeConfig config;
+    private final ProxyConfig config;
 
     @Override
     public void deleteUser(User u, String origin)

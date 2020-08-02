@@ -31,6 +31,8 @@ import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.io.BackEndType;
 import net.alpenblock.bungeeperms.platform.EventListener;
+import net.alpenblock.bungeeperms.platform.proxy.NetworkType;
+import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -51,9 +53,9 @@ public class BungeeEventListener implements Listener, EventListener
 
     private boolean enabled = false;
 
-    private final BungeeConfig config;
+    private final ProxyConfig config;
 
-    public BungeeEventListener(BungeeConfig config)
+    public BungeeEventListener(ProxyConfig config)
     {
         this.config = config;
     }
