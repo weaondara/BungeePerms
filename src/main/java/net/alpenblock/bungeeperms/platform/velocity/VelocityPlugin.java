@@ -341,19 +341,19 @@ public class VelocityPlugin implements PlatformPlugin
         @Override
         public void info(String msg)
         {
-            parent.info(msg); //To change body of generated methods, choose Tools | Templates.
+            parent.info(msg);
         }
 
         @Override
         public void warning(String msg)
         {
-            parent.warn(msg); //To change body of generated methods, choose Tools | Templates.
+            parent.warn(msg);
         }
 
         @Override
         public void severe(String msg)
         {
-            parent.error(msg); //To change body of generated methods, choose Tools | Templates.
+            parent.error(msg);
         }
     }
 }
