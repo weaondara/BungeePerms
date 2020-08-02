@@ -130,6 +130,7 @@
                             <include>com.google.code.gson:gson</include>
                             <include>org.bstats:bstats-bukkit</include>
                             <include>org.bstats:bstats-bungeecord</include>
+                            <include>org.yaml:snakeyaml</include>
                         </includes>
                     </artifactSet>
                     <relocations>
@@ -301,6 +302,11 @@
             <artifactId>bstats-bungeecord</artifactId>
             <version>1.5</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.18</version>
         </dependency>
     </dependencies>
 </project>

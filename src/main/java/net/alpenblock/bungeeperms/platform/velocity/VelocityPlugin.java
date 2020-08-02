@@ -16,6 +16,7 @@
  */
 package net.alpenblock.bungeeperms.platform.velocity;
 
+import com.google.inject.Inject;
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
@@ -32,10 +33,12 @@ import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
@@ -50,7 +53,7 @@ import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 import net.kyori.text.TextComponent;
 
-@Plugin(id = "bungeeperms", name = "BungeePerms", version = "@version@", authors =
+@Plugin(id = "bungeeperms", name = "BungeePerms", version = "dev", authors =
 {
     "wea_ondara", "AuroraRainbow"
 })
@@ -84,6 +87,7 @@ public class VelocityPlugin implements PlatformPlugin
 
     private final PlatformType platformType = PlatformType.Velocity;
 
+    @Inject
     public VelocityPlugin(ProxyServer proxyServer, Logger logger) //onLoad
     {
         //static
@@ -94,7 +98,7 @@ public class VelocityPlugin implements PlatformPlugin
         this.logger = logger;
 
         //metrics
-        startMetrics();
+        //startMetrics();
 
         //load config
         Config conf = new Config(this, "/config.yml");
@@ -105,7 +109,7 @@ public class VelocityPlugin implements PlatformPlugin
         //register commands
         loadcmds();
 
-        listener = new VelocityEventListener(config);
+        listener = new VelocityEventListener(config, proxyServer);
         dispatcher = new VelocityEventDispatcher();
         notifier = new VelocityNotifier(config);
         pmsender = new VelocityPluginMessageSender();
@@ -162,19 +166,22 @@ public class VelocityPlugin implements PlatformPlugin
     @Override
     public String getPluginName()
     {
-        return this.getPluginName();
+        Plugin p = this.getClass().getAnnotation(Plugin.class);
+        return p.name();
     }
 
     @Override
     public String getVersion()
     {
-        return this.getVersion();
+        Plugin p = this.getClass().getAnnotation(Plugin.class);
+        return p.version();
     }
 
     @Override
     public String getAuthor()
     {
-        return this.getAuthor();
+        Plugin p = this.getClass().getAnnotation(Plugin.class);
+        return Arrays.stream(p.authors()).collect(Collectors.joining(", "));
     }
 
     @Override

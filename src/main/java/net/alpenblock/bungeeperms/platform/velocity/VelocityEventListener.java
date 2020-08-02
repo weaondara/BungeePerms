@@ -54,7 +54,6 @@ import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 public class VelocityEventListener implements EventListener
 {
 
-    @Inject
     private ProxyServer proxyServer;
 
     @Getter
@@ -64,9 +63,11 @@ public class VelocityEventListener implements EventListener
 
     private final ProxyConfig config;
 
-    public VelocityEventListener(ProxyConfig config)
+    @Inject
+    public VelocityEventListener(ProxyConfig config, ProxyServer proxyserver)
     {
         this.config = config;
+        this.proxyServer = proxyserver;
     }
 
     @Override
