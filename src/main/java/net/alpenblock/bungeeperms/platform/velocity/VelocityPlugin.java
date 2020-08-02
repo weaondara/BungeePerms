@@ -88,14 +88,14 @@ public class VelocityPlugin implements PlatformPlugin
     private final PlatformType platformType = PlatformType.Velocity;
 
     @Inject
-    public VelocityPlugin(ProxyServer proxyServer, Logger logger) //onLoad
+    public VelocityPlugin(ProxyServer proxyServer, org.slf4j.Logger logger) //onLoad
     {
         //static
         instance = this;
 
         //init
         this.proxyServer = proxyServer;
-        this.logger = logger;
+        this.logger = new L4JWrapper(logger);
 
         //metrics
         //startMetrics();
@@ -325,6 +325,35 @@ public class VelocityPlugin implements PlatformPlugin
         public List<String> suggest(CommandSource sender, String[] args)
         {
             return VelocityPlugin.this.onTabComplete(sender, this, "", args);
+        }
+    }
+    
+    private static class L4JWrapper extends Logger
+    {
+        private final org.slf4j.Logger parent;
+
+        public L4JWrapper(org.slf4j.Logger parent)
+        {
+            super(parent.getName(), null);
+            this.parent = parent;
+        }
+
+        @Override
+        public void info(String msg)
+        {
+            parent.info(msg); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void warning(String msg)
+        {
+            parent.warn(msg); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void severe(String msg)
+        {
+            parent.error(msg); //To change body of generated methods, choose Tools | Templates.
         }
     }
 }
