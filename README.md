@@ -1,9 +1,9 @@
 ![Logo](https://drop.cutiepie.at/d/ou923gv3vjkal7er)
 
 # BungeePerms
-a permissions plugin for BungeeCord and Spigot/PaperSpigot
+a permissions plugin for BungeeCord/Velocity and Spigot/PaperSpigot
 
-BungeePerms is a permissions plugin for BungeeCord and Spigot. It overrides the built-in permissions systems
+BungeePerms is a permissions plugin for BungeeCord/Velocity and Spigot/PaperSpigot. It overrides the built-in permissions systems
 so you don't need BungeeCord/Spigot permissions (anymore). BungeePerms can form a network so that it's a single
 system managing all permissions in your network.
 
@@ -30,7 +30,7 @@ For BungeePerms 4 use
     <dependency>
         <groupId>net.alpenblock</groupId>
         <artifactId>BungeePerms</artifactId>
-        <version>4.0-dev-81</version>
+        <version>4.0-dev-108</version>
     </dependency>
 </dependencies>
 ```
