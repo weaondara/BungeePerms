@@ -91,7 +91,6 @@
             <url>file://${project.basedir}/lib/repository/</url>
         </repository>
     </repositories>
-    
     <build>
         <finalName>${build.name}</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -103,13 +102,60 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources/velocity</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <source>${maven.compiler.source}</source>
+                            <target>${maven.compiler.target}</target>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <excludes>
+                                <exclude>net/alpenblock/bungeeperms/platform/velocity/VelocityPlugin.java</exclude>
+                            </excludes>
+<!--                            <includes>
+                                <include>src/main/java</include>
+                                <include>../../../target/generated-sources/velocity/VelocityPlugin.java</include>
+                            </includes>-->
+                        </configuration>
+                    </execution>
+<!--                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <source>${maven.compiler.source}</source>
+                            <target>${maven.compiler.target}</target>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                        </configuration>
+                    </execution>-->
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -239,6 +285,30 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- for velocity plugin version insertion -->
+            <plugin> 
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>maven-replacer-plugin</artifactId>
+                <version>1.4.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <file>src/main/java/net/alpenblock/bungeeperms/platform/velocity/VelocityPlugin.java</file>
+                            <outputFile>target/generated-sources/velocity/VelocityPlugin.java</outputFile>
+                            <replacements>
+                                <replacement>
+                                    <token>@version@</token>
+                                    <value>${build.fullversion.resource}</value>
+                                </replacement>
+                            </replacements>                        
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

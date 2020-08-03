@@ -54,7 +54,7 @@ import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 import net.kyori.text.TextComponent;
 
-@Plugin(id = "bungeeperms", name = "BungeePerms", version = "dev", authors =
+@Plugin(id = "bungeeperms", name = "BungeePerms", version = "@version@", authors =
 {
     "wea_ondara", "AuroraRainbow"
 })
@@ -123,6 +123,9 @@ public class VelocityPlugin implements PlatformPlugin
     @Subscribe(order = PostOrder.FIRST)
     public void onEnable(ProxyInitializeEvent event) //onEnable
     {
+        //metrics
+        startMetrics();
+        
         proxyServer.getChannelRegistrar().register(CHANNEL_ID);
         bungeeperms.enable();
     }
@@ -167,22 +170,25 @@ public class VelocityPlugin implements PlatformPlugin
     @Override
     public String getPluginName()
     {
-        Plugin p = this.getClass().getAnnotation(Plugin.class);
-        return p.name();
+        return proxyServer.getPluginManager().fromInstance(this).get().getDescription().getName().get();
+//        Plugin p = this.getClass().getAnnotation(Plugin.class);
+//        return p.name();
     }
 
     @Override
     public String getVersion()
     {
-        Plugin p = this.getClass().getAnnotation(Plugin.class);
-        return p.version();
+        return proxyServer.getPluginManager().fromInstance(this).get().getDescription().getVersion().get();
+//        Plugin p = this.getClass().getAnnotation(Plugin.class);
+//        return p.version();
     }
 
     @Override
     public String getAuthor()
     {
-        Plugin p = this.getClass().getAnnotation(Plugin.class);
-        return Arrays.stream(p.authors()).collect(Collectors.joining(", "));
+        return String.join(", ", proxyServer.getPluginManager().fromInstance(this).get().getDescription().getAuthors());
+//        Plugin p = this.getClass().getAnnotation(Plugin.class);
+//        return Arrays.stream(p.authors()).collect(Collectors.joining(", "));
     }
 
     @Override
@@ -194,6 +200,9 @@ public class VelocityPlugin implements PlatformPlugin
     @Override
     public File getPluginFolder()
     {
+//        File file = new File(proxyServer.getPluginManager().fromInstance(this).get().getDescription().getSource().get().toFile().getParentFile(), getPluginName());
+//        System.out.println("file: "+file.getAbsolutePath());
+//        return file;
         return new File(System.getProperty("user.dir"), "plugins/BungeePerms");
     }
 
@@ -286,9 +295,11 @@ public class VelocityPlugin implements PlatformPlugin
     {
         try
         {
-            Class c = Class.forName("net.alpenblock.bungeeperms.metrics.bungee.Metrics");
-            Constructor cc = c.getConstructor(Plugin.class);
-            cc.newInstance(this);
+            Class cpd = Class.forName("net.alpenblock.bungeeperms.metrics.velocity.Metrics$PluginData");
+            Object plugindata = cpd.getConstructor(Object.class, ProxyServer.class, org.slf4j.Logger.class).newInstance(this, proxyServer, ((L4JWrapper)logger).parent);
+            Class c = Class.forName("net.alpenblock.bungeeperms.metrics.velocity.Metrics");
+            Constructor cc = c.getConstructor(cpd);
+            cc.newInstance(plugindata);
         }
         catch (Exception ex)
         {
