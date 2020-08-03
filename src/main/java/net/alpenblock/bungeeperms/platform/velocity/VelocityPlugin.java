@@ -34,17 +34,16 @@ import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.TabCompleter;
+import net.alpenblock.bungeeperms.UpstreamServer;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PlatformType;
@@ -83,6 +82,7 @@ public class VelocityPlugin implements PlatformPlugin
     private VelocityEventDispatcher dispatcher;
     private VelocityNotifier notifier;
     private PluginMessageSender pmsender;
+    private UpstreamServer upstreamServer;
 
     private BungeePerms bungeeperms;
 
@@ -128,11 +128,18 @@ public class VelocityPlugin implements PlatformPlugin
         
         proxyServer.getChannelRegistrar().register(CHANNEL_ID);
         bungeeperms.enable();
+        
+        //start upstream server
+        upstreamServer = new UpstreamServer();
+        upstreamServer.start();
     }
 
     @Subscribe(order = PostOrder.LAST)
     public void onDisable(ProxyShutdownEvent event) //onDisable
     {
+        //stop upstream server
+        upstreamServer.stop();
+        
         bungeeperms.disable();
         proxyServer.getChannelRegistrar().unregister(CHANNEL_ID);
     }
@@ -171,24 +178,18 @@ public class VelocityPlugin implements PlatformPlugin
     public String getPluginName()
     {
         return proxyServer.getPluginManager().fromInstance(this).get().getDescription().getName().get();
-//        Plugin p = this.getClass().getAnnotation(Plugin.class);
-//        return p.name();
     }
 
     @Override
     public String getVersion()
     {
         return proxyServer.getPluginManager().fromInstance(this).get().getDescription().getVersion().get();
-//        Plugin p = this.getClass().getAnnotation(Plugin.class);
-//        return p.version();
     }
 
     @Override
     public String getAuthor()
     {
         return String.join(", ", proxyServer.getPluginManager().fromInstance(this).get().getDescription().getAuthors());
-//        Plugin p = this.getClass().getAnnotation(Plugin.class);
-//        return Arrays.stream(p.authors()).collect(Collectors.joining(", "));
     }
 
     @Override
@@ -200,14 +201,11 @@ public class VelocityPlugin implements PlatformPlugin
     @Override
     public File getPluginFolder()
     {
-//        File file = new File(proxyServer.getPluginManager().fromInstance(this).get().getDescription().getSource().get().toFile().getParentFile(), getPluginName());
-//        System.out.println("file: "+file.getAbsolutePath());
-//        return file;
         return new File(System.getProperty("user.dir"), "plugins/BungeePerms");
     }
 
     @Override
-    public VelocitySender getPlayer(String name)
+    public Sender getPlayer(String name)
     {
         CommandSource sender = proxyServer.getPlayer(name).get();
 
@@ -222,7 +220,7 @@ public class VelocityPlugin implements PlatformPlugin
     }
 
     @Override
-    public VelocitySender getPlayer(UUID uuid)
+    public Sender getPlayer(UUID uuid)
     {
         CommandSource sender = proxyServer.getPlayer(uuid).get();
 
@@ -237,7 +235,7 @@ public class VelocityPlugin implements PlatformPlugin
     }
 
     @Override
-    public VelocitySender getConsole()
+    public Sender getConsole()
     {
         return new VelocitySender(proxyServer.getConsoleCommandSource());
     }
