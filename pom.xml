@@ -6,8 +6,8 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <build.major>${project.version}</build.major>
         <build.type>SNAPSHOT</build.type>
         <build.number>1</build.number>
@@ -73,6 +73,10 @@
             <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
         <repository>
+            <id>velocity</id>
+            <url>https://repo.velocitypowered.com/snapshots/</url>
+        </repository>
+        <repository>
             <id>repository</id>
             <releases>
                 <enabled>true</enabled>
@@ -87,7 +91,6 @@
             <url>file://${project.basedir}/lib/repository/</url>
         </repository>
     </repositories>
-    
     <build>
         <finalName>${build.name}</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -99,13 +102,60 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources/velocity</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <source>${maven.compiler.source}</source>
+                            <target>${maven.compiler.target}</target>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <excludes>
+                                <exclude>net/alpenblock/bungeeperms/platform/velocity/VelocityPlugin.java</exclude>
+                            </excludes>
+<!--                            <includes>
+                                <include>src/main/java</include>
+                                <include>../../../target/generated-sources/velocity/VelocityPlugin.java</include>
+                            </includes>-->
+                        </configuration>
+                    </execution>
+<!--                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <source>${maven.compiler.source}</source>
+                            <target>${maven.compiler.target}</target>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                        </configuration>
+                    </execution>-->
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -126,6 +176,7 @@
                             <include>com.google.code.gson:gson</include>
                             <include>org.bstats:bstats-bukkit</include>
                             <include>org.bstats:bstats-bungeecord</include>
+                            <include>org.yaml:snakeyaml</include>
                         </includes>
                     </artifactSet>
                     <relocations>
@@ -224,12 +275,40 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.1.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- for velocity plugin version insertion -->
+            <plugin> 
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>maven-replacer-plugin</artifactId>
+                <version>1.4.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <file>src/main/java/net/alpenblock/bungeeperms/platform/velocity/VelocityPlugin.java</file>
+                            <outputFile>target/generated-sources/velocity/VelocityPlugin.java</outputFile>
+                            <replacements>
+                                <replacement>
+                                    <token>@version@</token>
+                                    <value>${build.fullversion.resource}</value>
+                                </replacement>
+                            </replacements>                        
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -240,6 +319,11 @@
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
             <version>1.12-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.velocitypowered</groupId>
+            <artifactId>velocity-api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -288,6 +372,11 @@
             <artifactId>bstats-bungeecord</artifactId>
             <version>1.5</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.18</version>
         </dependency>
     </dependencies>
 </project>

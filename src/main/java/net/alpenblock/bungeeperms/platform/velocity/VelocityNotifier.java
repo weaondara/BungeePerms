@@ -14,25 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.alpenblock.bungeeperms.platform.bungee;
+package net.alpenblock.bungeeperms.platform.velocity;
 
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.proxy.server.ServerInfo;
+import net.alpenblock.bungeeperms.platform.proxy.NetworkType;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.NetworkNotifier;
-import net.alpenblock.bungeeperms.platform.proxy.NetworkType;
 import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 @RequiredArgsConstructor
-public class BungeeNotifier implements NetworkNotifier
+public class VelocityNotifier implements NetworkNotifier
 {
 
+    private final ProxyServer proxyServer;
     private final ProxyConfig config;
 
     @Override
@@ -108,30 +109,30 @@ public class BungeeNotifier implements NetworkNotifier
             return;
         }
 
-        ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(player);
-        if (pp != null && pp.getServer() != null)
+        Player pp = proxyServer.getPlayer(player).get();
+        if (pp != null && pp.getCurrentServer() != null)
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                && !Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+                && !Statics.listContains(config.getNetworkServers(), pp.getCurrentServer().get().getServerInfo().getName()))
             {
                 return;
             }
             if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
-                && Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+                && Statics.listContains(config.getNetworkServers(), pp.getCurrentServer().get().getServerInfo().getName()))
             {
                 return;
             }
 
             //no feedback loop
-            if (origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
+            if (origin != null && pp.getCurrentServer().get().getServerInfo().getName().equalsIgnoreCase(origin))
             {
                 return;
             }
 
             //send message
-            pp.getServer().getInfo().sendData(BungeePerms.CHANNEL, msg.getBytes());
-            sendConfig(pp.getServer().getInfo());
+            pp.getCurrentServer().get().sendPluginMessage(VelocityPlugin.CHANNEL_ID, msg.getBytes());
+            sendConfig(pp.getCurrentServer().get().getServerInfo());
         }
     }
 
@@ -143,30 +144,30 @@ public class BungeeNotifier implements NetworkNotifier
             return;
         }
 
-        ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(player);
-        if (pp != null && pp.getServer() != null)
+        Player pp = proxyServer.getPlayer(player).get();
+        if (pp != null && pp.getCurrentServer() != null)
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                && !Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+                && !Statics.listContains(config.getNetworkServers(), pp.getCurrentServer().get().getServerInfo().getName()))
             {
                 return;
             }
             if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
-                && Statics.listContains(config.getNetworkServers(), pp.getServer().getInfo().getName()))
+                && Statics.listContains(config.getNetworkServers(), pp.getCurrentServer().get().getServerInfo().getName()))
             {
                 return;
             }
 
             //no feedback loop
-            if (origin != null && pp.getServer().getInfo().getName().equalsIgnoreCase(origin))
+            if (origin != null && pp.getCurrentServer().get().getServerInfo().getName().equalsIgnoreCase(origin))
             {
                 return;
             }
 
             //send message
-            pp.getServer().getInfo().sendData(BungeePerms.CHANNEL, msg.getBytes());
-            sendConfig(pp.getServer().getInfo());
+            pp.getCurrentServer().get().sendPluginMessage(VelocityPlugin.CHANNEL_ID, msg.getBytes());
+            sendConfig(pp.getCurrentServer().get().getServerInfo());
         }
     }
 
@@ -178,29 +179,29 @@ public class BungeeNotifier implements NetworkNotifier
             return;
         }
 
-        for (ServerInfo si : ProxyServer.getInstance().getConfig().getServers().values())
+        for (String si : proxyServer.getConfiguration().getServers().values())
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                && !Statics.listContains(config.getNetworkServers(), si.getName()))
+                && !Statics.listContains(config.getNetworkServers(), si))
             {
                 return;
             }
             if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
-                && Statics.listContains(config.getNetworkServers(), si.getName()))
+                && Statics.listContains(config.getNetworkServers(), si))
             {
                 return;
             }
 
             //no feedback loop
-            if (origin != null && si.getName().equalsIgnoreCase(origin))
+            if (origin != null && si.equalsIgnoreCase(origin))
             {
                 continue;
             }
 
             //send message
-            si.sendData(BungeePerms.CHANNEL, msg.getBytes());
-            sendConfig(si);
+            proxyServer.getServer(si).get().sendPluginMessage(VelocityPlugin.CHANNEL_ID, msg.getBytes());
+            sendConfig(proxyServer.getServer(si).get().getServerInfo());
         }
     }
 
@@ -208,19 +209,20 @@ public class BungeeNotifier implements NetworkNotifier
 
     private void sendConfig(ServerInfo info)
     {
+        RegisteredServer rs = proxyServer.getServer(info.getName()).get();
         synchronized (this)
         {
             long now = System.currentTimeMillis();
             if (lastConfigUpdate + 5 * 60 * 1000 < now)
             {
                 lastConfigUpdate = now;
-                info.sendData(BungeePerms.CHANNEL, ("configcheck"
-                                                    + ";" + info.getName()
-                                                    + ";" + config.getBackendType()
-                                                    + ";" + config.isUseUUIDs()
-                                                    + ";" + config.getResolvingMode()
-                                                    + ";" + config.isGroupPermission()
-                                                    + ";" + config.isUseRegexPerms()).getBytes());
+                rs.sendPluginMessage(VelocityPlugin.CHANNEL_ID, ("configcheck"
+                                                                 + ";" + info.getName()
+                                                                 + ";" + config.getBackendType()
+                                                                 + ";" + config.isUseUUIDs()
+                                                                 + ";" + config.getResolvingMode()
+                                                                 + ";" + config.isGroupPermission()
+                                                                 + ";" + config.isUseRegexPerms()).getBytes());
             }
         }
     }

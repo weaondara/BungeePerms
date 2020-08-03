@@ -14,20 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.alpenblock.bungeeperms.platform;
+package net.alpenblock.bungeeperms.platform.velocity.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.alpenblock.bungeeperms.User;
 
 @AllArgsConstructor
-@Getter
-public enum PlatformType
+public class VelocityPermsUserChangedEvent
 {
 
-    Bukkit("bukkit.conf.yml", false),
-    BungeeCord("bungee.conf.yml", true),
-    Velocity("velocity.conf.yml", true);
-
-    private final String defaultConfigPath;
-    private final boolean proxy;
+    @Getter
+    private final User user;
 }

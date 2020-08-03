@@ -23,6 +23,7 @@ import net.alpenblock.bungeeperms.platform.EventListener;
 import net.alpenblock.bungeeperms.platform.NetworkNotifier;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
+import net.alpenblock.bungeeperms.platform.ScheduledTask;
 import net.alpenblock.bungeeperms.platform.independend.VersionCheck;
 
 @Getter
@@ -49,7 +50,7 @@ public class BungeePerms
     private final EventDispatcher eventDispatcher;
     private final PermissionsResolver permissionsResolver;
     private final CleanupTask cleanupTask;
-    private int cleanupTaskId = -1;
+    private ScheduledTask cleanupTaskId;
 
     private boolean enabled;
 
@@ -119,8 +120,9 @@ public class BungeePerms
         enabled = false;
 
         logger.info("Deactivating BungeePerms ...");
-        plugin.cancelTask(cleanupTaskId);
-        cleanupTaskId = -1;
+        if (cleanupTaskId != null)
+            cleanupTaskId.cancel();
+        cleanupTaskId = null;
         eventListener.disable();
         permissionsManager.disable();
     }

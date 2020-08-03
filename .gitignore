@@ -1,3 +1,5 @@
-/target
+target/
 dependency-reduced-pom.xml
-/nbproject/
+nbproject/
+*.iml
+.idea/

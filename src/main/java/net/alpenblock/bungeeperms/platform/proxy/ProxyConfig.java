@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.alpenblock.bungeeperms.platform.bungee;
+package net.alpenblock.bungeeperms.platform.proxy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,13 +24,13 @@ import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.Config;
 
 @Getter
-public class BungeeConfig extends BPConfig
+public class ProxyConfig extends BPConfig
 {
 
     private NetworkType networkType;
     private List<String> networkServers;
 
-    public BungeeConfig(Config config)
+    public ProxyConfig(Config config)
     {
         super(config);
     }

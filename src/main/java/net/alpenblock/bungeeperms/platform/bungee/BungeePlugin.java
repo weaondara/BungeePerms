@@ -19,7 +19,6 @@ package net.alpenblock.bungeeperms.platform.bungee;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +33,9 @@ import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
 import net.alpenblock.bungeeperms.platform.PlatformType;
 import net.alpenblock.bungeeperms.platform.PluginMessageSender;
+import net.alpenblock.bungeeperms.platform.ScheduledTask;
 import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
+import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -49,7 +50,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     @Getter
     private static BungeePlugin instance;
 
-    private BungeeConfig config;
+    private ProxyConfig config;
 
     //platform dependend parts
     private BungeeEventListener listener;
@@ -73,7 +74,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
         //load config
         Config conf = new Config(this, "/config.yml");
         conf.load();
-        config = new BungeeConfig(conf);
+        config = new ProxyConfig(conf);
         config.load();
 
         //register commands
@@ -233,27 +234,21 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
     }
 
     @Override
-    public int registerRepeatingTask(Runnable r, long delay, long interval)
+    public ScheduledTask registerRepeatingTask(Runnable r, long delay, long interval)
     {
-        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, interval, TimeUnit.MILLISECONDS).getId();
+        return new BungeeScheduledTask(ProxyServer.getInstance().getScheduler().schedule(this, r, delay, interval, TimeUnit.MILLISECONDS));
     }
 
     @Override
-    public int runTaskLater(Runnable r, long delay)
+    public ScheduledTask runTaskLater(Runnable r, long delay)
     {
-        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS).getId();
+        return new BungeeScheduledTask(ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS));
     }
 
     @Override
-    public int runTaskLaterAsync(Runnable r, long delay)
+    public ScheduledTask runTaskLaterAsync(Runnable r, long delay)
     {
-        return ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS).getId();
-    }
-
-    @Override
-    public void cancelTask(int id)
-    {
-        ProxyServer.getInstance().getScheduler().cancel(id);
+        return new BungeeScheduledTask(ProxyServer.getInstance().getScheduler().schedule(this, r, delay, TimeUnit.MILLISECONDS));
     }
 
     @Override

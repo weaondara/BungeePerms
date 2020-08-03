@@ -1,4 +1,4 @@
-bungeeperms: '&6Willkommen zu BungeePerms, einem BungeeCord/Spigot-Permission Plugin'
+bungeeperms: '&6Willkommen zu BungeePerms, einem Berechtigungs-Plugin für BungeeCord/Velocity und Spigot/Paper'
 version: '&7Version &6{0}'
 author: '&7Autor &6{0}'
 permissions-reloaded: '&7Rechte neu geladen'

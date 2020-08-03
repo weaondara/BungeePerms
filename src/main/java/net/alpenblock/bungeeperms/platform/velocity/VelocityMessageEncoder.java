@@ -14,67 +14,73 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.alpenblock.bungeeperms.platform.bungee;
+package net.alpenblock.bungeeperms.platform.velocity;
 
 import java.util.ArrayList;
 import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.kyori.text.Component;
+import net.kyori.text.ComponentBuilder;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
+import net.kyori.text.format.TextDecoration;
 
-public class BungeeMessageEncoder extends MessageEncoder
+public class VelocityMessageEncoder extends MessageEncoder
 {
 
-    public static BaseComponent[] convert(net.md_5.bungee.api.chat.BaseComponent[] components)
+    public static BaseComponent[] convert(Component components)
     {
-        BaseComponent[] ret = new BaseComponent[components.length];
-        for (int i = 0; i < components.length; i++)
+        BaseComponent[] ret = new BaseComponent[components.children().size()];
+        for (int i = 0; i < components.children().size(); i++)
         {
-            ret[i] = new BaseComponent(components[i]);
+            ret[i] = new BaseComponent(components.children().get(i));
         }
         return ret;
     }
 
-    public static net.md_5.bungee.api.chat.BaseComponent[] convert(BaseComponent[] components)
+    public static Component convert(BaseComponent[] components)
     {
-        net.md_5.bungee.api.chat.BaseComponent[] ret = new net.md_5.bungee.api.chat.BaseComponent[components.length];
+        Component ret = TextComponent.empty();
+        List<Component> children = new ArrayList(components.length);
         for (int i = 0; i < components.length; i++)
         {
-            ret[i] = (net.md_5.bungee.api.chat.BaseComponent) components[i].getComponent();
+            children.add((Component) components[i].getComponent());
         }
+        ret.children(children);
         return ret;
     }
 
     private ComponentBuilder builder;
-    private net.md_5.bungee.api.chat.BaseComponent[] cache;
+    private Component cache;
 
     private List<String> list;
     private String current;
 
-    public BungeeMessageEncoder(MessageEncoder original)
+    public VelocityMessageEncoder(MessageEncoder original)
     {
         super(original);
-        if (!(original instanceof BungeeMessageEncoder))
+        if (!(original instanceof VelocityMessageEncoder))
         {
-            throw new IllegalArgumentException("original is not a BungeeMessageEncoder");
+            throw new IllegalArgumentException("original is not a VelocityMessageEncoder");
         }
 
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
-            builder = ((BungeeMessageEncoder) original).builder;
+            builder = ((VelocityMessageEncoder) original).builder;
         }
 
-        list = new ArrayList<>(((BungeeMessageEncoder) original).list);
-        current = ((BungeeMessageEncoder) original).current;
+        list = new ArrayList<>(((VelocityMessageEncoder) original).list);
+        current = ((VelocityMessageEncoder) original).current;
     }
 
-    public BungeeMessageEncoder(String text)
+    public VelocityMessageEncoder(String text)
     {
         super(text);
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
-            builder = new ComponentBuilder(text);
+            builder = TextComponent.builder(text);
         }
 
         list = new ArrayList<>();
@@ -102,7 +108,7 @@ public class BungeeMessageEncoder extends MessageEncoder
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             cache = null;
-            builder = builder.color(net.md_5.bungee.api.ChatColor.valueOf(color.name()));
+            builder = builder.color(TextColor.valueOf(color.name()));
         }
 
         current = color + current;
@@ -116,7 +122,7 @@ public class BungeeMessageEncoder extends MessageEncoder
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             cache = null;
-            builder = builder.bold(bold);
+            builder = builder.decoration(TextDecoration.BOLD, bold);
         }
         else
         {
@@ -137,7 +143,7 @@ public class BungeeMessageEncoder extends MessageEncoder
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             cache = null;
-            builder = builder.italic(italic);
+            builder = builder.decoration(TextDecoration.ITALIC, italic);
         }
         else
         {
@@ -158,7 +164,7 @@ public class BungeeMessageEncoder extends MessageEncoder
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             cache = null;
-            builder = builder.underlined(underlined);
+            builder = builder.decoration(TextDecoration.UNDERLINED, underlined);
         }
         else
         {
@@ -178,7 +184,7 @@ public class BungeeMessageEncoder extends MessageEncoder
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             cache = null;
-            builder = builder.strikethrough(strikethrough);
+            builder = builder.decoration(TextDecoration.STRIKETHROUGH, strikethrough);
         }
         else
         {
@@ -198,7 +204,7 @@ public class BungeeMessageEncoder extends MessageEncoder
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             cache = null;
-            builder = builder.obfuscated(obfuscated);
+            builder = builder.decoration(TextDecoration.OBFUSCATED, obfuscated);
         }
         else
         {
@@ -219,13 +225,13 @@ public class BungeeMessageEncoder extends MessageEncoder
         {
             if (clickEvent == null)
             {
-                builder = builder.event((net.md_5.bungee.api.chat.ClickEvent) null);
+                builder = builder.clickEvent(null);
             }
             else
             {
                 cache = null;
-                net.md_5.bungee.api.chat.ClickEvent.Action action = net.md_5.bungee.api.chat.ClickEvent.Action.valueOf(clickEvent.getAction().name());
-                builder = builder.event(new net.md_5.bungee.api.chat.ClickEvent(action, clickEvent.getValue()));
+                net.kyori.text.event.ClickEvent.Action action = net.kyori.text.event.ClickEvent.Action.valueOf(clickEvent.getAction().name());
+                builder = builder.clickEvent(net.kyori.text.event.ClickEvent.of(action, clickEvent.getValue()));
             }
         }
 
@@ -239,13 +245,13 @@ public class BungeeMessageEncoder extends MessageEncoder
         {
             if (hoverEvent == null)
             {
-                builder = builder.event((net.md_5.bungee.api.chat.HoverEvent) null);
+                builder = builder.hoverEvent(null);
             }
             else
             {
                 cache = null;
-                net.md_5.bungee.api.chat.HoverEvent.Action action = net.md_5.bungee.api.chat.HoverEvent.Action.valueOf(hoverEvent.getAction().name());
-                builder = builder.event(new net.md_5.bungee.api.chat.HoverEvent(action, convert(hoverEvent.getValue().create())));
+                net.kyori.text.event.HoverEvent.Action action = net.kyori.text.event.HoverEvent.Action.valueOf(hoverEvent.getAction().name());
+                builder = builder.hoverEvent(net.kyori.text.event.HoverEvent.of(action, convert(hoverEvent.getValue().create())));
             }
         }
 
@@ -257,7 +263,7 @@ public class BungeeMessageEncoder extends MessageEncoder
     {
         if (cache == null)
         {
-            cache = builder.create();
+            cache = builder.build();
         }
         return convert(cache);
     }
