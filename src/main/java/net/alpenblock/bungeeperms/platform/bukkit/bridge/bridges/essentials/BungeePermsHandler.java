@@ -19,6 +19,8 @@ package net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.essentials;
 import com.earth2me.essentials.perm.IPermissionsHandler;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Statics;
@@ -119,5 +121,21 @@ class BungeePermsHandler implements IPermissionsHandler
     public boolean tryProvider()
     {
         return true;
+    }
+
+    @Override
+    public void registerContext(String context, Function<Player, Iterable<String>> calculator, Supplier<Iterable<String>> suggestions)
+    {
+    }
+
+    @Override
+    public void unregisterContexts()
+    {
+    }
+
+    @Override
+    public String getBackendName()
+    {
+        return "BungeePerms";
     }
 }
