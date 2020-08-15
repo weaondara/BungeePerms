@@ -49,8 +49,8 @@ public class MysqlPermsAdapter
                            + "`id` INT( 64 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,"
                            + "`name` VARCHAR( 64 ) NOT NULL ,"
                            + "`type` TINYINT( 2 ) NOT NULL ,"
-                           + "`key` VARCHAR( 256 ) NOT NULL, "
-                           + "`value` VARCHAR( 256 ) NOT NULL, "
+                           + "`key` VARCHAR( 255 ) NOT NULL, "
+                           + "`value` VARCHAR( 255 ) NOT NULL, "
                            + "`server` VARCHAR( 64 ) DEFAULT NULL, "
                            + "`world` VARCHAR( 64 ) DEFAULT NULL, "
                            + "`timedstart` TIMESTAMP NULL DEFAULT NULL, "
@@ -76,6 +76,20 @@ public class MysqlPermsAdapter
                 stmt = mysql.stmt("ALTER TABLE `" + table + "` ADD COLUMN `timedstart` TIMESTAMP NULL DEFAULT NULL, ADD COLUMN `timedduration` INT(11) DEFAULT NULL");
                 mysql.runQuery(stmt);
             }
+            
+            //check indexes
+            try 
+            {
+                stmt = mysql.stmt("ALTER TABLE `" + table + "` ADD INDEX `bp_type_name_key` (`type`, `name`, `key`)");
+                mysql.runQuery(stmt);
+            } 
+            catch (Exception e) {}
+            try 
+            {
+                stmt = mysql.stmt("ALTER TABLE `" + table + "` ADD INDEX `bp_type_key_value` (`type`, `key`, `value`)");
+                mysql.runQuery(stmt);
+            } 
+            catch (Exception e) {}
         }
         catch (Exception e)
         {
