@@ -93,7 +93,7 @@ class BungeePermsHandler implements IPermissionsHandler
         if (u == null)
             return "";
 
-        return u.buildPrefix(new BukkitSender(player));
+        return u.buildPrefix(new BukkitSender(player)).replaceAll("([&§])x[&§](.)[&§](.)[&§](.)[&§](.)[&§](.)[&§](.)", "$1#$2$3$4$5$6$7");
     }
 
     @Override
@@ -103,7 +103,7 @@ class BungeePermsHandler implements IPermissionsHandler
         if (u == null)
             return "";
 
-        return u.buildSuffix(new BukkitSender(player));
+        return u.buildSuffix(new BukkitSender(player)).replaceAll("([&§])x[&§](.)[&§](.)[&§](.)[&§](.)[&§](.)[&§](.)", "$1#$2$3$4$5$6$7");
     }
 
     @Override
