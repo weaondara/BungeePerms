@@ -3332,7 +3332,7 @@ public class CommandHandler
     private String formatDuration(Date start, int duration)
     {
         String dur = "";
-        long end = start.getTime() + duration * 1000;
+        long end = start.getTime() + (long)duration * 1000;
         long d = end - System.currentTimeMillis();
         d /= 1000;
         if (d > 24 * 60 * 60)

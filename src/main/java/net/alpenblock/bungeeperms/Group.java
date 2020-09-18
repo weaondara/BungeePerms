@@ -276,7 +276,7 @@ public class Group implements Comparable<Group>, PermEntity
             for (int i = 0; i < gperms.size(); i++)
             {
                 BPPermission p = gperms.get(i).clone();
-                if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                if (p.getTimedStart() == null || tg.getStart().getTime() + (long)tg.getDuration() * 1000 > p.getTimedStart().getTime() + (long)p.getTimedDuration() * 1000)
                 {
                     p.setTimedStart(tg.getStart());
                     p.setTimedDuration(tg.getDuration());
@@ -326,7 +326,7 @@ public class Group implements Comparable<Group>, PermEntity
                 for (int i = 0; i < gperms.size(); i++)
                 {
                     BPPermission p = gperms.get(i).clone();
-                    if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                    if (p.getTimedStart() == null || tg.getStart().getTime() + (long)tg.getDuration() * 1000 > p.getTimedStart().getTime() + (long)p.getTimedDuration() * 1000)
                     {
                         p.setTimedStart(tg.getStart());
                         p.setTimedDuration(tg.getDuration());
@@ -374,7 +374,7 @@ public class Group implements Comparable<Group>, PermEntity
                     for (int i = 0; i < gperms.size(); i++)
                     {
                         BPPermission p = gperms.get(i).clone();
-                        if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                        if (p.getTimedStart() == null || tg.getStart().getTime() + (long)tg.getDuration() * 1000 > p.getTimedStart().getTime() + (long)p.getTimedDuration() * 1000)
                         {
                             p.setTimedStart(tg.getStart());
                             p.setTimedDuration(tg.getDuration());

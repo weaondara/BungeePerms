@@ -298,7 +298,7 @@ public class User implements PermEntity
             for (int i = 0; i < gperms.size(); i++)
             {
                 BPPermission p = gperms.get(i).clone();
-                if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                if (p.getTimedStart() == null || tg.getStart().getTime() + (long)tg.getDuration() * 1000 > p.getTimedStart().getTime() + (long)p.getTimedDuration() * 1000)
                 {
                     p.setTimedStart(tg.getStart());
                     p.setTimedDuration(tg.getDuration());
@@ -348,7 +348,7 @@ public class User implements PermEntity
                 for (int i = 0; i < gperms.size(); i++)
                 {
                     BPPermission p = gperms.get(i).clone();
-                    if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                    if (p.getTimedStart() == null || tg.getStart().getTime() + (long)tg.getDuration() * 1000 > p.getTimedStart().getTime() + (long)p.getTimedDuration() * 1000)
                     {
                         p.setTimedStart(tg.getStart());
                         p.setTimedDuration(tg.getDuration());
@@ -396,7 +396,7 @@ public class User implements PermEntity
                     for (int i = 0; i < gperms.size(); i++)
                     {
                         BPPermission p = gperms.get(i).clone();
-                        if (p.getTimedStart() == null || tg.getStart().getTime() + tg.getDuration() > p.getTimedStart().getTime() + p.getTimedDuration())
+                        if (p.getTimedStart() == null || tg.getStart().getTime() + (long)tg.getDuration() * 1000 > p.getTimedStart().getTime() + (long)p.getTimedDuration() * 1000)
                         {
                             p.setTimedStart(tg.getStart());
                             p.setTimedDuration(tg.getDuration());
@@ -782,7 +782,7 @@ public class User implements PermEntity
             for (int i = 0; i < l.getValue().size(); i++)
             {
                 TimedValue<String> g = l.getValue().get(i);
-                long end = g.getStart().getTime() + g.getDuration() * 1000;
+                long end = g.getStart().getTime() + (long)g.getDuration() * 1000;
                 if (end < System.currentTimeMillis())
                 {
                     BungeePerms.getInstance().getDebug().log("removing timed group " + g.getValue() + " from user " + name + " (" + l.getKey().getKey() + "," + l.getKey().getValue() + ")");
@@ -814,7 +814,7 @@ public class User implements PermEntity
             for (int i = 0; i < l.getValue().size(); i++)
             {
                 TimedValue<String> p = l.getValue().get(i);
-                long end = p.getStart().getTime() + p.getDuration() * 1000;
+                long end = p.getStart().getTime() + (long)p.getDuration() * 1000;
                 if (end < System.currentTimeMillis())
                 {
                     //remove timed perm
