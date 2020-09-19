@@ -274,10 +274,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.2.0</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <detectJavaApiLink>false</detectJavaApiLink>
                 </configuration>
                 <executions>
                     <execution>
@@ -286,7 +286,7 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
+                            <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                         </configuration>
                     </execution>
                 </executions>
