@@ -90,7 +90,7 @@ public class WorldEditBridge implements Bridge
             //inject BungeePerms
             Field f = we.getPermissionsResolver().getClass().getDeclaredField("enabledResolvers");
             f.setAccessible(true);
-            ((List) f.get(we.getPermissionsResolver())).add(BungeePermsResolver.class);
+            ((List) f.get(we.getPermissionsResolver())).add(0, BungeePermsResolver.class);
 
             we.getPermissionsResolver().findResolver();
         }
