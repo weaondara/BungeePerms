@@ -53,9 +53,9 @@ public class BridgeManager implements Listener
         bridgesmap = new HashMap<>();
         bridges = new ArrayList<>();
 
-        bridgesmap.put(WorldEditBridge.class, "com.sk89q.worldedit.bukkit.WorldEditPlugin");
         bridgesmap.put(VaultBridge.class, "net.milkbowl.vault.Vault");
         bridgesmap.put(EssentialsBridge.class, "com.earth2me.essentials.Essentials");
+        bridgesmap.put(WorldEditBridge.class, "com.sk89q.worldedit.bukkit.WorldEditPlugin");
         bridgesmap.put(PlaceholderApiBridge.class, "me.clip.placeholderapi.PlaceholderAPI");
 
         for (Map.Entry<Class<? extends Bridge>, String> entry : bridgesmap.entrySet())
