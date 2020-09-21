@@ -395,6 +395,10 @@ public class BPPermissible extends PermissibleBase
 
     private String getUserNodeName(User u)
     {
+        return getUserNodeName(sender, u);
+    }
+    
+    static String getUserNodeName(CommandSender sender, User u) {
         if (sender instanceof ConsoleCommandSender)
         {
             return "bungeeperms.console";

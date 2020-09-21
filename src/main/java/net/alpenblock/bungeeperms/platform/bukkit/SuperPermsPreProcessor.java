@@ -22,6 +22,7 @@ import java.util.Map;
 import net.alpenblock.bungeeperms.BPPermission;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.PermissionsPreProcessor;
+import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.Sender;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -33,7 +34,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 public class SuperPermsPreProcessor implements PermissionsPreProcessor
 {
 
-    private List<String> getSuperPerms(Sender s)
+    private List<PermissionAttachmentInfo> getSuperPerms(Sender s)
     {
         BukkitSender bs = (BukkitSender) s;
         CommandSender sender = bs.getSender();
@@ -50,29 +51,42 @@ public class SuperPermsPreProcessor implements PermissionsPreProcessor
         }
 
         BPPermissible perm = (BPPermissible) base;
-        List<String> l = new ArrayList(perm.getEffectiveSuperPerms().size());
-        for (PermissionAttachmentInfo e : perm.getEffectiveSuperPerms())
-        {
-            l.add((e.getValue() ? "" : "-") + e.getPermission().toLowerCase());
-        }
-        return l;
+        return new ArrayList(perm.getEffectiveSuperPerms());
     }
 
     @Override
     public List<BPPermission> process(List<BPPermission> perms, Sender s)
     {
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
-        if (!config.isSuperpermscompat())
-        {
+        if (!config.isSuperpermscompat()) 
             return perms;
-        }
 
         if (s != null)
         {
-            List<String> l = getSuperPerms(s);
+            User u = config.isUseUUIDs()
+                     ? BungeePerms.getInstance().getPermissionsManager().getUser(s.getUUID())
+                     : BungeePerms.getInstance().getPermissionsManager().getUser(s.getName());
+
+            String usernode = u == null ? null : BPPermissible.getUserNodeName(((BukkitSender) s).getSender(), u);
+            
+            List<PermissionAttachmentInfo> l = getSuperPerms(s);
             for (int i = 0; i < l.size(); i++)
             {
-                perms.add(i, new BPPermission(l.get(i), "SuperPerms", true, null, null, null, null));
+                if (l.get(i).getPermission().equals(usernode))
+                    continue;
+
+                String origin = null;
+                if (l.get(i).getAttachment() != null) 
+                {
+                    if (l.get(i).getAttachment().getPlugin() != null)
+                        origin = l.get(i).getAttachment().getPlugin().getName();
+                } 
+                else if (l.get(i).getPermission().toLowerCase().startsWith("minecraft."))
+                    origin = "Minecraft";
+                else if (l.get(i).getPermission().toLowerCase().startsWith("bukkit."))
+                    origin = "Bukkit";
+                    
+                perms.add(i, new BPPermission((l.get(i).getValue() ? "" : "-") + l.get(i).getPermission().toLowerCase(), "SuperPerms" + (origin != null ? " - " + origin : ""),  true, null, null, null, null));
             }
         }
 
@@ -97,12 +111,12 @@ public class SuperPermsPreProcessor implements PermissionsPreProcessor
             {
                 continue;
             }
-
+            
             //add all children
             List<BPPermission> l = new ArrayList();
             for (Map.Entry<String, Boolean> e : p.getChildren().entrySet())
             {
-                l.add(new BPPermission((e.getValue() ? "" : "-") + e.getKey().toLowerCase(), "SuperPerms child of " + perm, true, null, null, null, null));
+                l.add(new BPPermission((e.getValue() ? "" : "-") + e.getKey().toLowerCase(), perms.get(i).getOrigin() + " - child of " + perm, true, null, null, null, null));
             }
             perms.addAll(i + 1, l);
         }
