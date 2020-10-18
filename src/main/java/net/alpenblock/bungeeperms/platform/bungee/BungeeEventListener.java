@@ -201,6 +201,11 @@ public class BungeeEventListener implements Listener, EventListener
     @EventHandler(priority = Byte.MIN_VALUE)
     public void onMessage(PluginMessageEvent e)
     {
+        if (event.isCancelled())
+        {
+            return;
+        }
+    
         if (!e.getTag().equalsIgnoreCase(BungeePerms.CHANNEL))
         {
             return;
