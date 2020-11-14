@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BPConfig;
+import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.io.BackEndType;
 
 @Getter
 public class ProxyConfig extends BPConfig
@@ -62,5 +64,29 @@ public class ProxyConfig extends BPConfig
 
         newconf.setEnumValue("network.type", oldconf.getEnumValue("networktype", NetworkType.Global));
         newconf.setListString("network.servers", oldconf.getListString("networkservers", new ArrayList()));
+    }
+
+    @Override
+    public void validate()
+    {
+        super.validate();
+        if (getBackendType() == BackEndType.UPSTREAM)
+        {
+            BungeePerms.getLogger().severe("[Config] Invalid backend type " + getBackendType() + "! Falling back to YAML backend!");
+            setBackendType(BackEndType.YAML);
+        }
+        
+        if (getUpstreamport() <= 0)
+        {
+            //ignore ... disables upstream server
+        }
+        else if (getUpstreamport() < 1024)
+        {
+            BungeePerms.getLogger().warning("[Config] Upstream port is lower than 1024! This may cause problems with upstream backends!");
+        }
+        else if (getUpstreamport() > 49151)
+        {
+            BungeePerms.getLogger().warning("[Config] Upstream port is higher than 49151! This may cause problems with upstream backends!");
+        }
     }
 }

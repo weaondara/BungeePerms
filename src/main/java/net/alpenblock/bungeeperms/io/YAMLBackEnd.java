@@ -330,6 +330,9 @@ public class YAMLBackEnd implements BackEnd
             setTimed(permsconfusers, "users." + uname + ".timedgroups", user.getTimedGroupsString());
             permsconfusers.setListString("users." + uname + ".permissions", user.getPerms());
             setTimed(permsconfusers, "users." + uname + ".timedpermissions", user.getTimedPerms());
+            permsconfusers.setString("users." + uname + ".display", user.getDisplay());
+            permsconfusers.setString("users." + uname + ".prefix", user.getPrefix());
+            permsconfusers.setString("users." + uname + ".suffix", user.getSuffix());
 
             for (Map.Entry<String, Server> se : user.getServers().entrySet())
             {
