@@ -252,8 +252,8 @@
                             <artifactId>${project.artifactId}</artifactId>
                             <version>${build.fullversion.file}</version>
                             <file>target/${build.filename}</file>
-                            <sources>target/${build.sources.filename}</sources>
-                            <javadoc>target/${build.javadoc.filename}</javadoc>
+<!--                            <sources>target/${build.sources.filename}</sources>-->
+<!--                            <javadoc>target/${build.javadoc.filename}</javadoc>-->
                         </configuration>
                     </execution>
                 </executions>
