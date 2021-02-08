@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import net.alpenblock.bungeeperms.platform.PlatformType;
 
 public class Mysql
 {
@@ -45,15 +46,15 @@ public class Mysql
 
     private final BPConfig config;
     private final Debug debug;
-    private final String configsection;
+    private final boolean loadMysqlExplicitly;
     @Getter
     private Connection connection;
 
-    public Mysql(BPConfig c, Debug d, String configsection)
+    public Mysql(BPConfig c, Debug d, boolean loadMysqlExplicitly)
     {
         config = c;
         debug = d;
-        this.configsection = configsection;
+        this.loadMysqlExplicitly = loadMysqlExplicitly;
     }
 
     public void connect()
@@ -61,6 +62,8 @@ public class Mysql
         BungeePerms.getInstance().getPlugin().getLogger().info("Connecting to database");
         try
         {
+            if (loadMysqlExplicitly)
+                Class.forName("com.mysql.cj.jdbc.Driver");
             this.connection = DriverManager.getConnection(config.getMysqlURL(), config.getMysqlUser(), config.getMysqlPassword());
         }
         catch (Exception e)

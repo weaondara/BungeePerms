@@ -45,6 +45,7 @@ import net.alpenblock.bungeeperms.io.mysql2.MysqlPermEntity;
 import net.alpenblock.bungeeperms.io.mysql2.MysqlPermsAdapter;
 import net.alpenblock.bungeeperms.io.mysql2.ValueEntry;
 import net.alpenblock.bungeeperms.platform.PlatformPlugin;
+import net.alpenblock.bungeeperms.platform.PlatformType;
 
 public class MySQLBackEnd implements BackEnd
 {
@@ -64,7 +65,7 @@ public class MySQLBackEnd implements BackEnd
         config = BungeePerms.getInstance().getConfig();
         debug = BungeePerms.getInstance().getDebug();
 
-        mysql = new Mysql(config, debug, "bungeeperms");
+        mysql = new Mysql(config, debug, plugin.getPlatformType() == PlatformType.Velocity);
         mysql.connect();
 
         table = config.getMysqlTablePrefix() + "permissions";

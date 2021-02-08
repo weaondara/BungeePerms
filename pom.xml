@@ -177,6 +177,7 @@
                             <include>org.bstats:bstats-bukkit</include>
                             <include>org.bstats:bstats-bungeecord</include>
                             <include>org.yaml:snakeyaml</include>
+                            <include>mysql:mysql-connector-java</include>
                         </includes>
                     </artifactSet>
                     <relocations>
@@ -380,6 +381,11 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>1.18</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.13</version>
         </dependency>
     </dependencies>
 </project>

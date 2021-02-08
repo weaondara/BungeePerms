@@ -26,6 +26,7 @@ import net.alpenblock.bungeeperms.BPConfig;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Mysql;
+import net.alpenblock.bungeeperms.platform.PlatformType;
 
 public class MySQLUUIDPlayerDB implements UUIDPlayerDB
 {
@@ -41,7 +42,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
     {
         this.config = BungeePerms.getInstance().getConfig();
         this.debug = BungeePerms.getInstance().getDebug();
-        mysql = new Mysql(config, debug, "bungeeperms");
+        mysql = new Mysql(config, debug, BungeePerms.getInstance().getPlugin().getPlatformType() == PlatformType.Velocity);
         mysql.connect();
 
         table = config.getMysqlTablePrefix() + "uuidplayer";
