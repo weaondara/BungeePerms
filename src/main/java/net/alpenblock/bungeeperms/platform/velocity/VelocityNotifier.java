@@ -179,29 +179,29 @@ public class VelocityNotifier implements NetworkNotifier
             return;
         }
 
-        for (String si : proxyServer.getConfiguration().getServers().values())
+        for (RegisteredServer si : proxyServer.getAllServers())
         {
             //ignore servers not in config and netork type is server dependend
             if (config.getNetworkType() == NetworkType.ServerDependend
-                && !Statics.listContains(config.getNetworkServers(), si))
+                && !Statics.listContains(config.getNetworkServers(), si.getServerInfo().getName()))
             {
                 return;
             }
             if (config.getNetworkType() == NetworkType.ServerDependendBlacklist
-                && Statics.listContains(config.getNetworkServers(), si))
+                && Statics.listContains(config.getNetworkServers(), si.getServerInfo().getName()))
             {
                 return;
             }
 
             //no feedback loop
-            if (origin != null && si.equalsIgnoreCase(origin))
+            if (origin != null && si.getServerInfo().getName().equalsIgnoreCase(origin))
             {
                 continue;
             }
 
             //send message
-            proxyServer.getServer(si).get().sendPluginMessage(VelocityPlugin.CHANNEL_ID, msg.getBytes());
-            sendConfig(proxyServer.getServer(si).get().getServerInfo());
+            si.sendPluginMessage(VelocityPlugin.CHANNEL_ID, msg.getBytes());
+            sendConfig(si.getServerInfo());
         }
     }
 
