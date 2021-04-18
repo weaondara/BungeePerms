@@ -43,43 +43,42 @@ public class MysqlPermEntity
 
     private void load(ResultSet res) throws SQLException
     {
-        if (res.first())
+        if (res.next())
         {
             name = res.getString("name");
             type = EntityType.getByCode(res.getInt("type"));
-        }
-
-        res.beforeFirst();
-
-        while (res.next())
-        {
-            String key = res.getString("key");
-            String value = res.getString("value");
-            String server = res.getString("server");
-            String world = null;
-            if (server != null)
-                world = res.getString("world");
-            Timestamp start = res.getTimestamp("timedstart");
-            Integer dur = res.getInt("timedduration");
-            if (res.wasNull())
-                dur = null;
-            if (start == null || dur == null)
+        
+            do
             {
-                start = null;
-                dur = null;
+                String key = res.getString("key");
+                String value = res.getString("value");
+                String server = res.getString("server");
+                String world = null;
+                if (server != null)
+                    world = res.getString("world");
+                Timestamp start = res.getTimestamp("timedstart");
+                Integer dur = res.getInt("timedduration");
+                if (res.wasNull())
+                    dur = null;
+                if (start == null || dur == null)
+                {
+                    start = null;
+                    dur = null;
+                }
+
+                //add entry
+                ValueEntry ve = new ValueEntry(value, server, world, start, dur);
+
+                List<ValueEntry> e = data.get(key);
+                if (e == null)
+                {
+                    e = new ArrayList<>();
+                    data.put(key, e);
+                }
+
+                e.add(ve);
             }
-
-            //add entry
-            ValueEntry ve = new ValueEntry(value, server, world, start, dur);
-
-            List<ValueEntry> e = data.get(key);
-            if (e == null)
-            {
-                e = new ArrayList<>();
-                data.put(key, e);
-            }
-
-            e.add(ve);
+            while (res.next());
         }
 
         //close res? -> no will be done
