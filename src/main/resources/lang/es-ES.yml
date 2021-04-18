@@ -19,7 +19,6 @@ command:
   too-few-arguments: '&4Too few arguments!'
   too-many-arguments: '&4Too many arguments!'
   error: '&4An error occured! Please report this error on https://github.com/weaondara/BungeePerms/issues . Please include exceptions from console.'
-  no-permission: '&4You don''t have permission to do that!'
 error:
   invalid-bool-value: '&4Un valor boolean es requerido.'
   invalid-int-value: '&4Un valor entero mayor a cero es requerido.'

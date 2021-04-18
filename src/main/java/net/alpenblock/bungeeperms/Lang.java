@@ -90,7 +90,6 @@ public class Lang
         COMMAND_TOO_FEW_ARGUMENTS("command.too-few-arguments", Color.Error.alt() + "Too few arguments"),
         COMMAND_TOO_MANY_ARGUMENTS("command.too-many-arguments", Color.Error.alt() + "Too many arguments"),
         COMMAND_ERROR("command.error", Color.Error.alt() + "An error occured! Please report this error on https://github.com/weaondara/BungeePerms/issues . Please include exceptions from console."),
-        COMMAND_NO_PERMISSION("command.no-permission", Color.Error.alt() + "You don't have permission to do that!"),
         //error msgs
         ERR_INVALID_BOOL_VALUE("error.invalid-bool-value", Color.Error.alt() + "A boolean value is required!"),
         ERR_INVALID_INT_VALUE("error.invalid-int-value", Color.Error.alt() + "An integer value greater than 0 is required!"),
