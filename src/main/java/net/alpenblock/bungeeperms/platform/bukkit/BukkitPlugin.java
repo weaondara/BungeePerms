@@ -30,6 +30,7 @@ import lombok.SneakyThrows;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.TabCompleter;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
@@ -349,7 +350,7 @@ public class BukkitPlugin extends JavaPlugin implements PlatformPlugin
                 public void run()
                 {
                     if (!BukkitPlugin.this.onCommand(sender, cmd, label, args))
-                        sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
+                        sender.sendMessage(Color.Error + "[BungeePerms] " + Lang.translate(Lang.MessageType.COMMAND_NOT_FOUND));
                 }
             };
             if (conf.isAsyncCommands())

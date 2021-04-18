@@ -16,6 +16,12 @@ cleaning-done: '&2Bereinigung abgeschlossen. &6{0} &2User gelöscht.'
 no-permission: '&cDu hast keine Rechte um das zu tun!'
 overview-header: '&7Übersicht über alle Gruppen:'
 overview-item: '&7{0} (&6{1}&7, &6{2}&7 Rechte, &6{3}&7 eigene Rechte, &6{4}&7 Spieler, &6{5}&7 Rang, &6{6}&7 Gewichtung)'
+command:
+  not-found: '&4Befehl nicht gefunden!'
+  too-few-arguments: '&4Zu wenig Argumente!'
+  too-many-arguments: '&4Zu viele Argumente!'
+  error: '&4Ein Fehler ist aufgetreten. Bitte reporte diesen Fehler auf https://github.com/weaondara/BungeePerms/issues . Bitte inkludiere Exceptions von der Konsole.'
+  no-permission: '&4Du hast dafür keine Rechte!'
 error:
   invalid-bool-value: '&4Eine boolscher Wert ist erforderlich!'
   invalid-int-value: '&4Ein Integer-Wert größer 0 ist erforderlich!'

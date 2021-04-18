@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.TabCompleter;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
@@ -324,7 +325,7 @@ public class VelocityPlugin implements PlatformPlugin
                 public void run()
                 {
                     if (!VelocityPlugin.this.onCommand(sender, cmd, "", args))
-                        sender.sendMessage(TextComponent.of(Color.Error + "[BungeePerms] Command not found"));
+                        sender.sendMessage(TextComponent.of(Color.Error + "[BungeePerms] " + Lang.translate(Lang.MessageType.COMMAND_NOT_FOUND)));
                 }
             };
             if (config.isAsyncCommands())

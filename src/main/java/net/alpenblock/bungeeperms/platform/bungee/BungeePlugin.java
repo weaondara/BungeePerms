@@ -26,6 +26,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
+import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.TabCompleter;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
@@ -289,7 +290,7 @@ public class BungeePlugin extends Plugin implements PlatformPlugin
                 public void run()
                 {
                     if (!BungeePlugin.this.onCommand(sender, cmd, "", args))
-                        sender.sendMessage(Color.Error + "[BungeePerms] Command not found");
+                        sender.sendMessage(Color.Error + "[BungeePerms] " + Lang.translate(Lang.MessageType.COMMAND_NOT_FOUND));
                 }
             };
             if (config.isAsyncCommands())

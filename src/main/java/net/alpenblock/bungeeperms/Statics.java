@@ -203,12 +203,12 @@ public class Statics
     {
         if (args.length > length)
         {
-            Messages.sendTooManyArgsMessage(sender);
+            sender.sendMessage(Lang.translate(Lang.MessageType.COMMAND_TOO_MANY_ARGUMENTS));
             return false;
         }
         else if (args.length < length)
         {
-            Messages.sendTooLessArgsMessage(sender);
+            sender.sendMessage(Lang.translate(Lang.MessageType.COMMAND_TOO_FEW_ARGUMENTS));
             return false;
         }
         return true;
@@ -218,12 +218,12 @@ public class Statics
     {
         if (args.length > max)
         {
-            Messages.sendTooManyArgsMessage(sender);
+           sender.sendMessage(Lang.translate(Lang.MessageType.COMMAND_TOO_MANY_ARGUMENTS));
             return false;
         }
         else if (args.length < min)
         {
-            Messages.sendTooLessArgsMessage(sender);
+            sender.sendMessage(Lang.translate(Lang.MessageType.COMMAND_TOO_FEW_ARGUMENTS));
             return false;
         }
         return true;

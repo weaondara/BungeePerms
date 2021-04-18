@@ -364,7 +364,7 @@ public class CommandHandler
     {
         if (args.length < 3)
         {
-            Messages.sendTooLessArgsMessage(sender);
+            sender.sendMessage(Lang.translate(MessageType.COMMAND_TOO_FEW_ARGUMENTS));
             return true;
         }
 
@@ -1424,7 +1424,7 @@ public class CommandHandler
     {
         if (args.length < 3)
         {
-            Messages.sendTooLessArgsMessage(sender);
+            sender.sendMessage(Lang.translate(MessageType.COMMAND_TOO_FEW_ARGUMENTS));
             return true;
         }
 
@@ -1701,7 +1701,7 @@ public class CommandHandler
 
         if (args.length > 4)
         {
-            Messages.sendTooManyArgsMessage(sender);
+            sender.sendMessage(Lang.translate(MessageType.COMMAND_TOO_MANY_ARGUMENTS));
             return true;
         }
 
@@ -2918,7 +2918,7 @@ public class CommandHandler
         //minimal 2 args
         if (args.length < 2)
         {
-            Messages.sendTooLessArgsMessage(sender);
+            sender.sendMessage(Lang.translate(MessageType.COMMAND_TOO_FEW_ARGUMENTS));
             return true;
         }
 
@@ -2967,7 +2967,7 @@ public class CommandHandler
         }
         else
         {
-            Messages.sendTooManyArgsMessage(sender);
+            sender.sendMessage(Lang.translate(MessageType.COMMAND_TOO_MANY_ARGUMENTS));
         }
         return true;
     }
@@ -3061,7 +3061,7 @@ public class CommandHandler
         }
         else
         {
-            Messages.sendTooManyArgsMessage(sender);
+            sender.sendMessage(Lang.translate(MessageType.COMMAND_TOO_MANY_ARGUMENTS));
         }
         return true;
     }

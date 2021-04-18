@@ -86,6 +86,11 @@ public class Lang
         NO_PERM("no-permission", ChatColor.RED.alt() + "You don't have permission to do that!"),
         OVERVIEW_HEADER("overview-header", Color.Text.alt() + "Overview of groups:"),
         OVERVIEW_ITEM("overview-item", Color.Text.alt() + "{0} (" + Color.Value.alt() + "{1}" + Color.Text.alt() + ", " + Color.Value.alt() + "{2}" + Color.Text.alt() + " perms, " + Color.Value.alt() + "{3}" + Color.Text.alt() + " own perms, " + Color.Value.alt() + "{4}" + Color.Text.alt() + " users, " + Color.Value.alt() + "{5}" + Color.Text.alt() + " rank, " + Color.Value.alt() + "{6}" + Color.Text.alt() + " weight)"),
+        COMMAND_NOT_FOUND("command.not-found", Color.Error.alt() + "Command not found"),
+        COMMAND_TOO_FEW_ARGUMENTS("command.too-few-arguments", Color.Error.alt() + "Too few arguments"),
+        COMMAND_TOO_MANY_ARGUMENTS("command.too-many-arguments", Color.Error.alt() + "Too many arguments"),
+        COMMAND_ERROR("command.error", Color.Error.alt() + "An error occured! Please report this error on https://github.com/weaondara/BungeePerms/issues . Please include exceptions from console."),
+        COMMAND_NO_PERMISSION("command.no-permission", Color.Error.alt() + "You don't have permission to do that!"),
         //error msgs
         ERR_INVALID_BOOL_VALUE("error.invalid-bool-value", Color.Error.alt() + "A boolean value is required!"),
         ERR_INVALID_INT_VALUE("error.invalid-int-value", Color.Error.alt() + "An integer value greater than 0 is required!"),

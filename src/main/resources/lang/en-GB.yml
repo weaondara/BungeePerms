@@ -16,6 +16,12 @@ cleaning-done: '&2Finished cleaning. Deleted &6{0} users&2.'
 no-permission: '&cYou don''t have permission to do that!'
 overview-header: '&7Overview of groups:'
 overview-item: '&7{0} (&6{1}&7, &6{2}&7 perms, &6{3}&7 own perms, &6{4}&7 users, &6{5}&7 rank, &6{6}&7 weight)'
+command:
+  not-found: '&4Command not found!'
+  too-few-arguments: '&4Too few arguments!'
+  too-many-arguments: '&4Too many arguments!'
+  error: '&4An error occured! Please report this error on https://github.com/weaondara/BungeePerms/issues . Please include exceptions from console.'
+  no-permission: '&4You don''t have permission to do that!'
 error:
   invalid-bool-value: '&4A boolean value is required!'
   invalid-int-value: '&4An integer value greater than 0 is required!'
