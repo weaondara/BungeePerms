@@ -1781,7 +1781,7 @@ public class CommandHandler
                 return false;
             }
             List<String> users = pm().getGroupUsers(group);
-            sender.sendMessage(Lang.translate(MessageType.GROUP_USERS_HEADER, users.size(), group.getName()));
+            sender.sendMessage(Lang.translate(MessageType.GROUP_USERS_HEADER_COUNT, users.size(), group.getName()));
             return true;
         }
         return true;
