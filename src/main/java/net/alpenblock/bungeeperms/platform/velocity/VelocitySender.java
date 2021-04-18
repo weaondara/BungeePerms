@@ -38,6 +38,8 @@ public class VelocitySender implements Sender
     @Override
     public void sendMessage(String message)
     {
+        if (message.replaceAll("&.", "").replaceAll("§.", "").trim().isEmpty())
+            return;
         TextComponent t = TextComponent.builder().content(message).build();
         sender.sendMessage(t);
     }

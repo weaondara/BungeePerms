@@ -20,6 +20,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.md_5.bungee.api.CommandSender;
@@ -36,6 +37,8 @@ public class BungeeSender implements Sender
     @Override
     public void sendMessage(String message)
     {
+        if (message.replaceAll("&.", "").replaceAll("§.", "").trim().isEmpty())
+            return;
         sender.sendMessage(message);
     }
 

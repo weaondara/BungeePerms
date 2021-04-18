@@ -38,6 +38,8 @@ public class BukkitSender implements Sender
     @Override
     public void sendMessage(String message)
     {
+        if (message.replaceAll("&.", "").replaceAll("§.", "").trim().isEmpty())
+            return;
         sender.sendMessage(message);
     }
 
