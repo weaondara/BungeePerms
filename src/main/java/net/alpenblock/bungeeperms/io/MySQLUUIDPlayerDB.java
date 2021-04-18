@@ -96,7 +96,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
             stmt = mysql.stmt("SELECT id, uuid FROM `" + table + "` WHERE player=? ORDER BY id ASC LIMIT 1");
             stmt.setString(1, player);
             res = mysql.returnQuery(stmt);
-            if (res.last())
+            if (res.next())
             {
                 ret = UUID.fromString(res.getString("uuid"));
             }
@@ -127,7 +127,7 @@ public class MySQLUUIDPlayerDB implements UUIDPlayerDB
             stmt = mysql.stmt("SELECT player FROM `" + table + "` WHERE uuid=?");
             stmt.setString(1, uuid.toString());
             res = mysql.returnQuery(stmt);
-            if (res.last())
+            while (res.next())
             {
                 ret = res.getString("player");
             }
