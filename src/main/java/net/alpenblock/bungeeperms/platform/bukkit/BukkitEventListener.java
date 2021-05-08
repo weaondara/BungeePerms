@@ -37,6 +37,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -108,14 +109,14 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onLogin(PlayerLoginEvent e)
+    public void onPreLogin(AsyncPlayerPreLoginEvent e)
     {
-        String playername = e.getPlayer().getName();
+        String playername = e.getName();
         UUID uuid = null;
 
         if (config.isUseUUIDs())
         {
-            uuid = e.getPlayer().getUniqueId();
+            uuid = e.getUniqueId();
             BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN_UUID, playername, uuid));
 
             //update uuid player db
@@ -123,7 +124,7 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
         }
         else
         {
-            BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN, e.getPlayer().getName()));
+            BungeePerms.getLogger().info(Lang.translate(Lang.MessageType.LOGIN, e.getName()));
         }
 
         //remove user from cache if present
@@ -150,6 +151,16 @@ public class BukkitEventListener implements Listener, EventListener, PluginMessa
             u = pm().createTempUser(playername, uuid);
             pm().getBackEnd().saveUser(u, true);
         }
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onLogin(PlayerLoginEvent e)
+    {
+        String playername = e.getPlayer().getName();
+        UUID uuid = config.isUseUUIDs() ? e.getPlayer().getUniqueId() : null;
+
+        //load user from db if not in cache
+        User u = config.isUseUUIDs() ? pm().getUser(uuid) : pm().getUser(playername);
 
         BukkitPlugin.getInstance().getNotifier().sendWorldUpdate(e.getPlayer());
 
