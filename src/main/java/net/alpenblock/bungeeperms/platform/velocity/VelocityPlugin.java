@@ -210,7 +210,7 @@ public class VelocityPlugin implements PlatformPlugin
     @Override
     public VelocitySender getPlayer(String name)
     {
-        CommandSource sender = proxyServer.getPlayer(name).get();
+        CommandSource sender = proxyServer.getPlayer(name).orElse(null);
 
         VelocitySender s = null;
 
@@ -225,7 +225,7 @@ public class VelocityPlugin implements PlatformPlugin
     @Override
     public VelocitySender getPlayer(UUID uuid)
     {
-        CommandSource sender = proxyServer.getPlayer(uuid).get();
+        CommandSource sender = proxyServer.getPlayer(uuid).orElse(null);
 
         VelocitySender s = null;
 

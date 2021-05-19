@@ -109,7 +109,7 @@ public class VelocityNotifier implements NetworkNotifier
             return;
         }
 
-        Player pp = proxyServer.getPlayer(player).get();
+        Player pp = proxyServer.getPlayer(player).orElse(null);
         if (pp != null && pp.getCurrentServer() != null)
         {
             //ignore servers not in config and netork type is server dependend
@@ -144,7 +144,7 @@ public class VelocityNotifier implements NetworkNotifier
             return;
         }
 
-        Player pp = proxyServer.getPlayer(player).get();
+        Player pp = proxyServer.getPlayer(player).orElse(null);
         if (pp != null && pp.getCurrentServer() != null)
         {
             //ignore servers not in config and netork type is server dependend
