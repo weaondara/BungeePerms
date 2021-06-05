@@ -878,7 +878,8 @@ public class User implements PermEntity
                 continue;
             next = next == null ? end : Math.min(next, end);
         }
-        BungeePerms.getInstance().getDebug().log("getNextTimedPermission " + name + ": " + next);
+        if (BungeePerms.getInstance().getConfig().isDebug())
+            BungeePerms.getInstance().getDebug().log("getNextTimedPermission " + name + ": " + next);
         return next;
     }
 
