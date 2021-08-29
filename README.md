@@ -23,7 +23,7 @@ For BungeePerms 4 use
 <repositories>
     <repository>
         <id>bungeeperms-repo</id>
-        <url>http://repo.wea-ondara.net/repository/public/</url>
+        <url>https://repo.wea-ondara.net/repository/public/</url>
     </repository>
 </repositories>
 <dependencies>
@@ -40,7 +40,7 @@ For BungeePerms 3 (outdated) use
 <repositories>
     <repository>
         <id>bungeeperms-repo</id>
-        <url>http://repo.wea-ondara.net/repository/public/</url>
+        <url>https://repo.wea-ondara.net/repository/public/</url>
     </repository>
 </repositories>
 <dependencies>
