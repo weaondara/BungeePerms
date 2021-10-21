@@ -25,8 +25,7 @@ import lombok.Getter;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
 import net.alpenblock.bungeeperms.platform.Sender;
-import net.kyori.text.Component;
-import net.kyori.text.TextComponent;
+import net.kyori.adventure.text.Component;
 
 @Getter
 @AllArgsConstructor
@@ -40,7 +39,7 @@ public class VelocitySender implements Sender
     {
         if (message.replaceAll("&.", "").replaceAll("§.", "").trim().isEmpty())
             return;
-        TextComponent t = TextComponent.builder().content(message).build();
+        Component t = Component.text(message);
         sender.sendMessage(t);
     }
 

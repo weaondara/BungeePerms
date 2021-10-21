@@ -24,7 +24,8 @@ import net.alpenblock.bungeeperms.Lang;
 import net.alpenblock.bungeeperms.PermissionsChecker;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
-import net.kyori.text.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 @AllArgsConstructor
 public class VelocityPermissionsChecker extends PermissionsChecker
@@ -195,14 +196,14 @@ public class VelocityPermissionsChecker extends PermissionsChecker
             boolean isperm = (hasPerm(sender, perm));
             if (!isperm && msg)
             {
-                TextComponent t = TextComponent.builder().content(Lang.translate(Lang.MessageType.NO_PERM)).build();
+                Component t = Component.text(Lang.translate(Lang.MessageType.NO_PERM));
                 sender.sendMessage(t);
             }
             return isperm;
         }
         else
         {
-            TextComponent t = TextComponent.builder().content(Lang.translate(Lang.MessageType.NO_PERM)).build();
+            Component t = Component.text(Lang.translate(Lang.MessageType.NO_PERM));
             sender.sendMessage(t);
             return false;
         }
@@ -221,7 +222,7 @@ public class VelocityPermissionsChecker extends PermissionsChecker
         boolean isperm = hasPerm(sender, perm) || new VelocitySender(sender).isConsole();
         if (!isperm && msg)
         {
-            TextComponent t = TextComponent.builder().content(Lang.translate(Lang.MessageType.NO_PERM)).build();
+            Component t = Component.text(Lang.translate(Lang.MessageType.NO_PERM));
             sender.sendMessage(t);
         }
         return isperm;
@@ -242,14 +243,14 @@ public class VelocityPermissionsChecker extends PermissionsChecker
             boolean isperm = hasPermOnServer(sender, perm);
             if (!isperm && msg)
             {
-                TextComponent t = TextComponent.builder().content(Lang.translate(Lang.MessageType.NO_PERM)).build();
+                Component t = Component.text(Lang.translate(Lang.MessageType.NO_PERM));
                 sender.sendMessage(t);
             }
             return isperm;
         }
         else
         {
-            TextComponent t = TextComponent.builder().content(Lang.translate(Lang.MessageType.NO_PERM)).build();
+            Component t = Component.text(Lang.translate(Lang.MessageType.NO_PERM));
             sender.sendMessage(t);
             return false;
         }
@@ -268,7 +269,7 @@ public class VelocityPermissionsChecker extends PermissionsChecker
         boolean isperm = hasPermOnServer(sender, perm) || new VelocitySender(sender).isConsole();
         if (!isperm && msg)
         {
-            TextComponent t = TextComponent.builder().content(Lang.translate(Lang.MessageType.NO_PERM)).build();
+            Component t = Component.text(Lang.translate(Lang.MessageType.NO_PERM));
             sender.sendMessage(t);
         }
         return isperm;
@@ -289,14 +290,14 @@ public class VelocityPermissionsChecker extends PermissionsChecker
             boolean isperm = hasPermOnServerInWorld(sender, perm);
             if (!isperm && msg)
             {
-                TextComponent t = TextComponent.builder().content(Lang.translate(Lang.MessageType.NO_PERM)).build();
+                Component t = Component.text(Lang.translate(Lang.MessageType.NO_PERM));
                 sender.sendMessage(t);
             }
             return isperm;
         }
         else
         {
-            TextComponent t = TextComponent.builder().content(Lang.translate(Lang.MessageType.NO_PERM)).build();
+            Component t = Component.text(Lang.translate(Lang.MessageType.NO_PERM));
             sender.sendMessage(t);
             return false;
         }
@@ -315,7 +316,7 @@ public class VelocityPermissionsChecker extends PermissionsChecker
         boolean isperm = hasPermOnServerInWorld(sender, perm) || new VelocitySender(sender).isConsole();
         if (!isperm && msg)
         {
-            TextComponent t = TextComponent.builder().content(Lang.translate(Lang.MessageType.NO_PERM)).build();
+            Component t = Component.text(Lang.translate(Lang.MessageType.NO_PERM));
             sender.sendMessage(t);
         }
         return isperm;

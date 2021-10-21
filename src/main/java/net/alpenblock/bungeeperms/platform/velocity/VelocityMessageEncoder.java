@@ -21,11 +21,11 @@ import java.util.List;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.ChatColor;
 import net.alpenblock.bungeeperms.platform.MessageEncoder;
-import net.kyori.text.Component;
-import net.kyori.text.ComponentBuilder;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
-import net.kyori.text.format.TextDecoration;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class VelocityMessageEncoder extends MessageEncoder
 {
@@ -42,7 +42,7 @@ public class VelocityMessageEncoder extends MessageEncoder
 
     public static Component convert(BaseComponent[] components)
     {
-        Component ret = TextComponent.empty();
+        Component ret = Component.text("");
         List<Component> children = new ArrayList(components.length);
         for (int i = 0; i < components.length; i++)
         {
@@ -80,7 +80,7 @@ public class VelocityMessageEncoder extends MessageEncoder
         super(text);
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
-            builder = TextComponent.builder(text);
+            builder = Component.text().content(text);
         }
 
         list = new ArrayList<>();
@@ -93,7 +93,7 @@ public class VelocityMessageEncoder extends MessageEncoder
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             cache = null;
-            builder = builder.append(text);
+            builder = builder.append(Component.text(text));
         }
 
         list.add(current);
@@ -108,7 +108,7 @@ public class VelocityMessageEncoder extends MessageEncoder
         if (BungeePerms.getInstance().getPlugin().isChatApiPresent())
         {
             cache = null;
-            builder = builder.color(TextColor.valueOf(color.name()));
+            builder = builder.color(NamedTextColor.NAMES.value(color.name()));
         }
 
         current = color + current;
@@ -230,8 +230,8 @@ public class VelocityMessageEncoder extends MessageEncoder
             else
             {
                 cache = null;
-                net.kyori.text.event.ClickEvent.Action action = net.kyori.text.event.ClickEvent.Action.valueOf(clickEvent.getAction().name());
-                builder = builder.clickEvent(net.kyori.text.event.ClickEvent.of(action, clickEvent.getValue()));
+                net.kyori.adventure.text.event.ClickEvent.Action action = net.kyori.adventure.text.event.ClickEvent.Action.valueOf(clickEvent.getAction().name());
+                builder = builder.clickEvent(net.kyori.adventure.text.event.ClickEvent.clickEvent(action, clickEvent.getValue()));
             }
         }
 
@@ -250,8 +250,8 @@ public class VelocityMessageEncoder extends MessageEncoder
             else
             {
                 cache = null;
-                net.kyori.text.event.HoverEvent.Action action = net.kyori.text.event.HoverEvent.Action.valueOf(hoverEvent.getAction().name());
-                builder = builder.hoverEvent(net.kyori.text.event.HoverEvent.of(action, convert(hoverEvent.getValue().create())));
+                net.kyori.adventure.text.event.HoverEvent.Action action = net.kyori.adventure.text.event.HoverEvent.Action.NAMES.value(hoverEvent.getAction().name());
+                builder = builder.hoverEvent(net.kyori.adventure.text.event.HoverEvent.hoverEvent(action, convert(hoverEvent.getValue().create())));
             }
         }
 

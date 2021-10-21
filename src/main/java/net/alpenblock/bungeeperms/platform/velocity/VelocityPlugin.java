@@ -19,6 +19,7 @@ package net.alpenblock.bungeeperms.platform.velocity;
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -34,12 +35,10 @@ import net.alpenblock.bungeeperms.platform.independend.GroupProcessor;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Color;
 import net.alpenblock.bungeeperms.Config;
@@ -53,7 +52,7 @@ import net.alpenblock.bungeeperms.platform.PluginMessageSender;
 import net.alpenblock.bungeeperms.platform.ScheduledTask;
 import net.alpenblock.bungeeperms.platform.Sender;
 import net.alpenblock.bungeeperms.platform.proxy.ProxyConfig;
-import net.kyori.text.TextComponent;
+import net.kyori.adventure.text.Component;
 
 @Plugin(id = "bungeeperms", name = "BungeePerms", version = "@version@", authors =
 {
@@ -164,7 +163,7 @@ public class VelocityPlugin implements PlatformPlugin
     private void loadcmds()
     {
         CmdExec cmd = new CmdExec("bungeeperms", null, config.isAliasCommand() ? Statics.array("bp") : new String[0]);
-        proxyServer.getCommandManager().register(cmd, config.isAliasCommand() ? Statics.array("bp") : new String[0]);
+        proxyServer.getCommandManager().register("bungeeperms", cmd, config.isAliasCommand() ? Statics.array("bp") : new String[0]);
     }
 
 //plugin info
@@ -308,7 +307,7 @@ public class VelocityPlugin implements PlatformPlugin
         }
     }
 
-    private class CmdExec implements Command
+    private class CmdExec implements SimpleCommand
     {
 
         public CmdExec(String name, String permission, String... aliases)
@@ -316,7 +315,7 @@ public class VelocityPlugin implements PlatformPlugin
         }
 
         @Override
-        public void execute(final CommandSource sender, final String[] args)
+        public void execute(Invocation invocation)
         {
             final Command cmd = this;
             Runnable r = new Runnable()
@@ -324,8 +323,8 @@ public class VelocityPlugin implements PlatformPlugin
                 @Override
                 public void run()
                 {
-                    if (!VelocityPlugin.this.onCommand(sender, cmd, "", args))
-                        sender.sendMessage(TextComponent.of(Color.Error + "[BungeePerms] " + Lang.translate(Lang.MessageType.COMMAND_NOT_FOUND)));
+                    if (!VelocityPlugin.this.onCommand(invocation.source(), cmd, "", invocation.arguments()))
+                        invocation.source().sendMessage(Component.text(Color.Error + "[BungeePerms] " + Lang.translate(Lang.MessageType.COMMAND_NOT_FOUND)));
                 }
             };
             if (config.isAsyncCommands())
@@ -335,9 +334,9 @@ public class VelocityPlugin implements PlatformPlugin
         }
 
         @Override
-        public List<String> suggest(CommandSource sender, String[] args)
+        public List<String> suggest(Invocation invocation)
         {
-            return VelocityPlugin.this.onTabComplete(sender, this, "", args);
+            return VelocityPlugin.this.onTabComplete(invocation.source(), this, "", invocation.arguments());
         }
     }
 
