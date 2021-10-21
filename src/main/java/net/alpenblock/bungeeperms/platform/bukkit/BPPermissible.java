@@ -16,6 +16,7 @@
  */
 package net.alpenblock.bungeeperms.platform.bukkit;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -46,14 +47,14 @@ import org.bukkit.plugin.Plugin;
 public class BPPermissible extends PermissibleBase
 {
 
-    private CommandSender sender;
+    private final CommandSender sender;
     private PermissionAttachment attachment;
-    private Map<String, PermissionAttachmentInfo> permissions;
-    private Map<String, PermissionAttachmentInfo> superperms;
+    private final Map<String, PermissionAttachmentInfo> permissions;
+    private final Map<String, PermissionAttachmentInfo> superperms;
     @Getter
-    private Permissible oldPermissible = null;
-    private ServerOperator oldOpable = null;
-    private ServerOperator opable = null;
+    private final Permissible oldPermissible;
+    private final ServerOperator oldOpable;
+    private final ServerOperator opable;
     private boolean opdisabled = false;
     private boolean init = false;
 
@@ -62,7 +63,7 @@ public class BPPermissible extends PermissibleBase
         super(sender);
         this.sender = sender;
         this.oldPermissible = oldPermissible;
-        permissions = new LinkedHashMap<String, PermissionAttachmentInfo>()
+        permissions = Collections.synchronizedMap(new LinkedHashMap<String, PermissionAttachmentInfo>()
         {
             @Override
             public PermissionAttachmentInfo put(String k, PermissionAttachmentInfo v)
@@ -74,8 +75,8 @@ public class BPPermissible extends PermissibleBase
                 }
                 return super.put(k, v);
             }
-        };
-        superperms = new LinkedHashMap<String, PermissionAttachmentInfo>()
+        });
+        superperms = Collections.synchronizedMap(new LinkedHashMap<String, PermissionAttachmentInfo>()
         {
             @Override
             public PermissionAttachmentInfo put(String k, PermissionAttachmentInfo v)
@@ -87,7 +88,7 @@ public class BPPermissible extends PermissibleBase
                 }
                 return super.put(k, v);
             }
-        };
+        });
 
         //inject an opable
         oldOpable = Statics.getField(PermissibleBase.class, oldPermissible, ServerOperator.class, "opable");
@@ -159,7 +160,9 @@ public class BPPermissible extends PermissibleBase
         opdisabled = false;
 
         permissions.clear();
-        permissions.putAll(superperms);
+        synchronized(superperms) {
+            permissions.putAll(superperms);
+        }
 
         BukkitConfig config = (BukkitConfig) BungeePerms.getInstance().getConfig();
 
@@ -278,13 +281,17 @@ public class BPPermissible extends PermissibleBase
 
     public Set<PermissionAttachmentInfo> getEffectiveSuperPerms()
     {
-        return new LinkedHashSet<>(superperms.values());
+        synchronized(superperms) {
+            return new LinkedHashSet<>(superperms.values());
+        }
     }
 
     @Override
     public Set<PermissionAttachmentInfo> getEffectivePermissions()
     {
-        return new LinkedHashSet<>(permissions.values());
+        synchronized(permissions) {
+            return new LinkedHashSet<>(permissions.values());
+        }
     }
 
     @Override
@@ -308,7 +315,7 @@ public class BPPermissible extends PermissibleBase
     @Override
     public boolean isPermissionSet(Permission perm)
     {
-        return true;
+        return isPermissionSet(perm.getName());
     }
 
     @Override
