@@ -239,6 +239,22 @@
                             <pattern>org.bstats.bungeecord</pattern>
                             <shadedPattern>net.alpenblock.bungeeperms.metrics.bungee</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>com.mojang</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.libs.com.mojang</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.google</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.libs.com.google</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.mysql</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.libs.com.mysql</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.yaml</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.libs.org.yaml</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
