@@ -23,7 +23,7 @@
         <repository>
             <id>localdeployrepo</id>
             <name>wea_ondara's Repository</name>
-            <url>http://repo.wea-ondara.net/repository/public/</url>
+            <url>https://repo.wea-ondara.net/repository/public/</url>
         </repository>
     </distributionManagement>
     
