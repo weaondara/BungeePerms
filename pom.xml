@@ -244,8 +244,8 @@
                             <shadedPattern>net.alpenblock.bungeeperms.libs.com.mojang</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>com.google</pattern>
-                            <shadedPattern>net.alpenblock.bungeeperms.libs.com.google</shadedPattern>
+                            <pattern>com.google.gson</pattern>
+                            <shadedPattern>net.alpenblock.bungeeperms.libs.com.google.gson</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>com.mysql</pattern>
