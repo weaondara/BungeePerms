@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Getter;
 import net.alpenblock.bungeeperms.BPConfig;
+import net.alpenblock.bungeeperms.BPPermission;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Debug;
 import net.alpenblock.bungeeperms.Group;
@@ -939,4 +940,16 @@ public class MySQLBackEnd implements BackEnd
     {
         adapter.removeGroupReferences(g.getName());
     }
+
+    @Override
+    public List<BPPermission> getUsersWithPerm(String perm) {
+        return adapter.getUsersWithPerm(perm);
+    }
+
+    @Override
+    public List<BPPermission> getGroupsWithPerm(String perm) {
+        return adapter.getGroupsWithPerm(perm);
+    }
+
+
 }

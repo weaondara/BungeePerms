@@ -287,6 +287,7 @@ public class Lang
         HELP_GROUP_REMOVETIMEDPERM("help.group.remove-timed-perm", "Removes a timed permission from the group"),
         HELP_GROUP_HAS("help.group.has", "Checks if the group has the permission"),
         HELP_GROUP_LIST("help.group.list", "Lists the permissions of the group"),
+        HELP_SEARCH("search.search", "Lists where a permission is set for groups and users"),
         HELP_PROMOTE("help.promote", "Promotes the user to the next rank"),
         HELP_DEMOTE("help.demote", "Demotes the user to the previous rank"),
         HELP_FORMAT("help.format", "Reformates the permission.yml or mysql table - " + ChatColor.RED.alt() + "BE CAREFUL"),

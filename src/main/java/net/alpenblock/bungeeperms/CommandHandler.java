@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 wea_ondara
  *
  * BungeePerms is free software: you can redistribute it and/or modify
@@ -123,6 +123,10 @@ public class CommandHandler
             else if (args[0].equalsIgnoreCase("uuid"))
             {
                 return handleUUID(sender, args);
+            }
+            else if (args[0].equalsIgnoreCase("search"))
+            {
+                return handleSearch(sender, args);
             }
         }
         return false;
@@ -3152,7 +3156,62 @@ public class CommandHandler
         return true;
     }
 
-    //command util  
+    private boolean handleSearch(Sender sender, String[] args) {
+        if (!checker.hasOrConsole(sender, "bungeeperms.search", true)) {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 2, 3)) {
+            return true;
+        }
+
+        int page = 1;
+        if (args.length == 3 && Statics.isInt(args[2])) {
+            page = Integer.parseInt(args[2]);
+        }
+
+        String perm = args[1].toLowerCase();
+        List<BPPermission> userperm;
+        List<BPPermission> groupperm;
+        userperm = pm().getBackEnd().getUsersWithPerm(perm);
+        userperm.sort(Comparator.comparing(BPPermission::getOrigin));
+        groupperm = pm().getBackEnd().getGroupsWithPerm(perm);
+        groupperm.sort(Comparator.comparing(BPPermission::getOrigin));
+
+        if (!userperm.isEmpty()) {
+            sender.sendMessage("Users with permission '" + perm + "':");
+            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, userperm.size() / 20 + (userperm.size() % 20 > 0 ? 1 : 0)));
+            for (int i = (page - 1) * 20; i < page * 20 && i < userperm.size(); i++) {
+                BPPermission p = userperm.get(i);
+                String name = pm().getUUIDPlayerDB().getPlayerName(UUID.fromString(p.getOrigin()));
+                sender.sendMessage(Color.Text + "- " + Color.Value + (name != null ? name : p.getOrigin()) +
+                        Color.Text + " (Perm: " + Color.Value + p.getPermission() +
+                        (p.getServer() == null ? "" : (Color.Text + ", Server: " + Color.Value + p.getServer())) +
+                        (p.getWorld() == null ? "" : (Color.Text + ", World: " + Color.Value + p.getWorld())) +
+                        Color.Text + ")");
+            }
+        } else {
+            sender.sendMessage(Color.Text + "Found no user with permission " + Color.Value + perm + Color.Text + "..");
+        }
+
+        if (!groupperm.isEmpty()) {
+            sender.sendMessage("Groups with permission '" + perm + "':");
+            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, groupperm.size() / 20 + (groupperm.size() % 20 > 0 ? 1 : 0)));
+            for (int i = (page - 1) * 20; i < page * 20 && i < groupperm.size(); i++) {
+                BPPermission p = groupperm.get(i);
+                sender.sendMessage(Color.Text + "- " + Color.Value + p.getOrigin() +
+                        Color.Text + " (Perm: " + Color.Value + p.getPermission() +
+                        (p.getServer() == null ? "" : (Color.Text + ", Server: " + Color.Value + p.getServer())) +
+                        (p.getWorld() == null ? "" : (Color.Text + ", World: " + Color.Value + p.getWorld())) +
+                        Color.Text + ")");
+            }
+        } else {
+            sender.sendMessage(Color.Text + "Found no group with permission " + Color.Value + perm + Color.Text + "..");
+        }
+        return true;
+    }
+
+    //command util
     private void list(Sender sender, List<BPPermission> perms, String entity, int page, boolean only, String server, String world)
     {
         if (only)
