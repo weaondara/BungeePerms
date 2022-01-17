@@ -3171,42 +3171,23 @@ public class CommandHandler
         }
 
         String perm = args[1].toLowerCase();
-        List<BPPermission> userperm;
-        List<BPPermission> groupperm;
-        userperm = pm().getBackEnd().getUsersWithPerm(perm);
+        List<BPPermission> userperm = pm().getBackEnd().getUsersWithPerm(perm);
+        List<BPPermission> groupperm = pm().getBackEnd().getGroupsWithPerm(perm);
         userperm.sort(Comparator.comparing(BPPermission::getOrigin));
-        groupperm = pm().getBackEnd().getGroupsWithPerm(perm);
         groupperm.sort(Comparator.comparing(BPPermission::getOrigin));
 
         if (!userperm.isEmpty()) {
-            sender.sendMessage("Users with permission '" + perm + "':");
-            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, userperm.size() / 20 + (userperm.size() % 20 > 0 ? 1 : 0)));
-            for (int i = (page - 1) * 20; i < page * 20 && i < userperm.size(); i++) {
-                BPPermission p = userperm.get(i);
-                String name = pm().getUUIDPlayerDB().getPlayerName(UUID.fromString(p.getOrigin()));
-                sender.sendMessage(Color.Text + "- " + Color.Value + (name != null ? name : p.getOrigin()) +
-                        Color.Text + " (Perm: " + Color.Value + p.getPermission() +
-                        (p.getServer() == null ? "" : (Color.Text + ", Server: " + Color.Value + p.getServer())) +
-                        (p.getWorld() == null ? "" : (Color.Text + ", World: " + Color.Value + p.getWorld())) +
-                        Color.Text + ")");
-            }
+            sender.sendMessage(Lang.translate(MessageType.SEARCH_USER_HEADER, perm));
+            list(sender, userperm, null, page, false, null, null);
         } else {
-            sender.sendMessage(Color.Text + "Found no user with permission " + Color.Value + perm + Color.Text + "..");
+            sender.sendMessage(Lang.translate(MessageType.SEARCH_NO_USER_FOUND, perm));
         }
 
         if (!groupperm.isEmpty()) {
-            sender.sendMessage("Groups with permission '" + perm + "':");
-            sender.sendMessage(Lang.translate(MessageType.PERMISSIONS_LIST_HEADER_PAGE, page, groupperm.size() / 20 + (groupperm.size() % 20 > 0 ? 1 : 0)));
-            for (int i = (page - 1) * 20; i < page * 20 && i < groupperm.size(); i++) {
-                BPPermission p = groupperm.get(i);
-                sender.sendMessage(Color.Text + "- " + Color.Value + p.getOrigin() +
-                        Color.Text + " (Perm: " + Color.Value + p.getPermission() +
-                        (p.getServer() == null ? "" : (Color.Text + ", Server: " + Color.Value + p.getServer())) +
-                        (p.getWorld() == null ? "" : (Color.Text + ", World: " + Color.Value + p.getWorld())) +
-                        Color.Text + ")");
-            }
+            sender.sendMessage(Lang.translate(MessageType.SEARCH_GROUP_HEADER, perm));
+            list(sender, groupperm, null, page, false, null, null);
         } else {
-            sender.sendMessage(Color.Text + "Found no group with permission " + Color.Value + perm + Color.Text + "..");
+            sender.sendMessage(Lang.translate(MessageType.SEARCH_NO_GROUP_FOUND, perm));
         }
         return true;
     }
