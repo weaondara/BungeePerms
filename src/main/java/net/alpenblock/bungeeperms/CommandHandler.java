@@ -3173,10 +3173,19 @@ public class CommandHandler
         String perm = args[1].toLowerCase();
         List<BPPermission> userperm = pm().getBackEnd().getUsersWithPerm(perm);
         List<BPPermission> groupperm = pm().getBackEnd().getGroupsWithPerm(perm);
-        userperm.sort(Comparator.comparing(BPPermission::getOrigin));
-        groupperm.sort(Comparator.comparing(BPPermission::getOrigin));
+
+        if (config.isUseUUIDs()) {
+            Map<UUID, String> map = new HashMap<>();
+            map = pm().getUUIDPlayerDB().getAll();
+            for (BPPermission bpp : userperm) {
+                UUID uuid = UUID.fromString(bpp.getOrigin());
+                if (map.containsKey(uuid))
+                    bpp.setOrigin(map.get(uuid));
+            }
+        }
 
         if (!userperm.isEmpty()) {
+            userperm.sort(Comparator.comparing(BPPermission::getOrigin));
             sender.sendMessage(Lang.translate(MessageType.SEARCH_USER_HEADER, perm));
             list(sender, userperm, null, page, false, null, null);
         } else {
@@ -3184,6 +3193,7 @@ public class CommandHandler
         }
 
         if (!groupperm.isEmpty()) {
+            groupperm.sort(Comparator.comparing(BPPermission::getOrigin));
             sender.sendMessage(Lang.translate(MessageType.SEARCH_GROUP_HEADER, perm));
             list(sender, groupperm, null, page, false, null, null);
         } else {

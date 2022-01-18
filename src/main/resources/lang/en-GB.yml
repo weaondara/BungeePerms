@@ -24,8 +24,8 @@ command:
   search:
     user-header: '&7Users with permission &6{0}&7":'
     group-header: '&7Groups with permission &6{0}&7:'
-    no-user-found: '&7Found no user with permission &6{0}&7..'
-    no-group-found: '&7Found no group with permission &6{0}&7..'
+    no-user-found: '&7Found no user with permission &6{0}&7.'
+    no-group-found: '&7Found no group with permission &6{0}&7.'
 error:
   invalid-bool-value: '&4A boolean value is required!'
   invalid-int-value: '&4An integer value greater than 0 is required!'

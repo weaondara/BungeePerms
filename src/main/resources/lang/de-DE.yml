@@ -24,8 +24,8 @@ command:
   search:
     user-header: '&7User mit der Permission &6{0}&7":'
     group-header: '&7Gruppen mit der Permission &6{0}&7:'
-    no-user-found: '&7Es wurde kein User gefunden mit der Permission &6{0}&7..'
-    no-group-found: '&7Es wurde keine Gruppe gefunden mit der Permission &6{0}&7..'
+    no-user-found: '&7Es wurde kein User gefunden mit der Permission &6{0}&7.'
+    no-group-found: '&7Es wurde keine Gruppe gefunden mit der Permission &6{0}&7.'
 error:
   invalid-bool-value: '&4Eine boolscher Wert ist erforderlich!'
   invalid-int-value: '&4Ein Integer-Wert größer 0 ist erforderlich!'
