@@ -82,6 +82,7 @@ public class HelpProvider
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.group.perms.has",/*          */ makeSuggestCommand("/bp group <group> has <perm> [server [world]]", Lang.translate(MessageType.HELP_GROUP_HAS))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.group.perms.list",/*         */ makeSuggestCommand("/bp group <group> list", Lang.translate(MessageType.HELP_GROUP_LIST))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.group.perms.list",/*         */ makeSuggestCommand("/bp group <group> listonly", Lang.translate(MessageType.HELP_GROUP_LIST))));
+        HELP_ENTRIES.add(new HelpEntry("bungeeperms.search",/*                   */ makeSuggestCommand("/bp search <permission>", Lang.translate(MessageType.HELP_SEARCH))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.promote",/*                  */ makeSuggestCommand("/bp promote <user> [ladder]", Lang.translate(MessageType.HELP_PROMOTE))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.demote",/*                   */ makeSuggestCommand("/bp demote <user> [ladder]", Lang.translate(MessageType.HELP_DEMOTE))));
         HELP_ENTRIES.add(new HelpEntry("bungeeperms.format",/*                   */ makeClickCommand("/bp format", Lang.translate(MessageType.HELP_FORMAT))));

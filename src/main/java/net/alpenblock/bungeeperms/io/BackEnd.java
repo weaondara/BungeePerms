@@ -18,6 +18,8 @@ package net.alpenblock.bungeeperms.io;
 
 import java.util.List;
 import java.util.UUID;
+
+import net.alpenblock.bungeeperms.BPPermission;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 
@@ -103,4 +105,9 @@ public interface BackEnd
     public void clearDatabase();
     
     public void removeGroupReferences(Group g);
+
+    public List<BPPermission> getUsersWithPerm(String perm);
+
+    public List<BPPermission> getGroupsWithPerm(String perm);
+
 }

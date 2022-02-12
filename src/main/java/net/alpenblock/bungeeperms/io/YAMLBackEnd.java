@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.SneakyThrows;
 import net.alpenblock.bungeeperms.BPConfig;
+import net.alpenblock.bungeeperms.BPPermission;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Config;
 import net.alpenblock.bungeeperms.Group;
@@ -1129,5 +1130,67 @@ public class YAMLBackEnd implements BackEnd {
         for (String timedref : c.getSubNodes(key))
             if (timedref.equalsIgnoreCase(group))
                 c.deleteNode(key + "." + timedref);
+    }
+
+    @Override
+    public List<BPPermission> getUsersWithPerm(String permission) {
+       List<BPPermission> users = new ArrayList<>();
+        for (String user : permsconfusers.getSubNodes("users")) {
+            for (String perm : permsconfusers.getListString("users." + user + ".permissions", new ArrayList<>())) {
+                if (!perm.contains(permission))
+                    continue;
+                BPPermission bpperm = new BPPermission(perm, user, false, null, null, null, null);
+                users.add(bpperm);
+            }
+            for (String server : permsconfusers.getSubNodes("users." + user + ".servers")) {
+                for (String perm : permsconfusers.getListString("users." + user + ".servers." + server + ".permissions", new ArrayList<>())) {
+                    if (!perm.contains(permission))
+                        continue;
+                    BPPermission bpperm = new BPPermission(perm, user, false, server, null, null, null);
+                    users.add(bpperm);
+                }
+                for (String world : permsconfusers.getSubNodes("users." + user + ".servers." + server + ".worlds")) {
+                    for (String perm : permsconfusers.getListString("users." + user + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<>())) {
+                        if (!perm.contains(permission))
+                            continue;
+                        BPPermission bpperm = new BPPermission(perm, user, false, server, world, null, null);
+                        users.add(bpperm);
+                    }
+                }
+            }
+        }
+
+        return users;
+    }
+
+    @Override
+    public List<BPPermission> getGroupsWithPerm(String permission) {
+       List<BPPermission> groups = new ArrayList<>();
+        for (String group : permsconfgroups.getSubNodes("groups")) {
+            for (String perm : permsconfgroups.getListString("groups." + group + ".permissions", new ArrayList<>())) {
+                if (!perm.contains(permission))
+                    continue;
+                BPPermission bpperm = new BPPermission(perm, group, true, null, null, null, null);
+                groups.add(bpperm);
+            }
+            for (String server : permsconfgroups.getSubNodes("groups." + group + ".servers")) {
+                for (String perm : permsconfgroups.getListString("groups." + group + ".servers." + server + ".permissions", new ArrayList<>())) {
+                    if (!perm.contains(permission))
+                        continue;
+                    BPPermission bpperm = new BPPermission(perm, group, true, server, null, null, null);
+                    groups.add(bpperm);
+                }
+                for (String world : permsconfgroups.getSubNodes("groups." + group + ".servers." + server + ".worlds")) {
+                    for (String perm : permsconfgroups.getListString("groups." + group + ".servers." + server + ".worlds." + world + ".permissions", new ArrayList<>())) {
+                        if (!perm.contains(permission))
+                            continue;
+                        BPPermission bpperm = new BPPermission(perm, group, true, server, world, null, null);
+                        groups.add(bpperm);
+                    }
+                }
+            }
+        }
+
+        return groups;
     }
 }

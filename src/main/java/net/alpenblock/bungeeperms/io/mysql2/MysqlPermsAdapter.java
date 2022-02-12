@@ -21,6 +21,8 @@ import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.alpenblock.bungeeperms.BPPermission;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Mysql;
 
@@ -420,5 +422,59 @@ public class MysqlPermsAdapter
         {
             Mysql.close(stmt);
         }
+    }
+
+    public List<BPPermission> getUsersWithPerm(String perm) {
+        List<BPPermission> users = new ArrayList<>();
+
+        PreparedStatement stmt = null;
+        ResultSet res = null;
+        try {
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT * FROM `" + table + "` WHERE `key` LIKE 'permissions' AND `type`=" + EntityType.User.getCode() + " AND `value` LIKE '%" + perm + "%'");
+            res = mysql.returnQuery(stmt);
+            while (res.next()) {
+                String name = res.getString("name");
+                String value = res.getString("value");
+                String server = res.getString("server");
+                String world = res.getString("world");
+                BPPermission bpperm = new BPPermission(value, name, true, server, world, null, null);
+                users.add(bpperm);
+            }
+        } catch (Exception e) {
+            BungeePerms.getInstance().getDebug().log(e);
+        } finally {
+            Mysql.close(res);
+            Mysql.close(stmt);
+        }
+
+        return users;
+    }
+
+    public List<BPPermission> getGroupsWithPerm(String perm) {
+        List<BPPermission> groups = new ArrayList<>();
+
+        PreparedStatement stmt = null;
+        ResultSet res = null;
+        try {
+            mysql.checkConnection();
+            stmt = mysql.stmt("SELECT * FROM `" + table + "` WHERE `key` LIKE 'permissions' AND `type`=" + EntityType.Group.getCode() + " AND `value` LIKE '%" + perm + "%'");
+            res = mysql.returnQuery(stmt);
+            while (res.next()) {
+                String name = res.getString("name");
+                String value = res.getString("value");
+                String server = res.getString("server");
+                String world = res.getString("world");
+                BPPermission bpperm = new BPPermission(value, name, true, server, world, null, null);
+                groups.add(bpperm);
+            }
+        } catch (Exception e) {
+            BungeePerms.getInstance().getDebug().log(e);
+        } finally {
+            Mysql.close(res);
+            Mysql.close(stmt);
+        }
+
+        return groups;
     }
 }

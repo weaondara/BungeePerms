@@ -21,6 +21,11 @@ command:
   too-few-arguments: '&4Zu wenig Argumente!'
   too-many-arguments: '&4Zu viele Argumente!'
   error: '&4Ein Fehler ist aufgetreten. Bitte reporte diesen Fehler auf https://github.com/weaondara/BungeePerms/issues . Bitte inkludiere Exceptions von der Konsole.'
+  search:
+    user-header: '&7User mit der Permission &6{0}&7":'
+    group-header: '&7Gruppen mit der Permission &6{0}&7:'
+    no-user-found: '&7Es wurde kein User gefunden mit der Permission &6{0}&7.'
+    no-group-found: '&7Es wurde keine Gruppe gefunden mit der Permission &6{0}&7.'
 error:
   invalid-bool-value: '&4Eine boolscher Wert ist erforderlich!'
   invalid-int-value: '&4Ein Integer-Wert größer 0 ist erforderlich!'
@@ -237,6 +242,7 @@ help:
     remove-timed-perm: Entfernt eine temporäre Permission von einer Gruppe
     has: Prüft ob eine Gruppe eine Permission hat
     list: Listet die Permission der Gruppe auf
+  search: Listet User und Gruppen auf in der angegebene Permission gesetzt ist
   promote: Befördert den User zum nächsten Rang
   demote: Degradiert den User zum vorherigen Rang
   format: Formatiert die permission.yml oder MySQL-Tabelle neu - &cVORSICHT

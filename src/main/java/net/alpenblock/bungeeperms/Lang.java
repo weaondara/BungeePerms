@@ -90,6 +90,10 @@ public class Lang
         COMMAND_TOO_FEW_ARGUMENTS("command.too-few-arguments", Color.Error.alt() + "Too few arguments"),
         COMMAND_TOO_MANY_ARGUMENTS("command.too-many-arguments", Color.Error.alt() + "Too many arguments"),
         COMMAND_ERROR("command.error", Color.Error.alt() + "An error occured! Please report this error on https://github.com/weaondara/BungeePerms/issues . Please include exceptions from console."),
+        SEARCH_USER_HEADER("command.search.user-header",Color.Text.alt() + "Users with permission " + Color.Value.alt() + "{0}" + Color.Text.alt() + ":"),
+        SEARCH_GROUP_HEADER("command.search.group-header",Color.Text.alt() + "Groups with permission " + Color.Value.alt() + "{0}" + Color.Text.alt() + ":"),
+        SEARCH_NO_USER_FOUND("command.search.no-user-found", Color.Text.alt() + "Found no user with permission " + Color.Value.alt() + "{0}" + Color.Text.alt() + ".."),
+        SEARCH_NO_GROUP_FOUND("command.search.no-group-found",Color.Text.alt() + "Found no group with permission " + Color.Value.alt() + "{0}" + Color.Text.alt() + ".."),
         //error msgs
         ERR_INVALID_BOOL_VALUE("error.invalid-bool-value", Color.Error.alt() + "A boolean value is required!"),
         ERR_INVALID_INT_VALUE("error.invalid-int-value", Color.Error.alt() + "An integer value greater than 0 is required!"),
@@ -287,6 +291,7 @@ public class Lang
         HELP_GROUP_REMOVETIMEDPERM("help.group.remove-timed-perm", "Removes a timed permission from the group"),
         HELP_GROUP_HAS("help.group.has", "Checks if the group has the permission"),
         HELP_GROUP_LIST("help.group.list", "Lists the permissions of the group"),
+        HELP_SEARCH("help.search", "Lists where a permission is set for groups and users"),
         HELP_PROMOTE("help.promote", "Promotes the user to the next rank"),
         HELP_DEMOTE("help.demote", "Demotes the user to the previous rank"),
         HELP_FORMAT("help.format", "Reformates the permission.yml or mysql table - " + ChatColor.RED.alt() + "BE CAREFUL"),

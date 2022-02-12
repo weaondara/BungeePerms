@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 wea_ondara
  *
  * BungeePerms is free software: you can redistribute it and/or modify
@@ -123,6 +123,10 @@ public class CommandHandler
             else if (args[0].equalsIgnoreCase("uuid"))
             {
                 return handleUUID(sender, args);
+            }
+            else if (args[0].equalsIgnoreCase("search"))
+            {
+                return handleSearch(sender, args);
             }
         }
         return false;
@@ -3152,7 +3156,53 @@ public class CommandHandler
         return true;
     }
 
-    //command util  
+    private boolean handleSearch(Sender sender, String[] args) {
+        if (!checker.hasOrConsole(sender, "bungeeperms.search", true)) {
+            return true;
+        }
+
+        if (!Statics.matchArgs(sender, args, 2, 3)) {
+            return true;
+        }
+
+        int page = 1;
+        if (args.length == 3 && Statics.isInt(args[2])) {
+            page = Integer.parseInt(args[2]);
+        }
+
+        String perm = args[1].toLowerCase();
+        List<BPPermission> userperm = pm().getBackEnd().getUsersWithPerm(perm);
+        List<BPPermission> groupperm = pm().getBackEnd().getGroupsWithPerm(perm);
+
+        if (config.isUseUUIDs()) {
+            Map<UUID, String> map = new HashMap<>();
+            map = pm().getUUIDPlayerDB().getAll();
+            for (BPPermission bpp : userperm) {
+                UUID uuid = UUID.fromString(bpp.getOrigin());
+                if (map.containsKey(uuid))
+                    bpp.setOrigin(map.get(uuid));
+            }
+        }
+
+        if (!userperm.isEmpty()) {
+            userperm.sort(Comparator.comparing(BPPermission::getOrigin));
+            sender.sendMessage(Lang.translate(MessageType.SEARCH_USER_HEADER, perm));
+            list(sender, userperm, null, page, false, null, null);
+        } else {
+            sender.sendMessage(Lang.translate(MessageType.SEARCH_NO_USER_FOUND, perm));
+        }
+
+        if (!groupperm.isEmpty()) {
+            groupperm.sort(Comparator.comparing(BPPermission::getOrigin));
+            sender.sendMessage(Lang.translate(MessageType.SEARCH_GROUP_HEADER, perm));
+            list(sender, groupperm, null, page, false, null, null);
+        } else {
+            sender.sendMessage(Lang.translate(MessageType.SEARCH_NO_GROUP_FOUND, perm));
+        }
+        return true;
+    }
+
+    //command util
     private void list(Sender sender, List<BPPermission> perms, String entity, int page, boolean only, String server, String world)
     {
         if (only)
