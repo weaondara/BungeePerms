@@ -16,16 +16,20 @@
  */
 package net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.essentials;
 
+import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.perm.IPermissionsHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import com.earth2me.essentials.utils.TriState;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitSender;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 class BungeePermsHandler implements IPermissionsHandler
@@ -39,9 +43,18 @@ class BungeePermsHandler implements IPermissionsHandler
     }
 
     @Override
-    public String getGroup(Player player)
-    {
-        User u = perms.getPermissionsManager().getUser(player.getName());
+    public boolean addToGroup(OfflinePlayer base, String group) {
+        return false;
+    }
+
+    @Override
+    public boolean removeFromGroup(OfflinePlayer base, String group) {
+        return false;
+    }
+
+    @Override
+    public String getGroup(OfflinePlayer base) {
+        User u = perms.getPermissionsManager().getUser(base.getName());
         if (u == null)
         {
             return "";
@@ -51,13 +64,17 @@ class BungeePermsHandler implements IPermissionsHandler
     }
 
     @Override
-    public List<String> getGroups(Player player)
-    {
-        User u = perms.getPermissionsManager().getUser(player.getName());
+    public List<String> getGroups(OfflinePlayer base) {
+        User u = perms.getPermissionsManager().getUser(base.getName());
         if (u == null)
             return new ArrayList();
 
         return new ArrayList(u.getGroupsString());
+    }
+
+    @Override
+    public List<String> getGroups() {
+        return null;
     }
 
     @Override
@@ -107,6 +124,11 @@ class BungeePermsHandler implements IPermissionsHandler
     }
 
     @Override
+    public void registerContext(String context, Function<com.earth2me.essentials.User, Iterable<String>> calculator, Supplier<Iterable<String>> suggestions) {
+
+    }
+
+    @Override
     public boolean isPermissionSet(Player player, String string)
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
@@ -118,14 +140,8 @@ class BungeePermsHandler implements IPermissionsHandler
     }
 
     @Override
-    public boolean tryProvider()
-    {
-        return true;
-    }
-
-    @Override
-    public void registerContext(String context, Function<Player, Iterable<String>> calculator, Supplier<Iterable<String>> suggestions)
-    {
+    public TriState isPermissionSetExact(Player base, String node) {
+        return null;
     }
 
     @Override
@@ -137,5 +153,10 @@ class BungeePermsHandler implements IPermissionsHandler
     public String getBackendName()
     {
         return "BungeePerms";
+    }
+
+    @Override
+    public boolean tryProvider(Essentials ess) {
+        return false;
     }
 }
