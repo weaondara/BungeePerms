@@ -114,7 +114,8 @@ class BungeePermsHandler implements IPermissionsHandler
             return false;
 
         BukkitSender sender = new BukkitSender(player);
-        return u.getEffectivePerms(sender.getServer(), sender.getWorld()).contains(string.toLowerCase());
+        return u.getEffectivePerms(sender.getServer(), sender.getWorld()).stream()
+                .anyMatch(e -> e.getPermission().equalsIgnoreCase(string));
     }
 
     @Override
