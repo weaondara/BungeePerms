@@ -16,16 +16,21 @@
  */
 package net.alpenblock.bungeeperms.platform.bukkit.bridge.bridges.essentials;
 
+import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.perm.IPermissionsHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import com.earth2me.essentials.utils.TriState;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.Statics;
 import net.alpenblock.bungeeperms.User;
 import net.alpenblock.bungeeperms.platform.bukkit.BukkitSender;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 class BungeePermsHandler implements IPermissionsHandler
@@ -39,7 +44,41 @@ class BungeePermsHandler implements IPermissionsHandler
     }
 
     @Override
-    public String getGroup(Player player)
+    public boolean addToGroup(OfflinePlayer player, String group) {
+        User u = perms.getPermissionsManager().getUser(player.getName());
+        if (u == null)
+            return false;
+
+        Group g = perms.getPermissionsManager().getGroup(group);
+        if (g == null)
+            return false;
+
+        if (u.getGroups().contains(g))
+            return false;
+
+        perms.getPermissionsManager().addUserGroup(u, g, null, null);
+        return true;
+    }
+
+    @Override
+    public boolean removeFromGroup(OfflinePlayer player, String group) {
+        User u = perms.getPermissionsManager().getUser(player.getName());
+        if (u == null)
+            return false;
+
+        Group g = perms.getPermissionsManager().getGroup(group);
+        if (g == null)
+            return false;
+
+        if (!u.getGroups().contains(g))
+            return false;
+
+        perms.getPermissionsManager().removeUserGroup(u, g, null, null);
+        return true;
+    }
+
+    @Override
+    public String getGroup(OfflinePlayer player)
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
@@ -51,13 +90,18 @@ class BungeePermsHandler implements IPermissionsHandler
     }
 
     @Override
-    public List<String> getGroups(Player player)
+    public List<String> getGroups(OfflinePlayer player)
     {
         User u = perms.getPermissionsManager().getUser(player.getName());
         if (u == null)
             return new ArrayList();
 
         return new ArrayList(u.getGroupsString());
+    }
+
+    @Override
+    public List<String> getGroups() {
+        return perms.getPermissionsManager().getGroups().stream().map(Group::getName).collect(Collectors.toList());
     }
 
     @Override
@@ -119,13 +163,28 @@ class BungeePermsHandler implements IPermissionsHandler
     }
 
     @Override
-    public boolean tryProvider()
+    public TriState isPermissionSetExact(Player player, String string) {
+        User u = perms.getPermissionsManager().getUser(player.getName());
+        if (u == null)
+            return TriState.FALSE;
+
+        BukkitSender sender = new BukkitSender(player);
+        return u.getEffectivePerms(sender.getServer(), sender.getWorld()).stream()
+                .filter(e -> e.getPermission().equals(string.toLowerCase()))
+                .findFirst()
+                .map(e -> e.getPermission().equalsIgnoreCase(string))
+                .map(e -> e ? TriState.TRUE : TriState.FALSE)
+                .orElse(TriState.UNSET);
+    }
+
+    @Override
+    public boolean tryProvider(Essentials ess)
     {
         return true;
     }
 
     @Override
-    public void registerContext(String context, Function<Player, Iterable<String>> calculator, Supplier<Iterable<String>> suggestions)
+    public void registerContext(String context, Function<com.earth2me.essentials.User, Iterable<String>> calculator, Supplier<Iterable<String>> suggestions)
     {
     }
 
