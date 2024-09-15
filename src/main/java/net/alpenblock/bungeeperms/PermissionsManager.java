@@ -2160,6 +2160,8 @@ public class PermissionsManager
         }
         backEnd.reloadUser(u);
         u.invalidateCache();
+
+        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(u);
     }
 
     public void reloadUser(UUID uuid)
@@ -2172,10 +2174,15 @@ public class PermissionsManager
         }
         backEnd.reloadUser(u);
         u.invalidateCache();
+
+        BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(u);
     }
 
     public void reloadGroup(String group)
     {
+        List<User> eventUsers;
+        List<Group> eventGroups;
+
         Group g = getGroup(group);
         if (g == null)
         {
@@ -2201,6 +2208,7 @@ public class PermissionsManager
         {
             for (Group gr : groups)
                 gr.invalidateCache();
+            eventGroups = new ArrayList<>(groups);
         }
         finally
         {
@@ -2215,15 +2223,25 @@ public class PermissionsManager
             {
                 u.invalidateCache();
             }
+            eventUsers = new ArrayList<>(users);
         }
         finally
         {
             userlock.readLock().unlock();
         }
+
+        for (Group eg : eventGroups) {
+            BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(eg);
+        }
+
+        for (User u : eventUsers) {
+            BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(u);
+        }
     }
 
     public void reloadUsers()
     {
+        List<User> eventUsers;
         userlock.readLock().lock();
         try
         {
@@ -2232,15 +2250,23 @@ public class PermissionsManager
                 backEnd.reloadUser(u);
                 u.invalidateCache();
             }
+            eventUsers = new ArrayList<>(users);
         }
         finally
         {
             userlock.readLock().unlock();
         }
+
+        for (User u : eventUsers) {
+            BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(u);
+        }
     }
 
     public void reloadGroups()
     {
+        List<User> eventUsers;
+        List<Group> eventGroups;
+
         boolean holdread = false;
         grouplock.writeLock().lock();
         try
@@ -2260,6 +2286,7 @@ public class PermissionsManager
         {
             for (Group g : groups)
                 g.invalidateCache();
+            eventGroups = new ArrayList<>(groups);
         }
         finally
         {
@@ -2272,10 +2299,19 @@ public class PermissionsManager
         {
             for (User u : users)
                 u.invalidateCache();
+            eventUsers = new ArrayList<>(users);
         }
         finally
         {
             userlock.readLock().unlock();
+        }
+
+        for (Group eg : eventGroups) {
+            BungeePerms.getInstance().getEventDispatcher().dispatchGroupChangeEvent(eg);
+        }
+
+        for (User u : eventUsers) {
+            BungeePerms.getInstance().getEventDispatcher().dispatchUserChangeEvent(u);
         }
     }
 
