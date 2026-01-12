@@ -20,6 +20,7 @@ import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.perm.IPermissionsHandler;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -160,6 +161,16 @@ class BungeePermsHandler implements IPermissionsHandler
         BukkitSender sender = new BukkitSender(player);
         return u.getEffectivePerms(sender.getServer(), sender.getWorld()).stream()
                 .anyMatch(e -> e.getPermission().equalsIgnoreCase(string));
+    }
+
+//    @Override
+    public boolean isOfflinePermissionSet(UUID uuid, String node) {
+        User u = perms.getPermissionsManager().getUser(uuid);
+        if (u == null)
+            return false;
+
+        return u.getEffectivePerms(null, null).stream()
+                .anyMatch(e -> e.getPermission().equalsIgnoreCase(node));
     }
 
     @Override
